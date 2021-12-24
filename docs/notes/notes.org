@@ -1,0 +1,56 @@
+
+# Add preamble to enable hosting by html
+
+* Notes on Zhou et al.
+Generative models popular today:
++ GraphRNN
++ Li 2018
++ GraphAF
++ MolGAN
++ Ma et al 2018
++ GCPN
++ GNF
++ Graphite
+** Three most popular according to O'Bray 2021:
++ GraphRNN, GRAN, Graph Score Matching.
+
+* Objective:
+** Generative graph dist close to the input graph dist
+** (pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)
+
+* Criteria for good metrics:
+1. Robust to noise
+2. Expressive, if they don't arise from the same dist, then metric should detect this.
+3. Computationally efficient.
+
+* Problems with Frechet Inception Distance
++ Used only for images.
++ Perceived differences are not possible for graphs.
++ How about LPIPS?
+
+* Why comparing graphs is hard:
++ Metrics need to deal with spatial invariances such as cycles.
++ Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
+
+* MMD - current accepted method to evaluate generative GNNs
++ The MMD formula goes as follows:\begin{equation*}
+$\text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \sum_{i,j=1}^{n}k(y_i, y_j) - {2\over nm} \sum_{i=1}^{n}\sum_{j=1}^{m}k(y_i, y_j)$
++ use it for hypothesis/two-sample testing.
++ In practice, we evaluate $d_{MMD}(\mathcal{G},\mathcal{G*}) :=
+  MMD(f(\mathcal{G}),f(\mathcal{G}*))$ for a distribution $\mathcal{G}$. Given
+  multiple distributions $G_1, G_2, \hdots$, the values of $d_{MMD}$ can be used
+  to rank models, where smaller values are assumed to indicate a larger
+  agreement with the original distribution $\mathcal{G}*$.
++ Commonly used kernels: first Wasserstein distance, total variation distance,
+  radial basis function.
++ Commonly used descriptor functions: degree distribution histogram, clustering
+  coefficient, laplacian spectrum histogram.
+** Pitfalls of descriptors
++ Degree distributions are ok seemingly
++ Custering does not distinguish fully connected vs disconnected cliques
++ Spectral methods are not clearly expressive. Does not seem to be for certain classes of graphs.
+
+* MMD pitfalls
+** Parameters and descriptors are set a priori in the best case
+** Model performance is highly dependent on parameters and descriptor functions.
+**
