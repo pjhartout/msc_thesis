@@ -1,0 +1,16 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /Users/philiphartout/Documents/Git/msc_thesis/docs/notes/notes.org
+
+
+* MMD - current norm to evaluate generative GNNs
+:PROPERTIES:
+:ARCHIVE_TIME: 2021-12-23 Thu 16:51
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/notes.org
+:ARCHIVE_CATEGORY: notes
+:END:
++ The MMD formula goes as follows:
+\begin{equation*}
+\text{MMD}(X, Y) := {1\over n^2}
+\begin{equation*}
