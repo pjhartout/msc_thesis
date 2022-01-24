@@ -1,0 +1,59 @@
+#+BIND: org-export-use-babel nil
+#+TITLE: TITLE
+#+AUTHOR: Philip Hartout
+#+EMAIL: <philip.hartout@protonmail.com>
+#+DATE: Monday January 24, 2022
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:[a4paper,12pt,twoside]
+#+LaTeX_HEADER:\usepackage[usenames,dvipsnames,figures]{xcolor}
+#+LaTeX_HEADER:\usepackage[autostyle]{csquotes}
+#+LaTeX_HEADER:\usepackage[final]{pdfpages}
+#+LaTeX_HEADER:\usepackage{amsfonts, amssymb}            % Math symbols
+#+LaTeX_HEADER:\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+#+LATEX_HEADER_EXTRA:\hypersetup{colorlinks=false, linkcolor=black, citecolor=black, filecolor=black, urlcolor=black}
+#+LATEX_HEADER_EXTRA:\newtheorem{definition}{Definition}[section]
+#+MACRO: NEWLINE @@latex:\@@ @@html:<br>@@
+#+PROPERTY: header-args :exports both :session python_emacs_session :cache :results value
+#+OPTIONS: ^:nil
+#+OPTIONS: toc:nil
+#+TODO: TODO IN-PROGRESS WAITING | DONE CANCELED
+#+STARTUP: latexpreview
+#+LATEX_COMPILER: pdflatexorg-mode restarted
+
+* TODO <2022-01-24 Mon> Kick-off meeting with Tim
+** Organisational
+*** Thesis approval sitll pending by administration - Swantje (?) sitll has to approve
+*** Git repo for all thesis-related stuff can be found here: https://github.com/pjhartout/msc_thesis
+**** Can I add you + Karsten to it? Other structure needs to be adopted?
+*** Error message when logging in
+ #+CAPTION: bashrc
+ #+NAME:   fig:SED-HR4049
+ [[./images/bashrc_setup.png]]
+ #+CAPTION: error
+ #+NAME:   fig:SED-HR4049
+ [[./images/error_modulefile.png]]
+
+*** Arrange weekly updates
+*** Other items?
+** Datasets
+*** What are the objectives of the dataset you're building?
+**** A thought: since proteins are in 3D space, maybe a point cloud would be more meaningful representations to work with regarding topological methods.
+**** I believe it could still work with raw graph graph data, will have to investigate
+** This week's action items:
+*** Implement one or more GNN from literature
+**** GraphRNN, GRAN, Graph Score Matching.
+***** Other suggestions?
+**** Specifically, work with biological/non-biological datasets to "get the hang of it."
+*** Start with synthetic datasets
+*** k-NN and epsilon graph
+*** Organization: make timeline for thesis, key dates.
+**** Key dates,
+**** What needs to be implemented
+*** Midterm presentation date
+*** Check Euler ressources
+*** 40 Pages
+*** Other suggestions?
+*** Two scenarios:
+**** 1:  evaluate model given model and dataset
+**** 2: I have my own dataset, I want to do an analysis, find best parameters.
+*** Look for detailed
