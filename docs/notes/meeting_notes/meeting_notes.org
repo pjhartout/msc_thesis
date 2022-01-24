@@ -16,6 +16,5 @@
 #+PROPERTY: header-args :exports both :session python_emacs_session :cache :results value
 #+OPTIONS: ^:nil
 #+OPTIONS: toc:nil
-#+TODO: TODO IN-PROGRESS WAITING | DONE CANCELED
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
