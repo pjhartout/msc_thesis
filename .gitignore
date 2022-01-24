@@ -48,7 +48,7 @@ flycheck_*.el
 /network-security.data
 
 # Auto-generated org latex images
-/ltximg/org-ltximg_*
+ltximg/
 
 
 ### Julia ###
