@@ -126,7 +126,7 @@ Generative models popular today:
 This one has a fairly comprehensive website: https://sites.google.com/view/graph-normalizing-flows/
 Full architecture
 
-#+NAME: fig:figure name
+#+NAME: fig:Full architecture of the graph noramlizing flow DNN
 #+CAPTION: figure name
 #+ATTR_ORG: :width 400
 #+ATTR_LATEX: :width 2.0in
@@ -166,6 +166,15 @@ Full architecture
   organization={PMLR}
 }
   #+end_src
+
+  On MMD, they say the following:
+#+NAME: fig:MMD settings for evaluation of the graph score matching model
+#+CAPTION: figure name
+#+ATTR_ORG: :width 400
+#+ATTR_LATEX: :width 2.0in
+#+ATTR_HTML: :width 200
+[[./images/MMD_settings_graph_score_matching_paper.png]]
+
 * Objective:
 ** Generative graph dist close to the input graph dist
 ** (pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)
