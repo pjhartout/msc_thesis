@@ -170,9 +170,9 @@ Full architecture
   On MMD, they say the following:
 #+NAME: fig:MMD settings for evaluation of the graph score matching model
 #+CAPTION: figure name
-#+ATTR_ORG: :width 400
+#+ATTR_ORG: :width 1000
 #+ATTR_LATEX: :width 2.0in
-#+ATTR_HTML: :width 200
+#+ATTR_HTML: :width 500
 [[./images/MMD_settings_graph_score_matching_paper.png]]
 
 * Objective:
