@@ -57,7 +57,7 @@ Generative models popular today:
  + GraphRNN - generates the adjacency matrix of a graph by generating the adjacency vector of each node step by step, with graph outputs with different number of nodes.
  #+begin_src bibtex
 @inproceedings{you2018graphrnn,
-  title={Graphrnn: Generating realistic graphs with deep auto-regressive models},
+  title={{GraphRNN: Generating realistic graphs with deep auto-regressive models}},
   author={You, Jiaxuan and Ying, Rex and Ren, Xiang and Hamilton, William and Leskovec, Jure},
   booktitle={International conference on machine learning},
   pages={5708--5717},
@@ -146,6 +146,7 @@ Full architecture
 
 ** Three most popular according to O'Bray 2021:
 + GraphRNN, GRAN, Graph Score Matching.
+
 + Graph Recurrent Attention Networks
   #+begin_src bibtex
 @article{liao2019efficient,
