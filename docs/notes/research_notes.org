@@ -216,36 +216,6 @@ $\text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \su
 ** Model performance is highly dependent on parameters and descriptor functions.
 
 
-
-* Computer Vision
-** Image-to-Image Translation
-*** CycleGAN: Unpaired Image-to-Image Translation using
-        Cycle-Consistent Adversarial Networks citep:zhu2017CycleGAN.
-
-
-
-        #+begin_src bibtex
-@inproceedings{zhu2017unpaired,
-  title={Unpaired image-to-image translation using cycle-consistent adversarial networks},
-  author={Zhu, Jun-Yan and Park, Taesung and Isola, Phillip and Efros, Alexei A},
-  booktitle={Proceedings of the IEEE international conference on computer vision},
-  pages={2223--2232},
-  year={2017}
-}
-        #+end_src
-  This is one of my favorite papers. The authors extending some
-  of the classic work done in Pix2Pix citep:isola2017pix2pix to
-  /unpaired/ sets of images. At the core of the CycleGAN
-  procedure are two Generative Adversarial Networks that learn
-  to map images between two domains. The key addition that makes
-  this process work is an additional loss term, which enforces
-  that images passed through both generators should be as close
-  as possible to the input image. This has practical motivation:
-  if we translate one way and then translate back, we should
-  expect the input to be unchanged. The results are impressive
-  and eye catching. This work inspired a paper of mine:
-  GeneSIS-RT.
-
 * References
   :PROPERTIES:
   :UNNUMBERED: t
