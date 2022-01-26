@@ -1,4 +1,4 @@
-% Created 2022-01-24 Mon 18:05
+% Created 2022-01-26 Wed 18:04
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -18,8 +18,9 @@
 \usepackage[final]{pdfpages}
 \usepackage{amsfonts, amssymb}            % Math symbols
 \usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
-\usepackage[natbib=true]{biblatex} \DeclareFieldFormat{apacase}{#1} \addbibresource{~/Documents/Git/msc_thesis/thesis/refs.bib}
 \usepackage{parskip}
+\usepackage[natbib=true]{biblatex} \DeclareFieldFormat{apacase}{#1} \addbibresource{~/Documents/Git/msc_thesis/thesis/refs.bib}
+\nocite{*}
 \hypersetup{colorlinks=false, linkcolor=black, citecolor=black, filecolor=black, urlcolor=black}
 \newtheorem{definition}{Definition}[section]
 \author{Philip Hartout}
@@ -36,30 +37,24 @@
 
 \maketitle
 
-\section{Generative modelling}
-\label{sec:orgde7dfef}
-\subsection{Methods}
-\label{sec:org31d8c8b}
-\subsubsection{Real-valued non volume-preserving used on images}
-\label{sec:orgacd366e}
 \section{Graph Neural Networks}
-\label{sec:org447aafb}
+\label{sec:orgfbe1bb7}
 \subsection{Reviews}
-\label{sec:orgb1a9b0e}
+\label{sec:org3913502}
 \subsubsection{Graph neural networks:}
-\label{sec:org660f6cd}
+\label{sec:org750da89}
     A review of methods and applications
 Zhou et al mention several GNN approaches in use today
 Generative models popular today:
 \paragraph{Sequential graph generation process}
-\label{sec:orgb57dbb6}
+\label{sec:org30c993c}
 \begin{itemize}
 \item GraphRNN - generates the adjacency matrix of a graph by generating the adjacency vector of each node step by step, with graph outputs with different number of nodes.
 \item Li 2018 - also generates nodes and edges sequentially uses the hidden state to decide what to do at the next step
 \item GraphAF - also a sequential process, Conducts a validity check of each molecule generated at each step to see if it's valid.
 \end{itemize}
 \paragraph{Non-sequential graph generation process}
-\label{sec:org532aaa6}
+\label{sec:org9bfb462}
 \begin{itemize}
 \item MolGAN - to generate small molecules. Uses a permutation-invariant to solve the node adjacency matrix at once. Also implements an RL-based optimization toward desired chemical properties
 \item Ma et al 2018 - constrained VAE for semantic validity of generated graph
@@ -69,54 +64,80 @@ Generative models popular today:
 This one has a fairly comprehensive website: \url{https://sites.google.com/view/graph-normalizing-flows/}
 Full architecture
 
-6\begin{figure}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=2.0in]{./images/full_arch_gnf.png}
-\caption{\label{fig:figure name}figure name}
+\caption{\label{fig:Full architecture of the graph noramlizing flow DNN}figure name}
 \end{figure}
 \begin{itemize}
 \item Graphite isotropic gaussian for VAE + iterative refinement for decoding
 \end{itemize}
 \subsection{Three most popular according to O'Bray 2021:}
-\label{sec:org2822432}
+\label{sec:org14aa321}
 \begin{itemize}
 \item GraphRNN, GRAN, Graph Score Matching.
+
+\item Graph Recurrent Attention Networks
+\begin{quote}
+In previous work, You et al. [37] computed degree distributions, clustering
+coefficient distributions, and the number of occurrence of all orbits with 4
+nodes, and then used the maximum mean discrepancy (MMD) over these graph
+statistics, relying on Gaussian kernels with the first Wasserstein distance,
+i.e., earth mover’s distance (EMD), in the MMD.In practice, we found computing
+this MMD with the Gaussian EMD kernel to be very slow for moderately large
+graphs. Therefore, we use the total variation (TV) distance, which greatly
+speeds up the evaluation and is still consistent with EMD. In addition to the
+node degree, clustering coefficient and orbit counts (used by [36]), we also
+compare the spectra of the graphs by computing the eigenvalues of the
+normalized graph Laplacian (quantized to approximate a probability density).
+This spectral comparison provides a view of the global graph properties,
+whereas the previous metrics focus on local graph statistics.
+\end{quote}
+
+\item Graph Score Matching
+On MMD, they say the following:
 \end{itemize}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{./images/MMD_settings_graph_score_matching_paper.png}
+\caption{\label{fig:MMD settings for evaluation of the graph score matching model}MMD optimization strategy}
+\end{figure}
 
-\section{Objective:}
-\label{sec:orgbea99e2}
-\subsection{Generative graph dist close to the input graph dist}
-\label{sec:orge5030dd}
-\subsection{(pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)}
-\label{sec:org646e1e7}
-
-\section{Criteria for good metrics:}
-\label{sec:org5e3d246}
+\section{Generative modelling metrics}
+\label{sec:orge5d2435}
+\subsection{Objective:}
+\label{sec:org6219d36}
+\subsubsection{Generative graph dist close to the input graph dist}
+\label{sec:orgafd9cbf}
+\subsubsection{(pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)}
+\label{sec:org8992771}
+\subsection{On images}
+\label{sec:orgd3a626e}
+\subsubsection{Frechet Inception Distance}
+\label{sec:orgceac6bd}
+The idea here is to use deeper representational layers of an ANN and used the squared Wasserstein metric to compare two multinomial Gaussians.
+Introduced 2017
+\subsubsection{LPIPS \href{https://richzhang.github.io/PerceptualSimilarity/}{Project page}}
+\label{sec:org60a4d73}
+Introduced 2017
+\subsubsection{Why comparing graphs is hard:}
+\label{sec:org21a20ba}
+\begin{itemize}
+\item Metrics need to deal with spatial invariances such as cycles.
+\item Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
+\item Other publications:
+\end{itemize}
+\subsection{Desiderata for good metrics:}
+\label{sec:org076118a}
 \begin{enumerate}
 \item Robust to noise
 \item Expressive, if they don't arise from the same dist, then metric should detect this.
 \item Computationally efficient.
 \end{enumerate}
-
-\section{Problems with Frechet Inception Distance}
-\label{sec:org5f06944}
-\begin{itemize}
-\item Used only for images.
-\item Perceived differences are not possible for graphs.
-\item How about LPIPS?
-\end{itemize}
-
-\section{Why comparing graphs is hard:}
-\label{sec:orgd5aecb8}
-\begin{itemize}
-\item Metrics need to deal with spatial invariances such as cycles.
-\item Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
-\end{itemize}
-
 \section{MMD - current accepted method to evaluate generative GNNs}
-\label{sec:orgeea2349}
+\label{sec:orgb46c52f}
 \begin{itemize}
-\item The MMD formula goes as follows:\begin{equation*}
+\item The MMD formula goes as follows:
 \end{itemize}
 \(\text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \sum_{i,j=1}^{n}k(y_i, y_j) - {2\over nm} \sum_{i=1}^{n}\sum_{j=1}^{m}k(y_i, y_j)\)
 \begin{itemize}
@@ -129,49 +150,52 @@ agreement with the original distribution \(\mathcal{G}*\).
 \item Commonly used kernels: first Wasserstein distance, total variation distance,
 radial basis function.
 \item Commonly used descriptor functions: degree distribution histogram, clustering
-coefficient, laplacian spectrum histogram.
+coefficient, Laplacian spectrum histogram.
 \end{itemize}
-\subsection{Pitfalls of descriptors}
-\label{sec:org29e11db}
+\subsection{Potential pitfalls of descriptors}
+\label{sec:org46663bb}
 \begin{itemize}
 \item Degree distributions are ok seemingly
-\item Custering does not distinguish fully connected vs disconnected cliques
+\item Clustering does not distinguish fully connected vs disconnected cliques
 \item Spectral methods are not clearly expressive. Does not seem to be for certain classes of graphs.
+\item Parameters and descriptors are set a priori in the best case
+\item Model performance is highly dependent on parameters and descriptor functions.
 \end{itemize}
 
-\section{MMD pitfalls}
-\label{sec:orge0585d9}
-\subsection{Parameters and descriptors are set a priori in the best case}
-\label{sec:org8aad64c}
-\subsection{Model performance is highly dependent on parameters and descriptor functions.}
-\label{sec:orge48080c}
 
+\section{Research objectives}
+\label{sec:org045f62e}
+There are multiple objectives here:
+\begin{enumerate}
+\item Find optimal kernel/hyperparameter combination based on controlled experiments on a given dataset to evaluate a good MMD configuration.
+\begin{itemize}
+\item For this we will need \url{https://www.alphafold.ebi.ac.uk/download}, because it's clean. Also filter single chain proteins to extract graphs in the first place.
+\item This can be built as a first step to get the pipeline going.
+\end{itemize}
 
+\item Show which parameters influence evaluation and how?
+\begin{itemize}
+\item Conduct perturbation experiments on graphs
+\end{itemize}
 
-\section{Computer Vision}
-\label{sec:org24bdf33}
-\subsection{Image-to-Image Translation}
-\label{sec:org900a111}
-\subsubsection{CycleGAN: Unpaired Image-to-Image Translation using}
-\label{sec:org8a0a19b}
-Cycle-Consistent Adversarial Networks citep:zhu2017CycleGAN.
+\item Find novel domain-agnostic evaluation \& domain-specific evaluation metrics
+\begin{enumerate}
+\item Domain-agnostic evaluation measures
+\begin{itemize}
+\item Correlation with graph-edit distance
+\item Correlation with perturbation
+\item Topology/persistence based approaches could be useful for modelling features like binding pockets, etc?
+\end{itemize}
 
-
-
-This is one of my favorite papers. The authors extending some
-of the classic work done in Pix2Pix citep:isola2017pix2pix to
-\emph{unpaired} sets of images. At the core of the CycleGAN
-procedure are two Generative Adversarial Networks that learn
-to map images between two domains. The key addition that makes
-this process work is an additional loss term, which enforces
-that images passed through both generators should be as close
-as possible to the input image. This has practical motivation:
-if we translate one way and then translate back, we should
-expect the input to be unchanged. The results are impressive
-and eye catching. This work inspired a paper of mine:
-GeneSIS-RT.
+\item Domain-specific evaluation measures
+\begin{itemize}
+\item Alignment
+\item Energy?
+\end{itemize}
+\end{enumerate}
+\end{enumerate}
 
 \section*{References}
-\label{sec:orgc73ae68}
-\printbibliography[heading=none]
+\label{sec:org249e2ac}
+\printbibliography
 \end{document}
