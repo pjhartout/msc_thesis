@@ -10,17 +10,13 @@ from pathlib import Path
 from pickle import dump
 
 import matplotlib.pyplot as plt
-from gnn_metrics.constants import N_JOBS
-from gnn_metrics.paths import HUMAN_PROTEOME
-from gnn_metrics.paths import HUMAN_PROTEOME_CA_GRAPHS
-from gnn_metrics.utils import filter_monomers
-from gnn_metrics.utils import filter_pdb_files
-from gnn_metrics.utils import make_dir
 from graphein.protein.config import ProteinGraphConfig
 from graphein.protein.graphs import construct_graph
-from graphein.protein.utils import download_alphafold_structure
-from joblib import delayed
-from joblib import Parallel
+from joblib import Parallel, delayed
+
+from gnn_metrics.constants import N_JOBS
+from gnn_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
+from gnn_metrics.utils import filter_monomers, filter_pdb_files, make_dir
 
 
 def pdb_to_graph(file: str, granularity: str = "CA"):
