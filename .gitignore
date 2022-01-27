@@ -1,3 +1,6 @@
+### Project-specific ignored directories ###
+data/
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
