@@ -23,8 +23,9 @@
 * TODO <2022-01-28 Fri> Weekly check-in with Tim
 ** What I did this week
 + Set up repository
-+ Work on plan
++ Work on plan [[../msc-timeline.xlsx][link to plan]]
 + Extract graphs from AlphaFold2 on homo sapiens (contains only monomers) PR #1
++ Extract contact maps (weighted graphs) from AlphaFold2 on homo sapiens (contains only monomers) PR #2
 + Trying to think of what to do next.
 ** As I see it, "finding optimal set of hyperparams" is a rather ill-defined task. Possible subtasks:
 *** Evaluate minimum MMD for given combination of descriptor kernel and parameter
@@ -32,8 +33,9 @@
 *** For a given dataset, do edge insertions, removals, etc. in a controlled manner to see the effect on the metric and tune appropriately.
 *** How to "find the optimal set of parameters"?
 **** Compute error w.r.t. "idealized" line & do grid search of parameters for datasets?
+**** Could be done with computing residuals
 
 ** Challenging fundamental assumptions:
-*** Are graphs really adequate objects for good protein design?
+*** Are unweighted graphs really adequate objects for good protein design?
 *** Modelling binding pockets, etc. should really involve topology & labeled notes. Idea of a 3D mesh could be more adequate.
 *** Proteins are actually weighted graphs (of CA atoms, of atoms, of points in a mesh model) where each edge is weighted as the distance between each atom. Can we use topological data analysis (i.e. Vietoris-Rips persistence) to evaluate distance between graphs?
