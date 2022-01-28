@@ -241,13 +241,13 @@ $\text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \su
   radial basis function.
 + Commonly used descriptor functions: degree distribution histogram, clustering
   coefficient, Laplacian spectrum histogram.
++ Recommended kernels: RBF, Laplacian kernel, linear kernel (expressivity & robustness need to be analyzed)
 ** Potential pitfalls of descriptors
 + Degree distributions are ok seemingly
 + Clustering does not distinguish fully connected vs disconnected cliques
 + Spectral methods are not clearly expressive. Does not seem to be for certain classes of graphs.
 + Parameters and descriptors are set a priori in the best case
 + Model performance is highly dependent on parameters and descriptor functions.
-
 
 * Research objectives
 There are multiple objectives here:
@@ -271,9 +271,9 @@ There are multiple objectives here:
 
 * Plan
 Make hyperparameter finding module
-1. Extract graphs from alphafold DB
-2. Determine perturbations
-3. Optimize MMD to find best combo for proportional increase according to proportional perturbation
+** DONE Extract graphs from alphafold DB
+** Determine perturbations
+** Optimize MMD to find best combo for proportional increase according to proportional perturbation
 
 
 * References
