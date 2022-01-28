@@ -36,6 +36,6 @@
 **** Could be done with computing residuals
 
 ** Challenging fundamental assumptions:
-*** Are unweighted graphs really adequate objects for good protein design?
+*** Are unweighted graphs really adequate objects for good protein design? A lot of information about the 3D structure and relationships get lost in the abstraction process.
 *** Modelling binding pockets, etc. should really involve topology & labeled notes. Idea of a 3D mesh could be more adequate.
 *** Proteins are actually weighted graphs (of CA atoms, of atoms, of points in a mesh model) where each edge is weighted as the distance between each atom. Can we use topological data analysis (i.e. Vietoris-Rips persistence) to evaluate distance between graphs?
