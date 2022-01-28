@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""pdb_to_graph.py
+"""pdb2graph.py
 
-This file converts *.pdb files to pickled networkx files in parallel.
+This file converts *.pdb files to pickled networkx graphs in parallel.
 
 """
 import os
+import random
 from pathlib import Path
 from pickle import dump
 
@@ -14,12 +15,12 @@ from graphein.protein.config import ProteinGraphConfig
 from graphein.protein.graphs import construct_graph
 from joblib import Parallel, delayed
 
-from gnn_metrics.constants import N_JOBS
+from gnn_metrics.constants import N_JOBS, REDUCE_DATA
 from gnn_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from gnn_metrics.utils import filter_monomers, filter_pdb_files, make_dir
 
 
-def pdb_to_graph(file: str, granularity: str = "CA"):
+def pdb2graph(file: str, granularity: str = "CA"):
     """Transforms a pdb file to a graph following the granularity parameter
 
     Args:
@@ -29,8 +30,8 @@ def pdb_to_graph(file: str, granularity: str = "CA"):
     """
     c = ProteinGraphConfig(granularity=granularity)
     g = construct_graph(pdb_path=str(HUMAN_PROTEOME / Path(file)))
-    file_graph = os.path.splitext(file)[0].split("/")[0] + ".pkl"
-    dump(g, open(str(HUMAN_PROTEOME_CA_GRAPHS / file_graph), "wb"))
+    file_graph_out = os.path.splitext(file)[0].split("/")[0] + ".pkl"
+    dump(g, open(str(HUMAN_PROTEOME_CA_GRAPHS / file_graph_out), "wb"))
 
 
 def main():
@@ -38,10 +39,14 @@ def main():
     pdb_files = filter_monomers(
         [str(HUMAN_PROTEOME / Path(file)) for file in pdb_files]
     )
+
+    if REDUCE_DATA:
+        pdb_files = random.sample(pdb_files, 1000)
+
     make_dir(HUMAN_PROTEOME_CA_GRAPHS)
 
     Parallel(n_jobs=N_JOBS, verbose=1)(
-        delayed(pdb_to_graph)(file) for file in pdb_files
+        delayed(pdb2graph)(file) for file in pdb_files
     )
 
 
