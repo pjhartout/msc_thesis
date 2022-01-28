@@ -45,7 +45,7 @@ def pdb2contact_map(file: str, granularity: str = "CA"):
             two = residues[y][granularity].get_coord()
             contact_map[x, y] = np.linalg.norm(one - two)
     with open(
-        str(HUMAN_PROTEOME_CA_CONTACT_MAP / file_path.stem) + ".pkl", "wb"
+        str(HUMAN_PROTEOME_CA_CONTACT_MAP / file_path.stem) + ".npy", "wb"
     ) as f:
         np.save(f, contact_map)
 
