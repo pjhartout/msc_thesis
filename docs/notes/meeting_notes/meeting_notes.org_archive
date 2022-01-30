@@ -47,3 +47,50 @@ Archived entries from file /Users/philiphartout/Documents/Git/msc_thesis/docs/no
 **** 1:  evaluate model given model and dataset
 **** 2: I have my own dataset, I want to do an analysis, find best parameters.
 *** Look for detailed
+
+* DONE <2022-01-28 Fri> Weekly check-in with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-01-30 Sun 13:21
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** What I did this week
++ Set up repository
++ Work on plan [[../msc-timeline.xlsx][link to plan]]
++ Extract graphs from AlphaFold2 on homo sapiens (contains only monomers) PR #1
++ Extract contact maps (weighted graphs) from AlphaFold2 on homo sapiens (contains only monomers) PR #2
++ Trying to think of what to do next.
+** Admin stuff to sort out:
+ #+begin_src bash
+git clone git@github.com:pjhartout/msc_thesis.git
+ #+end_src
+ does not work despite ssh setup
+ #+begin_src bash
+ping google.com
+ #+end_src
+ also seems to have trouble
+ Go through your bashrc maybe to check if everything is set up properly, see if ssh proxying through laptop is necessary/allowed
+** As I see it, "finding optimal set of hyperparams" is a rather ill-defined task. Possible subtasks:
+*** Evaluate minimum MMD for given combination of descriptor kernel and parameter
+    Provides "meaningful lower bound"
+*** For a given dataset, do edge insertions, removals, etc. in a controlled manner to see the effect on the metric and tune appropriately.
+*** How to "find the optimal set of parameters"?
+**** Compute error w.r.t. "idealized" line & do grid search of parameters for datasets?
+**** Could be done with computing residuals
+**** Spearman/Pearson
+** Challenging fundamental assumptions:
+*** Are unweighted graphs really adequate objects for good protein design? A lot of information about the 3D structure and relationships get lost in the abstraction process.
+*** Modelling binding pockets, etc. should really involve topology & labeled notes. Idea of a 3D mesh could be more adequate.
+*** Proteins are actually weighted graphs (of CA atoms, of atoms, of points in a mesh model) where each edge is weighted as the distance between each atom. Can we use topological data analysis (i.e. Vietoris-Rips persistence) to evaluate distance between graphs?
+*** TDA metrics use weighted graphs from graph geodesic distance
+** Action items next meeting:
+*** Go through https://distill.pub/2021/gnn-intro/
+*** Go through https://arxiv.org/abs/1907.05600
+*** Start writing parameter finding pipeline
+*** kernels, MMD, other milestones for pipeline
+*** MMD between alphafold vs pdb database
+*** Work in /local/scratch
+*** Use pytorch loaders
+*** Fiddle around with data architecture
+*** Make slide desk of literature review

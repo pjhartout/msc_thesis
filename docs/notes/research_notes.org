@@ -248,7 +248,6 @@ $\text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \su
 + Spectral methods are not clearly expressive. Does not seem to be for certain classes of graphs.
 + Parameters and descriptors are set a priori in the best case
 + Model performance is highly dependent on parameters and descriptor functions.
-
 * Research objectives
 There are multiple objectives here:
 1. Find optimal kernel/hyperparameter combination based on controlled experiments on a given dataset to evaluate a good MMD configuration.
@@ -267,15 +266,17 @@ There are multiple objectives here:
    2. Domain-specific evaluation measures
       + Alignment
       + Energy?
-
-
+** From Tim: gather literature sources. Intro structure
+*** Evaluation of generative models (different domains)
+*** Evaluation of generative models for graphs
+**** Check how it was done before, why combo of parameters/kernels were used.
+*** Evaluation of proteins (…/molecules/drugs) (What makes a valid protein?)
+*** Evaluation of generative models for proteins
 * Plan
 Make hyperparameter finding module
 ** DONE Extract graphs from alphafold DB
 ** Determine perturbations
 ** Optimize MMD to find best combo for proportional increase according to proportional perturbation
-
-
 * References
   :PROPERTIES:
   :UNNUMBERED: t
