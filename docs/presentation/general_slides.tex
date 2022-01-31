@@ -151,7 +151,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \end{itemize}
   \endminipage
   \minipage{0.3\textwidth}
-    \begin{figure}[center]
+  \begin{figure}[center]
     \centering
     \begin{tikzpicture}[align=center, node distance=1cm, align=center]
 
@@ -222,7 +222,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \item $k: \mathcal{X}\times\mathcal{X}\to\mathbb{R}$ is a valid kernel.
   \end{itemize}
   MMD is a kernelized proxy of the distance between two graph distributions $G$ and $G*$ computed as $d_{\text{MMD}}(G,G^*)=MMD(f(G),f(G^*))$, where $f$ is the descriptor function of the graph. A lower $d_{\text{MMD}}(G,G^*)$ indicates a greater similarity between $G$ and $G*$.
-
+  \textcolor{blue}{Potentially look at other metrics for GNNs. \cite{thompson2022evaluation}}
 \end{frame}
 
 \begin{frame}[fragile]{Perturbations to graphs}
@@ -240,8 +240,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \end{itemize}
 \end{frame}
 
-
-\begin{frame}[fragile]{Domain agnostic}
+\begin{frame}[fragile]{Evaluation}
   Domain agnostic \cite{o2021evaluation}:
   \begin{itemize}
   \item Correlation with perturbation
@@ -255,6 +254,26 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Workflows enabled by the package}
+  \begin{figure}[center]
+    \centering
+    \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+
+      \node (dataset) [orangebox] {Protein dataset};
+      \node (run) [orangebox, right of=dataset, xshift=2cm] {Run package};
+      \node (min) [orangebox, right of=run, xshift=2cm] {Estmation of\\ $\min_{MMD}$};
+      \node (optimal) [orangebox, above of=min] {Optimal $k$ and \\ $\sigma$ or $\lambda$};
+      \node (plots) [orangebox, below of=min] {Plots of  \\metric behaviours};
+      \draw [arrow] (dataset) -- (run);
+      \draw [arrow] (run) |- (optimal);
+      \draw [arrow] (run) -- (min);
+      \draw [arrow] (run) |- (plots);
+    \end{tikzpicture}
+    \caption{Workflows enabled by the package.}
+    \label{fig:overview}
+  \end{figure}
+
+\end{frame}
 
 \begin{frame}[allowframebreaks]{References}
 
