@@ -280,8 +280,19 @@ There are multiple objectives here:
 **** Check how it was done before, why combo of parameters/kernels were used.
 *** Evaluation of proteins (…/molecules/drugs) (What makes a valid protein?)
 *** Evaluation of generative models for proteins
-
-* [#B] Annotations
+* Module-wise breakdown of the plan
++ Graph extraction
++ Descriptor functions
++ kernels, MMD
++ Domain agnostic
++ Domain specific
++ Other metrics
++ TDA descriptors
++ Labeled edge graph
++ NSPDK
++ Other metrics
++ Extract graph from real datasets
+* Annotations
 Online approach to k-NN graph construction
 #+begin_src bibtex
 @article{zhao2021approximate,
@@ -400,6 +411,8 @@ Examples using the Neighborhood Subgraph Pairwise Distance graph kernel (NSPDK)
   year={2020}
 }
 #+end_src
+
+
 * References
   :PROPERTIES:
   :UNNUMBERED: t
