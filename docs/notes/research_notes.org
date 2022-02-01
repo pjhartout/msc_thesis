@@ -412,7 +412,14 @@ Examples using the Neighborhood Subgraph Pairwise Distance graph kernel (NSPDK)
 }
 #+end_src
 
-
+Inverse protein folding problem, maybe good to look at to see what makes a good protein.
+#+begin_src bibtex
+@article{ingraham2019generative,
+  title={Generative models for graph-based protein design},
+  author={Ingraham, John and Garg, Vikas K and Barzilay, Regina and Jaakkola, Tommi},
+  year={2019}
+}
+#+end_src
 * References
   :PROPERTIES:
   :UNNUMBERED: t
