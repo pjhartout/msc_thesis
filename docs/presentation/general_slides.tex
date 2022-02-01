@@ -124,7 +124,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \begin{itemize}
   \item Start with human proteome from AlphaFold (23390 samples,
     \href{https://ftp.ebi.ac.uk/pub/databases/alphafold/latest/UP000005640_9606_HUMAN_v2.tar}{source})
-  \item Expand to other experimentally datasets if time allows. Will involve cleaning steps.
+  \item Expand to other experimentally datasets \& add cleaning handlers
   \end{itemize}
 \end{frame}
 
@@ -185,7 +185,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
 
   Topological descriptors (using the weighted, fully connected contact map):
   \begin{itemize}
-  \item Persistence diagram, converted to Betti curves, persistence image, persistence landscapes, persistence entropy. \cite{tauzin2021giotto}
+  \item Persistence diagram, converted to Betti curves, persistence image, persistence landscapes. \cite{tauzin2021giotto}
   \item Also possible to obtain vector representation from persistence diagram by applying a heat kernel to it. \cite{reininghaus2015stable}
   \end{itemize}
 
@@ -236,7 +236,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
 
   Domain specific:
   \begin{itemize}
-  \item t.b.d.
+  \item t.b.d. (e.g. add edge ``disrupting'' binding pocket, how to do this?)
   \end{itemize}
 \end{frame}
 
@@ -251,6 +251,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \begin{itemize}
   \item Alignment
   \item (estimated) folding energy
+  \item Investigate what makes a ``good'' protein.
   \end{itemize}
 \end{frame}
 
@@ -273,6 +274,14 @@ parametrization for evaluating generative GNNs on protein datasets.}
     \label{fig:overview}
   \end{figure}
 
+\end{frame}
+
+\begin{frame}[fragile]{Plots to understand the behaviour of MMD}
+  \begin{itemize}
+  \item Distribution of $\min_{MMD}$} for different random test/train splits.
+  \item Correlation perturbation with MMD values with different parameters
+  \item MMD vs. parameter
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
