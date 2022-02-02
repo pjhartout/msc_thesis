@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     # mandatory
-    name="gnn_metrics",
+    name="GGNN_metrics",
     # mandatory
     version="0.1",
     # mandatory

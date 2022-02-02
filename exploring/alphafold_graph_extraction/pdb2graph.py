@@ -15,9 +15,9 @@ from graphein.protein.config import ProteinGraphConfig
 from graphein.protein.graphs import construct_graph
 from joblib import Parallel, delayed
 
-from gnn_metrics.constants import N_JOBS, REDUCE_DATA
-from gnn_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
-from gnn_metrics.utils import filter_monomers, filter_pdb_files, make_dir
+from GGNN_metrics.constants import N_JOBS, REDUCE_DATA
+from GGNN_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
+from GGNN_metrics.utils import filter_monomers, filter_pdb_files, make_dir
 
 
 def pdb2graph(file: str, granularity: str = "CA"):
