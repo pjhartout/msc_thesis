@@ -129,7 +129,7 @@ parametrization for evaluating generative GNNs on protein datasets.}
 \end{frame}
 
 \begin{frame}[fragile]{Graph extraction from pdb file}
-  \minipage{0.7\textwidth}
+  \minipage{0.65\textwidth}
   Granularity:
   \begin{itemize}
   \item CA-atom (1 point per amino acid)
@@ -141,30 +141,36 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \item Contact map (fully connected weighted graph).
   \item $\varepsilon$-neighborhood graph. \cite{anastasiu2016algorithms}
   \item k-nearest neighbor graph. \cite{zhao2021approximate}
-  \item \textcolor{blue}{Graph of all atoms with their bond type (incl. e.g. disulfide bond)}
+  \item \textcolor{blue}{Intramolecular graphs} (hydrogen bonds, salt bridges, pi-cation bonds)
+  \item \textcolor{blue}{Delaunay graph} (through Delaunay triangulation,
+    results in denser graph) \cite{taylor2006graph}.
 
   \end{itemize}
 
-  Dependencies
-  \begin{itemize}
-  \item only depend on \texttt{Biopython} to manipulate \texttt{.pdb} files.
-  \end{itemize}
+  Dependenies: only depend on \texttt{Biopython}.
+
   \endminipage
-  \minipage{0.3\textwidth}
+  \minipage[t]{0.05\textwidth}
+  \hfill\vline\hfill
+  \endminipage
+  \minipage{0.25\textwidth}
   \begin{figure}[center]
     \centering
     \begin{tikzpicture}[align=center, node distance=1cm, align=center]
 
       \node (proteins) [orangebox] {Protein \texttt{.pdb} file};
-      \node (bond) [bluebox, above of=proteins] {Bond graph};
+      \coordinate[above of=proteins] (ct);
+      \node (imol) [bluebox, right of=ct, xshift=0.5cm, yshift=0.5cm] {Delaunay \\graph};
+      \node (dela) [bluebox, left of=ct, xshift=-0.5cm, yshift=0.5cm] {Intra-mol.\\ graph};
       \node (contact) [orangebox, below of=proteins] {Contact map};
-      \coordinate[below of=contact] (c);
-      \node (eNNG) [orangebox, right of=c, xshift=0.5cm] {$\varepsilon$-NNG};
-      \node (kNNG) [orangebox, left of=c, xshift=-0.5cm] {$k$-NNG};
+      \coordinate[below of=contact] (cb);
+      \node (eNNG) [orangebox, right of=cb, xshift=0.5cm] {$\varepsilon$-NNG};
+      \node (kNNG) [orangebox, left of=cb, xshift=-0.5cm] {$k$-NNG};
       \draw [arrow] (proteins) -- (contact);
       \draw [arrow] (contact) -- (eNNG);
       \draw [arrow] (contact) -- (kNNG);
-      \draw [arrow] (proteins) -- (bond);
+      \draw [arrow] (proteins) -- (imol);
+      \draw [arrow] (proteins) -- (dela);
     \end{tikzpicture}
     \caption{Order of extraction of graphs from \texttt{.pdb} files.}
     \label{fig:overview}
