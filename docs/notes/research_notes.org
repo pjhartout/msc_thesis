@@ -420,6 +420,36 @@ Inverse protein folding problem, maybe good to look at to see what makes a good 
   year={2019}
 }
 #+end_src
+
+Papers discussing Delaunay graphs (dual graph of Voronoi diagram), obtained through Delaunay triangulation. Useful for extracting hierarchical structures. Graph edges can also be added on the basis of the Delaunay triangulation. Delaunay triangles correspond to joining points that share a face in the 3D Voronoi diagram of the protein structures. For distance-based edges, a Long Interaction Network (LIN) parameter controls the minimum required separation in the amino acid sequence for edge creation. This can be useful in reducing the number of noisy edges under distance-based edge creation schemes. Edge featurisation for atom-level graphs is provided by annotations of bond type and ring status.
+#+begin_src bibtex
+@article{taylor2006graph,
+  title={Graph theoretic properties of networks formed by the Delaunay tessellation of protein structures},
+  author={Taylor, Todd J and Vaisman, Iosif I},
+  journal={Physical Review E},
+  volume={73},
+  number={4},
+  pages={041925},
+  year={2006},
+  publisher={APS}
+}
+#+end_src
+
+Not a great review, but still useful source of references and gives overview of the field.
+#+begin_src bibtex
+@article{fasoulis2021graph,
+  title={Graph representation learning for structural proteomics},
+  author={Fasoulis, Romanos and Paliouras, Georgios and Kavraki, Lydia E},
+  journal={Emerging Topics in Life Sciences},
+  volume={5},
+  number={6},
+  pages={789--802},
+  year={2021},
+  publisher={Portland Press Ltd.}
+}
+#+end_src
+
+
 * References
   :PROPERTIES:
   :UNNUMBERED: t

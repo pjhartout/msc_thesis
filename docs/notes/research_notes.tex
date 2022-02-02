@@ -1,4 +1,4 @@
-% Created 2022-01-26 Wed 18:04
+% Created 2022-02-02 Wed 16:11
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -38,27 +38,27 @@
 \maketitle
 
 \section{Graph Neural Networks}
-\label{sec:orgfbe1bb7}
+\label{sec:org0a12569}
 \subsection{Reviews}
-\label{sec:org3913502}
+\label{sec:org2845576}
 \subsubsection{Graph neural networks:}
-\label{sec:org750da89}
+\label{sec:org4c781ce}
     A review of methods and applications
 Zhou et al mention several GNN approaches in use today
 Generative models popular today:
 \paragraph{Sequential graph generation process}
-\label{sec:org30c993c}
+\label{sec:org38c0b05}
 \begin{itemize}
 \item GraphRNN - generates the adjacency matrix of a graph by generating the adjacency vector of each node step by step, with graph outputs with different number of nodes.
 \item Li 2018 - also generates nodes and edges sequentially uses the hidden state to decide what to do at the next step
 \item GraphAF - also a sequential process, Conducts a validity check of each molecule generated at each step to see if it's valid.
 \end{itemize}
 \paragraph{Non-sequential graph generation process}
-\label{sec:org9bfb462}
+\label{sec:orgf1af366}
 \begin{itemize}
 \item MolGAN - to generate small molecules. Uses a permutation-invariant to solve the node adjacency matrix at once. Also implements an RL-based optimization toward desired chemical properties
 \item Ma et al 2018 - constrained VAE for semantic validity of generated graph
-\item GCPN similar to MolGAN, uses RL based methods to ensure validity of domain-specific rules
+\item GCPN similar to MolGAN, uses RL based methods to ensure validity of domain-specific rules Example work showing EMD kernel:
 \item Graph Normalizing Flows
 \end{itemize}
 This one has a fairly comprehensive website: \url{https://sites.google.com/view/graph-normalizing-flows/}
@@ -73,7 +73,7 @@ Full architecture
 \item Graphite isotropic gaussian for VAE + iterative refinement for decoding
 \end{itemize}
 \subsection{Three most popular according to O'Bray 2021:}
-\label{sec:org14aa321}
+\label{sec:org34a27ab}
 \begin{itemize}
 \item GraphRNN, GRAN, Graph Score Matching.
 
@@ -104,38 +104,38 @@ On MMD, they say the following:
 \end{figure}
 
 \section{Generative modelling metrics}
-\label{sec:orge5d2435}
+\label{sec:org18f08a7}
 \subsection{Objective:}
-\label{sec:org6219d36}
+\label{sec:org80c6c46}
 \subsubsection{Generative graph dist close to the input graph dist}
-\label{sec:orgafd9cbf}
+\label{sec:orgbcd2db5}
 \subsubsection{(pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)}
-\label{sec:org8992771}
+\label{sec:org3c2903f}
 \subsection{On images}
-\label{sec:orgd3a626e}
+\label{sec:org7b32362}
 \subsubsection{Frechet Inception Distance}
-\label{sec:orgceac6bd}
+\label{sec:org1441abc}
 The idea here is to use deeper representational layers of an ANN and used the squared Wasserstein metric to compare two multinomial Gaussians.
 Introduced 2017
 \subsubsection{LPIPS \href{https://richzhang.github.io/PerceptualSimilarity/}{Project page}}
-\label{sec:org60a4d73}
+\label{sec:orgef55e67}
 Introduced 2017
 \subsubsection{Why comparing graphs is hard:}
-\label{sec:org21a20ba}
+\label{sec:org4228fdf}
 \begin{itemize}
 \item Metrics need to deal with spatial invariances such as cycles.
 \item Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
 \item Other publications:
 \end{itemize}
 \subsection{Desiderata for good metrics:}
-\label{sec:org076118a}
+\label{sec:org20cc667}
 \begin{enumerate}
 \item Robust to noise
 \item Expressive, if they don't arise from the same dist, then metric should detect this.
 \item Computationally efficient.
 \end{enumerate}
 \section{MMD - current accepted method to evaluate generative GNNs}
-\label{sec:orgb46c52f}
+\label{sec:org5c236b1}
 \begin{itemize}
 \item The MMD formula goes as follows:
 \end{itemize}
@@ -151,9 +151,10 @@ agreement with the original distribution \(\mathcal{G}*\).
 radial basis function.
 \item Commonly used descriptor functions: degree distribution histogram, clustering
 coefficient, Laplacian spectrum histogram.
+\item Recommended kernels: RBF, Laplacian kernel, linear kernel (expressivity \& robustness need to be analyzed)
 \end{itemize}
 \subsection{Potential pitfalls of descriptors}
-\label{sec:org46663bb}
+\label{sec:orga10a6cd}
 \begin{itemize}
 \item Degree distributions are ok seemingly
 \item Clustering does not distinguish fully connected vs disconnected cliques
@@ -161,10 +162,8 @@ coefficient, Laplacian spectrum histogram.
 \item Parameters and descriptors are set a priori in the best case
 \item Model performance is highly dependent on parameters and descriptor functions.
 \end{itemize}
-
-
 \section{Research objectives}
-\label{sec:org045f62e}
+\label{sec:orge4418bb}
 There are multiple objectives here:
 \begin{enumerate}
 \item Find optimal kernel/hyperparameter combination based on controlled experiments on a given dataset to evaluate a good MMD configuration.
@@ -194,8 +193,48 @@ There are multiple objectives here:
 \end{itemize}
 \end{enumerate}
 \end{enumerate}
-
+\subsection{From Tim: gather literature sources. Intro structure}
+\label{sec:org3d7a487}
+\subsubsection{Evaluation of generative models (different domains)}
+\label{sec:org7833772}
+\subsubsection{Evaluation of generative models for graphs}
+\label{sec:orgd96e491}
+\paragraph{Check how it was done before, why combo of parameters/kernels were used.}
+\label{sec:org45ebe8c}
+\subsubsection{Evaluation of proteins (…/molecules/drugs) (What makes a valid protein?)}
+\label{sec:org0a7ea03}
+\subsubsection{Evaluation of generative models for proteins}
+\label{sec:org9934110}
+\section{Module-wise breakdown of the plan}
+\label{sec:org2a8afbe}
+\begin{itemize}
+\item Graph extraction
+\item Descriptor functions
+\item kernels, MMD
+\item Domain agnostic
+\item Domain specific
+\item Other metrics
+\item TDA descriptors
+\item Labeled edge graph
+\item NSPDK
+\item Other metrics
+\item Extract graph from real datasets
+\end{itemize}
+\section{Annotations}
+\label{sec:org0a5e2f1}
+Online approach to k-NN graph construction
+epsilon nearest neighbor graphs dissertation with history and construction methods.
+Giotto-TDA library
+Heat kernel on persistence diagrams
+original mmd papers
+Specific MMD for biological data:
+Introduction several metrics based on the features extracted by an untrained random GNN, showing more expressive metrics of GNN performance
+Neighborhood Subgraph Pairwise Distance graph kernel (NSPDK)
+Examples using the Neighborhood Subgraph Pairwise Distance graph kernel (NSPDK)
+Inverse protein folding problem, maybe good to look at to see what makes a good protein.
+Papers discussing Delaunay graphs (dual graph of Voronoi diagram), obtained through Delaunay triangulation. Useful for extracting hierarchical structures. Graph edges can also be added on the basis of the Delaunay triangulation. Delaunay triangles correspond to joining points that share a face in the 3D Voronoi diagram of the protein structures. For distance-based edges, a Long Interaction Network (LIN) parameter controls the minimum required separation in the amino acid sequence for edge creation. This can be useful in reducing the number of noisy edges under distance-based edge creation schemes. Edge featurisation for atom-level graphs is provided by annotations of bond type and ring status.
+Not a great review, but still useful source of references and gives overview of the field.
 \section*{References}
-\label{sec:org249e2ac}
+\label{sec:org8fed4c4}
 \printbibliography
 \end{document}
