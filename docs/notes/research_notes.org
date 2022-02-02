@@ -449,7 +449,6 @@ Not a great review, but still useful source of references and gives overview of 
 }
 #+end_src
 
-
 * References
   :PROPERTIES:
   :UNNUMBERED: t
