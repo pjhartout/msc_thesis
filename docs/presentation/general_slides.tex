@@ -257,6 +257,8 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \item Alignment
   \item (estimated) folding energy
   \item Investigate what makes a ``good'' protein.
+  \item Hard coded validity check: minimal distance/distribution between CA atoms/notes, ability
+    to translate this to AA sequence, ...
   \end{itemize}
 \end{frame}
 
@@ -286,6 +288,8 @@ parametrization for evaluating generative GNNs on protein datasets.}
   \item Distribution of $\min_{MMD}$ for different random test/train splits.
   \item Correlation perturbation with MMD values with different parameters
   \item MMD vs. parameter
+  \item Test the interpretability of the metric by checking distribution of
+    distances within protein families, stable/unstable families, etc.
   \end{itemize}
 \end{frame}
 
