@@ -42,7 +42,8 @@ def filter_monomers(lst_of_files: List[str]) -> List[str]:
 
 
 def make_dir(directory: str) -> None:
-    """Makes directory and does not stop if it is already created.
+    """Idempotent function making directory and does not stop if it is already
+    created.
 
     Args:
         directory (str): directory to be created
@@ -57,3 +58,9 @@ def make_dir(directory: str) -> None:
         )
     else:
         print(f"Successfully created the directory {directory}")
+
+
+def write_matrix(matrix, fname):
+    """TODO: docstring"""
+    with open(fname, "wb") as f:
+        np.save(f, matrix)
