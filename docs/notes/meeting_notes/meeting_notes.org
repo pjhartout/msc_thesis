@@ -20,6 +20,5 @@
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
 * TODO <2022-02-04 Fri> Meeting with Tim
-** Suppose a graph is generated, how to translate it to proteins?
-** Dividing in protein families, evolutionarily related?
-** Work with MSA?
+** Go through overview slides/excel
+** Showcase progress/design philosophy of graph extraction.
