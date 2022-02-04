@@ -19,12 +19,12 @@
 #+OPTIONS: toc:nil
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
-
 #+LATEX_CLASS_OPTIONS: [12pt]
 #+LATEX_HEADER: \usepackage{parskip}
 #+LATEX_HEADER: \usepackage[natbib=true]{biblatex} \DeclareFieldFormat{apacase}{#1} \addbibresource{~/Documents/Git/msc_thesis/thesis/refs.bib}
 #+LATEX_HEADER: \nocite{*}
 #+OPTIONS: <:nil c:nil todo:nil H:5
+#+EXCLUDE_TAGS: noexport
 
 * Graph Neural Networks
 ** Reviews
@@ -292,7 +292,7 @@ There are multiple objectives here:
 + NSPDK
 + Other metrics
 + Extract graph from real datasets
-* Annotations
+* Annotations :noexport:
 Online approach to k-NN graph construction
 #+begin_src bibtex
 @article{zhao2021approximate,
@@ -450,7 +450,4 @@ Not a great review, but still useful source of references and gives overview of 
 #+end_src
 
 * References
-  :PROPERTIES:
-  :UNNUMBERED: t
-  :END:
-  #+LaTeX: \printbibliography
+#+LaTeX: \printbibliography[heading=none]
