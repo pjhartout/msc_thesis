@@ -10,9 +10,7 @@ python = "^3.9"
 pandas = "^1.4.0"
 pre-commit = "^2.17.0"
 matplotlib = "^3.5.1"
-POT = "^0.8.1"
 pytest = "^6.2.5"
-click = "^8.0.3"
 isort = "^5.10.1"
 jupyter = "^1.0.0"
 mypy = "^0.931"
@@ -22,8 +20,8 @@ pandoc = "^2.0.1"
 PyYAML = "^6.0"
 scikit-learn = "^1.0.2"
 tqdm = "^4.62.3"
-
 pyprojroot = "^0.2.0"
+giotto-tda = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 
