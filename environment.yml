@@ -1,0 +1,21 @@
+name: ggnn_metrics
+
+dependencies:
+  - python=3.9
+  - numpy
+  - matplotlib
+  - pandas
+  - bokeh
+  - pytest
+  - isort
+  - jupyter
+  - mypy
+  - networkx
+  - numpy
+  - pandoc
+  - PyYAML
+  - scikit-learn
+  - tqdm
+  - pip
+  - pip:
+    - giotto-tda
