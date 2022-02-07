@@ -94,3 +94,51 @@ ping google.com
 *** Use pytorch loaders
 *** Fiddle around with data architecture
 *** Make slide desk of literature review
+
+* DONE <2022-02-04 Fri> Meeting with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-04 Fri 18:48
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** DONE Agenda
+*** Go through overview slides/excel
+*** Showcase progress/design philosophy of graph extraction.
+
+* DONE <2022-02-04 Fri> Meeting with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-04 Fri 18:49
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** DONE list
+*** Go through overview slides/excel
+*** Showcase progress/design philosophy of graph extraction.
+** DONE Meeting notes
+*** Write synopsis paper novel metrics
+*** distill.pub
+*** biopandas check as substitute (more lightweight)
+*** read spectra literature
+*** fingerprint of diagram, look at topoAE. requirement: map to 1D vector.
+*** Descriptor: add biological descriptors? Embeddings, sequence based embeddings, graph based embedding.
+*** Zernicke embeddings, structral representation based on graphs.
+*** Linear, RBF, Laplacian kernels.
+*** grapkel, work in graph-specific kernels.
+*** Google protein-specific kernels.
+*** Check domain-agnostic perturbations
+*** Remove subgraphs
+*** Protein folding energy: assumption, assume free-lowest free energy structures
+*** FoldX gives free energy
+*** Alter the pdb files
+*** Pymol, check editors for pdb files
+*** Binding pocket selection and perturbations there.
+*** UniProt, advanced search, catalytic sites.
+*** Look for datasets in the data.
+*** Disregard graph edit distance
+*** Check criteria to be admitted to pdb
+*** Check protein biophysics slides pdb files. + uniprot admission criteria.
+*** What parameters do I need to use for this?
+*** Look at expressivity of representation.
+*** add mini case study ready for midterm presentation.

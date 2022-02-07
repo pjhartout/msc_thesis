@@ -24,3 +24,12 @@ Archived entries from file /Users/philiphartout/Documents/Git/msc_thesis/docs/no
   :ARCHIVE_CATEGORY: research_notes
   :ARCHIVE_TODO: TEMP
   :END:
+
+* Graph Laplacian
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-04 Fri 20:11
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/research_notes.org
+  :ARCHIVE_OLPATH: Fundamental concepts
+  :ARCHIVE_CATEGORY: research_notes
+  :END:
+  Given Adjacency matrix $A$
