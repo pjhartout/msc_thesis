@@ -1,4 +1,4 @@
-% Created 2022-02-04 Fri 14:53
+% Created 2022-02-05 Sat 19:05
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -36,25 +36,124 @@
 \begin{document}
 
 \maketitle
+\section{Fundamental concepts}
+\label{sec:orga260b27}
+\subsection{Graph Laplacian}
+\label{sec:org2fa1245}
+Given Adjacency matrix \(A\) of dimension \(n\times n\) and degree matrix \(D\) of
+a given graph \(G\), the graph Laplacian \(L\) of \(G\) is given by:
+\(L=D-A\).
+\(p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iL^i\). \(p_w(L)\) is \(n\times n\).
+\subsection{ChebNet}
+\label{sec:org84e9368}
+\(p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iT_iL^i\)
+where \(T_i\) is the degree-i Chebyshev polynomial of the first kind and
+\(\widetilde{L}\) is the normalized Laplacian derived using the largest
+eigenvalue of \(L\).
+
+\(L\) is p.s.d., all eigenvalues of \(L\) are \(>0\). If \(\lambda_{\max}(L)>1\),
+then \(L\)'s entries increase. \(\widetilde{L}\) normalizes the eigenvalues of \(L\)
+and bounds them in \([-1,1]\). \(\widetilde{L}\) is defined as
+\begin{equation*}
+\widetilde{L} = {2L\over\lambda_{\max}(L) - I_n}
+\end{equation*}
+Embedding computation
+\begin{enumerate}
+\item \(h^{0}=x\)
+\item For \(k=1,2,\dots,K\):
+\begin{enumerate}
+\item \(p^{(k)}=p_{w^{(k)}}(L)\)
+\item \(g^{(k)}=p^{(k)}\times h^{k-1}\)
+\item \(h^{(k)} = \sigma(g^{(k)})\)
+\end{enumerate}
+\end{enumerate}
+where \(\sigma\) is some non-linearity.
+
+\subsection{Modern GNNs}
+\label{sec:org7f35622}
+When going back to \(p_w(L)=L\), focussing on one verted, we have:
+   \begin{align*}
+(Lx)_v &= L_v x\\
+&= \sum_{u\in G}L_{vu}x_u\\
+&= \sum_{u\in G}(D_{vu}-A_{vu})x_u\\
+&= D_vx_v-\sum_{u\in\mathcal{N}(v)}x_u
+   \end{align*}
+This is a 1-hop localized convolution. This does two steps:
+\begin{itemize}
+\item Aggregating over immediate neighbour features \(x_u\).
+\item Combining with the node's own feature \(x_v\)
+\end{itemize}
+Ensuring that the agg. is node order equivariant, the overall convolution
+becomes node-order equivariant. This can be considered as messsage passing
+between adjacent nodes. After each step, some nodes receive information from
+their neighbour.
+
+By iteratively repeating the 1-hop localized convolutions \(K\) times (i.e.
+repeatedly passing messages), the receptive field of the conv. effectively
+includes all nodes up to \(K\) hops away.
+
+Some modern aggregation and combination functions:
+\begin{itemize}
+\item graph convolutional networks (GCN)
+\item graph attention networks (GAT)
+\item graph sample and aggregate (GraphSAGE)
+\item graph isomorphism network (GIN)
+\end{itemize}
+\subsection{Global convolutions}
+\label{sec:org53bb139}
+\subsubsection{Spectral convolutions}
+\label{sec:orgda3d05d}
+Smoother graphs have a quantity \(R_(x)=\sum_{(i,j)\in E}(x_i-x_j)^2\) that
+reflects that feature vectors \(x\) that assign similar values to adjacent
+nodes in \(G\) would have smaller values of \(R_L(x)\). \(L\) is a real, symmetric
+matrix which has eigenvalues \(\lambda_1\leq\dots\leq\lambda_n\). Eigenvectors
+can be taken to be orthonormal.
+
+The set of eigenvalues of \(L\) are successively less smooth. They are called the spectrum of \(L\).
+
+The spectral decomp. of \(L\) as \(L=U\Lambda U^T\) where \(\Lambda\) is the
+diagonal matrix of sorted eigenvalues, and \(U\) denotes the matrix of the
+eigenvectors. sorted by increasing eigenvalues. Orthonormality between
+eigenvectors gives us \(U^T U = I\). Since each \(u\in\mathbb{R}^n\), any \(x\)
+can be represented as a linear combination of these eigenvectors, i.e.:
+\begin{equation*}
+x = \sum_{i=1}^{n}\widetilde{x_i}u_i=U\widetilde{x}.
+\end{equation*}
+where \(\widetilde{x}\) are the coefficients. Again, the orthonormality of the eigenvalues allows us to state \(x=U\widetilde{x} \iff U^Tx=\widetilde{x}\).
+We can then compute global convolutions, defining:
+    \begin{equation*}
+h^{(k)} =
+\begin{bmatrix}
+h^{(k)}_1\\
+\vdots\\
+h^{(k)}_n\\
+\end{bmatrix}
+    \end{equation*}
+We start with the original features \(h^{(0)}=x\), then
+\begin{enumerate}
+\item \(\hat{h}^{(k-1)} = U_m^Th^{(k-1)}\)
+\item \(\hat{g}^{(k)}=\hat{w}^{(k)}\odot\hat{h}^{(k-1)}\)
+\item \(h^{(k)}=\sigma(g^{(k)})\)
+\end{enumerate}
 
 \section{Graph Neural Networks}
-\label{sec:orgc369127}
+\label{sec:org8b5968b}
 \subsection{Reviews}
-\label{sec:org6139dfe}
+\label{sec:orgb03f3f2}
 \subsubsection{Graph neural networks:}
-\label{sec:org6f49ab2}
+\label{sec:org87f95e1}
     A review of methods and applications
 Zhou et al mention several GNN approaches in use today
 Generative models popular today:
 \paragraph{Sequential graph generation process}
-\label{sec:org1a6c827}
+\label{sec:org28d51b7}
 \begin{itemize}
 \item GraphRNN - generates the adjacency matrix of a graph by generating the adjacency vector of each node step by step, with graph outputs with different number of nodes.
 \item Li 2018 - also generates nodes and edges sequentially uses the hidden state to decide what to do at the next step
 \item GraphAF - also a sequential process, Conducts a validity check of each molecule generated at each step to see if it's valid.
 \end{itemize}
 \paragraph{Non-sequential graph generation process}
-\label{sec:org470876b}
+\label{sec:org9d79f2f}
 \begin{itemize}
 \item MolGAN - to generate small molecules. Uses a permutation-invariant to solve the node adjacency matrix at once. Also implements an RL-based optimization toward desired chemical properties
 \item Ma et al 2018 - constrained VAE for semantic validity of generated graph
@@ -73,7 +172,7 @@ Full architecture
 \item Graphite isotropic gaussian for VAE + iterative refinement for decoding
 \end{itemize}
 \subsection{Three most popular according to O'Bray 2021:}
-\label{sec:org111a200}
+\label{sec:orgfad32cc}
 \begin{itemize}
 \item GraphRNN, GRAN, Graph Score Matching.
 
@@ -104,38 +203,38 @@ On MMD, they say the following:
 \end{figure}
 
 \section{Generative modelling metrics}
-\label{sec:org1dd25ee}
+\label{sec:org6ba30de}
 \subsection{Objective:}
-\label{sec:orgd5fffe4}
+\label{sec:org9931b1d}
 \subsubsection{Generative graph dist close to the input graph dist}
-\label{sec:orgdf8d2dd}
+\label{sec:org5ee9482}
 \subsubsection{(pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)}
-\label{sec:org139b108}
+\label{sec:org8d51c09}
 \subsection{On images}
-\label{sec:org9778d2a}
+\label{sec:org03f83c9}
 \subsubsection{Frechet Inception Distance}
-\label{sec:org22b2250}
+\label{sec:org747ed08}
 The idea here is to use deeper representational layers of an ANN and used the squared Wasserstein metric to compare two multinomial Gaussians.
 Introduced 2017
 \subsubsection{LPIPS \href{https://richzhang.github.io/PerceptualSimilarity/}{Project page}}
-\label{sec:org07e040e}
+\label{sec:org5c91634}
 Introduced 2017
 \subsubsection{Why comparing graphs is hard:}
-\label{sec:org5c93317}
+\label{sec:org3ede22e}
 \begin{itemize}
 \item Metrics need to deal with spatial invariances such as cycles.
 \item Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
 \item Other publications:
 \end{itemize}
 \subsection{Desiderata for good metrics:}
-\label{sec:org10a6d13}
+\label{sec:orgbb828c4}
 \begin{enumerate}
 \item Robust to noise
 \item Expressive, if they don't arise from the same dist, then metric should detect this.
 \item Computationally efficient.
 \end{enumerate}
 \section{MMD - current accepted method to evaluate generative GNNs}
-\label{sec:orga1d49a3}
+\label{sec:orga066285}
 \begin{itemize}
 \item The MMD formula goes as follows:
 \end{itemize}
@@ -154,7 +253,7 @@ coefficient, Laplacian spectrum histogram.
 \item Recommended kernels: RBF, Laplacian kernel, linear kernel (expressivity \& robustness need to be analyzed)
 \end{itemize}
 \subsection{Potential pitfalls of descriptors}
-\label{sec:orgf7854a9}
+\label{sec:orgc5a0e7b}
 \begin{itemize}
 \item Degree distributions are ok seemingly
 \item Clustering does not distinguish fully connected vs disconnected cliques
@@ -163,7 +262,7 @@ coefficient, Laplacian spectrum histogram.
 \item Model performance is highly dependent on parameters and descriptor functions.
 \end{itemize}
 \section{Research objectives}
-\label{sec:orgb39c5cf}
+\label{sec:org58cac30}
 There are multiple objectives here:
 \begin{enumerate}
 \item Find optimal kernel/hyperparameter combination based on controlled experiments on a given dataset to evaluate a good MMD configuration.
@@ -194,19 +293,19 @@ There are multiple objectives here:
 \end{enumerate}
 \end{enumerate}
 \subsection{From Tim: gather literature sources. Intro structure}
-\label{sec:orgd63c5c5}
+\label{sec:orgd5288e2}
 \subsubsection{Evaluation of generative models (different domains)}
-\label{sec:org0f99bff}
+\label{sec:org43c478e}
 \subsubsection{Evaluation of generative models for graphs}
-\label{sec:org82acf97}
+\label{sec:org4595ee5}
 \paragraph{Check how it was done before, why combo of parameters/kernels were used.}
-\label{sec:orge368d0e}
+\label{sec:org02b8637}
 \subsubsection{Evaluation of proteins (…/molecules/drugs) (What makes a valid protein?)}
-\label{sec:org352c07d}
+\label{sec:org43f04ad}
 \subsubsection{Evaluation of generative models for proteins}
-\label{sec:orgdb3a1aa}
+\label{sec:org7a61ae4}
 \section{Module-wise breakdown of the plan}
-\label{sec:orgf9f2670}
+\label{sec:org0671e8e}
 \begin{itemize}
 \item Graph extraction
 \item Descriptor functions
@@ -220,7 +319,8 @@ There are multiple objectives here:
 \item Other metrics
 \item Extract graph from real datasets
 \end{itemize}
+
 \section{References}
-\label{sec:orgc94f65d}
+\label{sec:orgb22ccfb}
 \printbibliography[heading=none]
 \end{document}

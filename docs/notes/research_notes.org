@@ -25,6 +25,89 @@
 #+LATEX_HEADER: \nocite{*}
 #+OPTIONS: <:nil c:nil todo:nil H:5
 #+EXCLUDE_TAGS: noexport
+* Fundamental concepts
+** Graph Laplacian
+   Given Adjacency matrix $A$ of dimension $n\times n$ and degree matrix $D$ of
+   a given graph $G$, the graph Laplacian $L$ of $G$ is given by:
+   $L=D-A$.
+   $p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iL^i$. $p_w(L)$ is $n\times n$.
+** ChebNet
+   $p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iT_iL^i$
+   where $T_i$ is the degree-i Chebyshev polynomial of the first kind and
+   $\widetilde{L}$ is the normalized Laplacian derived using the largest
+   eigenvalue of $L$.
+
+   $L$ is p.s.d., all eigenvalues of $L$ are $>0$. If $\lambda_{\max}(L)>1$,
+   then $L$'s entries increase. $\widetilde{L}$ normalizes the eigenvalues of $L$
+   and bounds them in $[-1,1]$. $\widetilde{L}$ is defined as
+\begin{equation*}
+\widetilde{L} = {2L\over\lambda_{\max}(L) - I_n}
+\end{equation*}
+Embedding computation
+1. $h^{0}=x$
+2. For $k=1,2,\dots,K$:
+   1. $p^{(k)}=p_{w^{(k)}}(L)$
+   2. $g^{(k)}=p^{(k)}\times h^{k-1}$
+   3. $h^{(k)} = \sigma(g^{(k)})$
+where $\sigma$ is some non-linearity.
+
+** Modern GNNs
+   When going back to $p_w(L)=L$, focussing on one verted, we have:
+   \begin{align*}
+(Lx)_v &= L_v x\\
+&= \sum_{u\in G}L_{vu}x_u\\
+&= \sum_{u\in G}(D_{vu}-A_{vu})x_u\\
+&= D_vx_v-\sum_{u\in\mathcal{N}(v)}x_u
+   \end{align*}
+   This is a 1-hop localized convolution. This does two steps:
+   + Aggregating over immediate neighbour features $x_u$.
+   + Combining with the node's own feature $x_v$
+   Ensuring that the agg. is node order equivariant, the overall convolution
+   becomes node-order equivariant. This can be considered as messsage passing
+   between adjacent nodes. After each step, some nodes receive information from
+   their neighbour.
+
+   By iteratively repeating the 1-hop localized convolutions $K$ times (i.e.
+   repeatedly passing messages), the receptive field of the conv. effectively
+   includes all nodes up to $K$ hops away.
+
+   Some modern aggregation and combination functions:
+   + graph convolutional networks (GCN)
+   + graph attention networks (GAT)
+   + graph sample and aggregate (GraphSAGE)
+   + graph isomorphism network (GIN)
+** Global convolutions
+*** Spectral convolutions
+    Smoother graphs have a quantity $R_(x)=\sum_{(i,j)\in E}(x_i-x_j)^2$ that
+    reflects that feature vectors $x$ that assign similar values to adjacent
+    nodes in $G$ would have smaller values of $R_L(x)$. $L$ is a real, symmetric
+    matrix which has eigenvalues $\lambda_1\leq\dots\leq\lambda_n$. Eigenvectors
+    can be taken to be orthonormal.
+
+    The set of eigenvalues of $L$ are successively less smooth. They are called the spectrum of $L$.
+
+    The spectral decomp. of $L$ as $L=U\Lambda U^T$ where $\Lambda$ is the
+    diagonal matrix of sorted eigenvalues, and $U$ denotes the matrix of the
+    eigenvectors. sorted by increasing eigenvalues. Orthonormality between
+    eigenvectors gives us $U^T U = I$. Since each $u\in\mathbb{R}^n$, any $x$
+    can be represented as a linear combination of these eigenvectors, i.e.:
+    \begin{equation*}
+    x = \sum_{i=1}^{n}\widetilde{x_i}u_i=U\widetilde{x}.
+    \end{equation*}
+    where $\widetilde{x}$ are the coefficients. Again, the orthonormality of the eigenvalues allows us to state $x=U\widetilde{x} \iff U^Tx=\widetilde{x}$.
+    We can then compute global convolutions, defining:
+    \begin{equation*}
+h^{(k)} =
+\begin{bmatrix}
+h^{(k)}_1\\
+\vdots\\
+h^{(k)}_n\\
+\end{bmatrix}
+    \end{equation*}
+    We start with the original features $h^{(0)}=x$, then
+    1. $\hat{h}^{(k-1)} = U_m^Th^{(k-1)}$
+    2. $\hat{g}^{(k)}=\hat{w}^{(k)}\odot\hat{h}^{(k-1)}$
+    3. $h^{(k)}=\sigma(g^{(k)})$
 
 * Graph Neural Networks
 ** Reviews
@@ -292,6 +375,7 @@ There are multiple objectives here:
 + NSPDK
 + Other metrics
 + Extract graph from real datasets
+
 * Annotations :noexport:
 Online approach to k-NN graph construction
 #+begin_src bibtex
