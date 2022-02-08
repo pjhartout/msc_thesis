@@ -4,11 +4,11 @@
 Provides various utilities useful for the project
 """
 
-import functools
+import contextlib
 import os
-import time
 from typing import List
 
+import joblib
 from tqdm import tqdm
 
 
@@ -68,16 +68,25 @@ def write_matrix(matrix, fname):
         np.save(f, matrix)
 
 
-def timeit(func):
-    """timeit's doc"""
+@contextlib.contextmanager
+def tqdm_joblib(tqdm_object):
+    """Context manager to patch joblib to report into tqdm progress bar.
 
-    @functools.wraps(func)
-    def time_closure(*args, **kwargs):
-        """time_wrapper's doc string"""
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        time_elapsed = time.perf_counter() - start
-        print(f"Function: {func.__name__}, Time: {time_elapsed}")
-        return result
+    Code stolen from https://stackoverflow.com/a/58936697
+    """
 
-    return time_closure
+    class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        def __call__(self, *args, **kwargs):
+            tqdm_object.update(n=self.batch_size)
+            return super().__call__(*args, **kwargs)
+
+    old_batch_callback = joblib.parallel.BatchCompletionCallBack
+    joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
+    try:
+        yield tqdm_object
+    finally:
+        joblib.parallel.BatchCompletionCallBack = old_batch_callback
+        tqdm_object.close()
