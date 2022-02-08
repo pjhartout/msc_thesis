@@ -1,4 +1,8 @@
-name: ggnn_metrics
+name: proteinggnnmetrics
+
+channels:
+  - conda-forge
+  - defaults
 
 dependencies:
   - python=3.9
@@ -16,6 +20,9 @@ dependencies:
   - PyYAML
   - scikit-learn
   - tqdm
+  - pyprojroot
+  - biopython
+  - joblib
   - pip
   - pip:
     - giotto-tda
