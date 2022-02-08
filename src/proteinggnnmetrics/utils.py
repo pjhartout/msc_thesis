@@ -4,9 +4,12 @@
 Provides various utilities useful for the project
 """
 
+import contextlib
 import os
 from typing import List
 
+import joblib
+import numpy as np
 from tqdm import tqdm
 
 
@@ -64,3 +67,27 @@ def write_matrix(matrix, fname):
     """TODO: docstring"""
     with open(fname, "wb") as f:
         np.save(f, matrix)
+
+
+@contextlib.contextmanager
+def tqdm_joblib(tqdm_object):
+    """Context manager to patch joblib to report into tqdm progress bar.
+
+    Code stolen from https://stackoverflow.com/a/58936697
+    """
+
+    class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        def __call__(self, *args, **kwargs):
+            tqdm_object.update(n=self.batch_size)
+            return super().__call__(*args, **kwargs)
+
+    old_batch_callback = joblib.parallel.BatchCompletionCallBack
+    joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
+    try:
+        yield tqdm_object
+    finally:
+        joblib.parallel.BatchCompletionCallBack = old_batch_callback
+        tqdm_object.close()
