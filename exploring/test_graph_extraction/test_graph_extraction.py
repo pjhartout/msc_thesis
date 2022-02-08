@@ -14,29 +14,20 @@ from pickle import dump
 
 import matplotlib.pyplot as plt
 import numpy as np
+from Bio.PDB.PDBParser import PDBParser
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
-from proteinggnnmetrics.graphs.extraction import ContactMap
+from proteinggnnmetrics.debug import timeit
+from proteinggnnmetrics.graphs import (
+    ContactMap,
+    KNNGraph,
+    ParallelGraphExtraction,
+)
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
-from proteinggnnmetrics.utils import filter_pdb_files, timeit
-
-
-@timeit
-def compute_contact_map_dist_task(contactmap, files):
-    res = list()
-    for file in files:
-        res.append(cm_transform(contactmap, HUMAN_PROTEOME / file, N_JOBS))
-    return res
-
-
-@timeit  # Faster
-def compute_contact_map_dist_files(contactmap, files):
-    res = Parallel(n_jobs=N_JOBS)(
-        delayed(cm_transform)(contactmap, HUMAN_PROTEOME / file, 1)
-        for file in files
-    )
-    return res
+from proteinggnnmetrics.pdb import ParallelCoordinates
+from proteinggnnmetrics.utils import filter_pdb_files, tqdm_joblib
 
 
 def cm_transform(contactmap, file, n_jobs):
@@ -44,17 +35,25 @@ def cm_transform(contactmap, file, n_jobs):
     return contact_map
 
 
+@timeit
 def main():
     random_state = np.random.RandomState(42)
 
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
-
+    pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 1000)
+        pdb_files = random.sample(pdb_files, 5000)
 
-    contactmap = ContactMap(granularity="CA", random_state=random_state)
-    res_1 = compute_contact_map_dist_files(contactmap, pdb_files)
-    res_2 = compute_contact_map_dist_task(contactmap, pdb_files)
+    parallel_cooords = ParallelCoordinates(n_jobs=N_JOBS)
+    coordinates = parallel_cooords.get_coordinates_from_files(
+        pdb_files, granularity="CA"
+    )
+
+    contactmap = ContactMap(metric="euclidean", n_jobs=1)
+    parallelextraction = ParallelGraphExtraction(n_jobs=N_JOBS)
+    contact_maps = parallelextraction.transform(
+        coordinates, contactmap.transform
+    )
 
 
 if __name__ == "__main__":
