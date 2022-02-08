@@ -74,17 +74,14 @@ class KNNGraph(GraphConstruction):
 
     def transform(self, graph: np.ndarray):
         """Extract contact map from contents of fname"""
-        _adjacency_matrix_func = partial(
-            kneighbors_graph,
+        knn_graph = kneighbors_graph(
+            graph,
             n_neighbors=self.n_neighbors,
             metric=self.metric,
             p=self.p,
             metric_params=self.metric_params,
             mode=self.mode,
             include_self=False,
-        )
-        knn_graph = Parallel(n_jobs=self.n_jobs)(
-            delayed(_adjacency_matrix_func)(graph_row) for graph_row in graph
         )
         return knn_graph
 
@@ -116,7 +113,7 @@ class ParallelGraphExtraction(GraphConstruction):
     def transform(self, samples: np.ndarray, func) -> np.ndarray:
         with tqdm_joblib(
             tqdm(
-                desc="Extracting coordinates from pdb files",
+                desc=f"Extracting graphs using {str(func.__qualname__)}",
                 total=len(samples),
             )
         ) as progressbar:
