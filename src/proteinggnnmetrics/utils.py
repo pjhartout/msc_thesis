@@ -4,7 +4,9 @@
 Provides various utilities useful for the project
 """
 
+import functools
 import os
+import time
 from typing import List
 
 from tqdm import tqdm
@@ -64,3 +66,18 @@ def write_matrix(matrix, fname):
     """TODO: docstring"""
     with open(fname, "wb") as f:
         np.save(f, matrix)
+
+
+def timeit(func):
+    """timeit's doc"""
+
+    @functools.wraps(func)
+    def time_closure(*args, **kwargs):
+        """time_wrapper's doc string"""
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        time_elapsed = time.perf_counter() - start
+        print(f"Function: {func.__name__}, Time: {time_elapsed}")
+        return result
+
+    return time_closure
