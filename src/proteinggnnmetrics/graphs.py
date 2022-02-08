@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """graph_construction.py
@@ -23,17 +22,13 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
 
-from proteinggnnmetrics.constants import N_JOBS
-from proteinggnnmetrics.paths import (
-    HUMAN_PROTEOME,
-    HUMAN_PROTEOME_CA_CONTACT_MAP,
-)
-from proteinggnnmetrics.utils import write_matrix
+from .constants import N_JOBS
+from .utils import tqdm_joblib, write_matrix
 
 
 class GraphConstruction(metaclass=ABCMeta):
-    def __init__(self, random_state):
-        self.random_state = random_state
+    def __init__(self):
+        pass
 
     def transform(self, graph):
         """Conversion function."""
@@ -43,36 +38,16 @@ class ContactMap(GraphConstruction):
     """Extract contact map from pdb file (fully connected weighted graph)"""
 
     def __init__(
-        self,
-        granularity: str,
-        metric="euclidean",
-        p=2,
-        metric_params=None,
-        n_jobs=None,
-        **kwargs,
+        self, metric="euclidean", p=2, metric_params=None, n_jobs=1, **kwargs,
     ):
         super().__init__(**kwargs)
-        self.granularity = granularity
+        self.n_jobs = n_jobs
+        self.metric = metric
 
-    def transform(self, fname, n_jobs):
+    def transform(self, coords: np.ndarray):
         """Extract contact map from contents of fname"""
-        file_path = Path(fname)
-        parser = PDBParser()
-
-        structure = parser.get_structure(
-            file_path.stem, HUMAN_PROTEOME / file_path
-        )
-
-        residues = [
-            r for r in structure.get_residues() if r.get_id()[0] == " "
-        ]
-
-        coordinates = list()
-        for x in range(len(residues)):
-            coordinates.append(residues[x][self.granularity].get_coord())
-        coordinates = np.vstack(coordinates)
         return pairwise_distances(
-            coordinates, metric="euclidean", n_jobs=n_jobs
+            coords, metric=self.metric, n_jobs=self.n_jobs
         )
 
 
@@ -129,5 +104,24 @@ class EpsilonGraph(GraphConstruction):
         return epsilon_neighborhood_graph
 
 
-if __name__ == "__main__":
-    main()
+class ParallelGraphExtraction(GraphConstruction):
+    """
+    Parallelizes the graph extraction process to process multiple graphs in
+    parallel.
+    """
+
+    def __init__(self, n_jobs) -> None:
+        self.n_jobs = n_jobs
+
+    def transform(self, samples: np.ndarray, func) -> np.ndarray:
+        with tqdm_joblib(
+            tqdm(
+                desc="Extracting coordinates from pdb files",
+                total=len(samples),
+            )
+        ) as progressbar:
+            graphs = Parallel(n_jobs=N_JOBS)(
+                delayed(func)(sample) for sample in samples
+            )
+
+        return graphs
