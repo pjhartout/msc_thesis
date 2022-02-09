@@ -51,11 +51,13 @@ def main():
     epsilongraph = EpsilonGraph(epsilon=6)
     epsilon_graphs = epsilongraph.transform(contact_maps)
 
-    plt.imshow(knn_graphs[0].toarray(), interpolation="nearest")
-    plt.savefig("sample_knn.png")
-
-    plt.imshow(epsilon_graphs[0], interpolation="nearest")
-    plt.savefig("sample_epsilon.png")
+    for i, map in tqdm(
+        enumerate(contact_maps),
+        total=len(contact_maps),
+        desc="Export contact maps",
+    ):
+        plt.imshow(map, interpolation="nearest")
+        plt.savefig(f"sample_map_{i}.png")
 
 
 if __name__ == "__main__":
