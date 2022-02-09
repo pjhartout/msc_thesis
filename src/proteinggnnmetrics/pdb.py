@@ -16,11 +16,11 @@ from Bio.PDB.PDBParser import PDBParser
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-from proteinggnnmetrics.utils import tqdm_joblib
+from proteinggnnmetrics.utils.utils import tqdm_joblib
 
 from .errors import FileExtentionError
 from .paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
-from .utils import tqdm_joblib
+from .utils.utils import tqdm_joblib
 
 
 class Coordinates:
