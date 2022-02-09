@@ -13,12 +13,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from Bio.PDB.PDBParser import PDBParser
-from joblib import Parallel, delayed
-from tqdm import tqdm
-
 from GGNN_metrics.constants import N_JOBS, REDUCE_DATA
 from GGNN_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_CONTACT_MAP
 from GGNN_metrics.utils import filter_monomers, filter_pdb_files, make_dir
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
 parser = PDBParser()
 

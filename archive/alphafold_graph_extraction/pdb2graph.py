@@ -11,13 +11,12 @@ from pathlib import Path
 from pickle import dump
 
 import matplotlib.pyplot as plt
-from graphein.protein.config import ProteinGraphConfig
-from graphein.protein.graphs import construct_graph
-from joblib import Parallel, delayed
-
 from GGNN_metrics.constants import N_JOBS, REDUCE_DATA
 from GGNN_metrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from GGNN_metrics.utils import filter_monomers, filter_pdb_files, make_dir
+from graphein.protein.config import ProteinGraphConfig
+from graphein.protein.graphs import construct_graph
+from joblib import Parallel, delayed
 
 
 def pdb2graph(file: str, granularity: str = "CA"):
