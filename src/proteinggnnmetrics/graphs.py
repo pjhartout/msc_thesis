@@ -13,6 +13,7 @@ import random
 from abc import ABCMeta
 from functools import partial
 from pathlib import Path
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +24,8 @@ from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
 
 from .constants import N_JOBS
-from .utils import tqdm_joblib, write_matrix
+from .utils.utils import tqdm_joblib
+from .utils.validation import check_graph
 
 
 class GraphConstruction(metaclass=ABCMeta):
@@ -38,17 +40,33 @@ class ContactMap(GraphConstruction):
     """Extract contact map from pdb file (fully connected weighted graph)"""
 
     def __init__(
-        self, metric="euclidean", p=2, metric_params=None, n_jobs=1, **kwargs,
+        self,
+        n_jobs=N_JOBS,
+        metric="euclidean",
+        p=2,
+        metric_params=None,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.n_jobs = n_jobs
         self.metric = metric
 
-    def transform(self, coords: np.ndarray):
+    def transform(self, X: List):
         """Extract contact map from contents of fname"""
-        return pairwise_distances(
-            coords, metric=self.metric, n_jobs=self.n_jobs
-        )
+
+        def compute_contact_map(X):
+            return pairwise_distances(
+                X, metric=self.metric, n_jobs=self.n_jobs
+            )
+
+        pairwise_dist_list = list()
+        with tqdm_joblib(
+            tqdm(desc=f"Extracting contact map", total=len(X),)
+        ) as progressbar:
+            Xt = Parallel(n_jobs=N_JOBS)(
+                delayed(compute_contact_map)(sample) for sample in X
+            )
+        return Xt
 
 
 class KNNGraph(GraphConstruction):
@@ -57,14 +75,15 @@ class KNNGraph(GraphConstruction):
     def __init__(
         self,
         n_neighbors: str,
+        n_jobs=N_JOBS,
         mode="connectivity",
         metric="euclidean",
         p=2,
         metric_params=None,
-        n_jobs=None,
         **kwargs,
     ):
         super().__init__(**kwargs)
+        self.n_jobs = n_jobs
         self.n_neighbors = n_neighbors
         self.mode = mode
         self.metric = metric
@@ -72,53 +91,53 @@ class KNNGraph(GraphConstruction):
         self.metric_params = metric_params
         self.n_jobs = n_jobs
 
-    def transform(self, graph: np.ndarray):
+    def transform(self, X: np.ndarray):
         """Extract contact map from contents of fname"""
-        knn_graph = kneighbors_graph(
-            graph,
-            n_neighbors=self.n_neighbors,
-            metric=self.metric,
-            p=self.p,
-            metric_params=self.metric_params,
-            mode=self.mode,
-            include_self=False,
-        )
-        return knn_graph
+        check_graph(X)
+
+        def knn_graph_func(X):
+            return kneighbors_graph(
+                X,
+                n_neighbors=self.n_neighbors,
+                metric=self.metric,
+                p=self.p,
+                metric_params=self.metric_params,
+                mode=self.mode,
+                include_self=False,
+            )
+
+        with tqdm_joblib(
+            tqdm(desc=f"Extracting KNN graph from contact map", total=len(X),)
+        ) as progressbar:
+            Xt = Parallel(n_jobs=self.n_jobs)(
+                delayed(knn_graph_func)(sample) for sample in X
+            )
+
+        return Xt
 
 
 class EpsilonGraph(GraphConstruction):
     """Extract epsilon graph"""
 
     def __init__(
-        self, epsilon: float, **kwargs,
+        self, epsilon: float = 3.0, n_jobs: int = N_JOBS, **kwargs,
     ):
         super().__init__(**kwargs)
         self.epsilon = epsilon
-
-    def transform(self, graph: np.ndarray):
-        """Extract contact map from contents of fname"""
-        epsilon_neighborhood_graph = np.where(graph < self.epsilon, 1, 0)
-        return epsilon_neighborhood_graph
-
-
-class ParallelGraphExtraction(GraphConstruction):
-    """
-    Parallelizes the graph extraction process to process multiple graphs in
-    parallel.
-    """
-
-    def __init__(self, n_jobs) -> None:
         self.n_jobs = n_jobs
 
-    def transform(self, samples: np.ndarray, func) -> np.ndarray:
+    def transform(self, X: np.ndarray):
+        """Extract contact map from contents of fname"""
+        check_graph(X)
+
+        def epsilon_graph_func_(X):
+            return np.where(X < self.epsilon, 1, 0)
+
         with tqdm_joblib(
-            tqdm(
-                desc=f"Extracting graphs using {str(func.__qualname__)}",
-                total=len(samples),
-            )
+            tqdm(desc=f"Extracting epsilon graph", total=len(X),)
         ) as progressbar:
-            graphs = Parallel(n_jobs=N_JOBS)(
-                delayed(func)(sample) for sample in samples
+            Xt = Parallel(n_jobs=self.n_jobs)(
+                delayed(epsilon_graph_func_)(sample) for sample in X
             )
 
-        return graphs
+        return Xt
