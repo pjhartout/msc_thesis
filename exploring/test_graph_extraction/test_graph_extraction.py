@@ -19,16 +19,11 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
-from proteinggnnmetrics.debug import timeit
-from proteinggnnmetrics.graphs import (
-    ContactMap,
-    EpsilonGraph,
-    KNNGraph,
-    ParallelGraphExtraction,
-)
+from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from proteinggnnmetrics.pdb import ParallelCoordinates
-from proteinggnnmetrics.utils import filter_pdb_files, tqdm_joblib
+from proteinggnnmetrics.utils.debug import timeit
+from proteinggnnmetrics.utils.utils import filter_pdb_files, tqdm_joblib
 
 
 def cm_transform(contactmap, file, n_jobs):
@@ -42,26 +37,21 @@ def main():
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 1000)
+        pdb_files = random.sample(pdb_files, 100)
 
     parallel_cooords = ParallelCoordinates(n_jobs=N_JOBS)
     coordinates = parallel_cooords.get_coordinates_from_files(
         pdb_files, granularity="CA"
     )
 
-    contactmap = ContactMap(metric="euclidean", n_jobs=1)
-    parallelextraction = ParallelGraphExtraction(n_jobs=N_JOBS)
-    contact_maps = parallelextraction.transform(
-        coordinates, contactmap.transform
-    )
+    contactmap = ContactMap(metric="euclidean")
+    contact_maps = contactmap.transform(coordinates)
 
     knngraph = KNNGraph(n_neighbors=4)
-    knn_graphs = parallelextraction.transform(contact_maps, knngraph.transform)
+    knn_graphs = knngraph.transform(contact_maps)
 
     epsilongraph = EpsilonGraph(epsilon=6)
-    epsilon_graphs = parallelextraction.transform(
-        contact_maps, epsilongraph.transform
-    )
+    epsilon_graphs = epsilongraph.transform(contact_maps)
 
     plt.imshow(knn_graphs[0].toarray(), interpolation="nearest")
     plt.savefig("sample_knn.png")
