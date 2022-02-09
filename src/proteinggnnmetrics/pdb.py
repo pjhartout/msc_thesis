@@ -18,14 +18,16 @@ from tqdm import tqdm
 
 from proteinggnnmetrics.utils.utils import tqdm_joblib
 
+from .constants import N_JOBS
 from .errors import FileExtentionError
 from .paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from .utils.utils import tqdm_joblib
 
 
 class Coordinates:
-    def __init__(self, granularity="CA") -> None:
+    def __init__(self, granularity="CA", n_jobs=N_JOBS) -> None:
         self.granularity = granularity
+        self.n_jobs = n_jobs
 
     def get_atom_coordinates(self, fname: PosixPath) -> np.ndarray:
         parser = PDBParser()
@@ -39,21 +41,7 @@ class Coordinates:
 
         return np.vstack(coordinates)
 
-
-class ParallelCoordinates:
-    """
-    Wrapper of Coordinates to extract coordinates in separate threads to
-    process multiple files simultaneously. Useful when dealing with
-    proteome-scale datasets.
-    """
-
-    def __init__(self, n_jobs) -> None:
-        self.n_jobs = n_jobs
-
-    def get_coordinates_from_files(
-        self, fname_list: List[str], granularity="CA"
-    ) -> np.ndarray:
-
+    def transform(self, fname_list: List[str], granularity="CA"):
         pathname_list = [Path(file) for file in fname_list]
         for file in pathname_list:
             if file.suffix != ".pdb":
