@@ -7,22 +7,10 @@ Performs basic validation checks of data objects
 """
 
 import os
+from pathlib import Path
+from typing import Any, List
 
-
-def _check_array_mod(X, **kwargs):
-    """Modified version of :func:`sklearn.utils.validation.check_array. When
-    keyword parameter `force_all_finite` is set to False, NaNs are not
-    accepted but infinity is."""
-    if not kwargs.get("force_all_finite", True):
-        Xnew = check_array(X, **kwargs)
-        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
-            raise ValueError(
-                "Input contains NaNs. Only finite values and "
-                "infinity are allowed when parameter "
-                "`force_all_finite` is False."
-            )
-        return Xnew
-    return check_array(X, **kwargs)
+from ..errors import FileExtentionError
 
 
 def check_graph(X, distance_matrices=False, **kwargs):
@@ -45,6 +33,19 @@ def check_graph(X, distance_matrices=False, **kwargs):
                 f"sparse matrices. Structure of dimension {X.ndim} passed."
                 + extra_2D
             )
+    return X
+
+
+def check_fnames(files: Any):
+    if type(files) == list:
+        pathname_list = [Path(file) for file in files]
+        for file in pathname_list:
+            if file.suffix != ".pdb":
+                raise FileExtentionError(
+                    "Make sure you're only processing PDB files!"
+                )
+        return pathname_list
+    return files
 
 
 if __name__ == "__main__":

@@ -93,7 +93,7 @@ class KNNGraph(GraphConstruction):
 
     def transform(self, X: np.ndarray):
         """Extract contact map from contents of fname"""
-        check_graph(X)
+        X = check_graph(X)
 
         def knn_graph_func(X):
             return kneighbors_graph(
@@ -112,7 +112,6 @@ class KNNGraph(GraphConstruction):
             Xt = Parallel(n_jobs=self.n_jobs)(
                 delayed(knn_graph_func)(sample) for sample in X
             )
-
         return Xt
 
 
@@ -128,7 +127,7 @@ class EpsilonGraph(GraphConstruction):
 
     def transform(self, X: np.ndarray):
         """Extract contact map from contents of fname"""
-        check_graph(X)
+        X = check_graph(X)
 
         def epsilon_graph_func_(X):
             return np.where(X < self.epsilon, 1, 0)
@@ -139,5 +138,4 @@ class EpsilonGraph(GraphConstruction):
             Xt = Parallel(n_jobs=self.n_jobs)(
                 delayed(epsilon_graph_func_)(sample) for sample in X
             )
-
         return Xt
