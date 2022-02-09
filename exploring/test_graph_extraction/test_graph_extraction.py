@@ -21,7 +21,7 @@ from tqdm import tqdm
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
-from proteinggnnmetrics.pdb import ParallelCoordinates
+from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import timeit
 from proteinggnnmetrics.utils.utils import filter_pdb_files, tqdm_joblib
 
@@ -39,10 +39,8 @@ def main():
     if REDUCE_DATA:
         pdb_files = random.sample(pdb_files, 100)
 
-    parallel_cooords = ParallelCoordinates(n_jobs=N_JOBS)
-    coordinates = parallel_cooords.get_coordinates_from_files(
-        pdb_files, granularity="CA"
-    )
+    coord = Coordinates(granularity="CA", n_jobs=N_JOBS)
+    coordinates = coord.transform(pdb_files, granularity="CA")
 
     contactmap = ContactMap(metric="euclidean")
     contact_maps = contactmap.transform(coordinates)
