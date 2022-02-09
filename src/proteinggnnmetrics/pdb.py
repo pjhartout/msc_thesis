@@ -17,9 +17,9 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from proteinggnnmetrics.utils.utils import tqdm_joblib
+from proteinggnnmetrics.utils.validation import check_fnames
 
 from .constants import N_JOBS
-from .errors import FileExtentionError
 from .paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from .utils.utils import tqdm_joblib
 
@@ -42,21 +42,14 @@ class Coordinates:
         return np.vstack(coordinates)
 
     def transform(self, fname_list: List[str], granularity="CA"):
-        pathname_list = [Path(file) for file in fname_list]
-        for file in pathname_list:
-            if file.suffix != ".pdb":
-                raise FileExtentionError(
-                    "Make sure you're only processing PDB files!"
-                )
-        coordinates = Coordinates(granularity=granularity)
+        fname_list = check_fnames(fname_list)
         with tqdm_joblib(
             tqdm(
                 desc="Extracting coordinates from pdb files",
-                total=len(pathname_list),
+                total=len(fname_list),
             )
         ) as progressbar:
             fname_list_coordinates = Parallel(n_jobs=self.n_jobs)(
-                delayed(coordinates.get_atom_coordinates)(file)
-                for file in pathname_list
+                delayed(self.get_atom_coordinates)(file) for file in fname_list
             )
         return fname_list_coordinates
