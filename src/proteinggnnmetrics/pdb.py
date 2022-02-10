@@ -60,7 +60,7 @@ class Coordinates:
         if self.granularity in ["N", "CA", "C", "O"]:
             for x in range(len(residues)):
                 coordinates.append(residues[x][self.granularity].get_coord())
-        elif self.granularity == "all":
+        elif self.granularity == "all":  # untested
             for residue in range(len(residues)):
                 for atom in residue:
                     coordinates.append(atom.get_coord())
