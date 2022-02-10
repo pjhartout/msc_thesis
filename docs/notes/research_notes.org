@@ -462,7 +462,14 @@ images that use embeddings extracted from a task-specific network."
 + (Q1) What are the strengths and limitations of each metric?
 + (Q2) Is pretraining a GNN necessary to accurately evaluate GGMs with image domain metrics? -> No
 + (Q3) Is there a strong scalar and domain-agnostic metric for evaluating and ranking GGMs?
-+ Expressivity: ability of graphs to measure diversity of generated graphs,
++ Expressivity: ability of graphs to measure diversity of generated graphs
+  + They simulate expressivity by running Affinity Propagation on graphs, by simulating mode collapse and mode dropping.
+  + "To simulate mode collapse, we progressively replace each datapoint with its cluster centre. The degree of perturbation $t$ represents the ratio of clusters that have been collapsed in this manner."
+  + To simulate mode dropping, we progressively remove clusters from $\mathbb{S}_g$. To keep $|\mathbb{S}_g|$ constant, we randomly select samples from the remaining clusters to duplicate. In this experiment, the degree of perturbation $t$ is the ratio of clusters that have been deleted from $\mathbb{S}_g$.
+
++ GIN work uses ZINC dataset to show that the metric captures changes in node and edge labels.
++ Rank correlation is used (Spearman, Pearson biased for linearity)
+
 #+begin_src bibtex
 @article{thompson2022evaluation,
   title={On Evaluation Metrics for Graph Generative Models},
@@ -575,6 +582,18 @@ Randomly initialized CNN to evaluate generative models
   organization={PMLR}
 }
 #+end_src
+
+GAN work on metric disturbances:
+#+begin_src bibtex
+@article{xu2018empirical,
+  title={An empirical study on evaluation metrics of generative adversarial networks},
+  author={Xu, Qiantong and Huang, Gao and Yuan, Yang and Guo, Chuan and Sun, Yu and Wu, Felix and Weinberger, Kilian},
+  journal={arXiv preprint arXiv:1806.07755},
+  year={2018}
+}
+#+end_src
+
+
 
 * References
 #+LaTeX: \printbibliography[heading=none]
