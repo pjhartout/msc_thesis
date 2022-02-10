@@ -1,4 +1,4 @@
-% Created 2022-02-05 Sat 19:05
+% Created 2022-02-09 Wed 17:58
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -37,15 +37,15 @@
 
 \maketitle
 \section{Fundamental concepts}
-\label{sec:orga260b27}
+\label{sec:orgea7472b}
 \subsection{Graph Laplacian}
-\label{sec:org2fa1245}
+\label{sec:orgb9e97e6}
 Given Adjacency matrix \(A\) of dimension \(n\times n\) and degree matrix \(D\) of
 a given graph \(G\), the graph Laplacian \(L\) of \(G\) is given by:
 \(L=D-A\).
 \(p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iL^i\). \(p_w(L)\) is \(n\times n\).
 \subsection{ChebNet}
-\label{sec:org84e9368}
+\label{sec:org08e310c}
 \(p_w(L)=w_0I_n+w_1L+w_2L+\dots+w_dL^d=\sum_{i=0}^{d}w_iT_iL^i\)
 where \(T_i\) is the degree-i Chebyshev polynomial of the first kind and
 \(\widetilde{L}\) is the normalized Laplacian derived using the largest
@@ -70,7 +70,7 @@ Embedding computation
 where \(\sigma\) is some non-linearity.
 
 \subsection{Modern GNNs}
-\label{sec:org7f35622}
+\label{sec:orgf782960}
 When going back to \(p_w(L)=L\), focussing on one verted, we have:
    \begin{align*}
 (Lx)_v &= L_v x\\
@@ -100,9 +100,9 @@ Some modern aggregation and combination functions:
 \item graph isomorphism network (GIN)
 \end{itemize}
 \subsection{Global convolutions}
-\label{sec:org53bb139}
+\label{sec:org61ce873}
 \subsubsection{Spectral convolutions}
-\label{sec:orgda3d05d}
+\label{sec:orgb722067}
 Smoother graphs have a quantity \(R_(x)=\sum_{(i,j)\in E}(x_i-x_j)^2\) that
 reflects that feature vectors \(x\) that assign similar values to adjacent
 nodes in \(G\) would have smaller values of \(R_L(x)\). \(L\) is a real, symmetric
@@ -137,23 +137,23 @@ We start with the original features \(h^{(0)}=x\), then
 \end{enumerate}
 
 \section{Graph Neural Networks}
-\label{sec:org8b5968b}
+\label{sec:orgc34bdd8}
 \subsection{Reviews}
-\label{sec:orgb03f3f2}
+\label{sec:orge903421}
 \subsubsection{Graph neural networks:}
-\label{sec:org87f95e1}
+\label{sec:orgbef911b}
     A review of methods and applications
 Zhou et al mention several GNN approaches in use today
 Generative models popular today:
 \paragraph{Sequential graph generation process}
-\label{sec:org28d51b7}
+\label{sec:org9ddd24d}
 \begin{itemize}
 \item GraphRNN - generates the adjacency matrix of a graph by generating the adjacency vector of each node step by step, with graph outputs with different number of nodes.
 \item Li 2018 - also generates nodes and edges sequentially uses the hidden state to decide what to do at the next step
 \item GraphAF - also a sequential process, Conducts a validity check of each molecule generated at each step to see if it's valid.
 \end{itemize}
 \paragraph{Non-sequential graph generation process}
-\label{sec:org9d79f2f}
+\label{sec:orgc4e2d01}
 \begin{itemize}
 \item MolGAN - to generate small molecules. Uses a permutation-invariant to solve the node adjacency matrix at once. Also implements an RL-based optimization toward desired chemical properties
 \item Ma et al 2018 - constrained VAE for semantic validity of generated graph
@@ -172,11 +172,11 @@ Full architecture
 \item Graphite isotropic gaussian for VAE + iterative refinement for decoding
 \end{itemize}
 \subsection{Three most popular according to O'Bray 2021:}
-\label{sec:orgfad32cc}
+\label{sec:orgd421911}
 \begin{itemize}
 \item GraphRNN, GRAN, Graph Score Matching.
 
-\item Graph Recurrent Attention Networks
+\item Graph Recurrent Attention Networks, also uses graph spectra for MMD.
 \begin{quote}
 In previous work, You et al. [37] computed degree distributions, clustering
 coefficient distributions, and the number of occurrence of all orbits with 4
@@ -203,38 +203,38 @@ On MMD, they say the following:
 \end{figure}
 
 \section{Generative modelling metrics}
-\label{sec:org6ba30de}
+\label{sec:orga603086}
 \subsection{Objective:}
-\label{sec:org9931b1d}
+\label{sec:org2b62b87}
 \subsubsection{Generative graph dist close to the input graph dist}
-\label{sec:org5ee9482}
+\label{sec:org35086db}
 \subsubsection{(pseudo)-metric to assess dissimilarity between G (generated graphs) and G* (input graphs)}
-\label{sec:org8d51c09}
+\label{sec:org6a831e9}
 \subsection{On images}
-\label{sec:org03f83c9}
+\label{sec:org9ef07e6}
 \subsubsection{Frechet Inception Distance}
-\label{sec:org747ed08}
+\label{sec:org8ecfe44}
 The idea here is to use deeper representational layers of an ANN and used the squared Wasserstein metric to compare two multinomial Gaussians.
 Introduced 2017
 \subsubsection{LPIPS \href{https://richzhang.github.io/PerceptualSimilarity/}{Project page}}
-\label{sec:org5c91634}
+\label{sec:orgb0296ea}
 Introduced 2017
 \subsubsection{Why comparing graphs is hard:}
-\label{sec:org3ede22e}
+\label{sec:org6bafbd3}
 \begin{itemize}
 \item Metrics need to deal with spatial invariances such as cycles.
 \item Graph edit distance is NP-hard (Zeng 2009) and therefore does not satisfy efficiency criterion.
 \item Other publications:
 \end{itemize}
 \subsection{Desiderata for good metrics:}
-\label{sec:orgbb828c4}
+\label{sec:org8dcfe1f}
 \begin{enumerate}
 \item Robust to noise
 \item Expressive, if they don't arise from the same dist, then metric should detect this.
 \item Computationally efficient.
 \end{enumerate}
 \section{MMD - current accepted method to evaluate generative GNNs}
-\label{sec:orga066285}
+\label{sec:orged08cad}
 \begin{itemize}
 \item The MMD formula goes as follows:
 \end{itemize}
@@ -253,7 +253,7 @@ coefficient, Laplacian spectrum histogram.
 \item Recommended kernels: RBF, Laplacian kernel, linear kernel (expressivity \& robustness need to be analyzed)
 \end{itemize}
 \subsection{Potential pitfalls of descriptors}
-\label{sec:orgc5a0e7b}
+\label{sec:org262655a}
 \begin{itemize}
 \item Degree distributions are ok seemingly
 \item Clustering does not distinguish fully connected vs disconnected cliques
@@ -262,7 +262,7 @@ coefficient, Laplacian spectrum histogram.
 \item Model performance is highly dependent on parameters and descriptor functions.
 \end{itemize}
 \section{Research objectives}
-\label{sec:org58cac30}
+\label{sec:orgad46a08}
 There are multiple objectives here:
 \begin{enumerate}
 \item Find optimal kernel/hyperparameter combination based on controlled experiments on a given dataset to evaluate a good MMD configuration.
@@ -293,19 +293,19 @@ There are multiple objectives here:
 \end{enumerate}
 \end{enumerate}
 \subsection{From Tim: gather literature sources. Intro structure}
-\label{sec:orgd5288e2}
+\label{sec:org5147dbe}
 \subsubsection{Evaluation of generative models (different domains)}
-\label{sec:org43c478e}
+\label{sec:org647e0e8}
 \subsubsection{Evaluation of generative models for graphs}
-\label{sec:org4595ee5}
+\label{sec:org83fbdc5}
 \paragraph{Check how it was done before, why combo of parameters/kernels were used.}
-\label{sec:org02b8637}
+\label{sec:orgb9b70bd}
 \subsubsection{Evaluation of proteins (…/molecules/drugs) (What makes a valid protein?)}
-\label{sec:org43f04ad}
+\label{sec:org519b3ee}
 \subsubsection{Evaluation of generative models for proteins}
-\label{sec:org7a61ae4}
+\label{sec:orgf0d4bec}
 \section{Module-wise breakdown of the plan}
-\label{sec:org0671e8e}
+\label{sec:org3538d92}
 \begin{itemize}
 \item Graph extraction
 \item Descriptor functions
@@ -321,6 +321,6 @@ There are multiple objectives here:
 \end{itemize}
 
 \section{References}
-\label{sec:orgb22ccfb}
+\label{sec:org0db4ed6}
 \printbibliography[heading=none]
 \end{document}
