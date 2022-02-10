@@ -22,18 +22,13 @@ from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.debug import timeit
+from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.utils import filter_pdb_files, tqdm_joblib
 
 
-def cm_transform(contactmap, file, n_jobs):
-    contact_map = contactmap.transform(file, n_jobs)
-    return contact_map
-
-
+@measure_memory
 @timeit
 def main():
-
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
