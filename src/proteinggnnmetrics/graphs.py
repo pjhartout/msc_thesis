@@ -2,18 +2,17 @@
 
 """graph_construction.py
 
-Handles graph extraction from .pdb files
-
-TODO: docstrings
+Handles graph extraction from a set of atom coordinates.
 
 """
 
 import os
 import random
 from abc import ABCMeta
+from ctypes import Union
 from functools import partial
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,34 +28,77 @@ from .utils.validation import check_graph
 
 
 class GraphConstruction(metaclass=ABCMeta):
+    """Defines skeleton of graph construction classes"""
+
     def __init__(self):
         pass
 
-    def transform(self, graph):
-        """Conversion function."""
+    def transform(self, samples: Union[List, np.ndarray]) -> np.ndarray:
+        """Apply transformation
+
+        Args:
+            graphs (Any): list or array of samples
+
+        Returns:
+            np.ndarray: array of graphs
+        """
+        pass
 
 
 class ContactMap(GraphConstruction):
-    """Extract contact map from pdb file (fully connected weighted graph)"""
+    """Extract contact map from pdb file (fully connected weighted graph)
+
+    Args:
+        GraphConstruction (type): class constructor
+    """
 
     def __init__(
         self,
-        n_jobs=N_JOBS,
-        metric="euclidean",
-        p=2,
-        metric_params=None,
+        n_jobs: int = N_JOBS,
+        n_jobs_pairwise: int = 1,
+        metric: str = "euclidean",
+        p: int = 2,
+        metric_params: Dict = None,
         **kwargs,
     ):
+        """Contact map initialization
+
+        Args:
+            n_jobs (int, optional): number of cores to carry out the computation. Defaults to N_JOBS.
+            n_jobs_pairwise (int, optional): allows to parallelize pairwise metric
+                computations within a sample. Could be useful for large graphs, but
+                will result in n_jobs*n_jobs_pairwise CPU core required. Defaults to 1.
+            metric (str, optional): metric used to compute distance. Defaults to "euclidean".
+            p (int, optional): power of minkowski distance. Defaults to 2.
+            metric_params (Dict, optional): additional metrics parameters to pass. Defaults to None.
+        """
         super().__init__(**kwargs)
         self.n_jobs = n_jobs
+
+        self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
 
-    def transform(self, X: List):
-        """Extract contact map from contents of fname"""
+    def transform(self, X: List) -> List:
+        """Extract contact map from set of coordinates.
 
-        def compute_contact_map(X):
+        Args:
+            X (List): List of arrays containing coordinates.
+
+        Returns:
+            Xt (List): List of contact maps as square 2D matrices
+        """
+
+        def compute_contact_map(X: np.ndarray) -> np.ndarray:
+            """Computes contact map between all the amino acids in X
+
+            Args:
+                X (np.ndarray): coordinates from a protein
+
+            Returns:
+                np.ndarray: square matrix of distance between all the residues in X.
+            """
             return pairwise_distances(
-                X, metric=self.metric, n_jobs=self.n_jobs
+                X, metric=self.metric, n_jobs=self.n_jobs_pairwise
             )
 
         pairwise_dist_list = list()
@@ -70,7 +112,12 @@ class ContactMap(GraphConstruction):
 
 
 class KNNGraph(GraphConstruction):
-    """Extract KNN graph"""
+    """Extract KNN graph
+
+    Args:
+        GraphConstruction (type): class constructor
+
+    """
 
     def __init__(
         self,
@@ -91,11 +138,28 @@ class KNNGraph(GraphConstruction):
         self.metric_params = metric_params
         self.n_jobs = n_jobs
 
-    def transform(self, X: np.ndarray):
-        """Extract contact map from contents of fname"""
+    """Extract contact map from contents of fname"""
+
+    def transform(self, X: List) -> List:
+        """Extracts k-nearest neightbour graph from input contact map.
+
+        Args:
+            X (List): list of contact maps
+
+        Returns:
+            List: list of k-NN graphs.
+        """
         X = check_graph(X)
 
-        def knn_graph_func(X):
+        def knn_graph_func(X: np.ndarray) -> np.ndarray:
+            """knn graph extraction function for each graph
+
+            Args:
+                X (np.ndarray): graph to get the knn graph from
+
+            Returns:
+                np.ndarray:
+            """
             return kneighbors_graph(
                 X,
                 n_neighbors=self.n_neighbors,
@@ -125,8 +189,15 @@ class EpsilonGraph(GraphConstruction):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
 
-    def transform(self, X: np.ndarray):
-        """Extract contact map from contents of fname"""
+    def transform(self, X: List) -> List:
+        """Extract epsilon graph from list of contact maps
+
+        Args:
+            X (List): [description]
+
+        Returns:
+            List: [description]
+        """
         X = check_graph(X)
 
         def epsilon_graph_func_(X):
