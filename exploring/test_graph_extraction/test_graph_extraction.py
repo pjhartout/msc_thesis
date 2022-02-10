@@ -32,7 +32,7 @@ def main():
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 100)
+        pdb_files = random.sample(pdb_files, 50)
 
     coord = Coordinates(granularity="CA", n_jobs=N_JOBS)
     coordinates = coord.transform(pdb_files, granularity="CA")
@@ -45,14 +45,6 @@ def main():
 
     epsilongraph = EpsilonGraph(epsilon=6)
     epsilon_graphs = epsilongraph.transform(contact_maps)
-
-    for i, map in tqdm(
-        enumerate(contact_maps),
-        total=len(contact_maps),
-        desc="Export contact maps",
-    ):
-        plt.imshow(map, interpolation="nearest")
-        plt.savefig(f"sample_map_{i}.png")
 
 
 if __name__ == "__main__":
