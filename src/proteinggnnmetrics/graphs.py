@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Bio.PDB.PDBParser import PDBParser
 from joblib import Parallel, delayed
+from scipy import sparse
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
@@ -138,8 +139,6 @@ class KNNGraph(GraphConstruction):
         self.metric_params = metric_params
         self.n_jobs = n_jobs
 
-    """Extract contact map from contents of fname"""
-
     def transform(self, X: List) -> List:
         """Extracts k-nearest neightbour graph from input contact map.
 
@@ -160,14 +159,16 @@ class KNNGraph(GraphConstruction):
             Returns:
                 np.ndarray:
             """
-            return kneighbors_graph(
-                X,
-                n_neighbors=self.n_neighbors,
-                metric=self.metric,
-                p=self.p,
-                metric_params=self.metric_params,
-                mode=self.mode,
-                include_self=False,
+            return sparse.csr_matrix(
+                kneighbors_graph(
+                    X,
+                    n_neighbors=self.n_neighbors,
+                    metric=self.metric,
+                    p=self.p,
+                    metric_params=self.metric_params,
+                    mode=self.mode,
+                    include_self=False,
+                )
             )
 
         with tqdm_joblib(
@@ -190,18 +191,26 @@ class EpsilonGraph(GraphConstruction):
         self.n_jobs = n_jobs
 
     def transform(self, X: List) -> List:
-        """Extract epsilon graph from list of contact maps
+        """Extracts epsilon graph from input contact map.
 
         Args:
-            X (List): [description]
+            X (List): graph to get the epsilon graph from
 
         Returns:
-            List: [description]
+            List: list of epsilon graphs
         """
         X = check_graph(X)
 
-        def epsilon_graph_func_(X):
-            return np.where(X < self.epsilon, 1, 0)
+        def epsilon_graph_func_(X: np.ndarray) -> np.ndarray:
+            """epsilon graph extraction function for each graph
+
+            Args:
+                X (np.ndarray): contact map for epsilon graph
+
+            Returns:
+                np.ndarray: epsilon graph
+            """
+            return sparse.csr_matrix(np.where(X < self.epsilon, 1, 0))
 
         with tqdm_joblib(
             tqdm(desc=f"Extracting epsilon graph", total=len(X),)
