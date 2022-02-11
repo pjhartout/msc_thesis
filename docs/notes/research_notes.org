@@ -449,6 +449,7 @@ Specific MMD for biological data:
 }
 #+end_src
 
+** Additional metrics for GGNNs
 Introduction several metrics based on the features extracted by an untrained
 random GNN, showing more expressive metrics of GNN performance. "In this work,
 we mitigate these issues by searching for scalar, domain-agnostic, and scalable
@@ -594,6 +595,76 @@ GAN work on metric disturbances:
 #+end_src
 
 
+** Failure modes in molecule generation and optimization
+   Blunt way to eliminate molecules:
++ penalize high logP (high bioaccumulation, highly lipophillic) .
++ GuacaMol, check also MOSES
++ Frechet Chemnet distance
++ Difficult to assess whether or not the model capture intrinsic patterns of the data or just copies it. (/copy problem/, e.g. AddCarbon model)
++ likelihood on test set should be reported
++ scores not optimizing for what practicioner wants.
++ models generate molecules numerically superior but not useful, refinement of scoring function to account for unexpected behaviour.
+  + This phenomenon of optimization of a score in unexpected ways, has been observed in other applications [39]. In one illustrative setting,
+    the aim was to develop a body capable of locomotion, but the optimization procedure instead discovered the simpler solution of a tall
+    body falling over, which also satisfied the specified scoring function.
++ Things difficult to quantify: bioactivites, constraints "respected" by medicinal chemists
++ Set up an experiment with optimization score and control scores, to get
+  insight into how a generative model optimizes the score and whether it is
+  sensitive to mentioned biases (data splits) in the bioactivity model. they see
+  that the optimization score increases rapidly compared to data control score.
+
+#+begin_src bibtex
+@article{renz2019failure,
+  title={On failure modes in molecule generation and optimization},
+  author={Renz, Philipp and Van Rompaey, Dries and Wegner, J{\"o}rg Kurt and Hochreiter, Sepp and Klambauer, G{\"u}nter},
+  journal={Drug Discovery Today: Technologies},
+  volume={32},
+  pages={55--63},
+  year={2019},
+  publisher={Elsevier}
+}
+#+end_src
+
+Protein embeddings for binding residues prediction for multiple ligand classes.
+#+begin_src bibtex
+@article{littmann2021protein,
+  title={Protein embeddings and deep learning predict binding residues for various ligand classes},
+  author={Littmann, Maria and Heinzinger, Michael and Dallago, Christian and Weissenow, Konstantin and Rost, Burkhard},
+  journal={Scientific reports},
+  volume={11},
+  number={1},
+  pages={1--15},
+  year={2021},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
+Graph Kernels for comparative analysis of protein active sites (NADH, ATP binding site). Use random walk, shortest path and fingerprint kernel.
+#+begin_src bibtex
+@inproceedings{fober2009graph,
+  title={Graph-kernels for the comparative analysis of protein active sites},
+  author={Fober, Thomas and Mernberger, Marco and Moritz, Ralph and H{\"u}llermeier, Eyke},
+  booktitle={German conference on bioinformatics 2009},
+  year={2009},
+  organization={Gesellschaft f{\"u}r Informatik eV}
+}
+#+end_src
+
+** Check criteria to be admitted to pdb
+**** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
+
+****  This is all "relative (percentile rank) compared to the rest of the database"
+
+
+Survey of graph kernels
+#+begin_src bibtex
+@article{borgwardt2020graph,
+  title={Graph kernels: State-of-the-art and future challenges},
+  author={Borgwardt, Karsten and Ghisu, Elisabetta and Llinares-L{\'o}pez, Felipe and O'Bray, Leslie and Rieck, Bastian},
+  journal={arXiv preprint arXiv:2011.03854},
+  year={2020}
+}
+#+end_src
 
 * References
 #+LaTeX: \printbibliography[heading=none]
