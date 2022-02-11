@@ -142,3 +142,111 @@ ping google.com
 *** What parameters do I need to use for this?
 *** Look at expressivity of representation.
 *** add mini case study ready for midterm presentation.
+
+* DONE <2022-02-11 Fri> Meeting with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-11 Fri 18:22
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** Agenda items from last week
+*** DONE Go over code implementation: pointers?
+*** DONE biopandas check as substitute (more lightweight) -> not yet, seems biopandas works just fine.
+*** DONE fingerprint of diagram, look at topoAE. requirement: map to 1D vector. image can also be used, in general topo features are pretty compressed representations.
+*** DONE biological descriptors: look at embeddings: unirep, others? https://huggingface.co/Rostlab/prot_t5_xl_bfd maybe to compare similarity in embedding space?
+*** DONE grapkel, work in graph-specific kernels.
+*** DONE Google protein-specfic kernels:  SP, RW, Finger print-based kernel... all too computationally expensive?
+*** DONE Check domain-agnostic perturbations
+*** DONE (add to slides) Perturbations: Remove subgraphs, mode collapse and mode dropping.
+*** DONE Protein folding energy: assumption, assume free-lowest free energy structures
+**** FoldX gives free energy (have installed FoldX, not yet fidled around with it given priority)
+*** DONE Alter the pdb filse ->  should be possible using BioPython.
+*** DONE Pymol, check editors for pdb files (downloaded, still need to set it up)
+*** DONE Binding pocket selection and perturbations there.
+*** DONE UniProt, advanced search, catalytic sites.e
+*** DONE Look for datasets in the data.
+*** DONE WL kernel.
+*** DONE Graph survey.
+*** DONE Reddit: 12,000 graphs. 200 nodes, 250 edges. 128GB RAM. W-L kernel should run
+*** DONE Kernel computation: compute distance prior to exp.
+*** DONE Design perturbations for labeled graph
+*** DONE Change node labels, edge features (polar > non polar)
+*** DONE AA jittering
+*** DONE Python handlers rachamachadran outliers
+*** DONE Run Affinity Prop. on graphs and simulate mode collapse/drop on protein families.
+*** DONE Run perturbation with biological + graph theoretic one.
+*** DONE Check criteria to be admitted to pdb
+**** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
+
+* DONE <2022-02-11 Fri> Meeting with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-11 Fri 18:22
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** Agenda items from last week
+*** DONE Go over code implementation: pointers?
+*** DONE biopandas check as substitute (more lightweight) -> not yet, seems biopandas works just fine.
+*** DONE fingerprint of diagram, look at topoAE. requirement: map to 1D vector. image can also be used, in general topo features are pretty compressed representations.
+*** DONE biological descriptors: look at embeddings: unirep, others? https://huggingface.co/Rostlab/prot_t5_xl_bfd maybe to compare similarity in embedding space?
+*** DONE grapkel, work in graph-specific kernels.
+*** DONE Google protein-specfic kernels:  SP, RW, Finger print-based kernel... all too computationally expensive?
+*** DONE Check domain-agnostic perturbations
+*** DONE (add to slides) Perturbations: Remove subgraphs, mode collapse and mode dropping.
+*** DONE Protein folding energy: assumption, assume free-lowest free energy structures
+**** FoldX gives free energy (have installed FoldX, not yet fidled around with it given priority)
+*** DONE Alter the pdb filse ->  should be possible using BioPython.
+*** DONE Pymol, check editors for pdb files (downloaded, still need to set it up)
+*** DONE Binding pocket selection and perturbations there.
+*** DONE UniProt, advanced search, catalytic sites.e
+*** DONE Look for datasets in the data.
+*** DONE WL kernel.
+*** DONE Graph survey.
+*** DONE Reddit: 12,000 graphs. 200 nodes, 250 edges. 128GB RAM. W-L kernel should run
+*** DONE Kernel computation: compute distance prior to exp.
+*** DONE Design perturbations for labeled graph
+*** DONE Change node labels, edge features (polar > non polar)
+*** DONE AA jittering
+*** DONE Python handlers rachamachadran outliers
+*** DONE Run Affinity Prop. on graphs and simulate mode collapse/drop on protein families.
+*** DONE Run perturbation with biological + graph theoretic one.
+*** DONE Check criteria to be admitted to pdb
+**** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
+
+* DONE <2022-02-11 Fri> Meeting with Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-02-11 Fri 18:22
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** Agenda items from last week
+*** DONE Go over code implementation: pointers?
+*** DONE biopandas check as substitute (more lightweight) -> not yet, seems biopandas works just fine.
+*** DONE fingerprint of diagram, look at topoAE. requirement: map to 1D vector. image can also be used, in general topo features are pretty compressed representations.
+*** DONE biological descriptors: look at embeddings: unirep, others? https://huggingface.co/Rostlab/prot_t5_xl_bfd maybe to compare similarity in embedding space?
+*** DONE grapkel, work in graph-specific kernels.
+*** DONE Google protein-specfic kernels:  SP, RW, Finger print-based kernel... all too computationally expensive?
+*** DONE Check domain-agnostic perturbations
+*** DONE (add to slides) Perturbations: Remove subgraphs, mode collapse and mode dropping.
+*** DONE Protein folding energy: assumption, assume free-lowest free energy structures
+**** FoldX gives free energy (have installed FoldX, not yet fidled around with it given priority)
+*** DONE Alter the pdb filse ->  should be possible using BioPython.
+*** DONE Pymol, check editors for pdb files (downloaded, still need to set it up)
+*** DONE Binding pocket selection and perturbations there.
+*** DONE UniProt, advanced search, catalytic sites.e
+*** DONE Look for datasets in the data.
+*** DONE WL kernel.
+*** DONE Graph survey.
+*** DONE Reddit: 12,000 graphs. 200 nodes, 250 edges. 128GB RAM. W-L kernel should run
+*** DONE Kernel computation: compute distance prior to exp.
+*** DONE Design perturbations for labeled graph
+*** DONE Change node labels, edge features (polar > non polar)
+*** DONE AA jittering
+*** DONE Python handlers rachamachadran outliers
+*** DONE Run Affinity Prop. on graphs and simulate mode collapse/drop on protein families.
+*** DONE Run perturbation with biological + graph theoretic one.
+*** DONE Check criteria to be admitted to pdb
+**** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
