@@ -58,12 +58,18 @@ class Coordinates:
         ]
         coordinates = list()
         if self.granularity in ["N", "CA", "C", "O"]:
-            for x in range(len(residues)):
-                coordinates.append(residues[x][self.granularity].get_coord())
-        elif self.granularity == "all":  # untested
-            for residue in range(len(residues)):
+            for residue in residues:
+                coordinate = residue[self.granularity].get_coord()
+                name = residue.get_resname()
+                coordinates.append([coordinate, name])
+        elif self.granularity == "all":
+            # TODO: test
+            for residue in residues:
+                name = residue.get_resname()
+                atom_coords = list()
                 for atom in residue:
-                    coordinates.append(atom.get_coord())
+                    atom_coords.append(atom.get_coord())
+                coordinates.append([atom_coords, name])
         else:
             raise GranularityError("Specify correct granularity")
 
