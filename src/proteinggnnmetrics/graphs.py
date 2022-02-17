@@ -1,22 +1,15 @@
 # -*- coding: utf-8 -*-
 
-"""graph_construction.py
+"""graphs.py
 
 Handles graph extraction from a set of atom coordinates.
 
 """
 
-import os
-import random
 from abc import ABCMeta
-from ctypes import Union
-from functools import partial
-from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
-import matplotlib.pyplot as plt
 import numpy as np
-from Bio.PDB.PDBParser import PDBParser
 from joblib import Parallel, delayed
 from scipy import sparse
 from sklearn.metrics.pairwise import pairwise_distances
