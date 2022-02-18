@@ -18,13 +18,11 @@ from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
 
-from proteinggnnmetrics.errors import GranularityError
-from proteinggnnmetrics.utils.utils import tqdm_joblib
-from proteinggnnmetrics.utils.validation import check_fnames
-
 from .constants import N_JOBS
+from .errors import GranularityError
 from .protein import Protein
 from .utils.utils import distribute_function, tqdm_joblib
+from .utils.validation import check_fnames
 
 
 class Coordinates:
