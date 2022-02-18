@@ -6,10 +6,11 @@ Provides various utilities useful for the project
 
 import contextlib
 import os
-from typing import List
+from typing import Any, Callable, List
 
 import joblib
 import numpy as np
+from joblib import Parallel, delayed
 from tqdm import tqdm
 
 
@@ -91,3 +92,12 @@ def tqdm_joblib(tqdm_object):
     finally:
         joblib.parallel.BatchCompletionCallBack = old_batch_callback
         tqdm_object.close()
+
+
+def distribute_function(
+    func: Callable, X: Any, tqdm_label: str, n_jobs: int
+) -> Any:
+    """Simply distributues the execution of func across multiple cores to process X faster"""
+    with tqdm_joblib(tqdm(desc=tqdm_label, total=len(X),)) as progressbar:
+        Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
+    return Xt
