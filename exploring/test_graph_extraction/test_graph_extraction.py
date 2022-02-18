@@ -20,7 +20,11 @@ from scipy import sparse
 from tqdm import tqdm
 
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
-from proteinggnnmetrics.descriptors import DegreeHistogram
+from proteinggnnmetrics.descriptors import (
+    ClusteringHistogram,
+    DegreeHistogram,
+    LaplacianSpectrum,
+)
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from proteinggnnmetrics.pdb import Coordinates
@@ -62,10 +66,28 @@ def get_epsilongraphs(proteins):
 
 @measure_memory
 @timeit
-def get_histograms(proteins):
-    degree_histogram = DegreeHistogram("knn_graph", hist_len=30, n_jobs=N_JOBS)
-    histograms = degree_histogram.describe(proteins)
-    return histograms
+def get_deg_histograms(proteins):
+    degree_histogram = DegreeHistogram("knn_graph", n_bins=30)
+    proteins = degree_histogram.describe(proteins)
+    return proteins
+
+
+@measure_memory
+@timeit
+def get_clu_histograms(proteins):
+    clustering_histogram = ClusteringHistogram(
+        "knn_graph", n_bins=30, density=False,
+    )
+    proteins = clustering_histogram.describe(proteins)
+    return proteins
+
+
+@measure_memory
+@timeit
+def get_spectrum(proteins):
+    laplancian_histogram = LaplacianSpectrum("knn_graph", n_bins=30)
+    proteins = laplancian_histogram.describe(proteins)
+    return proteins
 
 
 @measure_memory
@@ -74,16 +96,17 @@ def main():
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 10)
+        pdb_files = random.sample(pdb_files, 100)
 
     proteins = get_coords(pdb_files)
     print(f"Coordinates: {len(proteins)}")
     proteins = get_contactmaps(proteins)
     proteins = get_knngraphs(proteins)
     proteins = get_epsilongraphs(proteins)
-
-    histograms = get_histograms(proteins)
-    print("END DEBUG")
+    proteins = get_deg_histograms(proteins)
+    proteins = get_clu_histograms(proteins)
+    proteins = get_spectrum(proteins)
+    print("END CALLS")
 
 
 if __name__ == "__main__":
