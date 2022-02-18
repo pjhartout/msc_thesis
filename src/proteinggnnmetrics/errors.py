@@ -21,3 +21,9 @@ class GraphTypeError(Exception):
     """Raised when wrong graph type is declared"""
 
     pass
+
+
+class TDAPipelineError(Exception):
+    """Raised when TDA pipeline is set incorrectly"""
+
+    pass

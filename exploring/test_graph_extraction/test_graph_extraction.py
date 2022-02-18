@@ -24,6 +24,7 @@ from proteinggnnmetrics.descriptors import (
     ClusteringHistogram,
     DegreeHistogram,
     LaplacianSpectrum,
+    TopologicalDescriptor,
 )
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
@@ -92,6 +93,21 @@ def get_spectrum(proteins):
 
 @measure_memory
 @timeit
+def get_tda_descriptor(proteins):
+    tda_descriptor = TopologicalDescriptor(
+        "landscape",
+        epsilon=0.01,
+        n_bins=100,
+        order=1,
+        n_jobs=N_JOBS,
+        landscape_layers=1,
+    )
+    proteins = tda_descriptor.describe(proteins)
+    return proteins
+
+
+@measure_memory
+@timeit
 def main():
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
@@ -106,6 +122,7 @@ def main():
     proteins = get_deg_histograms(proteins)
     proteins = get_clu_histograms(proteins)
     proteins = get_spectrum(proteins)
+    proteins = get_tda_descriptor(proteins)
     print("END CALLS")
 
 
