@@ -20,6 +20,7 @@ from scipy import sparse
 from tqdm import tqdm
 
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
+from proteinggnnmetrics.descriptors import DegreeHistogram
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
 from proteinggnnmetrics.pdb import Coordinates
@@ -37,7 +38,7 @@ def get_coords(pdb_files):
 
 @measure_memory
 @timeit
-def get_contactmap(proteins):
+def get_contactmaps(proteins):
     contactmap = ContactMap(metric="euclidean")
     proteins = contactmap.construct(proteins)
     return proteins
@@ -53,10 +54,18 @@ def get_knngraphs(proteins):
 
 @measure_memory
 @timeit
-def get_epsilongraph(proteins):
+def get_epsilongraphs(proteins):
     epsilongraph = EpsilonGraph(epsilon=2)
     proteins = epsilongraph.construct(proteins)
     return proteins
+
+
+@measure_memory
+@timeit
+def get_histograms(proteins):
+    degree_histogram = DegreeHistogram("knn_graph", hist_len=30, n_jobs=N_JOBS)
+    histograms = degree_histogram.describe(proteins)
+    return histograms
 
 
 @measure_memory
@@ -69,11 +78,11 @@ def main():
 
     proteins = get_coords(pdb_files)
     print(f"Coordinates: {len(proteins)}")
-    proteins = get_contactmap(proteins)
+    proteins = get_contactmaps(proteins)
     proteins = get_knngraphs(proteins)
-    proteins = get_epsilongraph(proteins)
+    proteins = get_epsilongraphs(proteins)
 
-    graph = proteins[1].get_nx_graph("contact_map")
+    histograms = get_histograms(proteins)
     print("END DEBUG")
 
 
