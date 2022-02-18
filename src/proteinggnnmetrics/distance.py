@@ -14,7 +14,7 @@ from typing import Any, Callable
 import numpy as np
 from scipy.spatial.distance import minkowski
 
-from proteinggnnmetrics.utils.validation import check_dist
+from .utils.validation import check_dist
 
 
 class DistanceFunction(metaclass=ABCMeta):
