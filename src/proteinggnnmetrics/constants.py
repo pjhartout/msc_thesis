@@ -5,6 +5,6 @@
 Provides global variables to other scripts used in the repository.
 """
 
-N_JOBS = 5
+N_JOBS = 6
 
 REDUCE_DATA = True

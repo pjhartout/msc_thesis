@@ -19,8 +19,24 @@
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
+* TODO <2022-02-18 Fri> Meeting with Tim
+** What I did
+*** Improve graph extraction methods (still need rework)
+*** Start descriptor functions and kernels
+*** Start perturbations and distance implementation.
+*** Proceeded as you said: barebones
+**** "def func_name pass" unimplemented functions to get an idea of the architecture
+**** to help visualize what the whole library will look like
+** What I plan to do
+*** Make custom protein object to speed up operations
+*** Accelerate bare bones library to get started on the difficult & exciting stuff like:
+**** protein perturbations, kernel pre-computations, computational evaluation
+*** Process some of the discussion points from last week
+*** Idea: get the easy stuff done asap to work on most challenging aspects (rachmachandran perturb, etc)
+*** Outline lit review
+
 * DONE <2022-02-11 Fri> Meeting with Tim
-** Agenda items from last week
+** Agenda items from two weeks ago
 *** DONE Go over code implementation: pointers?
 *** DONE biopandas check as substitute (more lightweight) -> not yet, seems biopandas works just fine.
 *** DONE fingerprint of diagram, look at topoAE. requirement: map to 1D vector. image can also be used, in general topo features are pretty compressed representations.
