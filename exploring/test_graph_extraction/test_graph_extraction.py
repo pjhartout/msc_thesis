@@ -112,7 +112,7 @@ def main():
     pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
     pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 100)
+        pdb_files = random.sample(pdb_files, 1000)
 
     proteins = get_coords(pdb_files)
     print(f"Coordinates: {len(proteins)}")
