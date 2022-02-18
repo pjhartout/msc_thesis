@@ -113,13 +113,14 @@ class Protein:
         with open(path, "wb") as f:
             pickle.dump(self, f)
 
-    @staticmethod
-    def plot_point_cloud(protein):
-        return protein
+    def plot_point_cloud(self):
+        pass
 
-    @staticmethod
-    def plot_contact_map(protein):
-        return protein
+    def plot_contact_map(self):
+        pass
+
+    def plot_graph(self, graph_type):
+        pass
 
     @staticmethod
     def load(path):
