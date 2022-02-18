@@ -69,7 +69,9 @@ class DegreeHistogram(Descriptor):
             if normalize:
                 histogram = histogram / np.sum(histogram)
 
-            protein.histograms["degree_histogram"] = histogram
+            protein.descriptors[self.graph_type][
+                "degree_histogram"
+            ] = histogram
 
             return protein
 
@@ -102,7 +104,9 @@ class ClusteringHistogram(Descriptor):
                 density=self.density,
             )
 
-            protein.histograms["clustering_histogram"] = histogram
+            protein.descriptors[self.graph_type][
+                "clustering_histogram"
+            ] = histogram
 
             return protein
 
@@ -135,7 +139,9 @@ class ClusteringHistogram(Descriptor):
                 density=self.density,
             )
 
-            protein.histograms["clustering_histogram"] = histogram
+            protein.descriptors[self.graph_type][
+                "clustering_histogram"
+            ] = histogram
 
             return protein
 
@@ -174,7 +180,9 @@ class LaplacianSpectrum(Descriptor):
                 range=self.bin_range,
             )
 
-            protein.histograms["laplacian_spectrum_histogram"] = histogram
+            protein.descriptors[self.graph_type][
+                "laplacian_spectrum_histogram"
+            ] = histogram
 
             return protein
 

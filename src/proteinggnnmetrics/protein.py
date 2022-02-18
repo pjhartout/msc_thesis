@@ -60,12 +60,20 @@ class Protein:
         }
 
         # Histograms, depends on the graph used
-        # TODO: find a way to make this graph type-dependent (i.e. a eps_graph
-        # does not have the same dist as a knn graph)
-        self.histograms = {
-            "degree_histogram": degree_histogram,
-            "clustering_histogram": clustering_histogram,
-            "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
+        self.descriptors = {
+            "knn_graph": {
+                "degree_histogram": degree_histogram,
+                "clustering_histogram": clustering_histogram,
+                "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
+            },
+            "eps_graph": {
+                "degree_histogram": degree_histogram,
+                "clustering_histogram": clustering_histogram,
+                "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
+            },
+            "contact_graph": {
+                # TDA stuff
+            },
         }
 
     def get_nx_graph(self, graph_type: str):
