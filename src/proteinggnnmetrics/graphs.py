@@ -4,7 +4,7 @@
 
 Handles graph extraction from a set of atom coordinates.
 
-TODO: check docstrings
+TODO: check docstrings, citations
 """
 
 from abc import ABCMeta
@@ -19,10 +19,9 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
 
-from proteinggnnmetrics.protein import Protein
-
 from .constants import N_JOBS
-from .utils.utils import tqdm_joblib
+from .protein import Protein
+from .utils.utils import distribute_function, tqdm_joblib
 from .utils.validation import check_graphs
 
 
@@ -103,12 +102,12 @@ class ContactMap(GraphConstruction):
             )
             return protein
 
-        with tqdm_joblib(
-            tqdm(desc=f"Extracting contact map", total=len(proteins),)
-        ) as progressbar:
-            proteins = Parallel(n_jobs=N_JOBS)(
-                delayed(compute_contact_map)(sample) for sample in proteins
-            )
+        proteins = distribute_function(
+            compute_contact_map,
+            proteins,
+            "Extracting contact map",
+            self.n_jobs,
+        )
 
         return proteins
 
@@ -163,15 +162,12 @@ class KNNGraph(GraphConstruction):
             )
             return protein
 
-        with tqdm_joblib(
-            tqdm(
-                desc=f"Extracting KNN graph from contact map",
-                total=len(proteins),
-            )
-        ) as progressbar:
-            proteins = Parallel(n_jobs=self.n_jobs)(
-                delayed(knn_graph_func)(sample) for sample in proteins
-            )
+        proteins = distribute_function(
+            knn_graph_func,
+            proteins,
+            "Extracting KNN graph from contact map",
+            self.n_jobs,
+        )
         return proteins
 
 
@@ -196,7 +192,7 @@ class EpsilonGraph(GraphConstruction):
         """
         proteins = check_graphs(proteins)
 
-        def epsilon_graph_func_(protein: Protein) -> nx.Graph:
+        def epsilon_graph_func(protein: Protein) -> nx.Graph:
             """epsilon graph extraction function for each graph
 
             Args:
@@ -210,10 +206,11 @@ class EpsilonGraph(GraphConstruction):
             )
             return protein
 
-        with tqdm_joblib(
-            tqdm(desc=f"Extracting epsilon graph", total=len(proteins),)
-        ) as progressbar:
-            proteins = Parallel(n_jobs=self.n_jobs)(
-                delayed(epsilon_graph_func_)(sample) for sample in proteins
-            )
+        proteins = distribute_function(
+            epsilon_graph_func,
+            proteins,
+            "Extracting KNN graph from contact map",
+            self.n_jobs,
+        )
+
         return proteins

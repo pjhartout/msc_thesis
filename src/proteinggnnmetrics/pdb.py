@@ -18,13 +18,11 @@ from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
 
-from proteinggnnmetrics.errors import GranularityError
-from proteinggnnmetrics.utils.utils import tqdm_joblib
-from proteinggnnmetrics.utils.validation import check_fnames
-
 from .constants import N_JOBS
+from .errors import GranularityError
 from .protein import Protein
-from .utils.utils import tqdm_joblib
+from .utils.utils import distribute_function, tqdm_joblib
+from .utils.validation import check_fnames
 
 
 class Coordinates:
@@ -104,13 +102,11 @@ class Coordinates:
         """
         fname_list = check_fnames(fname_list)
 
-        with tqdm_joblib(
-            tqdm(
-                desc="Extracting coordinates from pdb files",
-                total=len(fname_list),
-            )
-        ) as progressbar:
-            protein = Parallel(n_jobs=self.n_jobs)(
-                delayed(self.get_atom_coordinates)(file) for file in fname_list
-            )
-        return protein
+        proteins = distribute_function(
+            self.get_atom_coordinates,
+            fname_list,
+            "Extracting coordinates from pdb files",
+            self.n_jobs,
+        )
+
+        return proteins

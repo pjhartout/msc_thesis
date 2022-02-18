@@ -19,7 +19,7 @@
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
-* TODO <2022-02-18 Fri> Meeting with Tim
+* DONE <2022-02-18 Fri> Meeting with Tim
 ** What I did
 *** Improve graph extraction methods (still need rework)
 *** Start descriptor functions and kernels
