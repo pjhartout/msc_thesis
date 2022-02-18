@@ -36,6 +36,9 @@ class Protein:
         knn_graph=None,
         eps_graph=None,
         contact_graph=None,
+        degree_histogram=None,
+        clustering_histogram=None,
+        laplacian_spectrum_histogram=None,
     ):
         # Basic protein descriptors
         self.name = name
@@ -54,6 +57,15 @@ class Protein:
             "knn_graph": knn_graph,
             "eps_graph": eps_graph,
             "contact_graph": contact_graph,
+        }
+
+        # Histograms, depends on the graph used
+        # TODO: find a way to make this graph type-dependent (i.e. a eps_graph
+        # does not have the same dist as a knn graph)
+        self.histograms = {
+            "degree_histogram": degree_histogram,
+            "clustering_histogram": clustering_histogram,
+            "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
         }
 
     def get_nx_graph(self, graph_type: str):
