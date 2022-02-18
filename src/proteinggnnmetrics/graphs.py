@@ -4,21 +4,26 @@
 
 Handles graph extraction from a set of atom coordinates.
 
+TODO: check docstrings
 """
 
 from abc import ABCMeta
 from typing import Dict, List, Union
 
+import networkx as nx
 import numpy as np
+import pandas as pd
 from joblib import Parallel, delayed
 from scipy import sparse
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
 
+from proteinggnnmetrics.protein import Protein
+
 from .constants import N_JOBS
 from .utils.utils import tqdm_joblib
-from .utils.validation import check_graph
+from .utils.validation import check_graphs
 
 
 class GraphConstruction(metaclass=ABCMeta):
@@ -27,7 +32,7 @@ class GraphConstruction(metaclass=ABCMeta):
     def __init__(self):
         pass
 
-    def transform(self, samples: Union[List, np.ndarray]) -> np.ndarray:
+    def construct(self, samples: Union[List, np.ndarray]) -> np.ndarray:
         """Apply transformation
 
         Args:
@@ -68,49 +73,48 @@ class ContactMap(GraphConstruction):
         """
         super().__init__(**kwargs)
         self.n_jobs = n_jobs
-
         self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
 
-    def transform(self, X: List) -> List:
+    def construct(self, proteins: List[Protein]) -> List[Protein]:
         """Extract contact map from set of coordinates.
 
         Args:
-            X (List): List of arrays containing coordinates.
+            proteins: List[Protein]: List of arrays containing coordinates.
 
         Returns:
-            Xt (List): List of contact maps as square 2D matrices
+            List[Protein]): List of proteins with included contact maps
         """
 
-        def compute_contact_map(X: np.ndarray) -> np.ndarray:
+        def compute_contact_map(protein: Protein) -> Protein:
             """Computes contact map between all the amino acids in X
 
             Args:
-                X (np.ndarray): coordinates from a protein
+                X (pd.DataFrame): coordinates from a protein
 
             Returns:
-                np.ndarray: square matrix of distance between all the residues in X.
+                nx.Graph: labeled, fully connected weighted graph of the contact
+                map.
             """
-            return pairwise_distances(
-                X, metric=self.metric, n_jobs=self.n_jobs_pairwise
+            protein.contact_map = pairwise_distances(
+                protein.coordinates,
+                metric=self.metric,
+                n_jobs=self.n_jobs_pairwise,
+            )
+            return protein
+
+        with tqdm_joblib(
+            tqdm(desc=f"Extracting contact map", total=len(proteins),)
+        ) as progressbar:
+            proteins = Parallel(n_jobs=N_JOBS)(
+                delayed(compute_contact_map)(sample) for sample in proteins
             )
 
-        pairwise_dist_list = list()
-        with tqdm_joblib(
-            tqdm(desc=f"Extracting contact map", total=len(X),)
-        ) as progressbar:
-            Xt = Parallel(n_jobs=N_JOBS)(
-                delayed(compute_contact_map)(sample) for sample in X
-            )
-        return Xt
+        return proteins
 
 
 class KNNGraph(GraphConstruction):
     """Extract KNN graph
-
-    Args:
-        GraphConstruction (type): class constructor
-
     """
 
     def __init__(
@@ -132,29 +136,23 @@ class KNNGraph(GraphConstruction):
         self.metric_params = metric_params
         self.n_jobs = n_jobs
 
-    def transform(self, X: List) -> List:
+    def construct(self, proteins: List[Protein]) -> List[Protein]:
         """Extracts k-nearest neightbour graph from input contact map.
-
-        Args:
-            X (List): list of contact maps
-
-        Returns:
-            List: list of k-NN graphs.
         """
-        X = check_graph(X)
+        proteins = check_graphs(proteins)
 
-        def knn_graph_func(X: np.ndarray) -> np.ndarray:
+        def knn_graph_func(protein: Protein) -> nx.Graph:
             """knn graph extraction function for each graph
 
             Args:
-                X (np.ndarray): graph to get the knn graph from
+                proteins (Protein): graph to get the knn graph from
 
             Returns:
-                np.ndarray:
+                Protein: proteins with knn adjancency matrix set.
             """
-            return sparse.csr_matrix(
+            protein.knn_adj = sparse.csr_matrix(
                 kneighbors_graph(
-                    X,
+                    protein.contact_map,
                     n_neighbors=self.n_neighbors,
                     metric=self.metric,
                     p=self.p,
@@ -163,14 +161,18 @@ class KNNGraph(GraphConstruction):
                     include_self=False,
                 )
             )
+            return protein
 
         with tqdm_joblib(
-            tqdm(desc=f"Extracting KNN graph from contact map", total=len(X),)
-        ) as progressbar:
-            Xt = Parallel(n_jobs=self.n_jobs)(
-                delayed(knn_graph_func)(sample) for sample in X
+            tqdm(
+                desc=f"Extracting KNN graph from contact map",
+                total=len(proteins),
             )
-        return Xt
+        ) as progressbar:
+            proteins = Parallel(n_jobs=self.n_jobs)(
+                delayed(knn_graph_func)(sample) for sample in proteins
+            )
+        return proteins
 
 
 class EpsilonGraph(GraphConstruction):
@@ -183,32 +185,35 @@ class EpsilonGraph(GraphConstruction):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
 
-    def transform(self, X: List) -> List:
+    def construct(self, proteins: List[Protein]) -> List[Protein]:
         """Extracts epsilon graph from input contact map.
 
         Args:
-            X (List): graph to get the epsilon graph from
+            proteins List[Protein]: graph to get the epsilon graph from
 
         Returns:
-            List: list of epsilon graphs
+            List[Protein]: list of epsilon graphs
         """
-        X = check_graph(X)
+        proteins = check_graphs(proteins)
 
-        def epsilon_graph_func_(X: np.ndarray) -> np.ndarray:
+        def epsilon_graph_func_(protein: Protein) -> nx.Graph:
             """epsilon graph extraction function for each graph
 
             Args:
-                X (np.ndarray): contact map for epsilon graph
+                protein (Protein): input protein
 
             Returns:
-                np.ndarray: epsilon graph
+                Protein: protein with epsilon graph adjacency matrix set.
             """
-            return sparse.csr_matrix(np.where(X < self.epsilon, 1, 0))
+            protein.eps_adj = sparse.csr_matrix(
+                np.where(protein.contact_map < self.epsilon, 1, 0)
+            )
+            return protein
 
         with tqdm_joblib(
-            tqdm(desc=f"Extracting epsilon graph", total=len(X),)
+            tqdm(desc=f"Extracting epsilon graph", total=len(proteins),)
         ) as progressbar:
-            Xt = Parallel(n_jobs=self.n_jobs)(
-                delayed(epsilon_graph_func_)(sample) for sample in X
+            proteins = Parallel(n_jobs=self.n_jobs)(
+                delayed(epsilon_graph_func_)(sample) for sample in proteins
             )
-        return Xt
+        return proteins
