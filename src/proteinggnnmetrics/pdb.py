@@ -8,11 +8,14 @@ Classes and methods to extract matrices from pdb files.
 
 import os
 from pathlib import Path, PosixPath
-from typing import List
+from typing import List, Tuple
 
+import networkx as nx
 import numpy as np
+import pandas as pd
 from Bio.PDB.PDBParser import PDBParser
 from joblib import Parallel, delayed
+from pyparsing import col
 from tqdm import tqdm
 
 from proteinggnnmetrics.errors import GranularityError
@@ -20,6 +23,7 @@ from proteinggnnmetrics.utils.utils import tqdm_joblib
 from proteinggnnmetrics.utils.validation import check_fnames
 
 from .constants import N_JOBS
+from .protein import Protein
 from .utils.utils import tqdm_joblib
 
 
@@ -37,7 +41,7 @@ class Coordinates:
         self.granularity = granularity
         self.n_jobs = n_jobs
 
-    def get_atom_coordinates(self, fname: PosixPath) -> np.ndarray:
+    def get_atom_coordinates(self, fname: PosixPath) -> Protein:
         """Given a file name, extracts its atom coordinates. self.granularity
         determines which atoms are considered.
 
@@ -51,17 +55,22 @@ class Coordinates:
             np.ndarray: array of coordinates of each of the atoms in fname
             (shape: n_atoms, 3)
         """
+        col_names = ["x_0", "x_1", "x_2"]
+
         parser = PDBParser()
         structure = parser.get_structure(fname.stem, fname)
         residues = [
             r for r in structure.get_residues() if r.get_id()[0] == " "
         ]
         coordinates = list()
+        sequence = list()
         if self.granularity in ["N", "CA", "C", "O"]:
             for residue in residues:
                 coordinate = residue[self.granularity].get_coord()
                 name = residue.get_resname()
-                coordinates.append([coordinate, name])
+                coordinates.append(coordinate)
+                sequence.append(name)
+
         elif self.granularity == "all":
             # TODO: test
             for residue in residues:
@@ -69,32 +78,39 @@ class Coordinates:
                 atom_coords = list()
                 for atom in residue:
                     atom_coords.append(atom.get_coord())
-                coordinates.append([atom_coords, name])
+                    coordinates.append(atom_coords)
+                    sequence.append(name)
+
         else:
             raise GranularityError("Specify correct granularity")
 
-        return np.vstack(coordinates)
+        coordinates = np.vstack(coordinates)
+        protein_name = Path(fname).name.split(".")[0]
+        return Protein(
+            name=protein_name, coordinates=coordinates, sequence=sequence
+        )
 
-    def transform(
-        self, fname_list: List[str], granularity: str = "CA"
+    def extract(
+        self, fname_list: List[PosixPath], granularity: str = "CA"
     ) -> List[np.ndarray]:
         """Transform a set of pdb files to get their associated coordinates.
 
         Args:
-            fname_list (List[str]): [description]
+            fname_list (List[PosixPath]): [description]
             granularity (str, optional): [description]. Defaults to "CA".
 
         Returns:
             List: list of arrays containing the coordinates for each file in fname_list
         """
         fname_list = check_fnames(fname_list)
+
         with tqdm_joblib(
             tqdm(
                 desc="Extracting coordinates from pdb files",
                 total=len(fname_list),
             )
         ) as progressbar:
-            Xt = Parallel(n_jobs=self.n_jobs)(
+            protein = Parallel(n_jobs=self.n_jobs)(
                 delayed(self.get_atom_coordinates)(file) for file in fname_list
             )
-        return Xt
+        return protein
