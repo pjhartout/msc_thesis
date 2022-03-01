@@ -123,23 +123,80 @@ class Protein:
             )
         return self.graphs[graph_type]
 
-    def save(self, path, auto_name: bool = True):
+    def save(self, path: PosixPath, auto_name: bool = True):
         if auto_name:
-            path = path + self.name.split(".")[0] + ".pkl"
+            path = path / str(self.name.split(".")[0] + ".pkl")
         with open(path, "wb") as f:
             pickle.dump(self, f)
-
-    def plot_point_cloud(self):
-        pass
 
     def plot_contact_map(self):
         pass
 
-    def plot_graph(self, graph_type):
-        pass
+    @staticmethod
+    def plot_point_cloud(point_cloud):
+        scene = {
+            "xaxis": {
+                "title": "0th",
+                "type": "linear",
+                "showexponent": "all",
+                "exponentformat": "e",
+            },
+            "yaxis": {
+                "title": "1st",
+                "type": "linear",
+                "showexponent": "all",
+                "exponentformat": "e",
+            },
+            "zaxis": {
+                "title": "2nd",
+                "type": "linear",
+                "showexponent": "all",
+                "exponentformat": "e",
+            },
+        }
+
+        fig = gobj.Figure()
+        fig.update_layout(scene=scene)
+
+        fig.add_trace(
+            gobj.Scatter3d(
+                x=point_cloud[:, 0],
+                y=point_cloud[:, 1],
+                z=point_cloud[:, 2],
+                mode="markers",
+                marker={
+                    "size": 4,
+                    "color": list(range(point_cloud.shape[0])),
+                    "colorscale": "Viridis",
+                    "opacity": 0.8,
+                },
+            )
+        )
+        return fig
 
     @staticmethod
-    def load(path):
+    def plot_graph(
+        G: List[nx.Graph],
+        sample: int = 0,
+        with_labels: bool = True,
+        return_fig: bool = False,
+        node_size: int = 100,
+        fontsize: int = 5,
+    ):
+        pos = nx.spring_layout(G[sample])
+        fig = nx.draw_networkx(
+            G[sample], pos=pos, with_labels=False, node_size=node_size,
+        )
+        for node, (x, y) in pos.items():
+            text(x, y, node, fontsize=fontsize, ha="center", va="center")
+
+        if return_fig:
+            return fig
+        else:
+            plt.show()
+
+    @staticmethod
+    def load(path: PosixPath):
         with open(path, "rb") as f:
             protein = pickle.load(f)
         return protein
