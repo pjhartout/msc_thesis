@@ -34,8 +34,8 @@ def set_data_home() -> PosixPath:
 
 
 DATA_HOME = set_data_home()
+CACHE_DIR = DATA_HOME / ".cache"
 HUMAN_PROTEOME = DATA_HOME / "UP000005640_9606_HUMAN_v2"
-
 HUMAN_PROTEOME_CA_GRAPHS = DATA_HOME / Path(
     "UP000005640_9606_HUMAN_v2_CA_GRAPHS"
 )
