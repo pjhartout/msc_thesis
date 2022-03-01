@@ -95,15 +95,11 @@
 
 \begin{frame}[fragile]{W-L kernel}
   \begin{itemize}
-  \item Acutally, W-L K. is a generalized version of the bag of node degrees
-    since node degrees are one-hop neighborhood node enrichment while W-L
-    iteratively enrich node voc. by doing $n$-hops.
-  \item Steps: take input graph, (1) iteratively compute hash value of each node
-    based on their neighborhood, (2) create feature map with counts of nodes
-    with given color at each iteration of the hash value computation
-  \item Notes: complexity is linear in \# edges. only the colors appearing in two
-    graphs needs to be tracked. Counting colors can be done in linear time in \#
-    nodes. In total, $\mathcal{O}(e)$
+  \item Computing $\phi(G)$ needs to be done explicitely and can be done
+    independently prior to computing $K_{WL}=\phi(G)^T\phi(G')$
+  \item How to compute $\phi(G)$? \texttt{networkx} has a function called
+\href{https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.graph_hashing.weisfeiler_lehman_graph_hash.html}{\texttt{weisfeiler\_lehman\_graph\_hash}}
+but it does not return the hash counts at each iteration.
   \end{itemize}
 \end{frame}
 
