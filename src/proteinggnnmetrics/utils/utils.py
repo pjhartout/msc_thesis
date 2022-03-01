@@ -6,10 +6,12 @@ Provides various utilities useful for the project
 
 import contextlib
 import os
-from typing import Any, Callable, List
+from typing import Any, Callable, Iterable, List
 
 import joblib
+import networkx as nx
 import numpy as np
+from grakel import Graph, graph_from_networkx
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
@@ -100,4 +102,9 @@ def distribute_function(
     """Simply distributues the execution of func across multiple cores to process X faster"""
     with tqdm_joblib(tqdm(desc=tqdm_label, total=len(X),)) as progressbar:
         Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
+    return Xt
+
+
+def networkx2grakel(X: Iterable) -> Iterable:
+    Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
     return Xt
