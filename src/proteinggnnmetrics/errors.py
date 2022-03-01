@@ -27,3 +27,9 @@ class TDAPipelineError(Exception):
     """Raised when TDA pipeline is set incorrectly"""
 
     pass
+
+
+class ProteinLoadingError(Exception):
+    """Raised when protein cannot be correctly loaded from disk"""
+
+    pass
