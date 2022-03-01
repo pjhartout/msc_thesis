@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""test_graph_extraction.py
+"""graph_extraction_pipeline.py
 
 This is test benchmark to test out the graph extraction process on alphafold data.
 
@@ -9,14 +9,7 @@ This is test benchmark to test out the graph extraction process on alphafold dat
 
 import os
 import random
-from pathlib import Path
-from pickle import dump
 
-import matplotlib.pyplot as plt
-import numpy as np
-from Bio.PDB.PDBParser import PDBParser
-from joblib import Parallel, delayed
-from scipy import sparse
 from tqdm import tqdm
 
 from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
@@ -27,10 +20,13 @@ from proteinggnnmetrics.descriptors import (
     TopologicalDescriptor,
 )
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.paths import HUMAN_PROTEOME, HUMAN_PROTEOME_CA_GRAPHS
+from proteinggnnmetrics.loaders import list_pdb_files
+from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.utils import filter_pdb_files
+
+random.seed(42)
 
 
 @measure_memory
@@ -109,10 +105,10 @@ def get_tda_descriptor(proteins):
 @measure_memory
 @timeit
 def main():
-    pdb_files = filter_pdb_files(os.listdir(HUMAN_PROTEOME))
-    pdb_files = [HUMAN_PROTEOME / file for file in pdb_files]
+    pdb_files = list_pdb_files(HUMAN_PROTEOME)
+
     if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 1000)
+        pdb_files = random.sample(pdb_files, 100)
 
     proteins = get_coords(pdb_files)
     print(f"Coordinates: {len(proteins)}")
@@ -123,6 +119,8 @@ def main():
     proteins = get_clu_histograms(proteins)
     proteins = get_spectrum(proteins)
     proteins = get_tda_descriptor(proteins)
+    for protein in tqdm(proteins):
+        protein.save(CACHE_DIR / "sample_human_proteome_alpha_fold")
     print("END CALLS")
 
 
