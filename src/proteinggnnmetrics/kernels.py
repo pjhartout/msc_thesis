@@ -13,12 +13,13 @@ from xmlrpc.client import Boolean
 
 import networkx as nx
 import numpy as np
-from gklearn.kernels import weisfeilerlehmankernel
 from grakel import graph_from_networkx, kernels
 from grakel.kernels import VertexHistogram, WeisfeilerLehman
 from sklearn.metrics.pairwise import linear_kernel
 
-from .utils.utils import networkx2grakel
+from proteinggnnmetrics.constants import N_JOBS
+
+from .utils.utils import distribute_function, networkx2grakel
 
 
 class Kernel(metaclass=ABCMeta):
@@ -64,6 +65,37 @@ class WLKernel(Kernel):
             return gk.fit_transform(X, Y)
         else:
             return gk.fit_transform(X)
+
+    def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
+        return self.compute_kernel_matrix(X, Y)
+
+    def transform(self, X: Any, Y: Any = None) -> np.ndarray:
+        return self.compute_kernel_matrix(X, Y)
+
+
+class PreComputedWLKernel(Kernel):
+    def __init__(self,):
+        pass
+
+    def compute_kernel_matrix(self, X: Any, Y: Any) -> np.ndarray:
+        def product(dicts):
+            running_sum = 0
+            for key in dicts[0]:
+                running_sum += dicts[0][key] * dicts[1][key]
+            return running_sum
+
+        if Y == None:
+            Y = X
+
+        # Parallelize
+        res = distribute_function(
+            product,
+            zip(X, Y),
+            "pre-computed_product",
+            N_JOBS,
+            max([len(X), len(Y)]),
+        )
+        return res
 
     def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
         return self.compute_kernel_matrix(X, Y)

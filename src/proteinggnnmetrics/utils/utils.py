@@ -97,10 +97,13 @@ def tqdm_joblib(tqdm_object):
 
 
 def distribute_function(
-    func: Callable, X: Any, tqdm_label: str, n_jobs: int
+    func: Callable, X: Any, tqdm_label: str, n_jobs: int, total: int = 1
 ) -> Any:
-    """Simply distributues the execution of func across multiple cores to process X faster"""
-    with tqdm_joblib(tqdm(desc=tqdm_label, total=len(X),)) as progressbar:
+    """Simply distributes the execution of func across multiple cores to process X faster"""
+    if total == 1:
+        total = len(X)
+
+    with tqdm_joblib(tqdm(desc=tqdm_label, total=total,)) as progressbar:
         Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
     return Xt
 
@@ -108,3 +111,15 @@ def distribute_function(
 def networkx2grakel(X: Iterable) -> Iterable:
     Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
     return Xt
+
+
+def flatten_lists(lists: list) -> list:
+    """Removes nested lists"""
+    result = list()
+    for _list in lists:
+        _list = list(_list)
+        if _list != []:
+            result += _list
+        else:
+            continue
+    return result

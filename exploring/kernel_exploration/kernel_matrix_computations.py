@@ -9,12 +9,15 @@ This is to test kernel matrix computations
 
 import os
 from pathlib import Path
+from re import X
 from typing import List
 
-import matplotlib.pyplot as plt
-from grakel.kernels import VertexHistogram, WeisfeilerLehman
-
-from proteinggnnmetrics.kernels import LinearKernel, WLKernel
+from proteinggnnmetrics.constants import N_JOBS
+from proteinggnnmetrics.kernels import (
+    LinearKernel,
+    PreComputedWLKernel,
+    WLKernel,
+)
 from proteinggnnmetrics.loaders import (
     load_descriptor,
     load_graphs,
@@ -22,6 +25,40 @@ from proteinggnnmetrics.loaders import (
 )
 from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.protein import Protein
+from proteinggnnmetrics.utils.debug import measure_memory, timeit
+from proteinggnnmetrics.utils.utils import distribute_function
+
+
+def compute_wl_hashes(protein):
+    protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph")
+    return protein
+
+
+@measure_memory
+@timeit
+def compute_naive_kernel(graphs):
+    wl_kernel = WLKernel()
+    KX = wl_kernel.fit_transform(graphs)
+    return KX
+
+
+@measure_memory
+@timeit
+def compute_precomp_kernel(proteins):
+    proteins = distribute_function(
+        compute_wl_hashes,
+        proteins,
+        "Computing Weisfeiler-Lehman Hashes",
+        N_JOBS,
+    )
+    hashes = [
+        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
+        for protein in proteins
+    ]
+
+    precomp_wl = PreComputedWLKernel()
+    KX = precomp_wl.fit_transform(hashes)
+    return KX
 
 
 def main():
@@ -48,13 +85,11 @@ def main():
     graphs = load_graphs(
         CACHE_DIR / "sample_human_proteome_alpha_fold", graph_type="knn_graph"
     )
-    wl_kernel = WLKernel()
+    KX = compute_naive_kernel(graphs)
 
-    G_dist_1 = graphs[half_point:]
-    G_dist_2 = graphs[:half_point]
-    KX = wl_kernel.transform(G_dist_1)
-    KY = wl_kernel.transform(G_dist_2)
-    KXY = wl_kernel.transform(G_dist_1, G_dist_2)
+    # 2. W-L histogram computation speedup
+    KX = compute_precomp_kernel(proteins)
+    # print(hashes)
 
 
 if __name__ == "__main__":

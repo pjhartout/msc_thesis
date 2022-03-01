@@ -12,6 +12,7 @@ TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/libr
 
 
 import pickle
+from collections import Counter
 from pathlib import PosixPath
 from typing import List
 
@@ -23,11 +24,11 @@ from matplotlib.pyplot import figure, text
 from scipy import sparse
 
 from .errors import AdjacencyMatrixError, GraphTypeError
+from .utils.utils import flatten_lists
 
 
 class Protein:
-    """Main protein object to store data related to a protein
-    """
+    """Main protein object to store data related to a protein"""
 
     def __init__(
         self,
@@ -69,20 +70,21 @@ class Protein:
                 "degree_histogram": degree_histogram,
                 "clustering_histogram": clustering_histogram,
                 "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
+                "weisfeiler-lehman-hist": {},
             },
             "eps_graph": {
                 "degree_histogram": degree_histogram,
                 "clustering_histogram": clustering_histogram,
                 "laplacian_spectrum_histogram": laplacian_spectrum_histogram,
+                "weisfeiler-lehman-hist": {},
             },
             "contact_graph": {
                 # TDA stuff
             },
         }
 
-    def get_nx_graph(self, graph_type: str):
-        """Returns graph of specified graph type with labeled nodes
-        """
+    def set_nx_graph(self, graph_type: str):
+        """Returns graph of specified graph type with labeled nodes"""
 
         def build_graph(adj_matrix):
             # Return graph if already pre-computed
@@ -123,7 +125,21 @@ class Protein:
             )
         return self.graphs[graph_type]
 
-    def save(self, path: PosixPath, auto_name: bool = True):
+    def set_weisfeiler_lehman_hashes(self, graph_type) -> None:
+        hashes = dict(
+            Counter(
+                flatten_lists(
+                    list(
+                        nx.weisfeiler_lehman_subgraph_hashes(
+                            self.graphs[graph_type]
+                        ).values()
+                    )
+                )
+            )
+        )
+        self.descriptors[graph_type]["weisfeiler-lehman-hist"] = hashes
+
+    def save(self, path: PosixPath, auto_name: bool = True) -> None:
         if auto_name:
             path = path / str(self.name.split(".")[0] + ".pkl")
         with open(path, "wb") as f:
