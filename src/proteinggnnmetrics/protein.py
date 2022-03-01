@@ -12,10 +12,14 @@ TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/libr
 
 
 import pickle
+from pathlib import PosixPath
 from typing import List
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import plotly.graph_objs as gobj
+from matplotlib.pyplot import figure, text
 from scipy import sparse
 
 from .errors import AdjacencyMatrixError, GraphTypeError
@@ -100,14 +104,18 @@ class Protein:
                 node_labels_map = dict(
                     zip(range(len(self.sequence)), self.sequence)
                 )
-                self.graphs[graph_type] = nx.relabel_nodes(G, node_labels_map)
+                nx.set_node_attributes(G, node_labels_map, "residue")
+                self.graphs[graph_type] = G
 
         if graph_type == "knn_graph":
             build_graph(self.knn_adj)
+
         elif graph_type == "epsilon_graph":
             build_graph(self.eps_adj)
+
         elif graph_type == "contact_map":
             build_graph(self.contact_map)
+
         else:
             raise GraphTypeError(
                 'Wrong graph type specified, should be one of ["knn_graph", '
