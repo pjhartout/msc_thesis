@@ -296,9 +296,9 @@ class TopologicalDescriptor(Descriptor):
             )
 
         contact_maps = [protein.contact_map for protein in proteins]
-        tda_descriptors = pipeline.Pipeline(self.tda_pipeline).fit_transform(
-            contact_maps
-        )
+        tda_descriptors = pipeline.Pipeline(
+            self.tda_pipeline, verbose=True
+        ).fit_transform(contact_maps)
 
         for protein, tda_descriptor in zip(proteins, tda_descriptors):
             protein.descriptors["contact_graph"][
