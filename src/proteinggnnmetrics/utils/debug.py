@@ -4,6 +4,8 @@ import time
 import tracemalloc
 from typing import Callable
 
+from .colors import bcolors
+
 
 def timeit(func: Callable) -> Callable:
     """Timeit decorator
@@ -21,7 +23,19 @@ def timeit(func: Callable) -> Callable:
         start = time.perf_counter()
         result = func(*args, **kwargs)
         time_elapsed = time.perf_counter() - start
-        print(f"Callable: {func.__name__}, Time: {time_elapsed}")
+        print(
+            f"\n"
+            + "Function Name       :"
+            + bcolors.OKGREEN
+            + f"{func.__name__}"
+            + bcolors.ENDC
+        )
+        print(
+            "Time                :"
+            + bcolors.OKGREEN
+            + f"{time_elapsed}"
+            + bcolors.ENDC
+        )
         return result
 
     return time_closure
@@ -43,12 +57,24 @@ def measure_memory(func: Callable, *args, **kwargs):
 
         current, peak = tracemalloc.get_traced_memory()
         print(
-            f"\n\033[37mFunction Name       :\033[35;1m {func.__name__}\033[0m"
+            f"\n"
+            + "Function Name       :"
+            + bcolors.OKGREEN
+            + f"{func.__name__}"
+            + bcolors.ENDC
         )
         print(
-            f"\033[37mCurrent memory usage:\033[36m {current / 10**6}MB\033[0m"
+            "Current memory usage:"
+            + bcolors.OKGREEN
+            + f"{current / 10**6}MB"
+            + bcolors.ENDC
         )
-        print(f"\033[37mPeak                :\033[36m {peak / 10**6}MB\033[0m")
+        print(
+            f"Peak                :"
+            + bcolors.OKGREEN
+            + f"{peak / 10**6}MB"
+            + bcolors.ENDC
+        )
         tracemalloc.stop()
         return result
 
