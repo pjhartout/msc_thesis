@@ -22,6 +22,8 @@ scikit-learn = "^1.0.2"
 tqdm = "^4.62.3"
 pyprojroot = "^0.2.0"
 giotto-tda = "^0.5.1"
+grakel = "^0.1.8"
+biopython = "^1.79"
 
 [tool.poetry.dev-dependencies]
 
