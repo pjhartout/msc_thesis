@@ -18,23 +18,22 @@ from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
 
-from .constants import N_JOBS
-from .errors import GranularityError
 from .protein import Protein
-from .utils.utils import distribute_function, tqdm_joblib
+from .utils.exception import GranularityError
+from .utils.functions import distribute_function, tqdm_joblib
 from .utils.validation import check_fnames
 
 
 class Coordinates:
     """Coordinates handles coordinate extraction of atoms in pdb files."""
 
-    def __init__(self, granularity: str = "CA", n_jobs: int = N_JOBS) -> None:
+    def __init__(self, granularity: str, n_jobs: int) -> None:
         """Initializes Coordinates object
 
         Args:
             granularity (str, optional): granularity of the desired set of
             coordinates. Can be N, CA, C, O, or all. Defaults to "CA".
-            n_jobs (int, optional): [description]. Defaults to N_JOBS.
+            n_jobs (int, optional): [description].
         """
         self.granularity = granularity
         self.n_jobs = n_jobs

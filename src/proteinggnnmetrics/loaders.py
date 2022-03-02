@@ -10,10 +10,10 @@ import os
 from pathlib import Path, PosixPath
 from typing import List
 
-from .errors import ProteinLoadingError
 from .protein import Protein
 from .utils.colors import bcolors
-from .utils.utils import filter_pdb_files
+from .utils.exception import ProteinLoadingError
+from .utils.functions import filter_pdb_files
 
 
 def list_pdb_files(path: PosixPath) -> List[PosixPath]:

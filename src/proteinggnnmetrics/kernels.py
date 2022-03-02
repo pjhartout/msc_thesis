@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import linear_kernel
 
 from proteinggnnmetrics.constants import N_JOBS
 
-from .utils.utils import distribute_function, networkx2grakel
+from .utils.functions import distribute_function, networkx2grakel
 
 
 class Kernel(metaclass=ABCMeta):

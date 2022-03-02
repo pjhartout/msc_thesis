@@ -19,9 +19,8 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from tqdm import tqdm
 
-from .constants import N_JOBS
 from .protein import Protein
-from .utils.utils import distribute_function, tqdm_joblib
+from .utils.functions import distribute_function, tqdm_joblib
 from .utils.validation import check_graphs
 
 

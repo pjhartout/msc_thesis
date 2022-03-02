@@ -12,7 +12,7 @@ from typing import Any, List
 
 import numpy as np
 
-from ..errors import FileExtentionError
+from .exception import FileExtentionError
 
 
 def check_graphs(X, distance_matrices=False, **kwargs):

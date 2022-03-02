@@ -14,10 +14,9 @@ import networkx as nx
 import numpy as np
 from gtda import curves, diagrams, homology, pipeline
 
-from .constants import N_JOBS
-from .errors import TDAPipelineError
 from .protein import Protein
-from .utils.utils import distribute_function
+from .utils.exception import TDAPipelineError
+from .utils.functions import distribute_function
 
 
 class Descriptor(metaclass=ABCMeta):

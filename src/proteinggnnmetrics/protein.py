@@ -23,8 +23,8 @@ import plotly.graph_objs as gobj
 from matplotlib.pyplot import figure, text
 from scipy import sparse
 
-from .errors import AdjacencyMatrixError, GraphTypeError
-from .utils.utils import flatten_lists
+from .utils.exception import AdjacencyMatrixError, GraphTypeError
+from .utils.functions import flatten_lists
 
 
 class Protein:
