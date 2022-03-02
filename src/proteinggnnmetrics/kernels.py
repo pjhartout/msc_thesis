@@ -8,13 +8,15 @@ Kernels
 
 import os
 from abc import ABCMeta
-from typing import Any, Callable
+from itertools import product
+from typing import Any, Callable, Iterable, List, Union
 
 import networkx as nx
 import numpy as np
 from grakel import graph_from_networkx, kernels
 from grakel.kernels import VertexHistogram, WeisfeilerLehman
 from sklearn.metrics.pairwise import linear_kernel
+from tqdm import tqdm
 
 from .utils.functions import distribute_function, networkx2grakel
 
@@ -74,33 +76,25 @@ class WeisfeilerLehmanKernel(Kernel):
             else:
                 return gk.transform(X)
 
-    def compute_prehashed_kernel_matrix(self, X: Any, Y: Any) -> np.ndarray:
+    def compute_prehashed_kernel_matrix(
+        self, X: Iterable, Y: Union[Iterable, None]
+    ) -> List:
         def dot_product(dicts):
             running_sum = 0
-
-            # the idea here is that if dicts[1] is much shorter than dicts[0],
-            # we loop through the shorter input to avoid checking useless keys.
-            len_dict = [len(elem.keys()) for elem in dicts]
-            # faster than np.argmin for shorter lists.
-            index_min = min(range(len(len_dict)), key=len_dict.__getitem__)
-
-            for key in dicts[index_min]:
-                running_sum += (
-                    dicts[index_min][key] * dicts[(index_min + 1) % 1][key]
-                )
+            for key in set(dicts[0].keys()).intersection(dicts[1].keys()):
+                running_sum += dicts[0][key] * dicts[1][key]
             return running_sum
 
         if Y == None:
             Y = X
 
-        # Parallelize
-        res = distribute_function(
-            dot_product,
-            zip(X, Y),
-            "pre-computed_product",
-            self.n_jobs,
-            max([len(X), len(Y)]),
-        )
+        iters = list(product(X, Y))
+        res = list()
+        for x in tqdm(
+            iters, desc="Dot product of elements in matrix", total=len(iters)
+        ):
+            res.append(dot_product(x))
+
         return res
 
     def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
