@@ -80,8 +80,17 @@ class PreComputedWLKernel(Kernel):
     def compute_kernel_matrix(self, X: Any, Y: Any) -> np.ndarray:
         def product(dicts):
             running_sum = 0
-            for key in dicts[0]:
-                running_sum += dicts[0][key] * dicts[1][key]
+
+            # the idea here is that if dicts[1] is much shorter than dicts[0],
+            # we loop through the shorter input to avoid checking useless keys.
+            len_dict = [len(elem.keys()) for elem in dicts]
+            # faster than np.argmin for shorter lists.
+            index_min = min(range(len(len_dict)), key=len_dict.__getitem__)
+
+            for key in dicts[index_min]:
+                running_sum += (
+                    dicts[index_min][key] * dicts[(index_min + 1) % 1][key]
+                )
             return running_sum
 
         if Y == None:
