@@ -9,7 +9,6 @@ dependencies:
   - numpy
   - matplotlib
   - pandas
-  - bokeh
   - pytest
   - isort
   - jupyter
@@ -22,7 +21,7 @@ dependencies:
   - tqdm
   - pyprojroot
   - biopython
-  - joblib
   - pip
   - pip:
     - giotto-tda
+    - grakel
