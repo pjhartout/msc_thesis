@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+
+"""exceptions.py
+
+Defines exceptions and errors used in the package
+"""
+
+
 class FileExtentionError(Exception):
     """Raised when file does not contain the right extension."""
 
