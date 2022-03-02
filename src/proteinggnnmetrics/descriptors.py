@@ -171,7 +171,7 @@ class LaplacianSpectrum(Descriptor):
         self.n_jobs = n_jobs
 
     def describe(self, proteins: List[Protein]) -> Any:
-        def calculate_laplacian_spectrum(protein: Protein,):
+        def calculate_laplacian_spectrum(protein: Protein):
             G = protein.set_nx_graph(self.graph_type)
             spectrum = nx.normalized_laplacian_spectrum(G)
             histogram = np.histogram(
@@ -261,7 +261,8 @@ class TopologicalDescriptor(Descriptor):
                         curves.Derivative(
                             order=self.order, n_jobs=self.n_jobs
                         ),
-                    )(
+                    ),
+                    (
                         "featurizer",
                         curves.StandardFeatures("max", n_jobs=self.n_jobs),
                     ),
