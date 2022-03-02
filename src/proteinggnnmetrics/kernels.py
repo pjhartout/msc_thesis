@@ -75,7 +75,7 @@ class WeisfeilerLehmanKernel(Kernel):
                 return gk.transform(X)
 
     def compute_prehashed_kernel_matrix(self, X: Any, Y: Any) -> np.ndarray:
-        def product(dicts):
+        def dot_product(dicts):
             running_sum = 0
 
             # the idea here is that if dicts[1] is much shorter than dicts[0],
@@ -95,7 +95,7 @@ class WeisfeilerLehmanKernel(Kernel):
 
         # Parallelize
         res = distribute_function(
-            product,
+            dot_product,
             zip(X, Y),
             "pre-computed_product",
             self.n_jobs,
