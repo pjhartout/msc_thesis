@@ -100,7 +100,7 @@ def tqdm_joblib(tqdm_object):
 
 
 def distribute_function(
-    func: Callable, X: Any, tqdm_label: str, n_jobs: int, total: int = 1
+    func: Callable, X: Iterable, tqdm_label: str, n_jobs: int, total: int = 1
 ) -> Any:
     """Simply distributes the execution of func across multiple cores to process X faster"""
     if total == 1:

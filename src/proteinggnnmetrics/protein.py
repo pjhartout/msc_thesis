@@ -125,13 +125,17 @@ class Protein:
             )
         return self.graphs[graph_type]
 
-    def set_weisfeiler_lehman_hashes(self, graph_type) -> None:
+    def set_weisfeiler_lehman_hashes(
+        self, graph_type: str, n_iter: int
+    ) -> None:
         hashes = dict(
             Counter(
                 flatten_lists(
                     list(
                         nx.weisfeiler_lehman_subgraph_hashes(
-                            self.graphs[graph_type]
+                            self.graphs[graph_type],
+                            node_attr="residue",
+                            iterations=n_iter,
                         ).values()
                     )
                 )

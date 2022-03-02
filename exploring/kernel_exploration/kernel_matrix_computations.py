@@ -12,11 +12,9 @@ from pathlib import Path
 from re import X
 from typing import List
 
-from proteinggnnmetrics.kernels import (
-    LinearKernel,
-    PreComputedWLKernel,
-    WLKernel,
-)
+from grakel.kernels.vertex_histogram import VertexHistogram
+
+from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
 from proteinggnnmetrics.loaders import (
     load_descriptor,
     load_graphs,
@@ -31,34 +29,63 @@ config = configure()
 
 
 def compute_wl_hashes(protein):
-    protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph")
+    protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph", n_iter=10)
     return protein
 
 
 @measure_memory
 @timeit
 def compute_naive_kernel(graphs):
-    wl_kernel = WLKernel()
+    wl_kernel = WeisfeilerLehmanKernel(
+        n_iter=10,
+        base_graph_kernel=VertexHistogram,
+        normalize=True,
+        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        pre_computed_hash=False,
+    )
     KX = wl_kernel.fit_transform(graphs)
     return KX
 
 
 @measure_memory
 @timeit
-def compute_precomp_kernel(proteins):
+def compute_hashes_then_kernel(proteins):
     proteins = distribute_function(
         compute_wl_hashes,
         proteins,
         "Computing Weisfeiler-Lehman Hashes",
-        config["COMPUTE"]["N_JOBS"],
+        int(config["COMPUTE"]["N_JOBS"]),
     )
     hashes = [
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
         for protein in proteins
     ]
+    wl_kernel = WeisfeilerLehmanKernel(
+        n_iter=10,
+        base_graph_kernel=VertexHistogram,
+        normalize=True,
+        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        pre_computed_hash=True,
+    )
+    KX = wl_kernel.fit_transform(hashes)
+    return KX, proteins
 
-    precomp_wl = PreComputedWLKernel()
-    KX = precomp_wl.fit_transform(hashes)
+
+@measure_memory
+@timeit
+def compute_kernel_using_precomputed_hashes(proteins):
+    hashes = [
+        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
+        for protein in proteins
+    ]
+    wl_kernel = WeisfeilerLehmanKernel(
+        n_iter=10,
+        base_graph_kernel=VertexHistogram,
+        normalize=True,
+        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        pre_computed_hash=True,
+    )
+    KX = wl_kernel.fit_transform(hashes)
     return KX
 
 
@@ -90,7 +117,8 @@ def main():
     KX = compute_naive_kernel(graphs)
 
     # 2. W-L histogram computation speedup
-    KX = compute_precomp_kernel(proteins)
+    KX, proteins = compute_hashes_then_kernel(proteins)
+    KX = compute_kernel_using_precomputed_hashes(proteins)
     # print(hashes)
 
 
