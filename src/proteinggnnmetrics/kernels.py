@@ -83,14 +83,14 @@ class WeisfeilerLehmanKernel(Kernel):
 
     def compute_prehashed_kernel_matrix(
         self, X: Iterable, Y: Union[Iterable, None]
-    ) -> List:
+    ) -> Iterable:
         def parallel_dot_product(lst: Iterable) -> Iterable:
             res = list()
             for x in lst:
                 res.append(dot_product(x))
             return res
 
-        def dot_product(dicts):
+        def dot_product(dicts: Tuple) -> List:
             running_sum = 0
             for key in set(dicts[0].keys()).intersection(dicts[1].keys()):
                 running_sum += dicts[0][key] * dicts[1][key]
