@@ -13,6 +13,7 @@ from pyprojroot import here
 
 REPO_HOME = here()
 
+# Location of fast ssd cache disk
 FAST_DATA_HOME = "/local0/scratch/phartout"
 
 
