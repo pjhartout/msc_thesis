@@ -12,7 +12,6 @@ from pathlib import Path
 from re import X
 from typing import List
 
-from proteinggnnmetrics.constants import N_JOBS
 from proteinggnnmetrics.kernels import (
     LinearKernel,
     PreComputedWLKernel,
@@ -26,7 +25,9 @@ from proteinggnnmetrics.loaders import (
 from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.utils import distribute_function
+from proteinggnnmetrics.utils.functions import configure, distribute_function
+
+config = configure()
 
 
 def compute_wl_hashes(protein):
@@ -49,7 +50,7 @@ def compute_precomp_kernel(proteins):
         compute_wl_hashes,
         proteins,
         "Computing Weisfeiler-Lehman Hashes",
-        N_JOBS,
+        config["COMPUTE"]["N_JOBS"],
     )
     hashes = [
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
@@ -62,6 +63,7 @@ def compute_precomp_kernel(proteins):
 
 
 def main():
+
     proteins = load_proteins(CACHE_DIR / "sample_human_proteome_alpha_fold")
     half_point = int(len(proteins) / 2)
 

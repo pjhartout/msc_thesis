@@ -12,7 +12,6 @@ import random
 
 from tqdm import tqdm
 
-from proteinggnnmetrics.constants import N_JOBS, REDUCE_DATA
 from proteinggnnmetrics.descriptors import (
     ClusteringHistogram,
     DegreeHistogram,
@@ -24,15 +23,16 @@ from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.utils import filter_pdb_files
+from proteinggnnmetrics.utils.functions import configure, filter_pdb_files
 
 random.seed(42)
+config = configure()
 
 
 @measure_memory
 @timeit
 def get_coords(pdb_files):
-    coord = Coordinates(granularity="CA", n_jobs=N_JOBS)
+    coord = Coordinates(granularity="CA", n_jobs=config["COMPUTE"]["N_JOBS"])
     proteins = coord.extract(pdb_files, granularity="CA")
     return proteins
 
@@ -82,7 +82,9 @@ def get_clu_histograms(proteins):
 @measure_memory
 @timeit
 def get_spectrum(proteins):
-    laplancian_histogram = LaplacianSpectrum("knn_graph", n_bins=30)
+    laplancian_histogram = LaplacianSpectrum(
+        "knn_graph", n_bins=30, n_jobs=config["COMPUTE"]["N_JOBS"]
+    )
     proteins = laplancian_histogram.describe(proteins)
     return proteins
 
@@ -95,7 +97,7 @@ def get_tda_descriptor(proteins):
         epsilon=0.01,
         n_bins=100,
         order=1,
-        n_jobs=N_JOBS,
+        n_jobs=config["COMPUTE"]["N_JOBS"],
         landscape_layers=1,
     )
     proteins = tda_descriptor.describe(proteins)
@@ -105,6 +107,7 @@ def get_tda_descriptor(proteins):
 @measure_memory
 @timeit
 def main():
+    config = configure()
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
     if REDUCE_DATA:
