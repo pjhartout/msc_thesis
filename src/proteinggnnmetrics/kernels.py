@@ -18,7 +18,12 @@ from grakel.kernels import VertexHistogram, WeisfeilerLehman
 from sklearn.metrics.pairwise import linear_kernel
 from tqdm import tqdm
 
-from .utils.functions import distribute_function, networkx2grakel
+from .utils.functions import (
+    chunks,
+    distribute_function,
+    flatten_lists,
+    networkx2grakel,
+)
 
 
 class Kernel(metaclass=ABCMeta):
@@ -79,6 +84,12 @@ class WeisfeilerLehmanKernel(Kernel):
     def compute_prehashed_kernel_matrix(
         self, X: Iterable, Y: Union[Iterable, None]
     ) -> List:
+        def parallel_dot_product(lst: Iterable) -> Iterable:
+            res = list()
+            for x in lst:
+                res.append(dot_product(x))
+            return res
+
         def dot_product(dicts):
             running_sum = 0
             for key in set(dicts[0].keys()).intersection(dicts[1].keys()):
@@ -88,12 +99,16 @@ class WeisfeilerLehmanKernel(Kernel):
         if Y == None:
             Y = X
 
-        iters = list(product(X, Y))
-        res = list()
-        for x in tqdm(
-            iters, desc="Dot product of elements in matrix", total=len(iters)
-        ):
-            res.append(dot_product(x))
+        iters = list(chunks(list(product(X, Y)), self.n_jobs))
+
+        res = flatten_lists(
+            distribute_function(
+                parallel_dot_product,
+                iters,
+                "Dot product of elements in matrix",
+                n_jobs=self.n_jobs,
+            )
+        )
 
         return res
 

@@ -24,8 +24,7 @@ def timeit(func: Callable) -> Callable:
         result = func(*args, **kwargs)
         time_elapsed = time.perf_counter() - start
         print(
-            f"\n"
-            + "Function Name       :"
+            "Function Name       :"
             + bcolors.OKGREEN
             + f"{func.__name__}"
             + bcolors.ENDC
@@ -57,8 +56,7 @@ def measure_memory(func: Callable, *args, **kwargs):
 
         current, peak = tracemalloc.get_traced_memory()
         print(
-            f"\n"
-            + "Function Name       :"
+            "Function Name       :"
             + bcolors.OKGREEN
             + f"{func.__name__}"
             + bcolors.ENDC

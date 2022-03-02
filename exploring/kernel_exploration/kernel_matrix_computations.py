@@ -98,7 +98,7 @@ def main():
     # 1.1 Linear kernel
     # First descriptor then computation
     # degree_histograms = load_descriptor(
-    #     CACHE_DIR / "sample_human_proteome_alpha_fold",
+    #     CACHE_DIR / "sample_human_proteome_alpha_fold"
     #     descriptor="degree_histogram",
     #     graph_type="knn_graph",
     # )
@@ -115,7 +115,6 @@ def main():
         CACHE_DIR / "sample_human_proteome_alpha_fold", graph_type="knn_graph"
     )
     KX = compute_naive_kernel(graphs)
-
     # 2. W-L histogram computation speedup
     KX, proteins = compute_hashes_then_kernel(proteins)
     KX = compute_kernel_using_precomputed_hashes(proteins)

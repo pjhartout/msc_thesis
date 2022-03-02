@@ -132,3 +132,11 @@ def configure() -> Dict:
     config = configparser.ConfigParser()
     config.read(here() / "setting.conf")
     return config
+
+
+def chunks(lst, n):
+    """returns lst divided into n chunks approx. the same size"""
+    k, m = divmod(len(lst), n)
+    return (
+        lst[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n)
+    )
