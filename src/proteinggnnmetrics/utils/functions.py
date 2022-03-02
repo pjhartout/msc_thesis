@@ -4,15 +4,18 @@
 Provides various utilities useful for the project
 """
 
+import configparser
 import contextlib
 import os
-from typing import Any, Callable, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List
 
 import joblib
 import networkx as nx
 import numpy as np
-from grakel import Graph, graph_from_networkx
+from grakel import graph_from_networkx
 from joblib import Parallel, delayed
+from matplotlib.path import Path
+from pyprojroot import here
 from tqdm import tqdm
 
 
@@ -123,3 +126,9 @@ def flatten_lists(lists: list) -> list:
         else:
             continue
     return result
+
+
+def configure() -> Dict:
+    config = configparser.ConfigParser()
+    config.read(here() / "setting.conf")
+    return config
