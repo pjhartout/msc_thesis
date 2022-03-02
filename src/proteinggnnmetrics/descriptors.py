@@ -32,14 +32,14 @@ class Descriptor(metaclass=ABCMeta):
 
 
 class DegreeHistogram(Descriptor):
-    def __init__(self, graph_type: str, n_bins: int, n_jobs: int = N_JOBS):
+    def __init__(self, graph_type: str, n_bins: int, n_jobs: int):
         self.n_bins = n_bins
         self.graph_type = graph_type
         self.n_jobs = n_jobs
 
     def describe(self, proteins: List[Protein]) -> Any:
         def calculate_degree_histogram(protein: Protein, normalize=True):
-            G = protein.get_nx_graph(self.graph_type)
+            G = protein.set_nx_graph(self.graph_type)
             degrees = np.array([val for (node, val) in G.degree()])
             histogram = np.bincount(degrees, minlength=self.n_bins + 1)
             if normalize:
@@ -56,14 +56,14 @@ class DegreeHistogram(Descriptor):
 
 
 class DegreeHistogram(Descriptor):
-    def __init__(self, graph_type: str, n_bins: int, n_jobs: int = N_JOBS):
+    def __init__(self, graph_type: str, n_bins: int, n_jobs: int):
         self.n_bins = n_bins
         self.graph_type = graph_type
         self.n_jobs = n_jobs
 
     def describe(self, proteins: List[Protein]) -> Any:
         def calculate_degree_histogram(protein: Protein, normalize=True):
-            G = protein.get_nx_graph(self.graph_type)
+            G = protein.set_nx_graph(self.graph_type)
             degrees = np.array([val for (node, val) in G.degree()])
             histogram = np.bincount(degrees, minlength=self.n_bins + 1)
 
@@ -87,7 +87,7 @@ class DegreeHistogram(Descriptor):
 
 class ClusteringHistogram(Descriptor):
     def __init__(
-        self, graph_type: str, n_bins: int, density: bool, n_jobs: int = N_JOBS
+        self, graph_type: str, n_bins: int, density: bool, n_jobs: int
     ):
         self.graph_type = graph_type
         self.n_bins = n_bins
@@ -96,7 +96,7 @@ class ClusteringHistogram(Descriptor):
 
     def describe(self, proteins: List[Protein]) -> Any:
         def calculate_clustering_histogram(protein: Protein, normalize=True):
-            G = protein.get_nx_graph(self.graph_type)
+            G = protein.set_nx_graph(self.graph_type)
             coefficient_list = list(nx.clustering(G).values())
             histogram, _ = np.histogram(
                 coefficient_list,
@@ -122,7 +122,7 @@ class ClusteringHistogram(Descriptor):
 
 class ClusteringHistogram(Descriptor):
     def __init__(
-        self, graph_type: str, n_bins: int, density: bool, n_jobs: int = N_JOBS
+        self, graph_type: str, n_bins: int, density: bool, n_jobs: int
     ):
         self.graph_type = graph_type
         self.n_bins = n_bins
@@ -131,7 +131,7 @@ class ClusteringHistogram(Descriptor):
 
     def describe(self, proteins: List[Protein]) -> Any:
         def calculate_clustering_histogram(protein: Protein, normalize=True):
-            G = protein.get_nx_graph(self.graph_type)
+            G = protein.set_nx_graph(self.graph_type)
             coefficient_list = list(nx.clustering(G).values())
             histogram, _ = np.histogram(
                 coefficient_list,
@@ -160,9 +160,9 @@ class LaplacianSpectrum(Descriptor):
         self,
         graph_type: str,
         n_bins: int,
+        n_jobs: int,
         density: bool = False,
         bin_range: Tuple = (0, 2),
-        n_jobs: int = N_JOBS,
     ):
         self.graph_type = graph_type
         self.n_bins = n_bins
@@ -172,7 +172,7 @@ class LaplacianSpectrum(Descriptor):
 
     def describe(self, proteins: List[Protein]) -> Any:
         def calculate_laplacian_spectrum(protein: Protein,):
-            G = protein.get_nx_graph(self.graph_type)
+            G = protein.set_nx_graph(self.graph_type)
             spectrum = nx.normalized_laplacian_spectrum(G)
             histogram = np.histogram(
                 spectrum,
