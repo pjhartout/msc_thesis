@@ -23,16 +23,19 @@ from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import configure, filter_pdb_files
+from proteinggnnmetrics.utils.functions import configure
 
 random.seed(42)
 config = configure()
+
+N_JOBS = int(config["COMPUTE"]["N_JOBS"])
+REDUCE_DATA = config["DEBUG"]["REDUCE_DATA"]
 
 
 @measure_memory
 @timeit
 def get_coords(pdb_files):
-    coord = Coordinates(granularity="CA", n_jobs=config["COMPUTE"]["N_JOBS"])
+    coord = Coordinates(granularity="CA", n_jobs=N_JOBS)
     proteins = coord.extract(pdb_files, granularity="CA")
     return proteins
 
@@ -40,7 +43,7 @@ def get_coords(pdb_files):
 @measure_memory
 @timeit
 def get_contactmaps(proteins):
-    contactmap = ContactMap(metric="euclidean")
+    contactmap = ContactMap(metric="euclidean", n_jobs=N_JOBS)
     proteins = contactmap.construct(proteins)
     return proteins
 
@@ -48,7 +51,7 @@ def get_contactmaps(proteins):
 @measure_memory
 @timeit
 def get_knngraphs(proteins):
-    knngraph = KNNGraph(n_neighbors=4)
+    knngraph = KNNGraph(n_neighbors=4, n_jobs=N_JOBS)
     proteins = knngraph.construct(proteins)
     return proteins
 
@@ -56,7 +59,7 @@ def get_knngraphs(proteins):
 @measure_memory
 @timeit
 def get_epsilongraphs(proteins):
-    epsilongraph = EpsilonGraph(epsilon=2)
+    epsilongraph = EpsilonGraph(epsilon=2, n_jobs=N_JOBS)
     proteins = epsilongraph.construct(proteins)
     return proteins
 
@@ -64,7 +67,7 @@ def get_epsilongraphs(proteins):
 @measure_memory
 @timeit
 def get_deg_histograms(proteins):
-    degree_histogram = DegreeHistogram("knn_graph", n_bins=30)
+    degree_histogram = DegreeHistogram("knn_graph", n_bins=30, n_jobs=N_JOBS)
     proteins = degree_histogram.describe(proteins)
     return proteins
 
@@ -73,7 +76,7 @@ def get_deg_histograms(proteins):
 @timeit
 def get_clu_histograms(proteins):
     clustering_histogram = ClusteringHistogram(
-        "knn_graph", n_bins=30, density=False,
+        "knn_graph", n_bins=30, density=False, n_jobs=N_JOBS
     )
     proteins = clustering_histogram.describe(proteins)
     return proteins
@@ -83,7 +86,7 @@ def get_clu_histograms(proteins):
 @timeit
 def get_spectrum(proteins):
     laplancian_histogram = LaplacianSpectrum(
-        "knn_graph", n_bins=30, n_jobs=config["COMPUTE"]["N_JOBS"]
+        "knn_graph", n_bins=30, n_jobs=N_JOBS
     )
     proteins = laplancian_histogram.describe(proteins)
     return proteins
@@ -97,7 +100,7 @@ def get_tda_descriptor(proteins):
         epsilon=0.01,
         n_bins=100,
         order=1,
-        n_jobs=config["COMPUTE"]["N_JOBS"],
+        n_jobs=N_JOBS,
         landscape_layers=1,
     )
     proteins = tda_descriptor.describe(proteins)
@@ -107,7 +110,6 @@ def get_tda_descriptor(proteins):
 @measure_memory
 @timeit
 def main():
-    config = configure()
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
     if REDUCE_DATA:

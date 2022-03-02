@@ -56,7 +56,6 @@ class ContactMap(GraphConstruction):
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
-        **kwargs,
     ):
         """Contact map initialization
 
@@ -69,7 +68,6 @@ class ContactMap(GraphConstruction):
             p (int, optional): power of minkowski distance. Defaults to 2.
             metric_params (Dict, optional): additional metrics parameters to pass. Defaults to None.
         """
-        super().__init__(**kwargs)
         self.n_jobs = n_jobs
         self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
@@ -122,9 +120,7 @@ class KNNGraph(GraphConstruction):
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
-        **kwargs,
     ):
-        super().__init__(**kwargs)
         self.n_jobs = n_jobs
         self.n_neighbors = n_neighbors
         self.mode = mode
@@ -171,10 +167,7 @@ class KNNGraph(GraphConstruction):
 class EpsilonGraph(GraphConstruction):
     """Extract epsilon graph"""
 
-    def __init__(
-        self, epsilon: float = 3.0, n_jobs: int = N_JOBS, **kwargs,
-    ):
-        super().__init__(**kwargs)
+    def __init__(self, epsilon: float, n_jobs: int):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
 
