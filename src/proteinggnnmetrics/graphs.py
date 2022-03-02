@@ -51,7 +51,7 @@ class ContactMap(GraphConstruction):
 
     def __init__(
         self,
-        n_jobs: int = N_JOBS,
+        n_jobs: int,
         n_jobs_pairwise: int = 1,
         metric: str = "euclidean",
         p: int = 2,
@@ -61,7 +61,7 @@ class ContactMap(GraphConstruction):
         """Contact map initialization
 
         Args:
-            n_jobs (int, optional): number of cores to carry out the computation. Defaults to N_JOBS.
+            n_jobs (int, optional): number of cores to carry out the computation.
             n_jobs_pairwise (int, optional): allows to parallelize pairwise metric
                 computations within a sample. Could be useful for large graphs, but
                 will result in n_jobs*n_jobs_pairwise CPU core required. Defaults to 1.
@@ -112,17 +112,16 @@ class ContactMap(GraphConstruction):
 
 
 class KNNGraph(GraphConstruction):
-    """Extract KNN graph
-    """
+    """Extract KNN graph"""
 
     def __init__(
         self,
         n_neighbors: str,
-        n_jobs=N_JOBS,
-        mode="connectivity",
-        metric="euclidean",
-        p=2,
-        metric_params=None,
+        n_jobs: int,
+        mode: str = "connectivity",
+        metric: str = "euclidean",
+        p: int = 2,
+        metric_params: Dict = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -135,8 +134,7 @@ class KNNGraph(GraphConstruction):
         self.n_jobs = n_jobs
 
     def construct(self, proteins: List[Protein]) -> List[Protein]:
-        """Extracts k-nearest neightbour graph from input contact map.
-        """
+        """Extracts k-nearest neightbour graph from input contact map."""
         proteins = check_graphs(proteins)
 
         def knn_graph_func(protein: Protein) -> nx.Graph:
