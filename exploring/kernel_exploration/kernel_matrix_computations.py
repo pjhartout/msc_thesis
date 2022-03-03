@@ -52,8 +52,8 @@ def compute_hashes_then_kernel(proteins):
     proteins = distribute_function(
         compute_wl_hashes,
         proteins,
-        "Computing Weisfeiler-Lehman Hashes",
         int(config["COMPUTE"]["N_JOBS"]),
+        "Computing Weisfeiler-Lehman Hashes",
     )
     hashes = [
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]

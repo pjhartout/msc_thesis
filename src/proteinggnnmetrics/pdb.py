@@ -104,8 +104,8 @@ class Coordinates:
         proteins = distribute_function(
             self.get_atom_coordinates,
             fname_list,
-            "Extracting coordinates from pdb files",
             self.n_jobs,
+            "Extracting coordinates from pdb files",
         )
 
         return proteins

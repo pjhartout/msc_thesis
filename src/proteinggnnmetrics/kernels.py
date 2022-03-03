@@ -108,10 +108,7 @@ class WeisfeilerLehmanKernel(Kernel):
 
         return flatten_lists(
             distribute_function(
-                parallel_dot_product,
-                iters,
-                "Dot product of elements in matrix",
-                n_jobs=self.n_jobs,
+                parallel_dot_product, iters, n_jobs=self.n_jobs,
             )
         )
 

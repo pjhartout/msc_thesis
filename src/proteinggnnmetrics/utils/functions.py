@@ -100,13 +100,17 @@ def tqdm_joblib(tqdm_object):
 
 
 def distribute_function(
-    func: Callable, X: Iterable, tqdm_label: str, n_jobs: int, total: int = 1
+    func: Callable,
+    X: Iterable,
+    n_jobs: int,
+    tqdm_label: str = None,
+    total: int = 1,
 ) -> Any:
     """Simply distributes the execution of func across multiple cores to process X faster"""
     if total == 1:
         total = len(X)
 
-    with tqdm_joblib(tqdm(desc=tqdm_label, total=total,)) as progressbar:
+    with tqdm_joblib(tqdm(desc=tqdm_label, total=total)) as progressbar:
         Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
     return Xt
 

@@ -26,8 +26,7 @@ class Descriptor(metaclass=ABCMeta):
         self.n_jobs = n_jobs
 
     def describe(self):
-        """Applies descriptor to graph
-        """
+        """Applies descriptor to graph"""
         pass
 
 
@@ -49,8 +48,8 @@ class DegreeHistogram(Descriptor):
         histograms = distribute_function(
             calculate_degree_histogram,
             proteins,
-            "Compute degree histogram",
             self.n_jobs,
+            "Compute degree histogram",
         )
         return histograms
 
@@ -79,8 +78,8 @@ class DegreeHistogram(Descriptor):
         proteins = distribute_function(
             calculate_degree_histogram,
             proteins,
-            "Compute degree histogram",
             self.n_jobs,
+            "Compute degree histogram",
         )
         return proteins
 
