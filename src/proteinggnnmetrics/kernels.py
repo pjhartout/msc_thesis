@@ -16,7 +16,6 @@ import numpy as np
 from grakel import graph_from_networkx, kernels
 from grakel.kernels import VertexHistogram, WeisfeilerLehman
 from sklearn.metrics.pairwise import linear_kernel
-from sklearn.utils.validation import check_array
 from tqdm import tqdm
 
 from .utils.functions import (
@@ -45,10 +44,10 @@ class WeisfeilerLehmanKernel(Kernel):
     def __init__(
         self,
         n_iter: int,
-        base_graph_kernel: Any,
         normalize: bool,
         n_jobs: int,
-        pre_computed_hash,
+        pre_computed_hash: bool = False,
+        base_graph_kernel: Any = None,
     ):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
@@ -59,13 +58,15 @@ class WeisfeilerLehmanKernel(Kernel):
     def compute_naive_kernel_matrix(
         self, X: Any, Y: Any, fit: bool
     ) -> np.ndarray:
+        X = check_graphs(X)
+
         gk = WeisfeilerLehman(
             n_iter=self.n_iter,
             base_graph_kernel=self.base_graph_kernel,
             normalize=self.normalize,
             n_jobs=self.n_jobs,
         )
-        X = check_graphs(X)
+
         X = networkx2grakel(X)
         if Y is not None:
             Y = graph_from_networkx(X)
@@ -83,6 +84,7 @@ class WeisfeilerLehmanKernel(Kernel):
         self, X: Iterable, Y: Union[Iterable, None]
     ) -> Iterable:
         X = check_hash(X)
+
         if Y is not None:
             Y = check_hash(Y)
 
@@ -132,9 +134,7 @@ class LinearKernel(Kernel):
         self.dense_output = dense_output
 
     def transform(self, X: Any, Y: Any = None) -> Any:
-        X = check_array(X)
-
-        if Y == None:
+        if Y is None:
             K = linear_kernel(X, X, dense_output=self.dense_output)
         else:
             K = linear_kernel(X, Y, dense_output=self.dense_output)
