@@ -65,8 +65,6 @@ def main():
     result = mmd.evaluate(hashes[:half], hashes[half:])
     print(result)
 
-    # TDA distance
-
 
 if __name__ == "__main__":
     main()
