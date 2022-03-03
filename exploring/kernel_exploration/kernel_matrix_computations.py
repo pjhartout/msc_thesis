@@ -9,7 +9,6 @@ This is to test kernel matrix computations
 
 import os
 from pathlib import Path
-from re import X
 from typing import List
 
 from grakel.kernels.vertex_histogram import VertexHistogram
