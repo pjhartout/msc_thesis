@@ -86,30 +86,53 @@
 
 \begin{frame}[fragile]{Linear kernel}
   \begin{itemize}
-  \item Not much to optimize there. Just check:
-    \href{https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.linear_kernel.html}{this
-    link}.
+  \item Not much to optimize there.
   \end{itemize}
 \end{frame}
 
 
-\begin{frame}[fragile]{W-L kernel}
+\begin{frame}[fragile]{Weisfeiler-Lehmann kernel}
   \begin{itemize}
   \item Computing $\phi(G)$ needs to be done explicitely and can be done
-    independently prior to computing $K_{WL}=\phi(G)^T\phi(G')$
+    independently (and in parallel) prior to computing $K_{WL}=\phi(G)^T\phi(G')$
   \item How to compute $\phi(G)$? \texttt{networkx} has a function called
-\href{https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.graph_hashing.weisfeiler_lehman_graph_hash.html}{\texttt{weisfeiler\_lehman\_graph\_hash}}
-but it does not return the hash counts at each iteration.
+    \href{https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.graph_hashing.weisfeiler_lehman_subgraph_hashes.html?highlight=weisfeiler_lehman_subgraph_hashes#networkx.algorithms.graph_hashing.weisfeiler_lehman_subgraph_hashes}{\texttt{weisfeiler\_lehman\_subgraph\_hashes}}.
+  \item Since we don't care about the order in the resulting
+    $K_{WL}=\phi(G)^T\phi(G')$, we can list each product that needs to be done
+    and execute them in parallel as well.
   \end{itemize}
 \end{frame}
 
 
-\begin{frame}[allowframebreaks]{References}
-
-  \bibliography{../../thesis/refs.bib}
-  \bibliographystyle{abbrv}
-
+\begin{frame}[fragile]{Weisfeiler-Lehmann kernel}
+  What does the implementation look like?
+  \begin{figure}
+    \centering
+    \includegraphics[width=.6\textwidth]{figures/setting_hash.png}
+    \caption{Setting the hash histogram for each protein}
+    \label{fig:hash_setting}
+  \end{figure}
 \end{frame}
 
+\begin{frame}[fragile]{Weisfeiler-Lehmann kernel}
+  What does the implementation look like?
+  \begin{figure}
+    \centering
+    \includegraphics[width=.5\textwidth]{figures/dot_product.png}
+    \caption{Computing the dot product of the feature maps in parallel.}
+    \label{fig:hash_setting}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Weisfeiler-Lehmann kernel}
+  How does it perform?
+  \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/wl-kernel_exec.png}
+    \caption{Performance and memory footprint of grakel vs. custom. Both are
+      done with 10 iterations of the W-L hashing step.}
+    \label{fig:performance}
+  \end{figure}
+\end{frame}
 
 \end{document}
