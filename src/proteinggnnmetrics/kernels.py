@@ -9,7 +9,7 @@ Kernels
 import os
 from abc import ABCMeta
 from itertools import product
-from typing import Any, Callable, Iterable, List, Union
+from typing import Any, Iterable, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -99,6 +99,8 @@ class WeisfeilerLehmanKernel(Kernel):
         if Y == None:
             Y = X
 
+        # It's faster to process n_jobs lists than to have one list and
+        # dispatch one item at a time.
         iters = list(chunks(list(product(X, Y)), self.n_jobs))
 
         res = flatten_lists(
