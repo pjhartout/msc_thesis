@@ -56,5 +56,10 @@ def check_dist(dist: Any) -> Any:
     return dist
 
 
+def check_hash(X):
+    """TODO: implement hash checks"""
+    return X
+
+
 if __name__ == "__main__":
     main()
