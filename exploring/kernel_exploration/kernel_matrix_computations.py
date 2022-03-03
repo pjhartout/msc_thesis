@@ -92,31 +92,28 @@ def compute_kernel_using_precomputed_hashes(proteins):
 def main():
 
     proteins = load_proteins(CACHE_DIR / "sample_human_proteome_alpha_fold")
-    half_point = int(len(proteins) / 2)
 
     # 1. Generic kernel
     # 1.1 Linear kernel
-    # First descriptor then computation
     # degree_histograms = load_descriptor(
-    #     CACHE_DIR / "sample_human_proteome_alpha_fold"
+    #     CACHE_DIR / "sample_human_proteome_alpha_fold",
     #     descriptor="degree_histogram",
     #     graph_type="knn_graph",
     # )
-    # G_1 = degree_histograms[half_point:]
-    # G_2 = degree_histograms[:half_point]
-    # linear_kernel = LinearKernel(dense_output=False)
-    # KX = linear_kernel.fit_transform(G_1)
-    # KY = linear_kernel.fit_transform(G_2)
-    # KXY = linear_kernel.fit_transform(G_1, G_2)
+    # linear_kernel = LinearKernel(dense_output=False,)
+    # KX = linear_kernel.transform(degree_histograms)
 
     # 2. Graph kernels
     # 2.1 WLKernel graph -> directly on graph structure
-    graphs = load_graphs(
-        CACHE_DIR / "sample_human_proteome_alpha_fold", graph_type="knn_graph"
-    )
+    print("### Grakel Implementation ###")
+    graphs = load_graphs(proteins, graph_type="knn_graph")
     KX = compute_naive_kernel(graphs)
+
     # 2. W-L histogram computation speedup
+    print("### Custom Implementation *without* precomputed W-L hashes ###")
     KX, proteins = compute_hashes_then_kernel(proteins)
+
+    print("### Custom Implementation *with* precomputed W-L hashes ###")
     KX = compute_kernel_using_precomputed_hashes(proteins)
     # print(hashes)
 
