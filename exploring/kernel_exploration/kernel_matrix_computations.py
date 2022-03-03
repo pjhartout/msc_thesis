@@ -100,7 +100,7 @@ def main():
     #     graph_type="knn_graph",
     # )
     # linear_kernel = LinearKernel(dense_output=False,)
-    # KX = linear_kernel.transform(degree_histograms)
+    KX = linear_kernel.transform(degree_histograms)
 
     # 2. Graph kernels
     # 2.1 WLKernel graph -> directly on graph structure
