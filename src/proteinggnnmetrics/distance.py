@@ -14,6 +14,8 @@ from typing import Any, Callable
 import numpy as np
 from scipy.spatial.distance import minkowski
 
+from proteinggnnmetrics.kernels import Kernel
+
 from .utils.validation import check_dist
 
 
@@ -33,35 +35,29 @@ class MaximumMeanDiscrepancy(DistanceFunction):
     """Implements maximum mean discrepancy
     """
 
-    def __init__(self, kernel: Callable):
+    def __init__(self, kernel: Kernel):
         self.kernel = kernel
 
-    def evaluate(self, X: Any) -> np.ndarray:
+    def evaluate(self, X: Any, Y: Any) -> np.ndarray:
         Xt = check_dist(X)
         Yt = check_dist(Y)
 
         # Following the original notation of the paper
-        m = Xt.shape[0]
-        n = Yt.shape[0]
+        m = len(Xt)
+        n = len(Yt)
 
-        K_XX = self.kernel(Xt, Xt)
-        K_YY = self.kernel(Yt, Yt)
-        K_XY = self.kernel(Xt, Yt)
+        K_XX = self.kernel.transform(Xt)
+        K_YY = self.kernel.transform(Yt)
+        K_XY = self.kernel.transform(Xt, Yt)
 
         # We could also skip diagonal elements in the calculation above but
         # this is more computationally efficient.
-        np.fill_diagonal(K_XX, 0)
-        np.fill_diagonal(K_YY, 0)
 
         k_XX = np.sum(K_XX)
         k_YY = np.sum(K_YY)
         k_XY = np.sum(K_XY)
 
-        mmd = (
-            1 / (m * (m - 1)) * k_XX
-            + 1 / (n * (n - 1)) * k_YY
-            - 2 / (m * n) * k_XY
-        )
+        mmd = 1 / (m ** 2) * k_XX + 1 / (n ** 2) * k_YY - 2 / (m * n) * k_XY
 
         return mmd
 
