@@ -52,7 +52,6 @@ def check_fnames(files: List[PosixPath]) -> List[PosixPath]:
 
 def check_dist(dist: Any) -> Any:
     """TODO: implement distribution checks"""
-    dist = np.asarray(dist)
     return dist
 
 
