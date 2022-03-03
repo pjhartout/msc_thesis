@@ -8,7 +8,7 @@ Convenience functions to load files into memory
 
 import os
 from pathlib import Path, PosixPath
-from typing import List
+from typing import List, Union
 
 from .protein import Protein
 from .utils.colors import bcolors
@@ -41,16 +41,30 @@ def load_proteins(path: PosixPath) -> List[Protein]:
     return proteins
 
 
-def load_descriptor(path: PosixPath, descriptor: str, graph_type: str):
-    proteins = load_proteins(path)
-    degree_histograms = list()
+def load_descriptor(
+    path_or_protein: Union[PosixPath, List[Protein]],
+    descriptor: str,
+    graph_type: str,
+):
+    if type(path_or_protein) == PosixPath:
+        proteins = load_proteins(path_or_protein)
+    else:
+        proteins = path_or_protein
+
+    descriptor_list = list()
     for protein in proteins:
-        degree_histograms.append(protein.descriptors[graph_type][descriptor])
-    return degree_histograms
+        descriptor_list.append(protein.descriptors[graph_type][descriptor])
+    return descriptor_list
 
 
-def load_graphs(path: PosixPath, graph_type: str):
-    proteins = load_proteins(path)
+def load_graphs(
+    path_or_protein: Union[PosixPath, List[Protein]], graph_type: str
+):
+    if type(path_or_protein) == PosixPath:
+        proteins = load_proteins(path_or_protein)
+    else:
+        proteins = path_or_protein
+
     graphs = list()
     for protein in proteins:
         graphs.append(protein.graphs[graph_type])
