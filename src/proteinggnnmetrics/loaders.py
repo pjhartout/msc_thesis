@@ -10,6 +10,8 @@ import os
 from pathlib import Path, PosixPath
 from typing import List, Union
 
+import numpy as np
+
 from .protein import Protein
 from .utils.colors import bcolors
 from .utils.exception import ProteinLoadingError
@@ -54,7 +56,7 @@ def load_descriptor(
     descriptor_list = list()
     for protein in proteins:
         descriptor_list.append(protein.descriptors[graph_type][descriptor])
-    return descriptor_list
+    return np.array(descriptor_list)
 
 
 def load_graphs(
