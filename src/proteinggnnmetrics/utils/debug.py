@@ -32,7 +32,7 @@ def timeit(func: Callable) -> Callable:
         print(
             "Time                :"
             + bcolors.OKGREEN
-            + f"{time_elapsed}"
+            + f"{time_elapsed} seconds"
             + bcolors.ENDC
         )
         return result
