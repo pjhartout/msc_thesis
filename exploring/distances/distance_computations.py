@@ -29,10 +29,6 @@ def compute_wl_hashes(protein):
 
 
 def main():
-
-    # Generate square random matrix
-    # A = np.random.rand(100, 100)
-
     proteins = load_proteins(CACHE_DIR / "sample_human_proteome_alpha_fold")
     half = int(len(proteins) / 2)
 
