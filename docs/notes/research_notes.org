@@ -666,5 +666,15 @@ Survey of graph kernels
 }
 #+end_src
 
+Kernel using Wasserstein distance
+#+begin_src bibtex
+@article{oh2019kernel,
+    title={Kernel wasserstein distance},
+    author={Oh, Jung Hun and Pouryahya, Maryam and Iyer, Aditi and Apte, Aditya P and Tannenbaum, Allen and Deasy, Joseph O},
+    journal={arXiv preprint arXiv:1905.09314},
+    year={2019}
+  }
+#+end_src
+
 * References
 #+LaTeX: \printbibliography[heading=none]
