@@ -19,6 +19,10 @@
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
+* TODO <2022-03-04 Fri> Meeting Tim
+** Check kernel correctness with scalar.
+** Implement unbiased + kernel self-compare sanity check
+
 * DONE <2022-02-18 Fri> Meeting with Tim
 ** What I did
 *** Improve graph extraction methods (still need rework)
