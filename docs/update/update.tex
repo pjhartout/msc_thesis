@@ -16,6 +16,7 @@
 % \usepackage[dvipsnames]{xcolor}
 \usepackage{animate}
 \usepackage{scalerel,xparse}
+\usepackage{amsmath}
 \usepackage[style=british]{csquotes}
 
 \title{Progress update}
@@ -158,9 +159,58 @@
 \end{frame}
 
 
-\begin{frame}[fragile]{MMD}
-
+\begin{frame}[fragile]{Kernels for TDA features}
+  The argument for using TDA features for MMD is that the (kernelized)
+  descriptor functions needs to be ``rich enough''. TDA features are very
+  expressive and operate on the contact map, a rich representation of any protein.
+  \begin{figure}[center]
+    \centering
+    \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+      \node (cm0) [orangebox] {Contact map};
+      \node (cm1) [orangebox, below of=cm0] {Contact map};
+      \node (g) [left of=cm0, xshift=-0.1cm] {$\mathcal{G}$};
+      \node (g_prime) [left of=cm1, xshift=-0.1cm] {$\mathcal{G}'$};
+      \node (pd0) [orangebox, right of=cm0, xshift=2cm] {Persistence Diagram};
+      \node (pd1) [orangebox, right of=cm1, xshift=2cm] {Persistence Diagram};
+      \node (kernel) [bluebox, right of=pd0, xshift=2cm] {Kernels?};
+      \draw [arrow] (cm0) -- (pd0);
+      \draw [arrow] (cm1) -- (pd1);
+    \end{tikzpicture}
+    \caption{kernels on TDA features.}
+    \label{fig:overview}
+  \end{figure}
+  Ideas: computer pairwise distances. Suppose persistence diagrams $\mathcal{P}_0,
+  \mathcal{P}_1\sim\mathcal{G}$ and $\mathcal{P}_2, \mathcal{P}_3\sim\mathcal{G}'$.
+  Can we do:
+  $K_{W}(\mathcal{G},\mathcal{G}')=\begin{bmatrix}
+    W_p(\mathcal{P}_0\mathcal{P}_2) & W_p(\mathcal{P}_1\mathcal{P}_2)\\
+    W_p(\mathcal{P}_0\mathcal{P}_3) & W_p(\mathcal{P}_1\mathcal{P}_3)\\
+  \end{bmatrix}$?\\
+  Where $W_p(\mathcal{P},\mathcal{P}')$ is the $p$-Wasserstein distance between
+  persistence diagrams. \\
+  The Wasserstein distance \textit{is also a metric}. Some work by \cite{oh2019kernel} suggest this is more complex.
 \end{frame}
 
+
+\begin{frame}[fragile]{Motifs}
+  Measure \textit{expressivity} of metric by comparing looking at proteins exhibiting
+  structural motifs as a significant part of their structure. Example of motifs:
+  \begin{itemize}
+  \item Beta-hairpins
+  \item Greek key
+  \item Omega loop
+  \item Helix-loop-helix
+  \item Zinc fingers
+  \item Helix-turn-helix
+  \item Nest/niche
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+
+  \bibliography{../../thesis/refs.bib}
+  \bibliographystyle{abbrv}
+
+\end{frame}
 
 \end{document}
