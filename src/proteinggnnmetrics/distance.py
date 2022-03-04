@@ -8,10 +8,13 @@ Distance functions.
 TODO: docs, tests, citations.
 """
 
+import math
 from abc import ABCMeta
-from typing import Any, Callable
+from re import L
+from typing import Any, Callable, Dict, Iterable
 
 import numpy as np
+from gtda.diagrams import PairwiseDistance
 from scipy.spatial.distance import minkowski
 
 from proteinggnnmetrics.kernels import Kernel
@@ -26,19 +29,17 @@ class DistanceFunction(metaclass=ABCMeta):
         pass
 
     def evaluate(self, X: Any, Y: Any) -> np.ndarray:
-        """Apply evaluation of the two input vectors
-        """
+        """Apply evaluation of the two input vectors"""
         pass
 
 
 class MaximumMeanDiscrepancy(DistanceFunction):
-    """Implements maximum mean discrepancy
-    """
+    """Implements maximum mean discrepancy"""
 
     def __init__(self, kernel: Kernel):
         self.kernel = kernel
 
-    def evaluate(self, X: Any, Y: Any) -> np.ndarray:
+    def evaluate(self, X: Any, Y: Any) -> float:
         Xt = check_dist(X)
         Yt = check_dist(Y)
 
@@ -59,7 +60,7 @@ class MaximumMeanDiscrepancy(DistanceFunction):
 
         mmd = 1 / (m ** 2) * k_XX + 1 / (n ** 2) * k_YY - 2 / (m * n) * k_XY
 
-        return mmd
+        return math.sqrt(mmd)
 
 
 class MinkowskyDistance(DistanceFunction):
@@ -69,6 +70,25 @@ class MinkowskyDistance(DistanceFunction):
         # Default set to 2 to recover Euclidean distance.
         self.p = p
 
-    def evaluate(self, X: Any, Y: Any) -> np.ndarray:
-        d = minkowski(X, Y, self.p)
+    def evaluate(self, X: np.ndarray, Y: np.ndarray) -> float:
+        d = minkowski(X.flatten(), Y.flatten(), self.p)
         return d
+
+
+class TopologicalPairwiseDistance(DistanceFunction):
+    def __init__(
+        self, metric: str, metric_params: Dict, order: int, n_jobs: int
+    ):
+        self.metric = metric
+        self.metric_params = metric_params
+        self.order = order
+        self.n_jobs = n_jobs
+
+    def evaluate(self, X: Iterable) -> np.ndarray:
+        pw_dist_diag = PairwiseDistance(
+            metric=self.metric,
+            metric_params=self.metric_params,
+            order=self.order,
+            n_jobs=self.n_jobs,
+        )
+        return pw_dist_diag.fit_transform(X)
