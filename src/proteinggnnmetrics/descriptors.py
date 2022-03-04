@@ -8,6 +8,7 @@ TODO: check docstrings, citations
 """
 
 from abc import ABCMeta
+from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
 import networkx as nx
@@ -86,35 +87,28 @@ class DegreeHistogram(Descriptor):
 
 class ClusteringHistogram(Descriptor):
     def __init__(
-        self, graph_type: str, n_bins: int, density: bool, n_jobs: int
+        self, graph_type: str, n_jobs: int, normalize: bool = True,
     ):
         self.graph_type = graph_type
-        self.n_bins = n_bins
-        self.density = density
         self.n_jobs = n_jobs
+        self.normalize = normalize
 
     def describe(self, proteins: List[Protein]) -> Any:
-        def calculate_clustering_histogram(protein: Protein, normalize=True):
+        def calculate_degree_histogram(protein: Protein):
             G = protein.set_nx_graph(self.graph_type)
-            coefficient_list = list(nx.clustering(G).values())
-            histogram, _ = np.histogram(
-                coefficient_list,
-                bins=self.n_bins,
-                range=(0.0, 1.0),
-                density=self.density,
-            )
+            degree_histogram = nx.degree_histogram(G)
 
             protein.descriptors[self.graph_type][
-                "clustering_histogram"
-            ] = histogram
+                "degree_histogram"
+            ] = degree_histogram
 
             return protein
 
         proteins = distribute_function(
-            calculate_clustering_histogram,
+            calculate_degree_histogram,
             proteins,
-            "Compute degree histogram",
             self.n_jobs,
+            "Compute degree histogram",
         )
         return proteins
 
@@ -148,8 +142,8 @@ class ClusteringHistogram(Descriptor):
         proteins = distribute_function(
             calculate_clustering_histogram,
             proteins,
-            "Compute clustering histogram",
             self.n_jobs,
+            "Compute clustering histogram",
         )
         return proteins
 
@@ -189,8 +183,8 @@ class LaplacianSpectrum(Descriptor):
         proteins = distribute_function(
             calculate_laplacian_spectrum,
             proteins,
-            "Compute Laplacian spectrum histogram",
             self.n_jobs,
+            "Compute Laplacian spectrum histogram",
         )
         return proteins
 
@@ -215,13 +209,15 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.tda_pipeline = [
+        self.base_tda_pipeline = [
             (
                 "diagram",
                 homology.VietorisRipsPersistence(
                     n_jobs=self.n_jobs, metric="precomputed"
                 ),
-            ),
+            )
+        ]
+        self.tda_pipeline = [
             ("filter", diagrams.Filtering(epsilon=self.epsilon)),
             ("rescaler", diagrams.Scaler()),
         ]
@@ -295,13 +291,19 @@ class TopologicalDescriptor(Descriptor):
             )
 
         contact_maps = [protein.contact_map for protein in proteins]
+        diagram_data = pipeline.Pipeline(
+            self.base_tda_pipeline, verbose=True
+        ).fit_transform(contact_maps)
         tda_descriptors = pipeline.Pipeline(
             self.tda_pipeline, verbose=True
-        ).fit_transform(contact_maps)
+        ).fit_transform(diagram_data)
 
-        for protein, tda_descriptor in zip(proteins, tda_descriptors):
+        for protein, diagram, tda_descriptor in zip(
+            proteins, diagram_data, tda_descriptors
+        ):
             protein.descriptors["contact_graph"][
                 self.tda_descriptor_type
             ] = tda_descriptor
+            protein.descriptors["contact_graph"]["diagram"] = diagram
 
         return proteins
