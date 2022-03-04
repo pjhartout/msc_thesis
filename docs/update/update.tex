@@ -18,7 +18,7 @@
 \usepackage{scalerel,xparse}
 \usepackage[style=british]{csquotes}
 
-\title{Kernels for proteins and MMD.}
+\title{Progress update}
 % \subtitle{Lab Update}
 \date{\today}
 \author{Philip Hartout}
@@ -77,10 +77,11 @@
 \maketitle
 
 \begin{frame}[fragile]{Introduction}
+
+
   \begin{itemize}
-  \item Here we want to go through the maths behind the kernels to make sure our
-    implementation is efficient.
-  \item Linear, Weissfeiler-Lehmann kernel
+  \item W-L implementation
+  \item Go through MMD code
   \end{itemize}
 \end{frame}
 
@@ -134,5 +135,32 @@
     \label{fig:performance}
   \end{figure}
 \end{frame}
+
+\begin{frame}[fragile]{MMD}
+  MMD implementations are different, why is the estimate more useful?\\
+  \begin{minipage}{.45\textwidth}
+  \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/mmd_estimate.png}
+    \caption{MMD estimate, from ICLR \texttt{graphgeneval}}
+    \label{fig:mmd_estimate}
+  \end{figure}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}{.45\textwidth}
+  \begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/mmd_current.png}
+    \caption{MMD computation, from \texttt{proteinggnnmetrics}}
+    \label{fig:mmd_current}
+  \end{figure}
+\end{minipage}
+\end{frame}
+
+
+\begin{frame}[fragile]{MMD}
+
+\end{frame}
+
 
 \end{document}
