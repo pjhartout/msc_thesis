@@ -30,7 +30,15 @@ class GraphConstruction(metaclass=ABCMeta):
     def __init__(self):
         pass
 
-    def construct(self, samples: Union[List, np.ndarray]) -> np.ndarray:
+    def fit(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein]) -> List[Protein]:
         """Apply transformation
 
         Args:
@@ -39,7 +47,7 @@ class GraphConstruction(metaclass=ABCMeta):
         Returns:
             np.ndarray: array of graphs
         """
-        pass
+        return proteins
 
 
 class ContactMap(GraphConstruction):
@@ -72,7 +80,15 @@ class ContactMap(GraphConstruction):
         self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
 
-    def construct(self, proteins: List[Protein]) -> List[Protein]:
+    def fit(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Extract contact map from set of coordinates.
 
         Args:
@@ -129,7 +145,15 @@ class KNNGraph(GraphConstruction):
         self.metric_params = metric_params
         self.n_jobs = n_jobs
 
-    def construct(self, proteins: List[Protein]) -> List[Protein]:
+    def fit(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Extracts k-nearest neightbour graph from input contact map."""
         proteins = check_graphs(proteins)
 
@@ -171,7 +195,15 @@ class EpsilonGraph(GraphConstruction):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
 
-    def construct(self, proteins: List[Protein]) -> List[Protein]:
+    def fit(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        """required for sklearn compatibility"""
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Extracts epsilon graph from input contact map.
 
         Args:

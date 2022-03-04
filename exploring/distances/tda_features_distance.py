@@ -36,12 +36,12 @@ def main():
         n_jobs=int(config["COMPUTE"]["N_JOBS"]),
     )
 
-    pairwise_distances = wasserstein_distance.evaluate(diagrams)
+    pairwise_distances = wasserstein_distance.fit_transform(diagrams)
 
     # show heatmap of pairwise distances
 
     minkowsky_distance = MinkowskyDistance(p=2)
-    distance = minkowsky_distance.evaluate(
+    distance = minkowsky_distance.fit_transform(
         pairwise_distances, pairwise_distances
     )
     print(distance)

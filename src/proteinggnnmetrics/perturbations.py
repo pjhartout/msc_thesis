@@ -19,7 +19,7 @@ class Perturbations(metaclass=ABCMeta):
         self.random_state = random_state
         pass
 
-    def perturb(self, X: Any) -> np.ndarray:
+    def fit_transform(self, X: Any) -> np.ndarray:
         """Apply perturbation to graph or graph representation
         """
         pass

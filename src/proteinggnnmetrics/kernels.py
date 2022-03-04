@@ -33,7 +33,15 @@ class Kernel(metaclass=ABCMeta):
     def __init__(self):
         pass
 
-    def transform(self, X: Any) -> Any:
+    def fit(self, X: Iterable) -> Iterable:
+        """required for sklearn compatibility"""
+        return X
+
+    def transform(self, X: Iterable) -> Iterable:
+        """required for sklearn compatibility"""
+        return X
+
+    def fit_transform(self, X: Any) -> Any:
         """Apply transformation to apply kernel to X"""
         pass
 
@@ -114,17 +122,21 @@ class WeisfeilerLehmanKernel(Kernel):
             )
         )
 
-    def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
-        if self.pre_computed_hash:
-            return self.compute_prehashed_kernel_matrix(X, Y)
-        else:
-            return self.compute_naive_kernel_matrix(X, Y, fit=True)
+    def fit(self, X: Iterable) -> Iterable:
+        """required for sklearn compatibility"""
+        return X
 
     def transform(self, X: Any, Y: Any = None) -> np.ndarray:
         if self.pre_computed_hash:
             return self.compute_prehashed_kernel_matrix(X, Y)
         else:
             return self.compute_naive_kernel_matrix(X, Y, fit=False)
+
+    def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
+        if self.pre_computed_hash:
+            return self.compute_prehashed_kernel_matrix(X, Y)
+        else:
+            return self.compute_naive_kernel_matrix(X, Y, fit=True)
 
 
 class LinearKernel(Kernel):
@@ -133,7 +145,15 @@ class LinearKernel(Kernel):
     ):
         self.dense_output = dense_output
 
-    def transform(self, X: Any, Y: Any = None) -> Any:
+    def fit(self, X: Iterable) -> Iterable:
+        """required for sklearn compatibility"""
+        return X
+
+    def transform(self, X: Iterable) -> Iterable:
+        """required for sklearn compatibility"""
+        return X
+
+    def fit_transform(self, X: Any, Y: Any = None) -> Any:
         if Y is None:
             K = linear_kernel(X, X, dense_output=self.dense_output)
         else:

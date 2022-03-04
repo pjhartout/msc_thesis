@@ -36,7 +36,7 @@ REDUCE_DATA = config["DEBUG"]["REDUCE_DATA"]
 @timeit
 def get_coords(pdb_files):
     coord = Coordinates(granularity="CA", n_jobs=N_JOBS)
-    proteins = coord.extract(pdb_files, granularity="CA")
+    proteins = coord.fit_transform(pdb_files)
     return proteins
 
 
@@ -44,7 +44,7 @@ def get_coords(pdb_files):
 @timeit
 def get_contactmaps(proteins):
     contactmap = ContactMap(metric="euclidean", n_jobs=N_JOBS)
-    proteins = contactmap.construct(proteins)
+    proteins = contactmap.fit_transform(proteins)
     return proteins
 
 
@@ -52,7 +52,7 @@ def get_contactmaps(proteins):
 @timeit
 def get_knngraphs(proteins):
     knngraph = KNNGraph(n_neighbors=4, n_jobs=N_JOBS)
-    proteins = knngraph.construct(proteins)
+    proteins = knngraph.fit_transform(proteins)
     return proteins
 
 
@@ -60,7 +60,7 @@ def get_knngraphs(proteins):
 @timeit
 def get_epsilongraphs(proteins):
     epsilongraph = EpsilonGraph(epsilon=2, n_jobs=N_JOBS)
-    proteins = epsilongraph.construct(proteins)
+    proteins = epsilongraph.fit_transform(proteins)
     return proteins
 
 
@@ -68,7 +68,7 @@ def get_epsilongraphs(proteins):
 @timeit
 def get_deg_histograms(proteins):
     degree_histogram = DegreeHistogram("knn_graph", n_bins=30, n_jobs=N_JOBS)
-    proteins = degree_histogram.describe(proteins)
+    proteins = degree_histogram.fit_transform(proteins)
     return proteins
 
 
@@ -78,7 +78,7 @@ def get_clu_histograms(proteins):
     clustering_histogram = ClusteringHistogram(
         "knn_graph", n_bins=30, density=False, n_jobs=N_JOBS
     )
-    proteins = clustering_histogram.describe(proteins)
+    proteins = clustering_histogram.fit_transform(proteins)
     return proteins
 
 
@@ -88,7 +88,7 @@ def get_spectrum(proteins):
     laplancian_histogram = LaplacianSpectrum(
         "knn_graph", n_bins=30, n_jobs=N_JOBS
     )
-    proteins = laplancian_histogram.describe(proteins)
+    proteins = laplancian_histogram.fit_transform(proteins)
     return proteins
 
 
@@ -103,7 +103,7 @@ def get_tda_descriptor(proteins):
         n_jobs=N_JOBS,
         landscape_layers=1,
     )
-    proteins = tda_descriptor.describe(proteins)
+    proteins = tda_descriptor.fit_transform(proteins)
     return proteins
 
 

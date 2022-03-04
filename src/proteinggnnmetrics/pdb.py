@@ -87,8 +87,16 @@ class Coordinates:
             name=protein_name, coordinates=coordinates, sequence=sequence
         )
 
-    def extract(
-        self, fname_list: List[PosixPath], granularity: str = "CA"
+    def fit(self):
+        """required for sklearn compatibility"""
+        pass
+
+    def transform(self):
+        """required for sklearn compatibility"""
+        pass
+
+    def fit_transform(
+        self, fname_list: List[PosixPath], y=None
     ) -> List[np.ndarray]:
         """Transform a set of pdb files to get their associated coordinates.
 

@@ -38,7 +38,7 @@ def main():
     )
     linear_kernel = LinearKernel(dense_output=False)
     mmd = MaximumMeanDiscrepancy(kernel=linear_kernel)
-    result = mmd.evaluate(degree_histograms, degree_histograms)
+    result = mmd.fit_transform(degree_histograms, degree_histograms)
 
     # Graph kernel, W-L
     proteins = distribute_function(
@@ -58,7 +58,7 @@ def main():
         pre_computed_hash=True,
     )
     mmd = MaximumMeanDiscrepancy(kernel=wl_kernel)
-    result = mmd.evaluate(hashes[:half], hashes[half:])
+    result = mmd.fit_transform(hashes[:half], hashes[half:])
     print(result)
 
 

@@ -28,7 +28,7 @@ class DistanceFunction(metaclass=ABCMeta):
     def __init__(self):
         pass
 
-    def evaluate(self, X: Any, Y: Any) -> np.ndarray:
+    def fit_transform(self, X: Any, Y: Any) -> np.ndarray:
         """Apply evaluation of the two input vectors"""
         pass
 
@@ -39,7 +39,7 @@ class MaximumMeanDiscrepancy(DistanceFunction):
     def __init__(self, kernel: Kernel):
         self.kernel = kernel
 
-    def evaluate(self, X: Any, Y: Any) -> float:
+    def fit_transform(self, X: Any, Y: Any) -> float:
         Xt = check_dist(X)
         Yt = check_dist(Y)
 
@@ -47,9 +47,9 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         m = len(Xt)
         n = len(Yt)
 
-        K_XX = self.kernel.transform(Xt)
-        K_YY = self.kernel.transform(Yt)
-        K_XY = self.kernel.transform(Xt, Yt)
+        K_XX = self.kernel.fit_transform(Xt)
+        K_YY = self.kernel.fit_transform(Yt)
+        K_XY = self.kernel.fit_transform(Xt, Yt)
 
         # We could also skip diagonal elements in the calculation above but
         # this is more computationally efficient.
@@ -70,7 +70,7 @@ class MinkowskyDistance(DistanceFunction):
         # Default set to 2 to recover Euclidean distance.
         self.p = p
 
-    def evaluate(self, X: np.ndarray, Y: np.ndarray) -> float:
+    def fit_transform(self, X: np.ndarray, Y: np.ndarray) -> float:
         d = minkowski(X.flatten(), Y.flatten(), self.p)
         return d
 
@@ -84,11 +84,11 @@ class TopologicalPairwiseDistance(DistanceFunction):
         self.order = order
         self.n_jobs = n_jobs
 
-    def evaluate(self, X: Iterable) -> np.ndarray:
+    def fit_transform(self, X: Iterable, Y: Iterable) -> np.ndarray:
         pw_dist_diag = PairwiseDistance(
             metric=self.metric,
             metric_params=self.metric_params,
             order=self.order,
             n_jobs=self.n_jobs,
         )
-        return pw_dist_diag.fit_transform(X)
+        return pw_dist_diag.fit_transform(X), pw_dist_diag.fit_transform(Y)
