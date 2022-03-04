@@ -102,8 +102,8 @@ class ContactMap(GraphConstruction):
         proteins = distribute_function(
             compute_contact_map,
             proteins,
-            "Extracting contact map",
             self.n_jobs,
+            "Extracting contact map",
         )
 
         return proteins
@@ -158,8 +158,8 @@ class KNNGraph(GraphConstruction):
         proteins = distribute_function(
             knn_graph_func,
             proteins,
-            "Extracting KNN graph from contact map",
             self.n_jobs,
+            "Extracting KNN graph from contact map",
         )
         return proteins
 
@@ -199,8 +199,8 @@ class EpsilonGraph(GraphConstruction):
         proteins = distribute_function(
             epsilon_graph_func,
             proteins,
-            "Extracting KNN graph from contact map",
             self.n_jobs,
+            "Extracting KNN graph from contact map",
         )
 
         return proteins
