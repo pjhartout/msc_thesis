@@ -38,28 +38,30 @@ def main():
     )
     linear_kernel = LinearKernel(dense_output=False)
     mmd = MaximumMeanDiscrepancy(kernel=linear_kernel)
-    result = mmd.fit_transform(degree_histograms, degree_histograms)
-
-    # Graph kernel, W-L
-    proteins = distribute_function(
-        compute_wl_hashes,
-        proteins,
-        int(config["COMPUTE"]["N_JOBS"]),
-        "Computing Weisfeiler-Lehman Hashes",
+    result = mmd.fit_transform(
+        np.array(degree_histograms), np.array(degree_histograms)
     )
-    hashes = [
-        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
-        for protein in proteins
-    ]
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=5,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
-        pre_computed_hash=True,
-    )
-    mmd = MaximumMeanDiscrepancy(kernel=wl_kernel)
-    result = mmd.fit_transform(hashes[:half], hashes[half:])
     print(result)
+    # # Graph kernel, W-L
+    # proteins = distribute_function(
+    #     compute_wl_hashes,
+    #     proteins,
+    #     int(config["COMPUTE"]["N_JOBS"]),
+    #     "Computing Weisfeiler-Lehman Hashes",
+    # )
+    # hashes = [
+    #     protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
+    #     for protein in proteins
+    # ]
+    # wl_kernel = WeisfeilerLehmanKernel(
+    #     n_iter=5,
+    #     normalize=True,
+    #     n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+    #     pre_computed_hash=True,
+    # )
+    # mmd = MaximumMeanDiscrepancy(kernel=wl_kernel)
+    # result = mmd.fit_transform(hashes[:half], hashes[half:])
+    # print(result)
 
 
 if __name__ == "__main__":
