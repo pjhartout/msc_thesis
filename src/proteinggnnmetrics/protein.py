@@ -144,8 +144,10 @@ class Protein:
         self.descriptors[graph_type]["weisfeiler-lehman-hist"] = hashes
 
     def save(self, path: PosixPath, auto_name: bool = True) -> None:
+
         if auto_name:
             path = path / str(self.name.split(".")[0] + ".pkl")
+
         with open(path, "wb") as f:
             pickle.dump(self, f)
 

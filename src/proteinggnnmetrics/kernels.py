@@ -6,9 +6,9 @@ Kernels
 
 """
 
-import itertools
 import os
 from abc import ABCMeta
+from itertools import product
 from typing import Any, Iterable, List, Tuple, Union
 
 import networkx as nx
@@ -51,16 +51,18 @@ class WeisfeilerLehmanKernel(Kernel):
 
     def __init__(
         self,
-        n_iter: int,
-        normalize: bool,
         n_jobs: int,
+        n_iter: int = 3,
+        normalize: bool = True,
         pre_computed_hash: bool = False,
         base_graph_kernel: Any = None,
+        biased: bool = False,
     ):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
         self.normalize = normalize
         self.n_jobs = n_jobs
+        self.biased = biased
         self.pre_computed_hash = pre_computed_hash
 
     def compute_naive_kernel_matrix(
@@ -68,7 +70,7 @@ class WeisfeilerLehmanKernel(Kernel):
     ) -> np.ndarray:
         X = check_graphs(X)
 
-        gk = WeisfeilerLehman(
+        wl_gk = WeisfeilerLehman(
             n_iter=self.n_iter,
             base_graph_kernel=self.base_graph_kernel,
             normalize=self.normalize,
@@ -79,14 +81,14 @@ class WeisfeilerLehmanKernel(Kernel):
         if Y is not None:
             Y = graph_from_networkx(X)
             if fit:
-                return gk.fit_transform(X, Y)
+                return wl_gk.fit_transform(X, Y)
             else:
-                return gk.transform(X, Y)
+                return wl_gk.transform(X, Y)
         else:
             if fit:
-                return gk.fit_transform(X)
+                return wl_gk.fit_transform(X)
             else:
-                return gk.transform(X)
+                return wl_gk.transform(X)
 
     def compute_prehashed_kernel_matrix(
         self, X: Iterable, Y: Union[Iterable, None]
@@ -103,18 +105,20 @@ class WeisfeilerLehmanKernel(Kernel):
             return res
 
         def dot_product(dicts: Tuple) -> int:
-            running_sum = 0
             # 0 * x = 0 so we only need to iterate over common keys
-            for key in set(dicts[0].keys()).intersection(dicts[1].keys()):
-                running_sum += dicts[0][key] * dicts[1][key]
-            return running_sum
+            return sum(
+                dicts[0][key] * dicts[1].get(key, 0) for key in dicts[0]
+            )
 
         if Y == None:
             Y = X
 
         # It's faster to process n_jobs lists than to have one list and
         # dispatch one item at a time.
-        iters = list(chunks(list(itertools.product(X, Y)), self.n_jobs))
+        if self.biased:
+            iters = list(chunks(list(product(X, Y)), self.n_jobs))
+        else:
+            iters = list(chunks([(x, y) for x, y in product(X, Y) if x != y]))
 
         return flatten_lists(
             distribute_function(
