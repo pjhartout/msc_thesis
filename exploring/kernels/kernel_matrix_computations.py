@@ -64,9 +64,10 @@ def compute_hashes_then_kernel(proteins):
         base_graph_kernel=VertexHistogram,
         normalize=True,
         n_jobs=int(config["COMPUTE"]["N_JOBS"]),
-        pre_computed_hash=True,
+        pre_computed_hash=False,
     )
     KX = wl_kernel.fit_transform(hashes)
+    print("Done")
     return KX, proteins
 
 
@@ -85,6 +86,7 @@ def compute_kernel_using_precomputed_hashes(proteins):
         pre_computed_hash=True,
     )
     KX = wl_kernel.fit_transform(hashes)
+    print("Done")
     return KX
 
 
@@ -100,13 +102,13 @@ def main():
     #     graph_type="knn_graph",
     # )
     # linear_kernel = LinearKernel(dense_output=False,)
-    KX = linear_kernel.transform(degree_histograms)
+    # KX = linear_kernel.transform(degree_histograms)
 
     # 2. Graph kernels
     # 2.1 WLKernel graph -> directly on graph structure
-    print("### Grakel Implementation ###")
-    graphs = load_graphs(proteins, graph_type="knn_graph")
-    KX = compute_naive_kernel(graphs)
+    # print("### Grakel Implementation ###")
+    # graphs = load_graphs(proteins, graph_type="knn_graph")
+    # KX = compute_naive_kernel(graphs)
 
     # 2. W-L histogram computation speedup
     print("### Custom Implementation *without* precomputed W-L hashes ###")
