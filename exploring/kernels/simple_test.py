@@ -103,22 +103,22 @@ def main():
         )
     print(res)
 
-    # Now the optimized KXX Gram matrix
-    full = pd.concat([X, X], ignore_index=True, sort=False).drop_duplicates()
-    n = len(X)
-    res = np.zeros((n, n))
-    # Just combinations if diag is not to be computed.
-    for combi in combinations_with_replacement(full.index, 2):
-        x = int(full.loc[combi[0]]["sample_index"])
-        y = int(full.loc[combi[1]]["sample_index"])
-        res[x][y] = (
-            full.loc[combi[0]].multiply(full.loc[combi[1]], fill_value=0).sum()
-        )
+    # # Now the optimized KXX Gram matrix
+    # full = pd.concat([X, X], ignore_index=True, sort=False).drop_duplicates()
+    # n = len(X)
+    # res = np.zeros((n, n))
+    # # Just combinations if diag is not to be computed.
+    # for combi in combinations_with_replacement(full.index, 2):
+    #     x = int(full.loc[combi[0]]["sample_index"])
+    #     y = int(full.loc[combi[1]]["sample_index"])
+    #     res[x][y] = (
+    #         full.loc[combi[0]].multiply(full.loc[combi[1]], fill_value=0).sum()
+    #     )
 
-    i_upper = np.triu_indices(n, 1)
-    i_lower = np.tril_indices(n, -1)
-    res[i_lower] = res[i_upper]
-    print(res)
+    # i_upper = np.triu_indices(n, 1)
+    # i_lower = np.tril_indices(n, -1)
+    # res[i_lower] = res[i_upper]
+    # print(res)
 
 
 if __name__ == "__main__":
