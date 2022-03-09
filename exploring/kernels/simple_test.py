@@ -19,11 +19,6 @@ import pandas as pd
 from proteinggnnmetrics.utils.functions import chunks, flatten_lists
 
 
-def dot_product(dicts: Tuple) -> int:
-    # 0 * x = 0 so we only need to iterate over common keys
-    return sum(dicts[0][key] * dicts[1].get(key, 0) for key in dicts[0])
-
-
 def get_hash(G):
     return dict(
         Counter(
@@ -103,7 +98,9 @@ def main():
     for combi in combinations(full.index, 2):
         x = int(full.loc[combi[0]]["sample_index"])
         y = int(full.loc[combi[1]]["sample_index"])
-        res[x][y] = dot_product((full.loc[combi[0]], full.loc[combi[1]]))
+        res[x][y] = (
+            full.loc[combi[0]].multiply(full.loc[combi[1]], fill_value=0).sum()
+        )
     print(res)
 
     # Now the optimized KXX Gram matrix
