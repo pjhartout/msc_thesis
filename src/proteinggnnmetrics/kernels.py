@@ -8,13 +8,15 @@ Kernels
 
 import os
 from abc import ABCMeta
-from itertools import product
+from itertools import combinations, combinations_with_replacement, product
 from typing import Any, Iterable, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
+import pandas as pd
 from grakel import graph_from_networkx, kernels
 from grakel.kernels import VertexHistogram, WeisfeilerLehman
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from tqdm import tqdm
 
@@ -57,6 +59,7 @@ class WeisfeilerLehmanKernel(Kernel):
         pre_computed_hash: bool = False,
         base_graph_kernel: Any = None,
         biased: bool = False,
+        vectorized: bool = True,
     ):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
@@ -64,6 +67,7 @@ class WeisfeilerLehmanKernel(Kernel):
         self.n_jobs = n_jobs
         self.biased = biased
         self.pre_computed_hash = pre_computed_hash
+        self.vectorized: bool = vectorized
 
     def compute_naive_kernel_matrix(
         self, X: Any, Y: Any, fit: bool
@@ -90,13 +94,9 @@ class WeisfeilerLehmanKernel(Kernel):
             else:
                 return wl_gk.transform(X)
 
-    def compute_prehashed_kernel_matrix(
-        self, X: Iterable, Y: Union[Iterable, None]
-    ) -> Iterable:
+    def compute_prehashed_kernel_matrix_unordered(self, X, Y):
         X = check_hash(X)
-
-        if Y is not None:
-            Y = check_hash(Y)
+        Y = check_hash(Y)
 
         def parallel_dot_product(lst: Iterable) -> Iterable:
             res = list()
@@ -105,26 +105,64 @@ class WeisfeilerLehmanKernel(Kernel):
             return res
 
         def dot_product(dicts: Tuple) -> int:
+            running_sum = 0
             # 0 * x = 0 so we only need to iterate over common keys
-            return sum(
-                dicts[0][key] * dicts[1].get(key, 0) for key in dicts[0]
-            )
+            for key in set(dicts[0].keys()).intersection(dicts[1].keys()):
+                running_sum += dicts[0][key] * dicts[1][key]
+            return running_sum
 
         if Y == None:
             Y = X
 
         # It's faster to process n_jobs lists than to have one list and
         # dispatch one item at a time.
-        if self.biased:
-            iters = list(chunks(list(product(X, Y)), self.n_jobs))
-        else:
-            iters = list(chunks([(x, y) for x, y in product(X, Y) if x != y]))
+        iters = list(chunks(list(product(X, Y)), self.n_jobs))
 
         return flatten_lists(
             distribute_function(
                 parallel_dot_product, iters, n_jobs=self.n_jobs,
             )
         )
+
+    def compute_prehashed_kernel_matrix_vectorized(
+        self, X: Iterable, Y: Union[Iterable, None]
+    ) -> np.ndarray:
+        def matrix2df(matrix, column_labels):
+            return pd.DataFrame(
+                matrix.todense(), columns=column_labels
+            ).fillna(0)
+
+        def remove_non_overlapping_vectors(Xt, Yt):
+            matched_cols = list(set(Xt.columns).intersection(set(Yt.columns)))
+            Xt = Xt[matched_cols]
+            Yt = Yt[matched_cols]
+            return Xt, Yt
+
+        X = check_hash(X)
+        Y = check_hash(Y)
+
+        vectorizer = DictVectorizer(dtype=np.uint8, sparse=True)
+        Xt = vectorizer.fit_transform(X)
+        column_labels = vectorizer.get_feature_names_out()
+        Xt = matrix2df(Xt, column_labels)
+        if Y == None or Y == X:
+            Yt = Xt
+        else:
+            Yt = vectorizer.fit_transform(Y)
+            column_labels = vectorizer.get_feature_names_out()
+            Yt = matrix2df(Yt, column_labels)
+
+        Xt, Yt = remove_non_overlapping_vectors(Xt, Yt)
+
+        Xt, Yt = Xt.values, Yt.values
+
+        return Xt.dot(Yt.T)
+
+    def compute_prehashed_kernel_matrix(self, X, Y):
+        if self.vectorized:
+            return self.compute_prehashed_kernel_matrix_vectorized(X, Y)
+        else:
+            return self.compute_prehashed_kernel_matrix_unordered(X, Y)
 
     def fit(self, X: Iterable) -> Iterable:
         """required for sklearn compatibility"""
