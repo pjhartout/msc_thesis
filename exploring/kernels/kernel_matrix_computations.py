@@ -68,9 +68,8 @@ def compute_hashes_then_kernel_vec(proteins):
         pre_computed_hash=True,
         vectorized=True,
     )
-    KXY = wl_kernel.fit_transform(hashes[:50], hashes[50:])
-    print(np.sum(KXY))
-    return proteins
+    KXY = wl_kernel.fit_transform(hashes, hashes)
+    return proteins, KXY
 
 
 @timeit
@@ -94,9 +93,8 @@ def compute_hashes_then_kernel_unordered(proteins):
         pre_computed_hash=True,
         vectorized=False,
     )
-    KXY = wl_kernel.fit_transform(hashes[:50], hashes[50:])
-    print(np.sum(KXY))
-    return proteins
+    KXY = wl_kernel.fit_transform(hashes, hashes)
+    return proteins, KXY
 
 
 @timeit
@@ -113,8 +111,8 @@ def compute_kernel_using_precomputed_hashes_vec(proteins):
         pre_computed_hash=True,
         vectorized=True,
     )
-    KX = wl_kernel.fit_transform(hashes[:50], hashes[50:])
-    print(np.sum(KX))
+    KX = wl_kernel.fit_transform(hashes, hashes)
+    return KX
 
 
 @timeit
@@ -131,8 +129,8 @@ def compute_kernel_using_precomputed_hashes_unordered(proteins):
         pre_computed_hash=True,
         vectorized=False,
     )
-    KX = wl_kernel.fit_transform(hashes[:50], hashes[50:])
-    print(np.sum(KX))
+    KX = wl_kernel.fit_transform(hashes, hashes)
+    return KX
 
 
 def main():
@@ -140,24 +138,26 @@ def main():
 
     # 2. W-L histogram computation speedup
     print(
-        "### Custom Implementation *without* precomputed W-L hashes vectorized ###"
-    )
-    proteins = compute_hashes_then_kernel_vec(proteins)
-
-    print(
         "### Custom Implementation *without* precomputed W-L hashes unordered ###"
     )
-    proteins = compute_hashes_then_kernel_unordered(proteins)
+    proteins, KX_uno = compute_hashes_then_kernel_unordered(proteins)
+    print(np.sum(KX_uno))
 
     print(
-        "### Custom Implementation *with* precomputed W-L hashes vectorized ###"
+        "### Custom Implementation *without* precomputed W-L hashes vectorized ###"
     )
-    compute_kernel_using_precomputed_hashes_vec(proteins)
-
+    proteins, KX_vec = compute_hashes_then_kernel_vec(proteins)
+    print(np.sum(KX_vec))
     print(
         "### Custom Implementation *with* precomputed W-L hashes unordered ###"
     )
-    compute_kernel_using_precomputed_hashes_unordered(proteins)
+    KX = compute_kernel_using_precomputed_hashes_unordered(proteins)
+    print(np.sum(KX))
+    print(
+        "### Custom Implementation *with* precomputed W-L hashes vectorized ###"
+    )
+    KX = compute_kernel_using_precomputed_hashes_vec(proteins)
+    print(np.sum(KX))
 
 
 if __name__ == "__main__":

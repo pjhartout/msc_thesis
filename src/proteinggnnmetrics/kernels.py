@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from grakel import graph_from_networkx, kernels
 from grakel.kernels import VertexHistogram, WeisfeilerLehman
+from matplotlib.cbook import flatten
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from tqdm import tqdm
@@ -24,6 +25,7 @@ from .utils.functions import (
     chunks,
     distribute_function,
     flatten_lists,
+    generate_random_strings,
     networkx2grakel,
 )
 from .utils.validation import check_graphs, check_hash
@@ -58,7 +60,7 @@ class WeisfeilerLehmanKernel(Kernel):
         normalize: bool = True,
         pre_computed_hash: bool = False,
         base_graph_kernel: Any = None,
-        biased: bool = False,
+        biased: bool = True,
         vectorized: bool = True,
     ):
         self.n_iter = n_iter
@@ -101,7 +103,14 @@ class WeisfeilerLehmanKernel(Kernel):
         def parallel_dot_product(lst: Iterable) -> Iterable:
             res = list()
             for x in lst:
-                res.append(dot_product(x))
+                res.append(
+                    {
+                        list(x.keys())[0]: [
+                            list(x.values())[0][0],
+                            dot_product(list(x.values())[0][1]),
+                        ]
+                    }
+                )
             return res
 
         def dot_product(dicts: Tuple) -> int:
@@ -116,13 +125,22 @@ class WeisfeilerLehmanKernel(Kernel):
 
         # It's faster to process n_jobs lists than to have one list and
         # dispatch one item at a time.
-        iters = list(chunks(list(product(X, Y)), self.n_jobs))
+        iters_data = list(list(product(X, Y)))
+        iters_idx = list(product(range(len(X)), range(len(Y))))
+        keys = generate_random_strings(10, len(flatten_lists(iters_data)))
+        iters = [
+            {key: [idx, data]}
+            for key, idx, data in zip(keys, iters_idx, iters_data)
+        ]
 
-        return flatten_lists(
-            distribute_function(
-                parallel_dot_product, iters, n_jobs=self.n_jobs,
-            )
-        )
+        matrix_elems = parallel_dot_product(iters)
+
+        K = np.zeros((len(X), len(Y)))
+        for elem in matrix_elems:
+            coords = list(elem.values())[0][0]
+            val = list(elem.values())[0][1]
+            K[coords[0], coords[1]] = val
+        return K
 
     def compute_prehashed_kernel_matrix_vectorized(
         self, X: Iterable, Y: Union[Iterable, None]
