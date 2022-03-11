@@ -81,7 +81,7 @@ def precomputed_vectorized_biased(X, Y):
         vectorized=True,
     )
     KXY = wl_kernel.fit_transform(X, Y)
-    positive_eig(KXY)
+    # positive_eig(KXY)
     print(KXY)
 
 
@@ -90,13 +90,15 @@ def precomputed_vectorized_biased(X, Y):
 def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
         n_jobs=config["COMPUTE"]["N_JOBS"],
-        n_iter=3,
+        n_iter=4,
         biased=True,
         pre_computed_hash=True,
         vectorized=False,
     )
     KXY = wl_kernel.fit_transform(X, Y)
-    positive_eig(KXY)
+    # positive_eig(KXY)
+    print(KXY.shape)
+    print(np.sum(KXY))
     print(KXY)
 
 
@@ -104,7 +106,7 @@ def precomputed_custom_biased(X, Y):
 @measure_memory
 def precomputed_naive_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        n_jobs=config["COMPUTE"]["N_JOBS"],
         n_iter=3,
         biased=True,
         pre_computed_hash=False,
@@ -112,7 +114,9 @@ def precomputed_naive_biased(X, Y):
         normalize=False,
     )
     KXY = wl_kernel.fit_transform(X, Y)
-    positive_eig(KXY)
+    # positive_eig(KXY)
+    print(KXY.shape)
+    print(np.sum(KXY))
     print(KXY)
 
 
@@ -125,16 +129,19 @@ def main():
         "Computing Weisfeiler-Lehman Hashes",
         show_tqdm=False,
     )
+
+    # proteins = proteins[:10]
+
     hashes = [
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
         for protein in proteins
     ]
 
-    precomputed_custom_biased(hashes, hashes)
+    precomputed_custom_biased(hashes[:30], hashes[30:])
     # precomputed_vectorized_biased(hashes, hashes)
 
     graphs = [protein.graphs["knn_graph"] for protein in proteins]
-    precomputed_naive_biased(graphs, graphs)
+    precomputed_naive_biased(graphs[:30], graphs[30:])
 
 
 if __name__ == "__main__":
