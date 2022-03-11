@@ -76,6 +76,7 @@ def generate_simple_data():
 
 
 @timeit
+@measure_memory
 def precomputed_vectorized_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
         n_jobs=config["COMPUTE"]["N_JOBS"],
@@ -88,6 +89,7 @@ def precomputed_vectorized_biased(X, Y):
 
 
 @timeit
+@measure_memory
 def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
         n_jobs=config["COMPUTE"]["N_JOBS"],
