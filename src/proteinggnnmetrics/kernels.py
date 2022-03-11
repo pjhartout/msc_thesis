@@ -14,8 +14,7 @@ from typing import Any, Iterable, List, Tuple, Union
 import networkx as nx
 import numpy as np
 import pandas as pd
-from grakel import graph_from_networkx, kernels
-from grakel.kernels import VertexHistogram, WeisfeilerLehman
+from grakel import WeisfeilerLehman, graph_from_networkx
 from matplotlib.cbook import flatten
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics.pairwise import linear_kernel
@@ -66,7 +65,10 @@ class WeisfeilerLehmanKernel(Kernel):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
         self.normalize = normalize
-        self.n_jobs = n_jobs
+        if n_jobs is not None:
+            self.n_jobs = int(n_jobs)
+        else:
+            self.n_jobs = None
         self.biased = biased
         self.pre_computed_hash = pre_computed_hash
         self.vectorized: bool = vectorized
@@ -132,8 +134,15 @@ class WeisfeilerLehmanKernel(Kernel):
             {key: [idx, data]}
             for key, idx, data in zip(keys, iters_idx, iters_data)
         ]
-
-        matrix_elems = parallel_dot_product(iters)
+        if self.n_jobs is not None:
+            iters = list(chunks(iters, self.n_jobs,))
+            matrix_elems = flatten_lists(
+                distribute_function(
+                    parallel_dot_product, iters, self.n_jobs, show_tqdm=False
+                )
+            )
+        else:
+            matrix_elems = parallel_dot_product(iters)
 
         K = np.zeros((len(X), len(Y)), dtype=int)
         for elem in matrix_elems:
