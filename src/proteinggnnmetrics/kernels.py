@@ -135,7 +135,7 @@ class WeisfeilerLehmanKernel(Kernel):
 
         matrix_elems = parallel_dot_product(iters)
 
-        K = np.zeros((len(X), len(Y)))
+        K = np.zeros((len(X), len(Y)), dtype=int)
         for elem in matrix_elems:
             coords = list(elem.values())[0][0]
             val = list(elem.values())[0][1]
@@ -146,31 +146,36 @@ class WeisfeilerLehmanKernel(Kernel):
         self, X: Iterable, Y: Union[Iterable, None]
     ) -> np.ndarray:
         def matrix2df(matrix, column_labels):
-            return pd.DataFrame(
-                matrix.todense(), columns=column_labels
-            ).fillna(0)
+            df = pd.DataFrame(matrix.todense(), columns=column_labels).fillna(
+                0
+            )
+            return df.reindex(sorted(df.columns), axis=1)
 
         def remove_non_overlapping_vectors(Xt, Yt):
-            matched_cols = list(set(Xt.columns).intersection(set(Yt.columns)))
-            Xt = Xt[matched_cols]
-            Yt = Yt[matched_cols]
+            # Get columns where all rows are equal to 0
+            d_x = (Xt == 0).all(axis=0)
+            d_y = (Yt == 0).all(axis=0)
+            cols_to_remove = d_x[d_x].index.tolist() + d_y[d_y].index.tolist()
+            # Remove d_x and d_y from Xt and Yt
+            Xt = Xt.drop(cols_to_remove, axis=1)
+            Yt = Yt.drop(cols_to_remove, axis=1)
             return Xt, Yt
 
         X = check_hash(X)
         Y = check_hash(Y)
 
-        vectorizer = DictVectorizer(dtype=np.uint8, sparse=True)
-        Xt = vectorizer.fit_transform(X)
+        vectorizer = DictVectorizer(dtype=int, sparse=True)
+        vectorizer.fit(X + Y)
         column_labels = vectorizer.get_feature_names_out()
+        Xt = vectorizer.transform(X)
         Xt = matrix2df(Xt, column_labels)
         if Y == None or Y == X:
             Yt = Xt
         else:
-            Yt = vectorizer.fit_transform(Y)
-            column_labels = vectorizer.get_feature_names_out()
+            Yt = vectorizer.transform(Y)
             Yt = matrix2df(Yt, column_labels)
 
-        Xt, Yt = remove_non_overlapping_vectors(Xt, Yt)
+        # Xt, Yt = remove_non_overlapping_vectors(Xt, Yt)
 
         Xt, Yt = Xt.values, Yt.values
 
