@@ -43,20 +43,6 @@ def positive_eig(K):
     assert_array_less(default_eigvalue_precision, min_eig)
 
 
-def get_hash(G):
-    return dict(
-        Counter(
-            flatten_lists(
-                list(
-                    nx.weisfeiler_lehman_subgraph_hashes(
-                        G, iterations=10,
-                    ).values()
-                )
-            )
-        )
-    )
-
-
 def compute_wl_hashes(protein):
     protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph", n_iter=3)
     return protein
