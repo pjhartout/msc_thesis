@@ -8,12 +8,13 @@ This is to test kernel matrix computations
 """
 
 import os
+from collections import Counter
 from pathlib import Path
 from typing import List
 
+import networkx as nx
 import numpy as np
 from grakel.kernels.vertex_histogram import VertexHistogram
-from matplotlib.pyplot import show
 
 from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
 from proteinggnnmetrics.loaders import (
@@ -24,140 +25,95 @@ from proteinggnnmetrics.loaders import (
 from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import configure, distribute_function
+from proteinggnnmetrics.utils.functions import (
+    configure,
+    distribute_function,
+    flatten_lists,
+)
 
 config = configure()
 
 
+def get_hash(G):
+    return dict(
+        Counter(
+            flatten_lists(
+                list(
+                    nx.weisfeiler_lehman_subgraph_hashes(
+                        G, iterations=10,
+                    ).values()
+                )
+            )
+        )
+    )
+
+
 def compute_wl_hashes(protein):
-    protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph", n_iter=10)
+    protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph", n_iter=3)
     return protein
 
 
-@timeit
-def compute_naive_kernel(graphs):
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=10,
-        base_graph_kernel=VertexHistogram,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
-        pre_computed_hash=False,
-    )
-    KX = wl_kernel.fit_transform(graphs)
-    return KX
+def generate_data(seed, n_graphs):
+    """Generates data for testing"""
+
+    # Generate n_graphs graphs
+
+    X = list()
+    Y = list()
+    for n in range(n_graphs):
+        X.append(get_hash(nx.erdos_renyi_graph(n=4, p=0.8, seed=seed)))
+        Y.append(get_hash(nx.erdos_renyi_graph(n=4, p=0.5, seed=seed)))
+    return X, Y
+
+
+def generate_simple_data():
+    s_1 = {"a": 2, "b": 3, "c": 1, "d": 10}
+    s_2 = {"a": 2, "b": 1, "e": 10, "f": 20}
+    s_3 = {"a": 2, "b": 1, "c": 2, "f": 1}
+    s_4 = {"b": 1, "c": 2, "f": 1, "g": 10}
+    s_5 = {"g": 10, "h": 20, "i": 1, "j": 2}
+    return [s_1, s_2, s_3, s_4, s_5]
 
 
 @timeit
-def compute_hashes_then_kernel_vec(proteins):
-    proteins = distribute_function(
-        compute_wl_hashes,
-        proteins,
-        int(config["COMPUTE"]["N_JOBS"]),
-        "Computing Weisfeiler-Lehman Hashes",
-        show_tqdm=False,
-    )
-    hashes = [
-        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
-        for protein in proteins
-    ]
+def precomputed_vectorized_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=10,
-        base_graph_kernel=VertexHistogram,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        n_jobs=config["COMPUTE"]["N_JOBS"],
+        biased=True,
         pre_computed_hash=True,
         vectorized=True,
     )
-    KXY = wl_kernel.fit_transform(hashes, hashes)
-    return proteins, KXY
+    KXY = wl_kernel.fit_transform(X, Y)
+    print(KXY)
 
 
 @timeit
-def compute_hashes_then_kernel_unordered(proteins):
-    proteins = distribute_function(
-        compute_wl_hashes,
-        proteins,
-        int(config["COMPUTE"]["N_JOBS"]),
-        "Computing Weisfeiler-Lehman Hashes",
-        show_tqdm=False,
-    )
-    hashes = [
-        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
-        for protein in proteins
-    ]
+def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=10,
-        base_graph_kernel=VertexHistogram,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        n_jobs=config["COMPUTE"]["N_JOBS"],
+        biased=True,
         pre_computed_hash=True,
         vectorized=False,
     )
-    KXY = wl_kernel.fit_transform(hashes, hashes)
-    return proteins, KXY
-
-
-@timeit
-def compute_kernel_using_precomputed_hashes_vec(proteins):
-    hashes = [
-        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
-        for protein in proteins
-    ]
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=10,
-        base_graph_kernel=VertexHistogram,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
-        pre_computed_hash=True,
-        vectorized=True,
-    )
-    KX = wl_kernel.fit_transform(hashes, hashes)
-    return KX
-
-
-@timeit
-def compute_kernel_using_precomputed_hashes_unordered(proteins):
-    hashes = [
-        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
-        for protein in proteins
-    ]
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_iter=10,
-        base_graph_kernel=VertexHistogram,
-        normalize=True,
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
-        pre_computed_hash=True,
-        vectorized=False,
-    )
-    KX = wl_kernel.fit_transform(hashes, hashes)
-    return KX
+    KXY = wl_kernel.fit_transform(X, Y)
+    print(KXY)
 
 
 def main():
     proteins = load_proteins(CACHE_DIR / "sample_human_proteome_alpha_fold")
-
-    # 2. W-L histogram computation speedup
-    print(
-        "### Custom Implementation *without* precomputed W-L hashes unordered ###"
+    proteins = distribute_function(
+        compute_wl_hashes,
+        proteins,
+        int(config["COMPUTE"]["N_JOBS"]),
+        "Computing Weisfeiler-Lehman Hashes",
+        show_tqdm=False,
     )
-    proteins, KX_uno = compute_hashes_then_kernel_unordered(proteins)
-    print(np.sum(KX_uno))
-
-    print(
-        "### Custom Implementation *without* precomputed W-L hashes vectorized ###"
-    )
-    proteins, KX_vec = compute_hashes_then_kernel_vec(proteins)
-    print(np.sum(KX_vec))
-    print(
-        "### Custom Implementation *with* precomputed W-L hashes unordered ###"
-    )
-    KX = compute_kernel_using_precomputed_hashes_unordered(proteins)
-    print(np.sum(KX))
-    print(
-        "### Custom Implementation *with* precomputed W-L hashes vectorized ###"
-    )
-    KX = compute_kernel_using_precomputed_hashes_vec(proteins)
-    print(np.sum(KX))
+    hashes = [
+        protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
+        for protein in proteins
+    ]
+    precomputed_custom_biased(hashes, hashes)
+    precomputed_vectorized_biased(hashes, hashes)
 
 
 if __name__ == "__main__":
