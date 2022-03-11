@@ -15,6 +15,7 @@ from typing import List
 import networkx as nx
 import numpy as np
 from grakel.kernels.vertex_histogram import VertexHistogram
+from numpy.testing import assert_array_less
 
 from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
 from proteinggnnmetrics.loaders import (
@@ -32,6 +33,14 @@ from proteinggnnmetrics.utils.functions import (
 )
 
 config = configure()
+
+default_eigvalue_precision = float("-1e-5")
+
+
+def positive_eig(K):
+    """Assert true if the calculated kernel matrix is valid."""
+    min_eig = np.real(np.min(np.linalg.eig(K)[0]))
+    assert_array_less(default_eigvalue_precision, min_eig)
 
 
 def get_hash(G):
@@ -80,11 +89,13 @@ def generate_simple_data():
 def precomputed_vectorized_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
         n_jobs=config["COMPUTE"]["N_JOBS"],
+        n_iter=3,
         biased=True,
         pre_computed_hash=True,
         vectorized=True,
     )
     KXY = wl_kernel.fit_transform(X, Y)
+    positive_eig(KXY)
     print(KXY)
 
 
@@ -93,11 +104,29 @@ def precomputed_vectorized_biased(X, Y):
 def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
         n_jobs=config["COMPUTE"]["N_JOBS"],
+        n_iter=3,
         biased=True,
         pre_computed_hash=True,
         vectorized=False,
     )
     KXY = wl_kernel.fit_transform(X, Y)
+    positive_eig(KXY)
+    print(KXY)
+
+
+@timeit
+@measure_memory
+def precomputed_naive_biased(X, Y):
+    wl_kernel = WeisfeilerLehmanKernel(
+        n_jobs=int(config["COMPUTE"]["N_JOBS"]),
+        n_iter=3,
+        biased=True,
+        pre_computed_hash=False,
+        vectorized=False,
+        normalize=False,
+    )
+    KXY = wl_kernel.fit_transform(X, Y)
+    positive_eig(KXY)
     print(KXY)
 
 
@@ -114,8 +143,12 @@ def main():
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
         for protein in proteins
     ]
+
     precomputed_custom_biased(hashes, hashes)
-    precomputed_vectorized_biased(hashes, hashes)
+    # precomputed_vectorized_biased(hashes, hashes)
+
+    graphs = [protein.graphs["knn_graph"] for protein in proteins]
+    precomputed_naive_biased(graphs, graphs)
 
 
 if __name__ == "__main__":
