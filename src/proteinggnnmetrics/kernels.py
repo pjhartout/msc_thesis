@@ -87,7 +87,7 @@ class WeisfeilerLehmanKernel(Kernel):
 
         X = networkx2grakel(X)
         if Y is not None:
-            Y = graph_from_networkx(X)
+            Y = networkx2grakel(Y)
             if fit:
                 return wl_gk.fit_transform(X, Y)
             else:
