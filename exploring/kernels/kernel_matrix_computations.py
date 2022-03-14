@@ -14,8 +14,9 @@ from typing import List
 
 import networkx as nx
 import numpy as np
-from grakel.kernels.vertex_histogram import VertexHistogram
+from grakel import VertexHistogram
 from numpy.testing import assert_array_less
+from sklearn.metrics.pairwise import linear_kernel
 
 from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
 from proteinggnnmetrics.loaders import (
@@ -40,25 +41,12 @@ default_eigvalue_precision = float("-1e-5")
 def positive_eig(K):
     """Assert true if the calculated kernel matrix is valid."""
     min_eig = np.real(np.min(np.linalg.eig(K)[0]))
-    assert_array_less(default_eigvalue_precision, min_eig)
+    assert_array_less(min_eig, default_eigvalue_precision)
 
 
 def compute_wl_hashes(protein):
     protein.set_weisfeiler_lehman_hashes(graph_type="knn_graph", n_iter=3)
     return protein
-
-
-def generate_data(seed, n_graphs):
-    """Generates data for testing"""
-
-    # Generate n_graphs graphs
-
-    X = list()
-    Y = list()
-    for n in range(n_graphs):
-        X.append(get_hash(nx.erdos_renyi_graph(n=4, p=0.8, seed=seed)))
-        Y.append(get_hash(nx.erdos_renyi_graph(n=4, p=0.5, seed=seed)))
-    return X, Y
 
 
 def generate_simple_data():
@@ -68,21 +56,6 @@ def generate_simple_data():
     s_4 = {"b": 1, "c": 2, "f": 1, "g": 10}
     s_5 = {"g": 10, "h": 20, "i": 1, "j": 2}
     return [s_1, s_2, s_3, s_4, s_5]
-
-
-@timeit
-@measure_memory
-def precomputed_vectorized_biased(X, Y):
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=config["COMPUTE"]["N_JOBS"],
-        n_iter=3,
-        biased=True,
-        pre_computed_hash=True,
-        vectorized=True,
-    )
-    KXY = wl_kernel.fit_transform(X, Y)
-    # positive_eig(KXY)
-    print(KXY)
 
 
 @timeit
@@ -97,27 +70,28 @@ def precomputed_custom_biased(X, Y):
     )
     KXY = wl_kernel.fit_transform(X, Y)
     # positive_eig(KXY)
-    print(KXY.shape)
-    print(np.sum(KXY))
-    print(KXY)
+    # Print shape of KXY
+    print(f"Custom: {KXY.shape}")
+    return KXY
 
 
 @timeit
 @measure_memory
 def precomputed_naive_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=config["COMPUTE"]["N_JOBS"],
+        n_jobs=None,
         n_iter=3,
         biased=True,
+        base_graph_kernel=VertexHistogram,
         pre_computed_hash=False,
         vectorized=False,
         normalize=False,
     )
     KXY = wl_kernel.fit_transform(X, Y)
     # positive_eig(KXY)
-    print(KXY.shape)
-    print(np.sum(KXY))
-    print(KXY)
+    # Print shape of KXY
+    print(f"Custom: {KXY.shape}")
+    return KXY
 
 
 def main():
@@ -130,18 +104,17 @@ def main():
         show_tqdm=False,
     )
 
-    # proteins = proteins[:10]
-
     hashes = [
         protein.descriptors["knn_graph"]["weisfeiler-lehman-hist"]
         for protein in proteins
     ]
 
-    precomputed_custom_biased(hashes[:30], hashes[30:])
-    # precomputed_vectorized_biased(hashes, hashes)
+    precomp = precomputed_custom_biased(hashes[:30], hashes[30:])
 
     graphs = [protein.graphs["knn_graph"] for protein in proteins]
-    precomputed_naive_biased(graphs[:30], graphs[30:])
+    naive = precomputed_naive_biased(graphs[:30], graphs[30:])
+    print("Precomputed:", precomp.shape)
+    print("Naive:", naive.shape)
 
 
 if __name__ == "__main__":
