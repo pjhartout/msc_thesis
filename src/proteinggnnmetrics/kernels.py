@@ -14,7 +14,7 @@ from typing import Any, Iterable, List, Tuple, Union
 import networkx as nx
 import numpy as np
 import pandas as pd
-from grakel import WeisfeilerLehman, graph_from_networkx
+from grakel import WeisfeilerLehman
 from matplotlib.cbook import flatten
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics.pairwise import linear_kernel
