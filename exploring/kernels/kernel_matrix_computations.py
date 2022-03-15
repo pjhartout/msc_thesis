@@ -67,11 +67,7 @@ def generate_simple_data():
 @measure_memory
 def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=config["COMPUTE"]["N_JOBS"],
-        n_iter=4,
-        biased=True,
-        pre_computed_hash=True,
-        vectorized=False,
+        n_jobs=config["COMPUTE"]["N_JOBS"], n_iter=4, biased=True,
     )
     KXY = wl_kernel.fit_transform(X, Y)
     # positive_eig(KXY)
@@ -82,17 +78,13 @@ def precomputed_custom_biased(X, Y):
 
 @timeit
 @measure_memory
-def precomputed_naive_biased(X, Y):
-    wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=None,
-        n_iter=3,
-        biased=True,
-        base_graph_kernel=VertexHistogram,
-        pre_computed_hash=False,
-        vectorized=False,
-        normalize=False,
+def grakel_test(X, Y):
+    X = networkx2grakel(X)
+    Y = networkx2grakel(Y)
+    wl_kernel = WeisfeilerLehman(
+        n_jobs=int(config["COMPUTE"]["N_JOBS"]), n_iter=3
     )
-    KXY = wl_kernel.fit_transform(X, Y)
+    KXY = wl_kernel.fit(X).transform(Y).T
     # positive_eig(KXY) Print shape of KXY
     print(f"Custom: {KXY.shape}")
     return KXY
@@ -129,7 +121,7 @@ def main():
 
     precomp = precomputed_custom_biased(hashes[:30], hashes[:30])
     graphs = [protein.graphs["knn_graph"] for protein in proteins]
-    grakel_res = precomputed_naive_biased(graphs[:30], graphs[:30])
+    grakel_res = grakel_test(graphs[:30], graphs[:30])
     graphkit_res = graphkit_test(graphs[:30], graphs[:30])
     print(f"Precomputed: {precomp.shape}")
     print(f"Grakel: {grakel_res.shape}")
@@ -145,7 +137,7 @@ def main():
 
     precomp = precomputed_custom_biased(hashes[:30], hashes[30:])
     graphs = [protein.graphs["knn_graph"] for protein in proteins]
-    grakel_res = precomputed_naive_biased(graphs[:30], graphs[30:])
+    grakel_res = grakel_test(graphs[:30], graphs[30:])
     graphkit_res = graphkit_test(graphs[:30], graphs[30:])
     print(f"Precomputed: {precomp.shape}")
     print(f"Grakel: {grakel_res.shape}")

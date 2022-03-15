@@ -57,7 +57,6 @@ class WeisfeilerLehmanKernel(Kernel):
         n_jobs: int,
         n_iter: int = 3,
         normalize: bool = True,
-        pre_computed_hash: bool = False,
         base_graph_kernel: Any = None,
         biased: bool = True,
         vectorized: bool = True,
@@ -70,33 +69,6 @@ class WeisfeilerLehmanKernel(Kernel):
         else:
             self.n_jobs = None
         self.biased = biased
-        self.pre_computed_hash = pre_computed_hash
-        self.vectorized: bool = vectorized
-
-    def compute_naive_kernel_matrix(
-        self, X: Any, Y: Any, fit: bool
-    ) -> np.ndarray:
-        X = check_graphs(X)
-
-        wl_gk = WeisfeilerLehman(
-            n_iter=self.n_iter,
-            base_graph_kernel=self.base_graph_kernel,
-            normalize=self.normalize,
-            n_jobs=self.n_jobs,
-        )
-
-        X = networkx2grakel(X)
-        if Y is not None:
-            Y = networkx2grakel(Y)
-            if fit:
-                return wl_gk.fit_transform(X, Y)
-            else:
-                return wl_gk.transform(X, Y)
-        else:
-            if fit:
-                return wl_gk.fit_transform(X)
-            else:
-                return wl_gk.transform(X)
 
     def compute_prehashed_kernel_matrix_unordered(self, X, Y):
         X = check_hash(X)
@@ -151,66 +123,18 @@ class WeisfeilerLehmanKernel(Kernel):
             K[coords[0], coords[1]] = val
         return K
 
-    def compute_prehashed_kernel_matrix_vectorized(
-        self, X: Iterable, Y: Union[Iterable, None]
-    ) -> np.ndarray:
-        def matrix2df(matrix, column_labels):
-            df = pd.DataFrame(matrix.todense(), columns=column_labels).fillna(
-                0
-            )
-            return df.reindex(sorted(df.columns), axis=1)
-
-        def remove_non_overlapping_vectors(Xt, Yt):
-            # Get columns where all rows are equal to 0
-            d_x = (Xt == 0).all(axis=0)
-            d_y = (Yt == 0).all(axis=0)
-            cols_to_remove = d_x[d_x].index.tolist() + d_y[d_y].index.tolist()
-            # Remove d_x and d_y from Xt and Yt
-            Xt = Xt.drop(cols_to_remove, axis=1)
-            Yt = Yt.drop(cols_to_remove, axis=1)
-            return Xt, Yt
-
-        X = check_hash(X)
-        Y = check_hash(Y)
-
-        vectorizer = DictVectorizer(dtype=int, sparse=True)
-        vectorizer.fit(X + Y)
-        column_labels = vectorizer.get_feature_names_out()
-        Xt = vectorizer.transform(X)
-        Xt = matrix2df(Xt, column_labels)
-        if Y == None or Y == X:
-            Yt = Xt
-        else:
-            Yt = vectorizer.transform(Y)
-            Yt = matrix2df(Yt, column_labels)
-
-        # Xt, Yt = remove_non_overlapping_vectors(Xt, Yt)
-
-        Xt, Yt = Xt.values, Yt.values
-
-        return Xt.dot(Yt.T)
-
     def compute_prehashed_kernel_matrix(self, X, Y):
-        if self.vectorized:
-            return self.compute_prehashed_kernel_matrix_vectorized(X, Y)
-        else:
-            return self.compute_prehashed_kernel_matrix_unordered(X, Y)
+        return self.compute_prehashed_kernel_matrix_unordered(X, Y)
 
     def fit(self, X: Iterable) -> Iterable:
         """required for sklearn compatibility"""
         return X
 
     def transform(self, X: Any, Y: Any = None) -> np.ndarray:
-        if self.pre_computed_hash:
-            return self.compute_prehashed_kernel_matrix(X, Y)
-        else:
-            return self.compute_naive_kernel_matrix(X, Y, fit=False)
+        return self.compute_prehashed_kernel_matrix(X, Y)
 
     def fit_transform(self, X: Any, Y: Any = None) -> np.ndarray:
-        if self.pre_computed_hash:
-            return self.compute_prehashed_kernel_matrix(X, Y)
-        else:
-            return self.compute_naive_kernel_matrix(X, Y, fit=True)
+        return self.compute_prehashed_kernel_matrix(X, Y)
 
 
 class LinearKernel(Kernel):
