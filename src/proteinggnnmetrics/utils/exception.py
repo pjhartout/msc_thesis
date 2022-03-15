@@ -40,3 +40,10 @@ class ProteinLoadingError(Exception):
     """Raised when protein cannot be correctly loaded from disk"""
 
     pass
+
+
+class UniquenessError(Exception):
+    """Raised when not enough random strings can be generated from given
+    string_length"""
+
+    pass

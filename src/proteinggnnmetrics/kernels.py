@@ -6,15 +6,17 @@ Kernels
 
 """
 
-import itertools
 import os
 from abc import ABCMeta
+from itertools import combinations, combinations_with_replacement, product
 from typing import Any, Iterable, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
-from grakel import graph_from_networkx, kernels
-from grakel.kernels import VertexHistogram, WeisfeilerLehman
+import pandas as pd
+from grakel import WeisfeilerLehman
+from matplotlib.cbook import flatten
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from tqdm import tqdm
 
@@ -22,6 +24,7 @@ from .utils.functions import (
     chunks,
     distribute_function,
     flatten_lists,
+    generate_random_strings,
     networkx2grakel,
 )
 from .utils.validation import check_graphs, check_hash
@@ -51,24 +54,31 @@ class WeisfeilerLehmanKernel(Kernel):
 
     def __init__(
         self,
-        n_iter: int,
-        normalize: bool,
         n_jobs: int,
+        n_iter: int = 3,
+        normalize: bool = True,
         pre_computed_hash: bool = False,
         base_graph_kernel: Any = None,
+        biased: bool = True,
+        vectorized: bool = True,
     ):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
         self.normalize = normalize
-        self.n_jobs = n_jobs
+        if n_jobs is not None:
+            self.n_jobs = int(n_jobs)
+        else:
+            self.n_jobs = None
+        self.biased = biased
         self.pre_computed_hash = pre_computed_hash
+        self.vectorized: bool = vectorized
 
     def compute_naive_kernel_matrix(
         self, X: Any, Y: Any, fit: bool
     ) -> np.ndarray:
         X = check_graphs(X)
 
-        gk = WeisfeilerLehman(
+        wl_gk = WeisfeilerLehman(
             n_iter=self.n_iter,
             base_graph_kernel=self.base_graph_kernel,
             normalize=self.normalize,
@@ -77,29 +87,32 @@ class WeisfeilerLehmanKernel(Kernel):
 
         X = networkx2grakel(X)
         if Y is not None:
-            Y = graph_from_networkx(X)
+            Y = networkx2grakel(Y)
             if fit:
-                return gk.fit_transform(X, Y)
+                return wl_gk.fit_transform(X, Y)
             else:
-                return gk.transform(X, Y)
+                return wl_gk.transform(X, Y)
         else:
             if fit:
-                return gk.fit_transform(X)
+                return wl_gk.fit_transform(X)
             else:
-                return gk.transform(X)
+                return wl_gk.transform(X)
 
-    def compute_prehashed_kernel_matrix(
-        self, X: Iterable, Y: Union[Iterable, None]
-    ) -> Iterable:
+    def compute_prehashed_kernel_matrix_unordered(self, X, Y):
         X = check_hash(X)
-
-        if Y is not None:
-            Y = check_hash(Y)
+        Y = check_hash(Y)
 
         def parallel_dot_product(lst: Iterable) -> Iterable:
             res = list()
             for x in lst:
-                res.append(dot_product(x))
+                res.append(
+                    {
+                        list(x.keys())[0]: [
+                            list(x.values())[0][0],
+                            dot_product(list(x.values())[0][1]),
+                        ]
+                    }
+                )
             return res
 
         def dot_product(dicts: Tuple) -> int:
@@ -114,13 +127,74 @@ class WeisfeilerLehmanKernel(Kernel):
 
         # It's faster to process n_jobs lists than to have one list and
         # dispatch one item at a time.
-        iters = list(chunks(list(itertools.product(X, Y)), self.n_jobs))
-
-        return flatten_lists(
-            distribute_function(
-                parallel_dot_product, iters, n_jobs=self.n_jobs,
+        iters_data = list(list(product(X, Y)))
+        iters_idx = list(product(range(len(X)), range(len(Y))))
+        keys = generate_random_strings(10, len(flatten_lists(iters_data)))
+        iters = [
+            {key: [idx, data]}
+            for key, idx, data in zip(keys, iters_idx, iters_data)
+        ]
+        if self.n_jobs is not None:
+            iters = list(chunks(iters, self.n_jobs,))
+            matrix_elems = flatten_lists(
+                distribute_function(
+                    parallel_dot_product, iters, self.n_jobs, show_tqdm=False
+                )
             )
-        )
+        else:
+            matrix_elems = parallel_dot_product(iters)
+
+        K = np.zeros((len(X), len(Y)), dtype=int)
+        for elem in matrix_elems:
+            coords = list(elem.values())[0][0]
+            val = list(elem.values())[0][1]
+            K[coords[0], coords[1]] = val
+        return K
+
+    def compute_prehashed_kernel_matrix_vectorized(
+        self, X: Iterable, Y: Union[Iterable, None]
+    ) -> np.ndarray:
+        def matrix2df(matrix, column_labels):
+            df = pd.DataFrame(matrix.todense(), columns=column_labels).fillna(
+                0
+            )
+            return df.reindex(sorted(df.columns), axis=1)
+
+        def remove_non_overlapping_vectors(Xt, Yt):
+            # Get columns where all rows are equal to 0
+            d_x = (Xt == 0).all(axis=0)
+            d_y = (Yt == 0).all(axis=0)
+            cols_to_remove = d_x[d_x].index.tolist() + d_y[d_y].index.tolist()
+            # Remove d_x and d_y from Xt and Yt
+            Xt = Xt.drop(cols_to_remove, axis=1)
+            Yt = Yt.drop(cols_to_remove, axis=1)
+            return Xt, Yt
+
+        X = check_hash(X)
+        Y = check_hash(Y)
+
+        vectorizer = DictVectorizer(dtype=int, sparse=True)
+        vectorizer.fit(X + Y)
+        column_labels = vectorizer.get_feature_names_out()
+        Xt = vectorizer.transform(X)
+        Xt = matrix2df(Xt, column_labels)
+        if Y == None or Y == X:
+            Yt = Xt
+        else:
+            Yt = vectorizer.transform(Y)
+            Yt = matrix2df(Yt, column_labels)
+
+        # Xt, Yt = remove_non_overlapping_vectors(Xt, Yt)
+
+        Xt, Yt = Xt.values, Yt.values
+
+        return Xt.dot(Yt.T)
+
+    def compute_prehashed_kernel_matrix(self, X, Y):
+        if self.vectorized:
+            return self.compute_prehashed_kernel_matrix_vectorized(X, Y)
+        else:
+            return self.compute_prehashed_kernel_matrix_unordered(X, Y)
 
     def fit(self, X: Iterable) -> Iterable:
         """required for sklearn compatibility"""

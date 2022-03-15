@@ -128,6 +128,11 @@ class Protein:
     def set_weisfeiler_lehman_hashes(
         self, graph_type: str, n_iter: int
     ) -> None:
+        hash_iter_0 = dict(
+            Counter(
+                list(dict(self.graphs[graph_type].nodes("residue")).values())
+            )
+        )
         hashes = dict(
             Counter(
                 flatten_lists(
@@ -141,11 +146,15 @@ class Protein:
                 )
             )
         )
-        self.descriptors[graph_type]["weisfeiler-lehman-hist"] = hashes
+        self.descriptors[graph_type]["weisfeiler-lehman-hist"] = (
+            hashes | hash_iter_0
+        )
 
     def save(self, path: PosixPath, auto_name: bool = True) -> None:
+
         if auto_name:
             path = path / str(self.name.split(".")[0] + ".pkl")
+
         with open(path, "wb") as f:
             pickle.dump(self, f)
 

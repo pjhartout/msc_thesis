@@ -75,9 +75,7 @@ def get_deg_histograms(proteins):
 @measure_memory
 @timeit
 def get_clu_histograms(proteins):
-    clustering_histogram = ClusteringHistogram(
-        "knn_graph", n_bins=30, density=False, n_jobs=N_JOBS
-    )
+    clustering_histogram = ClusteringHistogram("knn_graph", n_jobs=N_JOBS)
     proteins = clustering_histogram.fit_transform(proteins)
     return proteins
 
@@ -122,7 +120,7 @@ def main():
     proteins = get_epsilongraphs(proteins)
     proteins = get_deg_histograms(proteins)
     proteins = get_clu_histograms(proteins)
-    proteins = get_spectrum(proteins)
+    # proteins = get_spectrum(proteins)
     proteins = get_tda_descriptor(proteins)
     for protein in tqdm(proteins):
         protein.save(CACHE_DIR / "sample_human_proteome_alpha_fold")

@@ -7,6 +7,9 @@ Provides various utilities useful for the project
 import configparser
 import contextlib
 import os
+from itertools import product
+from random import choice
+from string import ascii_letters
 from typing import Any, Callable, Dict, Iterable, List
 
 import joblib
@@ -15,8 +18,11 @@ import numpy as np
 from grakel import graph_from_networkx
 from joblib import Parallel, delayed
 from matplotlib.path import Path
+from networkx.readwrite.graph6 import n_to_data
 from pyprojroot import here
 from tqdm import tqdm
+
+from .exception import UniquenessError
 
 
 def filter_pdb_files(lst_of_files: List[str]) -> List[str]:
@@ -105,12 +111,16 @@ def distribute_function(
     n_jobs: int,
     tqdm_label: str = None,
     total: int = 1,
+    show_tqdm: bool = True,
 ) -> Any:
     """Simply distributes the execution of func across multiple cores to process X faster"""
     if total == 1:
         total = len(X)
 
-    with tqdm_joblib(tqdm(desc=tqdm_label, total=total)) as progressbar:
+    if show_tqdm:
+        with tqdm_joblib(tqdm(desc=tqdm_label, total=total)) as progressbar:
+            Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
+    else:
         Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
     return Xt
 
@@ -144,3 +154,18 @@ def chunks(lst, n):
     return (
         lst[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n)
     )
+
+
+def generate_random_strings(string_length: int, n_strings: int) -> List[str]:
+    unique_strings = list()
+    for idx, item in enumerate(product(ascii_letters, repeat=string_length)):
+        if idx == n_strings:
+            break
+        unique_strings.append("".join(item))
+
+    if len(unique_strings) != n_strings:
+        raise UniquenessError(
+            f"Cannot generate enough unique strings from given string length "
+            "of {string_length}. Please increase the string_length to continue."
+        )
+    return unique_strings

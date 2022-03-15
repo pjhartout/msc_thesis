@@ -78,9 +78,7 @@ class DegreeHistogram(Descriptor):
 
 
 class ClusteringHistogram(Descriptor):
-    def __init__(
-        self, graph_type: str, n_jobs: int, normalize: bool = True,
-    ):
+    def __init__(self, graph_type: str, n_jobs: int, normalize: bool = True):
         self.graph_type = graph_type
         self.n_jobs = n_jobs
         self.normalize = normalize
