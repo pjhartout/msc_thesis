@@ -112,6 +112,7 @@ def distribute_function(
     tqdm_label: str = None,
     total: int = 1,
     show_tqdm: bool = True,
+    **kwargs,
 ) -> Any:
     """Simply distributes the execution of func across multiple cores to process X faster"""
     if total == 1:
@@ -119,9 +120,9 @@ def distribute_function(
 
     if show_tqdm:
         with tqdm_joblib(tqdm(desc=tqdm_label, total=total)) as progressbar:
-            Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
+            Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x, **kwargs) for x in X)
     else:
-        Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x) for x in X)
+        Xt = Parallel(n_jobs=n_jobs)(delayed(func)(x, **kwargs) for x in X)
     return Xt
 
 
