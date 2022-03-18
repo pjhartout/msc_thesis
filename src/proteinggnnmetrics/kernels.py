@@ -59,7 +59,6 @@ class WeisfeilerLehmanKernel(Kernel):
         normalize: bool = True,
         base_graph_kernel: Any = None,
         biased: bool = True,
-        vectorized: bool = True,
     ):
         self.n_iter = n_iter
         self.base_graph_kernel = base_graph_kernel
@@ -128,7 +127,7 @@ class WeisfeilerLehmanKernel(Kernel):
 
     def fit(self, X: Iterable) -> Iterable:
         """required for sklearn compatibility"""
-        return X
+        return None
 
     def transform(self, X: Any, Y: Any = None) -> np.ndarray:
         return self.compute_prehashed_kernel_matrix(X, Y)
