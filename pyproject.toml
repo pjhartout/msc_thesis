@@ -24,9 +24,11 @@ pyprojroot = "^0.2.0"
 giotto-tda = "^0.5.1"
 grakel = "^0.1.8"
 biopython = "^1.79"
+fastwlk = "^0.2.9"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
+proteinggnnmetrics = { path = "./src/", develop = true }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -13,10 +13,12 @@ from math import sqrt
 from typing import Any, Dict, Iterable, Tuple
 
 import numpy as np
+from grakel import WeisfeilerLehman
 from gtda.diagrams import PairwiseDistance
 from scipy.spatial.distance import minkowski
 
 from .kernels import Kernel
+from .utils.functions import networkx2grakel
 from .utils.validation import check_dist
 
 
@@ -26,16 +28,9 @@ class DistanceFunction(metaclass=ABCMeta):
     def __init__(self):
         pass
 
-    def fit(self):
-        """required for sklearn compatibility"""
-        pass
-
-    def transform(self):
-        """required for sklearn compatibility"""
-        pass
-
-    def fit_transform(self, X: Any, Y: Any) -> float:
-        """Apply evaluation of the two input vectors"""
+    def compute(X, Y):
+        """Computes distance between X and Y
+        """
         pass
 
 
@@ -64,13 +59,7 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         self.biased = biased
         self.squared = squared
 
-    def fit(self, proteins: Any) -> Any:
-        return proteins
-
-    def transform(self, X: np.ndarray) -> np.ndarray:
-        return X
-
-    def fit_transform(self, X: np.ndarray, Y: np.ndarray) -> float:
+    def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
         Xt = check_dist(X)
         Yt = check_dist(Y)
 
@@ -78,9 +67,9 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         m = len(Xt)
         n = len(Yt)
 
-        K_XX = self.kernel.fit_transform(Xt)
-        K_YY = self.kernel.fit_transform(Yt)
-        K_XY = self.kernel.fit_transform(Xt, Yt)
+        K_XX = self.kernel.compute_gram_matrix(Xt)
+        K_YY = self.kernel.compute_gram_matrix(Yt)
+        K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
 
         if self.biased:
 
@@ -115,8 +104,8 @@ class MaximumMeanDiscrepancy(DistanceFunction):
                 mmd = 0
                 raise RuntimeWarning("Warning: MMD is negative, set to 0")
 
-            # See: https://twitter.com/karpathy/status/1430316576016793600?s=21
-            return sqrt(mmd)
+        # See: https://twitter.com/karpathy/status/1430316576016793600?s=21
+        return sqrt(mmd)
 
 
 class MinkowskyDistance(DistanceFunction):
@@ -126,27 +115,27 @@ class MinkowskyDistance(DistanceFunction):
         # Default set to 2 to recover Euclidean distance.
         self.p = p
 
-    def fit_transform(self, X: np.ndarray, Y: np.ndarray) -> float:
+    def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
         d = minkowski(X.flatten(), Y.flatten(), self.p)
         return d
 
 
-class TopologicalPairwiseDistance:
-    def __init__(
-        self, metric: str, metric_params: Dict, order: int, n_jobs: int
-    ):
-        self.metric = metric
-        self.metric_params = metric_params
-        self.order = order
-        self.n_jobs = n_jobs
+# class TopologicalPairwiseDistance:
+#     def __init__(
+#         self, metric: str, metric_params: Dict, order: int, n_jobs: int
+#     ):
+#         self.metric = metric
+#         self.metric_params = metric_params
+#         self.order = order
+#         self.n_jobs = n_jobs
 
-    def fit_transform(
-        self, X: Iterable, Y: Iterable
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        pw_dist_diag = PairwiseDistance(
-            metric=self.metric,
-            metric_params=self.metric_params,
-            order=self.order,
-            n_jobs=self.n_jobs,
-        )
-        return pw_dist_diag.fit_transform(X), pw_dist_diag.fit_transform(Y)
+#     def compute(
+#         self, X: Iterable, Y: Iterable
+#     ) -> Tuple[np.ndarray, np.ndarray]:
+#         pw_dist_diag = PairwiseDistance(
+#             metric=self.metric,
+#             metric_params=self.metric_params,
+#             order=self.order,
+#             n_jobs=self.n_jobs,
+#         )
+#         return pw_dist_diag.fit_transform(X), pw_dist_diag.fit_transform(Y)
