@@ -23,6 +23,8 @@
 ** Zernicke
 ** Folding energy
 ** Perturbations
+** Wrote background
+** Fitness stuff into future directions as separate optimizations
 
 * TODO <2022-03-04 Fri> Meeting Tim
 ** Check kernel correctness with scalar.

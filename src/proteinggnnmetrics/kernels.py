@@ -27,7 +27,6 @@ class Kernel(metaclass=ABCMeta):
         """Apply transformation to apply kernel to X"""
         pass
 
-
 class LinearKernel(Kernel):
     def __init__(
         self, dense_output: bool = False,
