@@ -9,7 +9,10 @@ Here we want to showcase the use of sklearn.pipeline to pipe operations in order
 
 import random
 
+from fastwlk.kernel import WeisfeilerLehmanKernel
+from grakel import WeisfeilerLehman
 from gtda import pipeline
+from numpy import square
 
 from proteinggnnmetrics.descriptors import DegreeHistogram
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
@@ -18,7 +21,7 @@ from proteinggnnmetrics.kernels import LinearKernel
 from proteinggnnmetrics.loaders import (
     list_pdb_files,
     load_descriptor,
-    load_proteins,
+    load_graphs,
 )
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
@@ -58,8 +61,27 @@ def main():
 
     mmd = MaximumMeanDiscrepancy(
         kernel=LinearKernel(dense_output=False)
-    ).fit_transform(dist_1, dist_2)
-    print(f"MMD computed from pipeline is {mmd}")
+    ).compute(dist_1, dist_2)
+
+    print(f"MMD computed from degree histograms on k-nn graphs is {mmd}")
+
+    graph_dist_1 = load_graphs(protein_dist_1, "knn_graph")
+    graph_dist_2 = load_graphs(protein_dist_2, "knn_graph")
+
+    mmd = MaximumMeanDiscrepancy(
+        biased=False,
+        squared=True,
+        kernel=WeisfeilerLehmanKernel(
+            n_jobs=N_JOBS,
+            precomputed=False,
+            n_iter=3,
+            node_label="residue",
+            normalize=True,
+            biased=True,
+        ),
+    ).compute(graph_dist_1, graph_dist_2)
+
+    print(f"MMD computed from WL kernel on k-nn graphs is {mmd}")
 
 
 if __name__ == "__main__":

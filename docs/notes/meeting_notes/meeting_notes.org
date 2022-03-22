@@ -20,8 +20,6 @@
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
 * TODO <2022-03-11 Fri>
-** Update: Sanity checks kernels.
-** Inner product of 3x5 * 5x10 = 3x10?
 ** Zernicke
 ** Folding energy
 ** Perturbations
