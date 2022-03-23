@@ -177,6 +177,7 @@ class KNNGraph(GraphConstruction):
                     include_self=False,
                 )
             )
+            protein.set_nx_graph(graph_type="knn_graph")
             return protein
 
         proteins = distribute_function(
@@ -226,6 +227,7 @@ class EpsilonGraph(GraphConstruction):
             protein.eps_adj = sparse.csr_matrix(
                 np.where(protein.contact_map < self.epsilon, 1, 0)
             )
+            protein.set_nx_graph(graph_type="epsilon_graph")
             return protein
 
         proteins = distribute_function(
