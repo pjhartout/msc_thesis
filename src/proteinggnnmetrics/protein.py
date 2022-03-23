@@ -93,9 +93,9 @@ class Protein:
 
             else:
                 if sparse.issparse(adj_matrix):
-                    G = nx.from_scipy_sparse_matrix(self.knn_adj)
+                    G = nx.from_scipy_sparse_matrix(adj_matrix)
                 elif type(adj_matrix) == np.ndarray:
-                    G = nx.from_numpy_array(self.knn_adj)
+                    G = nx.from_numpy_array(adj_matrix)
                 else:
                     raise AdjacencyMatrixError(
                         "Adjacency matrix in unexpected format. Please check the \
@@ -112,7 +112,7 @@ class Protein:
         if graph_type == "knn_graph":
             build_graph(self.knn_adj)
 
-        elif graph_type == "epsilon_graph":
+        elif graph_type == "eps_graph":
             build_graph(self.eps_adj)
 
         elif graph_type == "contact_map":
