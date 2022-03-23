@@ -22,6 +22,12 @@ from .utils.functions import networkx2grakel
 from .utils.validation import check_dist
 
 
+def positive_eig(K):
+    """Assert true if the calculated kernel matrix is valid."""
+    min_eig = np.real(np.min(np.linalg.eig(K)[0]))
+    return min_eig
+
+
 class DistanceFunction(metaclass=ABCMeta):
     """Defines distance function"""
 
@@ -71,8 +77,13 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         K_YY = self.kernel.compute_gram_matrix(Yt)
         K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
 
-        if self.biased:
+        # Print min_eig for K_XX and K_YY and K_XY
+        print(f"Kernel: {self.kernel.__class__.__name__}")
+        print(f"K_XX min_eig: {positive_eig(K_XX)}")
+        print(f"K_YY min_eig: {positive_eig(K_YY)}")
+        print(f"K_XY min_eig: {positive_eig(K_XY)}")
 
+        if self.biased:
             k_XX = np.sum(K_XX)
             k_YY = np.sum(K_YY)
             k_XY = np.sum(K_XY)

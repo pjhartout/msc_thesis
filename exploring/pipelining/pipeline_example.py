@@ -10,6 +10,7 @@ Here we want to showcase the use of sklearn.pipeline to pipe operations in order
 import pickle
 import random
 
+import numpy as np
 import pandas as pd
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from grakel import WeisfeilerLehman
@@ -22,7 +23,11 @@ from proteinggnnmetrics.descriptors import (
 )
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
 from proteinggnnmetrics.graphs import ContactMap, KNNGraph
-from proteinggnnmetrics.kernels import LinearKernel, WassersteinKernel
+from proteinggnnmetrics.kernels import (
+    LinearKernel,
+    WassersteinKernel,
+    WeisfeilerLehmanGrakel,
+)
 from proteinggnnmetrics.loaders import (
     list_pdb_files,
     load_descriptor,
@@ -102,21 +107,29 @@ def main():
 
     # print(f"MMD computed from degree histograms on k-nn graphs is {mmd}")
 
-    # graph_dist_1 = load_graphs(protein_dist_1, "knn_graph")
-    # graph_dist_2 = load_graphs(protein_dist_2, "knn_graph")
+    graph_dist_1 = load_graphs(protein_dist_1, "knn_graph")
+    graph_dist_2 = load_graphs(protein_dist_2, "knn_graph")
 
-    # mmd = MaximumMeanDiscrepancy(
-    #     biased=False,
-    #     squared=True,
-    #     kernel=WeisfeilerLehmanKernel(
-    #         n_jobs=N_JOBS,
-    #         precomputed=False,
-    #         n_iter=3,
-    #         node_label="residue",
-    #         normalize=True,
-    #         biased=True,
-    #     ),
-    # ).compute(graph_dist_1, graph_dist_2)
+    mmd = MaximumMeanDiscrepancy(
+        biased=False,
+        squared=True,
+        kernel=WeisfeilerLehmanKernel(
+            n_jobs=N_JOBS,
+            precomputed=False,
+            n_iter=3,
+            node_label="residue",
+            normalize=False,
+            biased=True,
+        ),
+    ).compute(graph_dist_1, graph_dist_2)
+
+    mmd = MaximumMeanDiscrepancy(
+        biased=False,
+        squared=True,
+        kernel=WeisfeilerLehmanGrakel(
+            n_jobs=N_JOBS, n_iter=3, node_label="residue",
+        ),
+    ).compute(graph_dist_1, graph_dist_2)
     # print(f"MMD computed from k-nn graphs is {mmd}")
     # print(f"MMD computed from WL kernel on k-nn graphs is {mmd}")
 

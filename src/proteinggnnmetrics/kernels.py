@@ -14,6 +14,7 @@ from typing import Any, Iterable, List, Union
 import networkx as nx
 import numpy as np
 import pandas as pd
+from grakel import WeisfeilerLehman, graph_from_networkx
 from gtda.diagrams import PairwiseDistance
 from gtda.utils import check_diagrams
 from scipy.stats import wasserstein_distance
@@ -46,6 +47,11 @@ def distance2similarity(K):
     return K
 
 
+def networkx2grakel(X: Iterable) -> Iterable:
+    Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
+    return Xt
+
+
 class Kernel(metaclass=ABCMeta):
     """Defines skeleton of descriptor classes"""
 
@@ -69,6 +75,26 @@ class LinearKernel(Kernel):
         else:
             K = linear_kernel(X, Y, dense_output=self.dense_output)
         return K
+
+
+class WeisfeilerLehmanGrakel(Kernel):
+    def __init__(
+        self, n_jobs: int = 4, n_iter: int = 3, node_label: str = "residue",
+    ):
+        self.n_iter = n_iter
+        self.node_label = node_label
+        self.n_jobs = n_jobs
+
+    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
+        wl_kernel_grakel = WeisfeilerLehman(
+            n_jobs=self.n_jobs, n_iter=self.n_iter
+        )
+        if Y is None:
+            Y = X
+        X = networkx2grakel(X)
+        Y = networkx2grakel(Y)
+        KXY_grakel = wl_kernel_grakel.fit(X).transform(Y).T
+        return KXY_grakel
 
 
 class WassersteinKernel(Kernel):
