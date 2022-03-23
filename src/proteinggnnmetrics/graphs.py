@@ -130,7 +130,7 @@ class KNNGraph(GraphConstruction):
 
     def __init__(
         self,
-        n_neighbors: str,
+        n_neighbors: int,
         n_jobs: int,
         mode: str = "connectivity",
         metric: str = "euclidean",
