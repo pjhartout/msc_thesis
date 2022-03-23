@@ -55,7 +55,7 @@ class DegreeHistogram(Descriptor):
 
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein, normalize=True):
-            G = protein.set_nx_graph(self.graph_type)
+            G = protein.graphs[self.graph_type]
             degrees = np.array([val for (node, val) in G.degree()])
             histogram = np.bincount(degrees, minlength=self.n_bins + 1)
 
@@ -91,7 +91,7 @@ class ClusteringHistogram(Descriptor):
 
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein):
-            G = protein.set_nx_graph(self.graph_type)
+            G = protein.graphs[self.graph_type]
             degree_histogram = nx.degree_histogram(G)
 
             protein.descriptors[self.graph_type][
@@ -132,7 +132,7 @@ class LaplacianSpectrum(Descriptor):
 
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_laplacian_spectrum(protein: Protein):
-            G = protein.set_nx_graph(self.graph_type)
+            G = protein.graphs[self.graph_type]
             spectrum = nx.normalized_laplacian_spectrum(G)
             histogram = np.histogram(
                 spectrum,

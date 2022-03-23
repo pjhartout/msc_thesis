@@ -123,7 +123,6 @@ class Protein:
                 'Wrong graph type specified, should be one of ["knn_graph", '
                 '"epsilon_graph", "contact_map"]'
             )
-        return self.graphs[graph_type]
 
     def set_weisfeiler_lehman_hashes(
         self, graph_type: str, n_iter: int
