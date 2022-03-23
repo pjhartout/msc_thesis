@@ -41,8 +41,6 @@ def main():
     if REDUCE_DATA:
         pdb_files = random.sample(pdb_files, 100)
 
-    half = int(len(pdb_files) / 2)
-
     base_feature_steps = [
         ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
         ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
@@ -53,13 +51,15 @@ def main():
         ),
     ]
 
+    pdb_files = [prot for prot in pdb_files if "Q99996" in str(prot)]
+
     base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=100)
     print("Building baseline graphs")
     proteins = base_feature_pipeline.fit_transform(pdb_files)
 
     mmds = list()
     params = list()
-    for std in np.arange(0.1, 1.1, 0.1):
+    for std in np.arange(0.05, 1, 0.01):
         print(f"Applying Gaussian noise with std={std}")
         perturb_feature_steps = flatten_lists(
             [
