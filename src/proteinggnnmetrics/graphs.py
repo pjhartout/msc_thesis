@@ -227,14 +227,14 @@ class EpsilonGraph(GraphConstruction):
             protein.eps_adj = sparse.csr_matrix(
                 np.where(protein.contact_map < self.epsilon, 1, 0)
             )
-            protein.set_nx_graph(graph_type="epsilon_graph")
+            protein.set_nx_graph(graph_type="eps_graph")
             return protein
 
         proteins = distribute_function(
             epsilon_graph_func,
             proteins,
             self.n_jobs,
-            "Extracting KNN graph from contact map",
+            "Extracting Epsilon graph from contact map",
         )
 
         return proteins
