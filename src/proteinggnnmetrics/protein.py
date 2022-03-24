@@ -160,10 +160,11 @@ class Protein:
             pickle.dump(self, f)
 
     def plot_contact_map(self):
-        pass
+        plt.imshow(self.contact_map)
+        plt.colorbar()
+        plt.show()
 
-    @staticmethod
-    def plot_point_cloud(point_cloud):
+    def plot_point_cloud(self):
         scene = {
             "xaxis": {
                 "title": "0th",
@@ -190,13 +191,13 @@ class Protein:
 
         fig.add_trace(
             gobj.Scatter3d(
-                x=point_cloud[:, 0],
-                y=point_cloud[:, 1],
-                z=point_cloud[:, 2],
+                x=self.coordinates[:, 0],
+                y=self.coordinates[:, 1],
+                z=self.coordinates[:, 2],
                 mode="markers",
                 marker={
                     "size": 4,
-                    "color": list(range(point_cloud.shape[0])),
+                    "color": list(range(self.coordinates.shape[0])),
                     "colorscale": "Viridis",
                     "opacity": 0.8,
                 },
