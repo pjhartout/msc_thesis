@@ -64,6 +64,7 @@ class ContactMap(GraphConstruction):
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
+        verbose: bool = False,
     ):
         """Contact map initialization
 
@@ -79,6 +80,7 @@ class ContactMap(GraphConstruction):
         self.n_jobs = n_jobs
         self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -120,6 +122,7 @@ class ContactMap(GraphConstruction):
             proteins,
             self.n_jobs,
             "Extracting contact map",
+            show_tqdm=self.verbose,
         )
 
         return proteins
@@ -136,6 +139,7 @@ class KNNGraph(GraphConstruction):
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
+        verbose: bool = False,
     ):
         self.n_jobs = n_jobs
         self.n_neighbors = n_neighbors
@@ -144,6 +148,7 @@ class KNNGraph(GraphConstruction):
         self.p = p
         self.metric_params = metric_params
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -185,6 +190,7 @@ class KNNGraph(GraphConstruction):
             proteins,
             self.n_jobs,
             "Extracting KNN graph from contact map",
+            show_tqdm=self.verbose,
         )
         return proteins
 
@@ -192,9 +198,10 @@ class KNNGraph(GraphConstruction):
 class EpsilonGraph(GraphConstruction):
     """Extract epsilon graph"""
 
-    def __init__(self, epsilon: float, n_jobs: int):
+    def __init__(self, epsilon: float, n_jobs: int, verbose: bool = False):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -235,6 +242,7 @@ class EpsilonGraph(GraphConstruction):
             proteins,
             self.n_jobs,
             "Extracting Epsilon graph from contact map",
+            show_tqdm=self.verbose,
         )
 
         return proteins

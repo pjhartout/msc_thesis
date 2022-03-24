@@ -44,6 +44,7 @@ class Protein:
         degree_histogram=None,
         clustering_histogram=None,
         laplacian_spectrum_histogram=None,
+        verbose: bool = False,
     ):
         # Basic protein descriptors
         self.name = name
@@ -82,6 +83,7 @@ class Protein:
                 # TDA stuff
             },
         }
+        self.verbose = verbose
 
     def set_nx_graph(self, graph_type: str):
         """Returns graph of specified graph type with labeled nodes"""

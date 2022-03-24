@@ -42,10 +42,13 @@ class Descriptor(metaclass=ABCMeta):
 
 
 class DegreeHistogram(Descriptor):
-    def __init__(self, graph_type: str, n_bins: int, n_jobs: int):
+    def __init__(
+        self, graph_type: str, n_bins: int, n_jobs: int, verbose: bool = False
+    ):
         self.n_bins = n_bins
         self.graph_type = graph_type
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -73,15 +76,23 @@ class DegreeHistogram(Descriptor):
             proteins,
             self.n_jobs,
             "Compute degree histogram",
+            show_tqdm=self.verbose,
         )
         return proteins
 
 
 class ClusteringHistogram(Descriptor):
-    def __init__(self, graph_type: str, n_jobs: int, normalize: bool = True):
+    def __init__(
+        self,
+        graph_type: str,
+        n_jobs: int,
+        normalize: bool = True,
+        verbose: bool = False,
+    ):
         self.graph_type = graph_type
         self.n_jobs = n_jobs
         self.normalize = normalize
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -105,6 +116,7 @@ class ClusteringHistogram(Descriptor):
             proteins,
             self.n_jobs,
             "Compute degree histogram",
+            show_tqdm=self.verbose,
         )
         return proteins
 
@@ -117,12 +129,14 @@ class LaplacianSpectrum(Descriptor):
         n_jobs: int,
         density: bool = False,
         bin_range: Tuple = (0, 2),
+        verbose: bool = False,
     ):
         self.graph_type = graph_type
         self.n_bins = n_bins
         self.density = density
         self.bin_range = bin_range
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -152,6 +166,7 @@ class LaplacianSpectrum(Descriptor):
             proteins,
             self.n_jobs,
             "Compute Laplacian spectrum histogram",
+            show_tqdm=self.verbose,
         )
         return proteins
 
@@ -167,6 +182,7 @@ class TopologicalDescriptor(Descriptor):
         weight_function: Callable = None,
         landscape_layers: int = None,
         n_jobs: int = None,
+        verbose: bool = False,
     ) -> None:
         self.tda_descriptor_type = tda_descriptor_type
         self.epsilon = epsilon
@@ -188,6 +204,7 @@ class TopologicalDescriptor(Descriptor):
             ("filter", diagrams.Filtering(epsilon=self.epsilon)),
             ("rescaler", diagrams.Scaler()),
         ]
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -272,7 +289,7 @@ class TopologicalDescriptor(Descriptor):
         ).fit_transform(contact_maps)
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                self.tda_pipeline, verbose=True
+                self.tda_pipeline, verbose=self.verbose
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(

@@ -27,7 +27,9 @@ from .utils.validation import check_fnames
 class Coordinates:
     """Coordinates handles coordinate extraction of atoms in pdb files."""
 
-    def __init__(self, granularity: str, n_jobs: int) -> None:
+    def __init__(
+        self, granularity: str, n_jobs: int, verbose: bool = False
+    ) -> None:
         """Initializes Coordinates object
 
         Args:
@@ -37,6 +39,7 @@ class Coordinates:
         """
         self.granularity = granularity
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def get_atom_coordinates(self, fname: PosixPath) -> Protein:
         """Given a file name, extracts its atom coordinates. self.granularity
@@ -114,6 +117,7 @@ class Coordinates:
             fname_list,
             self.n_jobs,
             "Extracting coordinates from pdb files",
+            show_tqdm=self.verbose,
         )
 
         return proteins
