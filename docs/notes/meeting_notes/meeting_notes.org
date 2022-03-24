@@ -20,15 +20,11 @@
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
 * TODO <2022-03-11 Fri>
+** Wasserstein metric consequences
 ** Zernicke
 ** Folding energy
-** Perturbations
-** Wrote background
 ** Fitness stuff into future directions as separate optimizations
-
-* TODO <2022-03-04 Fri> Meeting Tim
-** Check kernel correctness with scalar.
-** Implement unbiased + kernel self-compare sanity check
+** TODO Wrote background
 
 * DONE <2022-02-18 Fri> Meeting with Tim
 ** What I did
