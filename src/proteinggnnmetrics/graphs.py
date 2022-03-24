@@ -64,6 +64,7 @@ class ContactMap(GraphConstruction):
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
+        verbose: bool = False,
     ):
         """Contact map initialization
 
@@ -79,6 +80,7 @@ class ContactMap(GraphConstruction):
         self.n_jobs = n_jobs
         self.n_jobs_pairwise = n_jobs_pairwise
         self.metric = metric
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -120,6 +122,7 @@ class ContactMap(GraphConstruction):
             proteins,
             self.n_jobs,
             "Extracting contact map",
+            show_tqdm=self.verbose,
         )
 
         return proteins
@@ -130,12 +133,13 @@ class KNNGraph(GraphConstruction):
 
     def __init__(
         self,
-        n_neighbors: str,
+        n_neighbors: int,
         n_jobs: int,
         mode: str = "connectivity",
         metric: str = "euclidean",
         p: int = 2,
         metric_params: Dict = None,
+        verbose: bool = False,
     ):
         self.n_jobs = n_jobs
         self.n_neighbors = n_neighbors
@@ -144,6 +148,7 @@ class KNNGraph(GraphConstruction):
         self.p = p
         self.metric_params = metric_params
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -177,6 +182,7 @@ class KNNGraph(GraphConstruction):
                     include_self=False,
                 )
             )
+            protein.set_nx_graph(graph_type="knn_graph")
             return protein
 
         proteins = distribute_function(
@@ -184,6 +190,7 @@ class KNNGraph(GraphConstruction):
             proteins,
             self.n_jobs,
             "Extracting KNN graph from contact map",
+            show_tqdm=self.verbose,
         )
         return proteins
 
@@ -191,9 +198,10 @@ class KNNGraph(GraphConstruction):
 class EpsilonGraph(GraphConstruction):
     """Extract epsilon graph"""
 
-    def __init__(self, epsilon: float, n_jobs: int):
+    def __init__(self, epsilon: float, n_jobs: int, verbose: bool = False):
         self.epsilon = epsilon
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -226,13 +234,15 @@ class EpsilonGraph(GraphConstruction):
             protein.eps_adj = sparse.csr_matrix(
                 np.where(protein.contact_map < self.epsilon, 1, 0)
             )
+            protein.set_nx_graph(graph_type="eps_graph")
             return protein
 
         proteins = distribute_function(
             epsilon_graph_func,
             proteins,
             self.n_jobs,
-            "Extracting KNN graph from contact map",
+            "Extracting Epsilon graph from contact map",
+            show_tqdm=self.verbose,
         )
 
         return proteins
