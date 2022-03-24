@@ -19,6 +19,15 @@
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
+* TODO <2022-03-24 Thu> Weekly Tim meeting
+** Wasserstein distance discussion
+*** Persistence Fisher Kernel
+*** Dive into negative definiteness of Wasserstein distance
+
+** Perturbations
+*** Apply transformation to subdomains looks easy-ish
+** Experiment tracking
+
 * TODO <2022-03-11 Fri>
 ** Wasserstein metric consequences
 ** Zernicke
