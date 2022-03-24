@@ -39,7 +39,7 @@ def main():
     )
     # add title
     plt.title(
-        f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}  \n on two different overlapping fragments."
+        f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}  \n on two different but overlapping fragments of the same protein."
     )
     plt.show()
 
