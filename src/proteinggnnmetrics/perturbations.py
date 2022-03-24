@@ -51,9 +51,9 @@ class GaussianNoise(Perturbations):
         self.verbose = verbose
 
     def add_noise_to_protein(self, protein: Protein) -> Protein:
-        noise = np.random.normal(0, 1, len(protein.coordinates) * 3).reshape(
-            len(protein.coordinates), 3
-        )
+        noise = np.random.normal(
+            loc=0, scale=self.noise_variance, size=len(protein.coordinates) * 3
+        ).reshape(len(protein.coordinates), 3)
         protein.coordinates = protein.coordinates + noise
         return protein
 
