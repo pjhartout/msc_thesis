@@ -42,11 +42,13 @@ class GaussianNoise(Perturbations):
         noise_mean: float,
         noise_variance: float,
         n_jobs: int,
+        verbose: bool = False,
     ) -> None:
         self.random_state = random_state
         self.noise_mean = noise_mean
         self.noise_variance = noise_variance
         self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def add_noise_to_protein(self, protein: Protein) -> Protein:
         noise = np.random.normal(0, 1, len(protein.coordinates) * 3).reshape(
@@ -67,5 +69,6 @@ class GaussianNoise(Perturbations):
             X,
             self.n_jobs,
             "Adding Gaussian noise to proteins",
+            show_tqdm=self.verbose,
         )
         return X
