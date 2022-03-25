@@ -250,3 +250,22 @@ ping google.com
 *** DONE Run perturbation with biological + graph theoretic one.
 *** DONE Check criteria to be admitted to pdb
 **** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
+
+* DONE <2022-03-04 Fri> Meeting Tim
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-24 Thu 16:26
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+** DONE Check kernel correctness with scalar.
+** DONE Implement unbiased + kernel self-compare sanity check
+
+* DONE Perturbations
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-24 Thu 16:26
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_OLPATH: <2022-03-11 Fri>
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:

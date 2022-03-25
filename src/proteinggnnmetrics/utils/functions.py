@@ -10,11 +10,12 @@ import os
 from itertools import product
 from random import choice
 from string import ascii_letters
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import joblib
 import networkx as nx
 import numpy as np
+import pandas as pd
 from grakel import graph_from_networkx
 from joblib import Parallel, delayed
 from matplotlib.path import Path
@@ -170,3 +171,90 @@ def generate_random_strings(string_length: int, n_strings: int) -> List[str]:
             "of {string_length}. Please increase the string_length to continue."
         )
     return unique_strings
+
+
+def pad_diagrams(Xt, homology_dimensions: Tuple = (0, 1)) -> np.ndarray:
+    """Pads the diagrams to the same size."""
+    # def filter(row,dim):
+    #     return row[:2] == dim
+    X_left = Xt[0]
+    X_right = Xt[1]
+
+    dim_shape_left = list()
+    for dim in homology_dimensions:
+        dim_shape_left.append(X_left[X_left[:, 2] == dim].shape[0])
+
+    dim_shape_right = list()
+    for dim in homology_dimensions:
+        dim_shape_right.append(X_right[X_right[:, 2] == dim].shape[0])
+
+    X_left = pd.DataFrame(X_left, columns=["birth", "death", "dim"])
+    X_right = pd.DataFrame(X_right, columns=["birth", "death", "dim"])
+
+    # Get unique dimensions
+    max_dims = {
+        dim: max([shape1, shape2])
+        for dim, shape1, shape2 in zip(
+            X_left["dim"].unique(), dim_shape_left, dim_shape_right
+        )
+    }
+
+    # Find smallest value in each dimension for both dataframes
+    min_birth_left = X_left.groupby("dim").min()["birth"].to_dict()
+    min_birth_right = X_right.groupby("dim").min()["birth"].to_dict()
+    min_values = {
+        k: min(v, min_birth_right[k]) for k, v in min_birth_left.items()
+    }
+    for dim in max_dims.keys():
+        # add n rows to dataframe
+        X_left = pd.concat(
+            [
+                X_left,
+                pd.DataFrame(
+                    {
+                        "birth": min_values[dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_left.loc[X_left["dim"] == dim])
+                        ),
+                        "death": min_values[dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_left.loc[X_left["dim"] == dim])
+                        ),
+                        "dim": [dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_left.loc[X_left["dim"] == dim])
+                        ),
+                    }
+                ),
+            ]
+        )
+        X_right = pd.concat(
+            [
+                X_right,
+                pd.DataFrame(
+                    {
+                        "birth": min_values[dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_right.loc[X_right["dim"] == dim])
+                        ),
+                        "death": min_values[dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_right.loc[X_right["dim"] == dim])
+                        ),
+                        "dim": [dim]
+                        * (
+                            max_dims[dim]
+                            - len(X_right.loc[X_right["dim"] == dim])
+                        ),
+                    }
+                ),
+            ]
+        )
+
+    Xt = np.array([X_left, X_right])
+    return Xt

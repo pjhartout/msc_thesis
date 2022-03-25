@@ -650,6 +650,29 @@ Graph Kernels for comparative analysis of protein active sites (NADH, ATP bindin
 }
 #+end_src
 
+Persistence Fisher Kernel
+#+begin_src bibtex
+@article{le2018persistence,
+  title={Persistence fisher kernel: A riemannian manifold kernel for persistence diagrams},
+  author={Le, Tam and Yamada, Makoto},
+  journal={Advances in Neural Information Processing Systems},
+  volume={31},
+  year={2018}
+}
+#+end_src
+
+Sliced Wasserstein kernel (approximates the wasserstein distance in kernel space)
+#+begin_src bibtex
+@inproceedings{carriere2017sliced,
+  title={Sliced Wasserstein kernel for persistence diagrams},
+  author={Carriere, Mathieu and Cuturi, Marco and Oudot, Steve},
+  booktitle={International conference on machine learning},
+  pages={664--673},
+  year={2017},
+  organization={PMLR}
+}
+#+end_src
+
 ** Check criteria to be admitted to pdb
 **** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
 
