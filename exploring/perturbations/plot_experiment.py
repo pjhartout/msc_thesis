@@ -18,6 +18,8 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 
 config = configure()
 
+plt.rcParams["figure.figsize"] = (10.4, 6.8)
+
 
 def main():
 
@@ -41,7 +43,9 @@ def main():
     plt.title(
         f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}  \n on two different but overlapping fragments of the same protein."
     )
-    plt.show()
+    print("Saving")
+    plt.tight_layout()
+    plt.savefig("plot_experiment.png")
 
 
 if __name__ == "__main__":
