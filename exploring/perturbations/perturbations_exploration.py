@@ -48,11 +48,20 @@ def main():
 
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
 
-    for epsilon in tqdm(range(1, 50, 5)):
+    for epsilon in tqdm(range(1, 10, 1), desc="Master loop for epsilon"):
         base_feature_steps = [
-            ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
-            ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
-            ("epsilon graph", EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS)),
+            (
+                "coordinates",
+                Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=False),
+            ),
+            (
+                "contact map",
+                ContactMap(metric="euclidean", n_jobs=N_JOBS, verbose=False),
+            ),
+            (
+                "epsilon graph",
+                EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS, verbose=False),
+            ),
             (
                 "degree histogram",
                 DegreeHistogram(
@@ -64,14 +73,11 @@ def main():
         base_feature_pipeline = pipeline.Pipeline(
             base_feature_steps, verbose=False
         )
-        # print("Building baseline graphs")
         proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
-        # fig = proteins[0].plot_point_cloud()
-        # fig.write_html(CACHE_DIR / f"images/{proteins[0].name}_base.html")
-        # fig = proteins[1].plot_point_cloud()
-        # fig.write_html(CACHE_DIR / f"images/{proteins[1].name}_base.html")
         results = list()
-        for std in np.arange(1, 100, 1):
+        for std in tqdm(
+            np.arange(1, 100, 2), desc="Standard deviation iteration"
+        ):
             perturb_feature_steps = flatten_lists(
                 [
                     base_feature_steps[:1]
@@ -83,6 +89,7 @@ def main():
                                 noise_mean=0,
                                 noise_variance=std,
                                 n_jobs=N_JOBS,
+                                verbose=False,
                             ),
                         )
                     ]
@@ -96,14 +103,6 @@ def main():
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
                 pdb_files[100:201]
             )
-            # fig = proteins_perturbed[0].plot_point_cloud()
-            # fig.write_html(
-            #     CACHE_DIR / f"images/{proteins[0].name}_std_{std}.html"
-            # )
-            # fig = proteins_perturbed[1].plot_point_cloud()
-            # fig.write_html(
-            #     CACHE_DIR / f"images/{proteins[1].name}_std_{std}.html"
-            # )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
                 proteins_perturbed, graph_type="eps_graph"
@@ -112,8 +111,13 @@ def main():
                 biased=True,
                 squared=True,
                 kernel=WeisfeilerLehmanKernel(
-                    n_jobs=N_JOBS, n_iter=5, normalize=True, biased=True
+                    n_jobs=N_JOBS,
+                    n_iter=5,
+                    normalize=True,
+                    biased=True,
+                    verbose=False,
                 ),
+                verbose=False,
             ).compute(graphs, graphs_perturbed)
             results.append({"mmd": mmd, "std": std})
             # print(f"{mmd:.2f}")
