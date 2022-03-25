@@ -15,18 +15,18 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from grakel import WeisfeilerLehman, graph_from_networkx
-from gtda.diagrams import PairwiseDistance
-from gtda.utils import check_diagrams
-from scipy.stats import wasserstein_distance
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
-from tqdm import tqdm
 
-from .utils.functions import (
-    chunks,
-    distribute_function,
-    flatten_lists,
-    generate_random_strings,
-    pad_diagrams,
+from .utils.metrics import (
+    _persistence_fisher_distance,
+    pairwise_persistence_diagram_kernels,
+)
+from .utils.preprocessing import (
+    Padding,
+    filter_dimension,
+    remove_giotto_pd_padding,
 )
 
 default_eigvalue_precision = float("-1e-5")
@@ -97,76 +97,72 @@ class WeisfeilerLehmanGrakel(Kernel):
         return KXY_grakel
 
 
-class WassersteinKernel(Kernel):
-    def __init__(self, n_jobs: Union[int, None], order: float):
-        self.n_jobs = n_jobs
-        self.order = order
+# The classes below are taken and modified parts of the Gudhi Library - https://gudhi.inria.fr/ - which is released under MIT.
 
-    def parallel_wasserstein_distance(self, lst: Iterable,) -> Iterable:
-        """Computes the pairwise wasserstein distance of elements in lst.
 
-        Args:
-            lst (Iterable): Iterable to compute the inner product of.
-
-        Returns:
-            Iterable: computed inner products.
-        """
-        res = list()
-        for x in lst:
-            res.append(
-                {
-                    list(x.keys())[0]: [
-                        list(x.values())[0][0],
-                        self.wasserstein_dist(list(x.values())[0][1]),
-                    ]
-                }
-            )
-        return res
-
-    def wasserstein_dist(self, X: Any) -> float:
-        pd = PairwiseDistance(
-            metric="wasserstein", order=self.order, n_jobs=1,
+class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
+    def __init__(
+        self,
+        bandwidth_fisher=1.0,
+        bandwidth=1.0,
+        kernel_approx=None,
+        n_jobs=None,
+    ):
+        self.bandwidth = bandwidth
+        self.bandwidth_fisher, self.kernel_approx = (
+            bandwidth_fisher,
+            kernel_approx,
         )
-        # Pad points with duplicate features to allow for concatenation
-        X = pad_diagrams(X)
-        K = pd.fit_transform(X)[1, 0]
-        return K
+        self.n_jobs = n_jobs
 
-    def compute_gram_matrix(self, X: List, Y: List = None) -> Any:
-        """Apply kernel"""
-        if Y is None or X == Y:
-            pd = PairwiseDistance(
-                metric="wasserstein", order=self.order, n_jobs=self.n_jobs,
-            )
-            K = pd.fit_transform(X)
-        else:
-            iters_data = list(list(product(X, Y)))
-            iters_idx = list(product(range(len(X)), range(len(Y))))
+    def fit(self, X, y=None):
+        self.diagrams_ = X
+        return self
 
-            keys = generate_random_strings(10, len(flatten_lists(iters_data)))
-            iters = [
-                {key: [idx, data]}
-                for key, idx, data in zip(keys, iters_idx, iters_data)
-            ]
-            if self.n_jobs is not None:
-                iters = list(chunks(iters, self.n_jobs,))
-                matrix_elems = flatten_lists(
-                    distribute_function(
-                        self.parallel_wasserstein_distance,
-                        iters,
-                        self.n_jobs,
-                        tqdm_label="Compute dot products",
-                    )
+    def transform(self, X):
+        return pairwise_persistence_diagram_kernels(
+            X,
+            self.diagrams_,
+            kernel="persistence_fisher",
+            bandwidth=self.bandwidth,
+            bandwidth_fisher=self.bandwidth_fisher,
+            kernel_approx=self.kernel_approx,
+            n_jobs=self.n_jobs,
+        )
+
+    def __call__(self, diag1, diag2):
+        return (
+            np.exp(
+                -_persistence_fisher_distance(
+                    diag1,
+                    diag2,
+                    bandwidth=self.bandwidth,
+                    kernel_approx=self.kernel_approx,
                 )
-            K = np.zeros((len(X), len(Y)), dtype=float)
-            for elem in matrix_elems:
-                coords = list(elem.values())[0][0]
-                val = list(elem.values())[0][1]
-                K[coords[0], coords[1]] = val
+            )
+            / self.bandwidth_fisher
+        )
 
-            if X == Y:
-                # mirror the matrix along diagonal
-                K = np.triu(K) + np.triu(K, 1).T
+    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
+        # Remove points where birth = death
+        # Loop over homology dimensions
 
-        K = distance2similarity(K)
-        return K
+        X = remove_giotto_pd_padding(X)
+        if Y is not None:
+            Y = remove_giotto_pd_padding(Y)
+
+        Ks = list()
+        for homology_dimension in X[0]["dim"].unique():
+            # Get the diagrams for the homology dimension
+            X_diag = filter_dimension(X, homology_dimension)
+            # X_diag = Padding(use=True).fit_transform(X_diag)
+            if Y is not None:
+                Y_diag = filter_dimension(Y, homology_dimension)
+                # Y_diag = Padding(use=True).fit_transform(Y_diag)
+
+            if Y is not None:
+                Ks.append(self.fit(X_diag).transform(Y_diag))
+            else:
+                Ks.append(self.fit_transform(X_diag))
+        # We take the average of the kernel matrices in each homology dimension
+        return np.average(np.array(Ks), axis=0)
