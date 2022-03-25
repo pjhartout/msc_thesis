@@ -59,11 +59,16 @@ class MaximumMeanDiscrepancy(DistanceFunction):
     """
 
     def __init__(
-        self, kernel: Kernel, biased: bool = False, squared: bool = True,
+        self,
+        kernel: Kernel,
+        biased: bool = False,
+        squared: bool = True,
+        verbose: bool = False,
     ):
         self.kernel = kernel
         self.biased = biased
         self.squared = squared
+        self.verbose = verbose
 
     def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
         Xt = check_dist(X)
@@ -77,11 +82,12 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         K_YY = self.kernel.compute_gram_matrix(Yt)
         K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
 
-        # Print min_eig for K_XX and K_YY and K_XY
-        print(f"Kernel: {self.kernel.__class__.__name__}")
-        print(f"K_XX min_eig: {positive_eig(K_XX)}")
-        print(f"K_YY min_eig: {positive_eig(K_YY)}")
-        print(f"K_XY min_eig: {positive_eig(K_XY)}")
+        if self.verbose:
+            # Print min_eig for K_XX and K_YY and K_XY
+            print(f"Kernel: {self.kernel.__class__.__name__}")
+            print(f"K_XX min_eig: {positive_eig(K_XX)}")
+            print(f"K_YY min_eig: {positive_eig(K_YY)}")
+            print(f"K_XY min_eig: {positive_eig(K_XY)}")
 
         if self.biased:
             k_XX = np.sum(K_XX)
