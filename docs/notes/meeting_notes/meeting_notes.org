@@ -20,6 +20,10 @@
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
 * TODO <2022-03-25 Fri> Meeting with Tim
+** discuss min eigenvalues
+
+
+* TODO <2022-03-25 Fri> Meeting with Tim
 ** Kernel composition of TDA and graph kernels.
 ** Mention MMD params
 ** Sample X and Y independently (diff set of prots).
@@ -32,6 +36,7 @@
 ** Perturbations: coordinates perturbation, node label perturbation, graph perturbations (edge rewiring and co.)
 ** Nice to have is the non-MMD
 ** Negative eigenvalues
+** Place equations next to plots
 
 * TODO <2022-03-24 Thu> Weekly Tim meeting
 ** Wasserstein distance discussion
