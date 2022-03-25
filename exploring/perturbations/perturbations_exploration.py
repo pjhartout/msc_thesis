@@ -46,9 +46,6 @@ REDUCE_DATA = bool(config["DEBUG"]["REDUCE_DATA"])
 def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
-    if REDUCE_DATA:
-        pdb_files = random.sample(pdb_files, 100)
-
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
 
     for epsilon in tqdm(range(1, 50, 5)):
@@ -64,17 +61,11 @@ def main():
             ),
         ]
 
-        pdb_files = [
-            prot
-            for prot in pdb_files
-            if "Q99996-F1-" in str(prot) or "Q99996-F2-" in str(prot)
-        ]
-
         base_feature_pipeline = pipeline.Pipeline(
             base_feature_steps, verbose=False
         )
         # print("Building baseline graphs")
-        proteins = base_feature_pipeline.fit_transform(pdb_files)
+        proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
         # fig = proteins[0].plot_point_cloud()
         # fig.write_html(CACHE_DIR / f"images/{proteins[0].name}_base.html")
         # fig = proteins[1].plot_point_cloud()
@@ -103,16 +94,16 @@ def main():
                 perturb_feature_steps, verbose=False
             )
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
-                pdb_files
+                pdb_files[100:201]
             )
-            fig = proteins_perturbed[0].plot_point_cloud()
-            fig.write_html(
-                CACHE_DIR / f"images/{proteins[0].name}_std_{std}.html"
-            )
-            fig = proteins_perturbed[1].plot_point_cloud()
-            fig.write_html(
-                CACHE_DIR / f"images/{proteins[1].name}_std_{std}.html"
-            )
+            # fig = proteins_perturbed[0].plot_point_cloud()
+            # fig.write_html(
+            #     CACHE_DIR / f"images/{proteins[0].name}_std_{std}.html"
+            # )
+            # fig = proteins_perturbed[1].plot_point_cloud()
+            # fig.write_html(
+            #     CACHE_DIR / f"images/{proteins[1].name}_std_{std}.html"
+            # )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
                 proteins_perturbed, graph_type="eps_graph"
