@@ -25,7 +25,7 @@ from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
 from proteinggnnmetrics.graphs import ContactMap, KNNGraph
 from proteinggnnmetrics.kernels import (
     LinearKernel,
-    WassersteinKernel,
+    PersistenceFisherKernel,
     WeisfeilerLehmanGrakel,
 )
 from proteinggnnmetrics.loaders import (
@@ -74,20 +74,27 @@ def main():
 
     feature_pipeline = pipeline.Pipeline(feature_pipeline, verbose=100)
 
-    protein_dist_1 = feature_pipeline.fit_transform(pdb_files[:10])
-    protein_dist_2 = feature_pipeline.fit_transform(pdb_files[10:20])
+    # protein_dist_1 = feature_pipeline.fit_transform(pdb_files[:10])
+    # protein_dist_2 = feature_pipeline.fit_transform(pdb_files[10:20])
+
+    # # Save the feature pipeline
+    # with open(CACHE_DIR / "protein_dist_1.pkl", "wb") as f:
+    #     pickle.dump(protein_dist_1, f)
+
+    # with open(CACHE_DIR / "protein_dist_2.pkl", "wb") as f:
+    #     pickle.dump(protein_dist_2, f)
 
     # Caching to accelerate debugging
     # Save protein_dist_1 and protein_dist_2
-    # with open(CACHE_DIR / "protein_dist_1.pkl", "rb") as f:
-    #     protein_dist_1 = pickle.load(f)
-    # # take 10 samples
-    # protein_dist_1 = protein_dist_1[:10]
+    with open(CACHE_DIR / "protein_dist_1.pkl", "rb") as f:
+        protein_dist_1 = pickle.load(f)
+    # take 10 samples
+    protein_dist_1 = protein_dist_1[:10]
 
-    # with open(CACHE_DIR / "protein_dist_2.pkl", "rb") as f:
-    #     protein_dist_2 = pickle.load(f)
-    # # take 10 samples
-    # protein_dist_2 = protein_dist_2[:10]
+    with open(CACHE_DIR / "protein_dist_2.pkl", "rb") as f:
+        protein_dist_2 = pickle.load(f)
+    # take 11 samples
+    protein_dist_2 = protein_dist_2[:11]
 
     dist_1 = load_descriptor(protein_dist_1, "diagram", "contact_graph")
     dist_2 = load_descriptor(protein_dist_2, "diagram", "contact_graph")
@@ -95,7 +102,7 @@ def main():
     mmd = MaximumMeanDiscrepancy(
         biased=False,
         squared=True,
-        kernel=WassersteinKernel(n_jobs=N_JOBS, order=2),
+        kernel=PersistenceFisherKernel(n_jobs=N_JOBS),
     ).compute(dist_1, dist_2)
 
     # dist_1 = load_descriptor(protein_dist_1, "degree_histogram", "knn_graph")
