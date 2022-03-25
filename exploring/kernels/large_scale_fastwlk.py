@@ -78,7 +78,7 @@ def main():
         ),
         (
             "epsilon graph",
-            EpsilonGraph(epsilon=6, n_jobs=N_JOBS, verbose=False),
+            EpsilonGraph(epsilon=20, n_jobs=N_JOBS, verbose=False),
         ),
     ]
 
