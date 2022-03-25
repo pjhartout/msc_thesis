@@ -685,6 +685,40 @@ transforming it to a similarity measure is not possible. (See Appendix A.)
 }
 #+end_src
 
+
+Gudhi references
+#+begin_src bibtex
+@book{gudhi:urm,
+ title  = "{GUDHI} User and Reference Manual",
+ author = "{The GUDHI Project}",
+ publisher  = "{GUDHI Editorial Board}",
+ year = 2015,
+ url = "http://gudhi.gforge.inria.fr/doc/latest/",
+}
+
+
+@incollection{gudhi:PersistenceRepresentations,
+ author =  "Pawel Dlotko",
+ title =   "Persistence representations",
+ publisher =  "{GUDHI Editorial Board}",
+ booktitle =   "{GUDHI} User and Reference Manual",
+ url = "http://gudhi.gforge.inria.fr/doc/latest/group___persistence__representations.html",
+ year = 2017
+}
+#+end_src
+
+Persistence weighted Gaussian kernel (slower than Fisher-based kernel)
+#+begin_src bibtex
+@inproceedings{kusano2016persistence,
+  title={Persistence weighted Gaussian kernel for topological data analysis},
+  author={Kusano, Genki and Hiraoka, Yasuaki and Fukumizu, Kenji},
+  booktitle={International Conference on Machine Learning},
+  pages={2004--2013},
+  year={2016},
+  organization={PMLR}
+}
+#+end_src
+
 ** Check criteria to be admitted to pdb
 **** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
 
