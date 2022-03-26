@@ -47,8 +47,10 @@ def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
-
-    for epsilon in tqdm(range(1, 10, 1), desc="Master loop for epsilon"):
+    now = datetime.now().strftime("%Y%m%d-%H%M%S")
+    os.mkdir(CACHE_DIR / f"experiment_{now}")
+    experiment_dir = CACHE_DIR / f"experiment_{now}"
+    for epsilon in tqdm(range(2, 20, 2), desc="Master loop for epsilon"):
         base_feature_steps = [
             (
                 "coordinates",
@@ -61,12 +63,6 @@ def main():
             (
                 "epsilon graph",
                 EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS, verbose=False),
-            ),
-            (
-                "degree histogram",
-                DegreeHistogram(
-                    "eps_graph", n_bins=50, n_jobs=N_JOBS, verbose=False
-                ),
             ),
         ]
 
@@ -124,8 +120,7 @@ def main():
 
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
-        now = datetime.now().strftime("%Y%m%d-%H%M%S")
-        results.to_csv(CACHE_DIR / f"results_epsilon_{epsilon}_{now}.csv")
+        results.to_csv(experiment_dir / f"results_epsilon_{epsilon}.csv")
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values
         )
@@ -144,7 +139,7 @@ def main():
                 ),
             ]
         )
-    correlations.to_csv(CACHE_DIR / "correlations.csv")
+    correlations.to_csv(experiment_dir / "correlations.csv")
 
 
 if __name__ == "__main__":
