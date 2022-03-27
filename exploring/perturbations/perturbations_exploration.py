@@ -48,7 +48,7 @@ def main():
 
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
 
-    for epsilon in tqdm(range(4, 20, 1)):
+    for epsilon in tqdm(range(4, 21, 1)):
         base_feature_steps = [
             ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
             ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
