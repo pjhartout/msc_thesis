@@ -21,7 +21,7 @@
 
 * TODO <2022-03-25 Fri> Meeting with Tim
 ** discuss min eigenvalues
-
+** discuss min graph edit distance with halting
 
 * TODO <2022-03-25 Fri> Meeting with Tim
 ** Kernel composition of TDA and graph kernels.
