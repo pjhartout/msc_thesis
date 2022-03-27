@@ -47,33 +47,20 @@ def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
-    now = datetime.now().strftime("%Y%m%d-%H%M%S")
-    os.mkdir(CACHE_DIR / f"experiment_{now}")
-    experiment_dir = CACHE_DIR / f"experiment_{now}"
-    for epsilon in tqdm(range(2, 20, 2), desc="Master loop for epsilon"):
+
+    for epsilon in tqdm(range(4, 20, 1)):
         base_feature_steps = [
-            (
-                "coordinates",
-                Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=False),
-            ),
-            (
-                "contact map",
-                ContactMap(metric="euclidean", n_jobs=N_JOBS, verbose=False),
-            ),
-            (
-                "epsilon graph",
-                EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS, verbose=False),
-            ),
+            ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
+            ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
+            ("epsilon graph", EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS)),
         ]
 
         base_feature_pipeline = pipeline.Pipeline(
             base_feature_steps, verbose=False
         )
-        proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
+        proteins = base_feature_pipeline.fit_transform(pdb_files[:2])
         results = list()
-        for std in tqdm(
-            np.arange(1, 100, 2), desc="Standard deviation iteration"
-        ):
+        for std in np.arange(0, 100, 1):
             perturb_feature_steps = flatten_lists(
                 [
                     base_feature_steps[:1]
@@ -85,7 +72,6 @@ def main():
                                 noise_mean=0,
                                 noise_variance=std,
                                 n_jobs=N_JOBS,
-                                verbose=False,
                             ),
                         )
                     ]
@@ -99,6 +85,14 @@ def main():
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
                 pdb_files[100:201]
             )
+            # fig = proteins_perturbed[0].plot_point_cloud()
+            # fig.write_html(
+            #     CACHE_DIR / f"images/{proteins[0].name}_std_{std}.html"
+            # )
+            # fig = proteins_perturbed[1].plot_point_cloud()
+            # fig.write_html(
+            #     CACHE_DIR / f"images/{proteins[1].name}_std_{std}.html"
+            # )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
                 proteins_perturbed, graph_type="eps_graph"
@@ -107,20 +101,16 @@ def main():
                 biased=True,
                 squared=True,
                 kernel=WeisfeilerLehmanKernel(
-                    n_jobs=N_JOBS,
-                    n_iter=5,
-                    normalize=True,
-                    biased=True,
-                    verbose=False,
+                    n_jobs=N_JOBS, n_iter=5, normalize=True, biased=True
                 ),
-                verbose=False,
             ).compute(graphs, graphs_perturbed)
             results.append({"mmd": mmd, "std": std})
             # print(f"{mmd:.2f}")
 
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
-        results.to_csv(experiment_dir / f"results_epsilon_{epsilon}.csv")
+        now = datetime.now().strftime("%Y%m%d-%H%M%S")
+        results.to_csv(CACHE_DIR / f"results_epsilon_{epsilon}_{now}.csv")
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values
         )
@@ -139,7 +129,7 @@ def main():
                 ),
             ]
         )
-    correlations.to_csv(experiment_dir / "correlations.csv")
+    correlations.to_csv(CACHE_DIR / "correlations.csv")
 
 
 if __name__ == "__main__":

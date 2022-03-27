@@ -24,13 +24,13 @@ plt.rcParams["figure.figsize"] = (10.4, 6.8)
 
 def main():
     df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon"])
-    for fname in os.listdir(here() / config["EXPERIMENT"]["EPSILON_VAR_PATH"]):
+    for fname in os.listdir(here() / config["EXPERIMENT"]["EXPERIMENT_PATH"]):
         if "results" in fname:
             exp_run = pd.read_csv(
-                here() / config["EXPERIMENT"]["EPSILON_VAR_PATH"] / fname,
+                here() / config["EXPERIMENT"]["EXPERIMENT_PATH"] / Path(fname),
                 index_col=0,
             )
-            exp_run["epsilon"] = int(fname.split("_")[2])
+            exp_run["epsilon"] = int(".".join(fname.split("_")).split(".")[2])
             df_plot = pd.concat([df_plot, exp_run])
     print("Plotting")
     palette = sns.color_palette("mako_r", len(df_plot["epsilon"].unique()))
@@ -46,7 +46,10 @@ def main():
     )
     print("Saving")
     plt.tight_layout()
-    plt.savefig("plot_multiple_experiments.png")
+    plt.savefig(
+        config["EXPERIMENT"]["PLOT_PATH"]
+        / Path("plot_multiple_experiments.png")
+    )
 
 
 if __name__ == "__main__":

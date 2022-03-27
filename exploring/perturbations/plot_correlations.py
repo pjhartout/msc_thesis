@@ -34,18 +34,25 @@ def main():
     results.columns = [epsilon_name, spear_corr_name, pears_corr_name]
 
     results = results.set_index(epsilon_name)
+    results = results.reset_index().melt(
+        id_vars=[epsilon_name], value_vars=[spear_corr_name, pears_corr_name]
+    )
+    palette = sns.color_palette("mako_r", len(results["variable"].unique()))
     sns.lineplot(
         data=results,
         x=epsilon_name,
-        y=spear_corr_name,
-        # hue="coherence",
+        y="value",
+        hue="variable",
+        palette=palette,
         # style="choice",
     )
     # add title
     plt.title(f"{spear_corr_name} vs {epsilon_name}")
     print("Saving")
     plt.tight_layout()
-    plt.savefig("plot_correlations.png")
+    plt.savefig(
+        config["EXPERIMENT"]["PLOT_PATH"] / Path("plot_correlations.png")
+    )
 
 
 if __name__ == "__main__":

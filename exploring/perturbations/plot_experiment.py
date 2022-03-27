@@ -25,7 +25,7 @@ def main():
 
     # Load the data
     results = pd.read_csv(
-        here() / config["EXPERIMENT"]["EXPERIMENT_REL_PATH"], index_col=0
+        here() / config["EXPERIMENT"]["INDIVIDUAL_EXPERIMENT"], index_col=0
     )
     mmd_name = "Maximum Mean Discrepancy"
     gnoise_name = "Injected Gaussian Noise to Coordinates"
@@ -41,11 +41,13 @@ def main():
     )
     # add title
     plt.title(
-        f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}  \n on two different but overlapping fragments of the same protein."
+        f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}."
     )
     print("Saving")
     plt.tight_layout()
-    plt.savefig("plot_experiment.png")
+    plt.savefig(
+        config["EXPERIMENT"]["PLOT_PATH"] / Path("plot_experiment.png")
+    )
 
 
 if __name__ == "__main__":
