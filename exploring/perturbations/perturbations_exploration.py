@@ -85,14 +85,6 @@ def main():
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
                 pdb_files[100:201]
             )
-            # fig = proteins_perturbed[0].plot_point_cloud()
-            # fig.write_html(
-            #     CACHE_DIR / f"images/{proteins[0].name}_std_{std}.html"
-            # )
-            # fig = proteins_perturbed[1].plot_point_cloud()
-            # fig.write_html(
-            #     CACHE_DIR / f"images/{proteins[1].name}_std_{std}.html"
-            # )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
                 proteins_perturbed, graph_type="eps_graph"
