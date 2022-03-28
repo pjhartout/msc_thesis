@@ -26,12 +26,12 @@ def set_data_home() -> PosixPath:
     if os.path.isdir(FAST_DATA_HOME):
         # Use fast SSD in cluster
         print(f"Data path: {FAST_DATA_HOME}")
-        return FAST_DATA_HOME
+        return Path(FAST_DATA_HOME) / "data"
     else:
         # Switch to default. Make sure repo is on fast SSD.
         data_home = REPO_HOME / "data"
         print(f"Data path: {data_home}")
-        return data_home
+        return Path(data_home)
 
 
 DATA_HOME = set_data_home()
