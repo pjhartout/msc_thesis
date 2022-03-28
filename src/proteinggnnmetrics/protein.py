@@ -28,25 +28,28 @@ from .utils.functions import flatten_lists
 
 
 class Protein:
-    """Main protein object to store data related to a protein"""
+    """Main protein object to store data related to a protein
+
+    TODO: make none of the elements in init required.
+    """
 
     def __init__(
         self,
-        name=None,
-        sequence: str = "",
-        coordinates=None,
-        contact_map=None,
-        knn_adj=None,
-        eps_adj=None,
+        name="",
+        sequence="",
+        coordinates=np.array([]),
+        contact_map=np.array([]),
+        knn_adj=np.array([]),
+        eps_adj=np.array([]),
         knn_graph=None,
         eps_graph=None,
         contact_graph=None,
-        degree_histogram=None,
-        clustering_histogram=None,
-        laplacian_spectrum_histogram=None,
-        path: PosixPath = PosixPath(),
-        phi_psi_angles: Dict[str, List] = dict(),
-        verbose: bool = False,
+        degree_histogram=np.array([]),
+        clustering_histogram=np.array([]),
+        laplacian_spectrum_histogram=np.array([]),
+        path=None,
+        phi_psi_angles=np.array([]),
+        verbose=False,
     ):
         # Basic protein descriptors
         self.name = name
