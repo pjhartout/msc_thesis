@@ -16,6 +16,7 @@ import numpy as np
 from grakel import WeisfeilerLehman
 from gtda.diagrams import PairwiseDistance
 from scipy.spatial.distance import minkowski
+from scipy.stats import pearsonr, spearmanr
 
 from .kernels import Kernel
 from .utils.functions import networkx2grakel
@@ -59,11 +60,16 @@ class MaximumMeanDiscrepancy(DistanceFunction):
     """
 
     def __init__(
-        self, kernel: Kernel, biased: bool = False, squared: bool = True,
+        self,
+        kernel: Kernel,
+        biased: bool = False,
+        squared: bool = True,
+        verbose: bool = False,
     ):
         self.kernel = kernel
         self.biased = biased
         self.squared = squared
+        self.verbose = verbose
 
     def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
         Xt = check_dist(X)
@@ -77,11 +83,12 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         K_YY = self.kernel.compute_gram_matrix(Yt)
         K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
 
-        # Print min_eig for K_XX and K_YY and K_XY
-        print(f"Kernel: {self.kernel.__class__.__name__}")
-        print(f"K_XX min_eig: {positive_eig(K_XX)}")
-        print(f"K_YY min_eig: {positive_eig(K_YY)}")
-        print(f"K_XY min_eig: {positive_eig(K_XY)}")
+        if self.verbose:
+            # Print min_eig for K_XX and K_YY and K_XY
+            print(f"Kernel: {self.kernel.__class__.__name__}")
+            print(f"K_XX min_eig: {positive_eig(K_XX)}")
+            print(f"K_YY min_eig: {positive_eig(K_YY)}")
+            print(f"K_XY min_eig: {positive_eig(K_XY)}")
 
         if self.biased:
             k_XX = np.sum(K_XX)
@@ -127,26 +134,32 @@ class MinkowskyDistance(DistanceFunction):
         self.p = p
 
     def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
-        d = minkowski(X.flatten(), Y.flatten(), self.p)
-        return d
+        return minkowski(X.flatten(), Y.flatten(), self.p)
 
 
-# class TopologicalPairwiseDistance:
-#     def __init__(
-#         self, metric: str, metric_params: Dict, order: int, n_jobs: int
-#     ):
-#         self.metric = metric
-#         self.metric_params = metric_params
-#         self.order = order
-#         self.n_jobs = n_jobs
+class SpearmanCorrelation(DistanceFunction):
+    """Spearman correlation coefficient"""
 
-#     def compute(
-#         self, X: Iterable, Y: Iterable
-#     ) -> Tuple[np.ndarray, np.ndarray]:
-#         pw_dist_diag = PairwiseDistance(
-#             metric=self.metric,
-#             metric_params=self.metric_params,
-#             order=self.order,
-#             n_jobs=self.n_jobs,
-#         )
-#         return pw_dist_diag.fit_transform(X), pw_dist_diag.fit_transform(Y)
+    def __init__(self, p_value: bool = False):
+        self.p_value = p_value
+
+    def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
+        correlation, p = spearmanr(X.flatten(), Y.flatten())
+        if self.p_value:
+            return correlation, p
+        else:
+            return correlation
+
+
+class PearsonCorrelation(DistanceFunction):
+    """Spearman correlation coefficient"""
+
+    def __init__(self, p_value: bool = False):
+        self.p_value = p_value  # p is two-sided here. No other choice.
+
+    def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
+        correlation, p = pearsonr(X.flatten(), Y.flatten(),)
+        if self.p_value:
+            return correlation, p
+        else:
+            return correlation
