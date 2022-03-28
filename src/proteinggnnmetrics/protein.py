@@ -13,8 +13,8 @@ TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/libr
 
 import pickle
 from collections import Counter
-from pathlib import PosixPath
-from typing import List
+from pathlib import Path, PosixPath
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -44,15 +44,19 @@ class Protein:
         degree_histogram=None,
         clustering_histogram=None,
         laplacian_spectrum_histogram=None,
+        path: PosixPath = PosixPath(),
+        phi_psi_angles: Dict[str, List] = dict(),
         verbose: bool = False,
     ):
         # Basic protein descriptors
         self.name = name
+        self.path = path
         self.sequence = sequence
 
         # Processed data extracted from pdb
         self.coordinates = coordinates
         self.contact_map = contact_map
+        self.phi_psi_angles = phi_psi_angles
 
         # Adjacency matrices
         self.knn_adj = knn_adj

@@ -10,10 +10,11 @@ import os
 from pathlib import Path, PosixPath
 from typing import List, Tuple
 
+import Bio
 import networkx as nx
 import numpy as np
 import pandas as pd
-from Bio.PDB.PDBParser import PDBParser
+from Bio.PDB import PDBParser, PPBuilder
 from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
@@ -21,7 +22,6 @@ from tqdm import tqdm
 from .protein import Protein
 from .utils.exception import GranularityError
 from .utils.functions import distribute_function, tqdm_joblib
-from .utils.validation import check_fnames
 
 
 class Coordinates:
@@ -87,7 +87,10 @@ class Coordinates:
         coordinates = np.vstack(coordinates)
         protein_name = Path(fname).name.split(".")[0]
         return Protein(
-            name=protein_name, coordinates=coordinates, sequence=sequence
+            name=protein_name,
+            path=fname,
+            coordinates=coordinates,
+            sequence=sequence,
         )
 
     def fit(self):
@@ -100,7 +103,7 @@ class Coordinates:
 
     def fit_transform(
         self, fname_list: List[PosixPath], y=None
-    ) -> List[np.ndarray]:
+    ) -> List[Protein]:
         """Transform a set of pdb files to get their associated coordinates.
 
         Args:
@@ -110,13 +113,51 @@ class Coordinates:
         Returns:
             List: list of arrays containing the coordinates for each file in fname_list
         """
-        fname_list = check_fnames(fname_list)
 
         proteins = distribute_function(
             self.get_atom_coordinates,
             fname_list,
             self.n_jobs,
             "Extracting coordinates from pdb files",
+            show_tqdm=self.verbose,
+        )
+
+        return proteins
+
+
+class RachmachandranAngles:
+    def __init__(self, n_jobs, verbose) -> None:
+        self.n_jobs = n_jobs
+        self.verbose = verbose
+
+    def get_angles(self, protein: Protein) -> Protein:
+        """Assumes only one chain"""
+        parser = PDBParser()
+        structure = parser.get_structure(protein.path.stem, protein.path)
+
+        angles = dict()
+        for idx_model, model in enumerate(structure):
+            polypeptides = PPBuilder().build_peptides(model)
+            for idx_poly, poly in enumerate(polypeptides):
+                angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
+
+        protein.phi_psi_angles = angles
+        return protein
+
+    def fit(self):
+        pass
+
+    def transform(self):
+        ...
+
+    def fit_transform(self, proteins: List[Protein], y=None):
+        """Gets the angles from the list of pdb files"""
+
+        proteins = distribute_function(
+            self.get_angles,
+            proteins,
+            self.n_jobs,
+            "Extracting Rachmachandran angles from pdb files",
             show_tqdm=self.verbose,
         )
 
