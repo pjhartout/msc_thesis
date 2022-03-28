@@ -10,6 +10,8 @@ extraction pipeline.
 
 from pathlib import Path
 
+import matplotlib as mpl
+import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -20,6 +22,14 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 config = configure()
 
 plt.rcParams["figure.figsize"] = (10.4, 6.8)
+plt.rcParams["savefig.dpi"] = 1200
+mpl.rcParams["font.family"] = "serif"
+cmfont = font_manager.FontProperties(
+    fname=mpl.get_data_path() + "/fonts/ttf/cmr10.ttf"
+)
+mpl.rcParams["font.serif"] = cmfont.get_name()
+mpl.rcParams["mathtext.fontset"] = "cm"
+mpl.rcParams["axes.unicode_minus"] = False
 
 
 def main():
@@ -38,7 +48,7 @@ def main():
         id_vars=[epsilon_name], value_vars=[spear_corr_name, pears_corr_name]
     )
     palette = sns.color_palette("mako_r", len(results["variable"].unique()))
-    sns.lineplot(
+    p = sns.lineplot(
         data=results,
         x=epsilon_name,
         y="value",
@@ -46,12 +56,16 @@ def main():
         palette=palette,
         # style="choice",
     )
+    p.set_xlabel("Epsilon value")
+    p.set_ylabel("Correlation Coefficient")
     # add title
-    plt.title(f"{spear_corr_name} vs {epsilon_name}")
+    plt.title(f"Correlation coefficient vs {epsilon_name}")
     print("Saving")
     plt.tight_layout()
     plt.savefig(
-        config["EXPERIMENT"]["PLOT_PATH"] / Path("plot_correlations.png")
+        here()
+        / config["EXPERIMENT"]["PLOT_PATH"]
+        / Path("plot_correlations.png")
     )
 
 

@@ -9,6 +9,8 @@ This file takes in the csv results of the experiment and makes a linechart out o
 
 from pathlib import Path
 
+import matplotlib as mpl
+import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -19,6 +21,14 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 config = configure()
 
 plt.rcParams["figure.figsize"] = (10.4, 6.8)
+plt.rcParams["savefig.dpi"] = 1200
+mpl.rcParams["font.family"] = "serif"
+cmfont = font_manager.FontProperties(
+    fname=mpl.get_data_path() + "/fonts/ttf/cmr10.ttf"
+)
+mpl.rcParams["font.serif"] = cmfont.get_name()
+mpl.rcParams["mathtext.fontset"] = "cm"
+mpl.rcParams["axes.unicode_minus"] = False
 
 
 def main():
@@ -32,13 +42,15 @@ def main():
     results.columns = [mmd_name, gnoise_name]
 
     results = results.set_index(gnoise_name)
-    sns.lineplot(
+    p = sns.lineplot(
         data=results,
         x=gnoise_name,
         y=mmd_name,
         # hue="coherence",
         # style="choice",
     )
+    p.set_xlabel("Epsilon value")
+    p.set_ylabel("Maximum Mean Discrepancy")
     # add title
     plt.title(
         f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}."
@@ -46,7 +58,9 @@ def main():
     print("Saving")
     plt.tight_layout()
     plt.savefig(
-        config["EXPERIMENT"]["PLOT_PATH"] / Path("plot_experiment.png")
+        here()
+        / config["EXPERIMENT"]["PLOT_PATH"]
+        / Path("plot_experiment.png")
     )
 
 
