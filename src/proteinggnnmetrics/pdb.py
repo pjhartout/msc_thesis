@@ -126,11 +126,12 @@ class Coordinates:
 
 
 class RachmachandranAngles:
-    def __init__(self, n_jobs, verbose) -> None:
+    def __init__(self, from_pdb: bool, n_jobs: int, verbose: bool) -> None:
+        self.from_pdb = from_pdb
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def get_angles(self, protein: Protein) -> Protein:
+    def get_angles_from_pdb(self, protein: Protein) -> Protein:
         """Assumes only one chain"""
         parser = PDBParser()
         structure = parser.get_structure(protein.path.stem, protein.path)
@@ -144,6 +145,9 @@ class RachmachandranAngles:
         protein.phi_psi_angles = angles
         return protein
 
+    def get_angles_from_coordinates(self, protein: Protein) -> Protein:
+        raise NotImplementedError("Not implemented yet")
+
     def fit(self):
         pass
 
@@ -153,12 +157,21 @@ class RachmachandranAngles:
     def fit_transform(self, proteins: List[Protein], y=None):
         """Gets the angles from the list of pdb files"""
 
-        proteins = distribute_function(
-            self.get_angles,
-            proteins,
-            self.n_jobs,
-            "Extracting Rachmachandran angles from pdb files",
-            show_tqdm=self.verbose,
-        )
+        if self.from_pdb:
+            proteins = distribute_function(
+                self.get_angles_from_pdb,
+                proteins,
+                self.n_jobs,
+                "Extracting Rachmachandran angles from pdb files",
+                show_tqdm=self.verbose,
+            )
+        else:
+            proteins = distribute_function(
+                self.get_angles_from_coordinates,
+                proteins,
+                self.n_jobs,
+                "Extracting Rachmachandran angles from coordinates",
+                show_tqdm=self.verbose,
+            )
 
         return proteins

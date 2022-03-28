@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""filename.py
+"""rachmachandran.py
 
-***file description***
+Test out Rachmachandran angles extraction.
 
 """
 
@@ -28,9 +28,17 @@ def main():
         granularity="CA", n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(pdb_files)
     proteins = RachmachandranAngles(
-        n_jobs=N_JOBS, verbose=VERBOSE
+        from_pdb=True, n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(proteins)
-    print(proteins[0].phi_psi_angles)
+
+    # Test out angle extraction from other granularities.
+    # proteins = Coordinates(
+    #     granularity="CA", n_jobs=N_JOBS, verbose=VERBOSE
+    # ).fit_transform(pdb_files)
+    # proteins = RachmachandranAngles(
+    #     from_pdb=False, n_jobs=N_JOBS, verbose=VERBOSE
+    # ).fit_transform(proteins)
+    # print(proteins[0].phi_psi_angles)
 
 
 if __name__ == "__main__":
