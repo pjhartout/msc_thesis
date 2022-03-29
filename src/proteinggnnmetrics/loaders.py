@@ -10,6 +10,7 @@ import os
 from pathlib import Path, PosixPath
 from typing import List, Union
 
+import networkx as nx
 import numpy as np
 
 from .protein import Protein
