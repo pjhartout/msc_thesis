@@ -6,49 +6,46 @@ Graph descriptors essentially extract fixed-length representation of a graph
 
 """
 
-from abc import ABCMeta
+import re
+from abc import ABCMeta, abstractmethod
 from typing import Any, Iterable, List
 
 import numpy as np
 
+from .loaders import load_graphs
 from .protein import Protein
 from .utils.functions import distribute_function
 
 
-class Perturbations(metaclass=ABCMeta):
+class Perturbation(metaclass=ABCMeta):
     """Defines skeleton of perturbation classes classes"""
 
-    def __init__(self, random_state):
+    def __init__(self, random_state: int, n_jobs: int, verbose: bool):
         self.random_state = random_state
+        self.n_jobs = n_jobs
+        self.verbose = verbose
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
+    def fit(self, proteins: List[Protein]) -> None:
         """For pipeline compatibiltiy"""
         pass
 
-    def transform(self, X: List[Protein]) -> None:
+    def transform(self, X: List[Protein]) -> List[Protein]:
         return X
 
-    def fit_transform(self, X: Any) -> Any:
+    def fit_transform(self, X: List[Protein]) -> List[Protein]:
         """Apply perturbation to graph or graph representation"""
         return X
 
 
-class GaussianNoise(Perturbations):
+class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
     def __init__(
-        self,
-        random_state: int,
-        noise_mean: float,
-        noise_variance: float,
-        n_jobs: int,
-        verbose: bool = False,
+        self, noise_mean: float, noise_variance: float, **kwargs,
     ) -> None:
-        self.random_state = random_state
+        super().__init__(**kwargs)
         self.noise_mean = noise_mean
         self.noise_variance = noise_variance
-        self.n_jobs = n_jobs
-        self.verbose = verbose
 
     def add_noise_to_protein(self, protein: Protein) -> Protein:
         noise = np.random.normal(
@@ -63,7 +60,7 @@ class GaussianNoise(Perturbations):
     def transform(self, X: List[Protein]) -> None:
         return X
 
-    def fit_transform(self, X: Iterable[Protein], y=None) -> Any:
+    def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
         X = distribute_function(
             self.add_noise_to_protein,
             X,
@@ -72,3 +69,200 @@ class GaussianNoise(Perturbations):
             show_tqdm=self.verbose,
         )
         return X
+
+
+# Classes below are adapted from
+# https://github.com/BorgwardtLab/ggme/blob/main/src/perturbations.py
+
+
+class GraphPerturbation(Perturbation):
+    """Base class for graph perturbations"""
+
+    def __init__(self, graph_type, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.graph_type = graph_type
+
+
+class RemoveEdges(GraphPerturbation):
+    """Randomly remove edges."""
+
+    def __init__(self, p_remove: float, **kwargs):
+        """Remove edges with probability p_remove."""
+        super().__init__(**kwargs)
+
+    def remove_edge(self, protein: Protein) -> Protein:
+        """Apply perturbation."""
+        graph = protein.graphs[self.graph_type].copy()
+        edges_to_remove = self.random_state.binomial(
+            1, self.p_remove, size=graph.number_of_edges()
+        )
+        edge_indices_to_remove = np.where(edges_to_remove == 1.0)[0]
+        edges = list(graph.edges())
+
+        for edge_index in edge_indices_to_remove:
+            edge = edges[edge_index]
+            graph.remove_edge(*edge)
+        protein.graphs[self.graph_type] = graph
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> Any:
+        X = distribute_function(
+            self.remove_edge,
+            X,
+            self.n_jobs,
+            "Removing edges",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+class AddEdges(GraphPerturbation):
+    """Randomly add edges."""
+
+    def __init__(self, p_add: float, **kwargs):
+        """Add edges with probability p_add."""
+        super().__init__(**kwargs)
+        self.p_add = p_add
+
+    def add_edge(self, protein: Protein) -> Protein:
+        """Apply perturbation."""
+        graph = graph = protein.graphs[self.graph_type].copy()
+        nodes = list(graph.nodes())
+
+        for i, node1 in enumerate(nodes):
+            nodes_to_connect = self.random_state.binomial(
+                1, self.p_add, size=len(nodes)
+            )
+            nodes_to_connect[i] = 0  # Never introduce self connections
+            node_idxs_to_connect = np.where(nodes_to_connect == 1)[0]
+            for j in node_idxs_to_connect:
+                node2 = nodes[j]
+                graph.add_edge(node1, node2)
+
+        protein.graphs[self.graph_type] = graph
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
+        X = distribute_function(
+            self.add_edge,
+            X,
+            self.n_jobs,
+            "Adding edges",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+class RewireEdges(GraphPerturbation):
+    """Randomly rewire edges."""
+
+    def __init__(self, p_rewire: float, **kwargs):
+        """Rewire edges with probability p_rewire."""
+        super().__init__(**kwargs)
+        self.p_rewire = p_rewire
+
+    def rewire_edge(self, protein: Protein) -> Protein:
+        """Apply perturbation."""
+        graph = protein.graphs[self.graph_type].copy()
+        edges_to_rewire = self.random_state.binomial(
+            1, self.p_rewire, size=graph.number_of_edges()
+        )
+        edge_indices_to_rewire = np.where(edges_to_rewire == 1.0)[0]
+        edges = list(graph.edges())
+        nodes = list(graph.nodes())
+
+        for edge_index in edge_indices_to_rewire:
+            edge = edges[edge_index]
+            graph.remove_edge(*edge)
+
+            # Randomly pick one of the nodes which should be detached
+            if self.random_state.random() > 0.5:
+                keep_node, detach_node = edge
+            else:
+                detach_node, keep_node = edge
+
+            # Pick a random node besides detach node and keep node to attach to
+            possible_nodes = list(
+                filter(lambda n: n not in [keep_node, detach_node], nodes)
+            )
+            attach_node = self.random_state.choice(possible_nodes)
+            graph.add_edge(keep_node, attach_node)
+
+        protein.graphs[self.graph_type] = graph
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> Any:
+        X = distribute_function(
+            self.rewire_edge,
+            X,
+            self.n_jobs,
+            "Rewiring edges",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+class AddConnectedNodes(GraphPerturbation):
+    """Randomly add nodes to graph."""
+
+    def __init__(self, n_nodes: int, p_edge: float, **kwargs):
+        """Add n_nodes nodes and attach edges to node with prob p_edge."""
+        super().__init__(**kwargs)
+        self.n_nodes = n_nodes
+        self.p_edge = p_edge
+
+    def add_connected_node(self, protein: Protein) -> Protein:
+        """Apply perturbation."""
+        graph = protein.graphs[self.graph_type].copy()
+
+        for i in range(self.n_nodes):
+            n_nodes = graph.number_of_nodes()
+            # As the graphs are loaded from numpy arrays the nodes are simply
+            # the index
+            new_node = n_nodes
+            graph.add_node(new_node)
+            nodes_idxs_to_attach = np.where(
+                self.random_state.binomial(1, self.p_edge, size=n_nodes)
+            )[0]
+            for node in nodes_idxs_to_attach:
+                graph.add_edge(new_node, node)
+
+        protein.graphs[self.graph_type] = graph
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> Any:
+        X = distribute_function(
+            self.add_connected_node,
+            X,
+            self.n_jobs,
+            "Adding connected nodes",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+__all__ = ["RemoveEdges", "AddEdges", "RewireEdges", "AddConnectedNodes"]
