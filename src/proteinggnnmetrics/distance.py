@@ -36,8 +36,7 @@ class DistanceFunction(metaclass=ABCMeta):
         pass
 
     def compute(X, Y):
-        """Computes distance between X and Y
-        """
+        """Computes distance between X and Y"""
         pass
 
 
@@ -96,7 +95,7 @@ class MaximumMeanDiscrepancy(DistanceFunction):
             k_XY = np.sum(K_XY)
 
             mmd = (
-                1 / (m ** 2) * k_XX + 1 / (n ** 2) * k_YY - 2 / (m * n) * k_XY
+                1 / (m**2) * k_XX + 1 / (n**2) * k_YY - 2 / (m * n) * k_XY
             )
 
         else:
@@ -158,7 +157,10 @@ class PearsonCorrelation(DistanceFunction):
         self.p_value = p_value  # p is two-sided here. No other choice.
 
     def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
-        correlation, p = pearsonr(X.flatten(), Y.flatten(),)
+        correlation, p = pearsonr(
+            X.flatten(),
+            Y.flatten(),
+        )
         if self.p_value:
             return correlation, p
         else:

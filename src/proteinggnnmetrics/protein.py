@@ -231,7 +231,10 @@ class Protein:
     ):
         pos = nx.spring_layout(G[sample])
         fig = nx.draw_networkx(
-            G[sample], pos=pos, with_labels=False, node_size=node_size,
+            G[sample],
+            pos=pos,
+            with_labels=False,
+            node_size=node_size,
         )
         for node, (x, y) in pos.items():
             text(x, y, node, fontsize=fontsize, ha="center", va="center")

@@ -41,7 +41,10 @@ class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
     def __init__(
-        self, noise_mean: float, noise_variance: float, **kwargs,
+        self,
+        noise_mean: float,
+        noise_variance: float,
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean
@@ -89,8 +92,9 @@ class RemoveEdges(GraphPerturbation):
     def __init__(self, p_remove: float, **kwargs):
         """Remove edges with probability p_remove."""
         super().__init__(**kwargs)
+        self.p_remove = p_remove
 
-    def remove_edge(self, protein: Protein) -> Protein:
+    def remove_edges(self, protein: Protein) -> Protein:
         """Apply perturbation."""
         graph = protein.graphs[self.graph_type].copy()
         edges_to_remove = self.random_state.binomial(
@@ -113,7 +117,7 @@ class RemoveEdges(GraphPerturbation):
 
     def fit_transform(self, X: List[Protein], y=None) -> Any:
         X = distribute_function(
-            self.remove_edge,
+            self.remove_edges,
             X,
             self.n_jobs,
             "Removing edges",
@@ -130,7 +134,7 @@ class AddEdges(GraphPerturbation):
         super().__init__(**kwargs)
         self.p_add = p_add
 
-    def add_edge(self, protein: Protein) -> Protein:
+    def add_edges(self, protein: Protein) -> Protein:
         """Apply perturbation."""
         graph = graph = protein.graphs[self.graph_type].copy()
         nodes = list(graph.nodes())
@@ -156,7 +160,7 @@ class AddEdges(GraphPerturbation):
 
     def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
         X = distribute_function(
-            self.add_edge,
+            self.add_edges,
             X,
             self.n_jobs,
             "Adding edges",
@@ -173,7 +177,7 @@ class RewireEdges(GraphPerturbation):
         super().__init__(**kwargs)
         self.p_rewire = p_rewire
 
-    def rewire_edge(self, protein: Protein) -> Protein:
+    def rewire_edges(self, protein: Protein) -> Protein:
         """Apply perturbation."""
         graph = protein.graphs[self.graph_type].copy()
         edges_to_rewire = self.random_state.binomial(
@@ -211,7 +215,7 @@ class RewireEdges(GraphPerturbation):
 
     def fit_transform(self, X: List[Protein], y=None) -> Any:
         X = distribute_function(
-            self.rewire_edge,
+            self.rewire_edges,
             X,
             self.n_jobs,
             "Rewiring edges",
@@ -229,7 +233,7 @@ class AddConnectedNodes(GraphPerturbation):
         self.n_nodes = n_nodes
         self.p_edge = p_edge
 
-    def add_connected_node(self, protein: Protein) -> Protein:
+    def add_connected_nodes(self, protein: Protein) -> Protein:
         """Apply perturbation."""
         graph = protein.graphs[self.graph_type].copy()
 
@@ -256,7 +260,7 @@ class AddConnectedNodes(GraphPerturbation):
 
     def fit_transform(self, X: List[Protein], y=None) -> Any:
         X = distribute_function(
-            self.add_connected_node,
+            self.add_connected_nodes,
             X,
             self.n_jobs,
             "Adding connected nodes",

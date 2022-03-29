@@ -92,7 +92,10 @@ class GaussianKernel(Kernel):
 
 class WeisfeilerLehmanGrakel(Kernel):
     def __init__(
-        self, n_jobs: int = 4, n_iter: int = 3, node_label: str = "residue",
+        self,
+        n_jobs: int = 4,
+        n_iter: int = 3,
+        node_label: str = "residue",
     ):
         self.n_iter = n_iter
         self.node_label = node_label
