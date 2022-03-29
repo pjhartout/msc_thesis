@@ -14,14 +14,14 @@ import Bio
 import networkx as nx
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBParser, PPBuilder
+from Bio.PDB import PDBParser, PPBuilder, vectors
 from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
 
 from .protein import Protein
 from .utils.exception import GranularityError
-from .utils.functions import distribute_function, tqdm_joblib
+from .utils.functions import distribute_function, flatten_lists, tqdm_joblib
 
 
 class Coordinates:
@@ -62,6 +62,7 @@ class Coordinates:
         residues = [
             r for r in structure.get_residues() if r.get_id()[0] == " "
         ]
+        protein_name = Path(fname).name.split(".")[0]
         coordinates = list()
         sequence = list()
         if self.granularity in ["N", "CA", "C", "O"]:
@@ -70,6 +71,39 @@ class Coordinates:
                 name = residue.get_resname()
                 coordinates.append(coordinate)
                 sequence.append(name)
+            return Protein(
+                name=protein_name,
+                path=fname,
+                coordinates=np.vstack(coordinates),
+                sequence=sequence,
+            )
+
+        elif self.granularity == "backbone":
+            N_coordinates = list()
+            CA_coordinates = list()
+            C_coordinates = list()
+            for residue in residues:
+                N_coordinates.append(residue["N"].get_coord())
+                CA_coordinates.append(residue["CA"].get_coord())
+                C_coordinates.append(residue["C"].get_coord())
+                for atom in residue:
+                    if (
+                        atom.get_id() == "N"
+                        or atom.get_id() == "CA"
+                        or atom.get_id() == "C"
+                    ):
+                        coordinate = atom.get_coord()
+                        coordinates.append(coordinate)
+                name = residue.get_resname()
+                sequence.append(name)
+            return Protein(
+                name=protein_name,
+                path=fname,
+                N_coordinates=np.vstack(N_coordinates),
+                CA_coordinates=np.vstack(CA_coordinates),
+                C_coordinates=np.vstack(C_coordinates),
+                sequence=sequence,
+            )
 
         elif self.granularity == "all":
             # TODO: test
@@ -80,18 +114,15 @@ class Coordinates:
                     atom_coords.append(atom.get_coord())
                     coordinates.append(atom_coords)
                     sequence.append(name)
+            return Protein(
+                name=protein_name,
+                path=fname,
+                coordinates=np.vstack(coordinates),
+                sequence=sequence,
+            )
 
         else:
             raise GranularityError("Specify correct granularity")
-
-        coordinates = np.vstack(coordinates)
-        protein_name = Path(fname).name.split(".")[0]
-        return Protein(
-            name=protein_name,
-            path=fname,
-            coordinates=coordinates,
-            sequence=sequence,
-        )
 
     def fit(self):
         """required for sklearn compatibility"""
@@ -142,11 +173,41 @@ class RachmachandranAngles:
             for idx_poly, poly in enumerate(polypeptides):
                 angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
 
-        protein.phi_psi_angles = angles
+        protein.phi_psi_angles = flatten_lists(angles.values())
         return protein
 
     def get_angles_from_coordinates(self, protein: Protein) -> Protein:
-        raise NotImplementedError("Not implemented yet")
+        """Gets the angles from the N, CA and C coordinates"""
+        phi_psi_angles = list()
+        for position in range(len(protein.sequence)):
+            # Phi angle
+            if position > 0:
+                phi = (
+                    vectors.calc_dihedral(
+                        vectors.Vector(protein.C_coordinates[position - 1]),
+                        vectors.Vector(protein.N_coordinates[position]),
+                        vectors.Vector(protein.CA_coordinates[position]),
+                        vectors.Vector(protein.C_coordinates[position]),
+                    ),
+                )[0]
+            else:
+                phi = None
+            # Psi angle
+            if position < len(protein.sequence) - 1:
+                psi = (
+                    vectors.calc_dihedral(
+                        vectors.Vector(protein.N_coordinates[position]),
+                        vectors.Vector(protein.CA_coordinates[position]),
+                        vectors.Vector(protein.C_coordinates[position]),
+                        vectors.Vector(protein.N_coordinates[position + 1]),
+                    ),
+                )[0]
+
+            else:
+                psi = None
+            phi_psi_angles.append((phi, psi))
+        protein.phi_psi_angles = phi_psi_angles
+        return protein
 
     def fit(self):
         pass
@@ -154,7 +215,7 @@ class RachmachandranAngles:
     def transform(self):
         ...
 
-    def fit_transform(self, proteins: List[Protein], y=None):
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Gets the angles from the list of pdb files"""
 
         if self.from_pdb:

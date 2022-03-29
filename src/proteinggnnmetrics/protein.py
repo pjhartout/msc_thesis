@@ -38,6 +38,9 @@ class Protein:
         name="",
         sequence="",
         coordinates=np.array([]),
+        N_coordinates=np.array([]),
+        C_coordinates=np.array([]),
+        CA_coordinates=np.array([]),
         contact_map=np.array([]),
         knn_adj=np.array([]),
         eps_adj=np.array([]),
@@ -58,6 +61,9 @@ class Protein:
 
         # Processed data extracted from pdb
         self.coordinates = coordinates
+        self.N_coordinates = N_coordinates
+        self.C_coordinates = C_coordinates
+        self.CA_coordinates = CA_coordinates
         self.contact_map = contact_map
         self.phi_psi_angles = phi_psi_angles
 
