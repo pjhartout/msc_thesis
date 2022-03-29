@@ -9,7 +9,7 @@ Kernels
 import os
 from abc import ABCMeta
 from itertools import combinations, combinations_with_replacement, product
-from typing import Any, Iterable, List, Union
+from typing import Any, Iterable, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -43,7 +43,7 @@ def distance2similarity(K):
     Convert distance matrix to similarity matrix using a strictly
     monotone decreasing function.
     """
-    K = 1 / (1 + K)
+    K = np.exp(-K)
     return K
 
 
@@ -64,17 +64,30 @@ class Kernel(metaclass=ABCMeta):
 
 
 class LinearKernel(Kernel):
-    def __init__(
-        self, dense_output: bool = False,
-    ):
+    def __init__(self, dense_output: bool = False, normalize: bool = False):
         self.dense_output = dense_output
+        self.normalize = normalize
 
-    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
-        if Y is None:
-            K = linear_kernel(X, X, dense_output=self.dense_output)
+    def compute_gram_matrix(self, X: np.ndarray, Y: np.ndarray = None) -> Any:
+        if self.normalize:
+            return np.dot(X, Y) / np.sqrt(np.dot(X, X) * np.dot(Y, Y))
+        return np.dot(X, Y)
+
+
+class GaussianKernel(Kernel):
+    def __init__(self, sigma, precomputed_product):
+        super().__init__()
+        self.sigma = sigma
+        self.precomputed_product = precomputed_product
+
+    def compute_gram_matrix(
+        self, X: np.ndarray, Y: np.ndarray = None
+    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+        P = np.dot(X - Y, X - Y)
+        if self.precomputed_product:
+            return np.exp(-self.sigma * P), P
         else:
-            K = linear_kernel(X, Y, dense_output=self.dense_output)
-        return K
+            return np.exp(-self.sigma * P)
 
 
 class WeisfeilerLehmanGrakel(Kernel):
