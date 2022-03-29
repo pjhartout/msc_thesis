@@ -14,7 +14,7 @@ import Bio
 import networkx as nx
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBParser, PPBuilder, vectors
+from Bio.PDB import PDBParser
 from joblib import Parallel, delayed
 from pyparsing import col
 from tqdm import tqdm
@@ -152,87 +152,5 @@ class Coordinates:
             "Extracting coordinates from pdb files",
             show_tqdm=self.verbose,
         )
-
-        return proteins
-
-
-class RachmachandranAngles:
-    def __init__(self, from_pdb: bool, n_jobs: int, verbose: bool) -> None:
-        self.from_pdb = from_pdb
-        self.n_jobs = n_jobs
-        self.verbose = verbose
-
-    def get_angles_from_pdb(self, protein: Protein) -> Protein:
-        """Assumes only one chain"""
-        parser = PDBParser()
-        structure = parser.get_structure(protein.path.stem, protein.path)
-
-        angles = dict()
-        for idx_model, model in enumerate(structure):
-            polypeptides = PPBuilder().build_peptides(model)
-            for idx_poly, poly in enumerate(polypeptides):
-                angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
-
-        protein.phi_psi_angles = flatten_lists(angles.values())
-        return protein
-
-    def get_angles_from_coordinates(self, protein: Protein) -> Protein:
-        """Gets the angles from the N, CA and C coordinates"""
-        phi_psi_angles = list()
-        for position in range(len(protein.sequence)):
-            # Phi angle
-            if position > 0:
-                phi = (
-                    vectors.calc_dihedral(
-                        vectors.Vector(protein.C_coordinates[position - 1]),
-                        vectors.Vector(protein.N_coordinates[position]),
-                        vectors.Vector(protein.CA_coordinates[position]),
-                        vectors.Vector(protein.C_coordinates[position]),
-                    ),
-                )[0]
-            else:
-                phi = None
-            # Psi angle
-            if position < len(protein.sequence) - 1:
-                psi = (
-                    vectors.calc_dihedral(
-                        vectors.Vector(protein.N_coordinates[position]),
-                        vectors.Vector(protein.CA_coordinates[position]),
-                        vectors.Vector(protein.C_coordinates[position]),
-                        vectors.Vector(protein.N_coordinates[position + 1]),
-                    ),
-                )[0]
-
-            else:
-                psi = None
-            phi_psi_angles.append((phi, psi))
-        protein.phi_psi_angles = phi_psi_angles
-        return protein
-
-    def fit(self):
-        pass
-
-    def transform(self):
-        ...
-
-    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
-        """Gets the angles from the list of pdb files"""
-
-        if self.from_pdb:
-            proteins = distribute_function(
-                self.get_angles_from_pdb,
-                proteins,
-                self.n_jobs,
-                "Extracting Rachmachandran angles from pdb files",
-                show_tqdm=self.verbose,
-            )
-        else:
-            proteins = distribute_function(
-                self.get_angles_from_coordinates,
-                proteins,
-                self.n_jobs,
-                "Extracting Rachmachandran angles from coordinates",
-                show_tqdm=self.verbose,
-            )
 
         return proteins

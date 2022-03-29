@@ -53,6 +53,7 @@ class Protein:
         path=None,
         phi_psi_angles=np.array([]),
         verbose=False,
+        interatomic_clashes=float,
     ):
         # Basic protein descriptors
         self.name = name
@@ -66,6 +67,7 @@ class Protein:
         self.CA_coordinates = CA_coordinates
         self.contact_map = contact_map
         self.phi_psi_angles = phi_psi_angles
+        self.interatomic_clashes = interatomic_clashes
 
         # Adjacency matrices
         self.knn_adj = knn_adj
