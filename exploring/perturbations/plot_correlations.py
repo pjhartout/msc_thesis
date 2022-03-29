@@ -21,7 +21,7 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 
 config = configure()
 
-plt.rcParams["figure.figsize"] = (10.4, 6.8)
+plt.rcParams["figure.figsize"] = (6.4, 4.8)
 plt.rcParams["savefig.dpi"] = 1200
 mpl.rcParams["font.family"] = "serif"
 cmfont = font_manager.FontProperties(
@@ -40,7 +40,7 @@ def main():
     )
     spear_corr_name = "Spearman's Correlation Coefficient"
     pears_corr_name = "Pearson's Correlation Coefficient"
-    epsilon_name = "Epsilon value used to extract the graphs"
+    epsilon_name = r"$\varepsilon$"
     results.columns = [epsilon_name, spear_corr_name, pears_corr_name]
 
     results = results.set_index(epsilon_name)
@@ -56,7 +56,8 @@ def main():
         palette=palette,
         # style="choice",
     )
-    p.set_xlabel("Epsilon value")
+    plt.legend(title="Coorelation Coefficient")
+    p.set_xlabel(epsilon_name)
     p.set_ylabel("Correlation Coefficient")
     # add title
     plt.title(f"Correlation coefficient vs {epsilon_name}")

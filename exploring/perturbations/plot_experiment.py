@@ -20,7 +20,7 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 
 config = configure()
 
-plt.rcParams["figure.figsize"] = (10.4, 6.8)
+plt.rcParams["figure.figsize"] = (6.4, 4.8)
 plt.rcParams["savefig.dpi"] = 1200
 mpl.rcParams["font.family"] = "serif"
 cmfont = font_manager.FontProperties(
@@ -49,11 +49,11 @@ def main():
         # hue="coherence",
         # style="choice",
     )
-    p.set_xlabel("Epsilon value")
+    p.set_xlabel(r"Standard Deviation of Injected Noise")
     p.set_ylabel("Maximum Mean Discrepancy")
     # add title
     plt.title(
-        f"{mmd_name} computed from Weisfeiler-Lehman kernel vs {gnoise_name}."
+        f"{mmd_name} computed from Weisfeiler-Lehman kernel \n vs {gnoise_name}."
     )
     print("Saving")
     plt.tight_layout()
