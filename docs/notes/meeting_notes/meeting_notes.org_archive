@@ -269,3 +269,39 @@ ping google.com
   :ARCHIVE_CATEGORY: meeting_notes
   :ARCHIVE_TODO: DONE
   :END:
+
+* DONE Sample X and Y independently (diff set of prots).
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-29 Tue 12:35
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_OLPATH: <2022-03-25 Fri> Meeting with Tim
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Prio: dvc, bio descriptors -> Use hydra instead
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-29 Tue 12:37
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_OLPATH: <2022-03-25 Fri> Meeting with Tim
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Prio: dvc, bio descriptors -> Use hydra instead
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-29 Tue 12:37
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_OLPATH: <2022-03-25 Fri> Meeting with Tim
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* IN-PROGRESS Perturbations: coordinates perturbation, node label perturbation, graph perturbations (edge rewiring and co.)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-29 Tue 12:39
+  :ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+  :ARCHIVE_OLPATH: <2022-03-25 Fri> Meeting with Tim
+  :ARCHIVE_CATEGORY: meeting_notes
+  :ARCHIVE_TODO: IN-PROGRESS
+  :END:
