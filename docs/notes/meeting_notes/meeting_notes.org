@@ -29,10 +29,10 @@
 ** Sample X and Y independently (diff set of prots).
 ** Think about helpers to choose kernels
 ** add third homology dimension
-** Look into clash score/
-** Prio: dvc, bio descriptors
-** Linear, RBF/Laplace, W-L
-** Graph descriptors and biological descriptors
+** VERIFY Look into clash score/
+** DONE Prio: dvc, bio descriptors -> Use hydra instead
+** DONE Linear, RBF/Laplace, W-L
+** DONE Graph descriptors and biological descriptors
 ** Perturbations: coordinates perturbation, node label perturbation, graph perturbations (edge rewiring and co.)
 ** Nice to have is the non-MMD
 ** Negative eigenvalues
