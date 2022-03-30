@@ -43,6 +43,7 @@ def main():
             exp_run["epsilon"] = int(".".join(fname.split("_")).split(".")[2])
             df_plot = pd.concat([df_plot, exp_run])
     print("Plotting")
+
     palette = sns.color_palette("mako_r", len(df_plot["epsilon"].unique()))
     p = sns.lineplot(
         data=df_plot.reset_index(drop=True),
@@ -51,7 +52,8 @@ def main():
         hue="epsilon",
         palette=palette,
     )
-    p.set_xlabel(r"$\varepsilon$ value")
+    plt.legend(title=r"$\varepsilon$")
+    p.set_xlabel(r"Standard Deviation of Injected Noise")
     p.set_ylabel("Maximum Mean Discrepancy")
     plt.title(
         "Multiple experiments of MMD vs gausian noise injection \n with varying levels of epsilon."

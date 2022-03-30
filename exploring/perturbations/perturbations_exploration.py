@@ -44,11 +44,10 @@ REDUCE_DATA = bool(config["DEBUG"]["REDUCE_DATA"])
 
 
 def main():
-    pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
 
-    for epsilon in tqdm(range(4, 21, 1)):
+    for epsilon in tqdm(range(10, 11, 1)):
         base_feature_steps = [
             ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
             ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
@@ -94,7 +93,7 @@ def main():
                 squared=True,
                 kernel=WeisfeilerLehmanKernel(
                     n_jobs=N_JOBS, n_iter=5, normalize=True, biased=True
-                ),
+                ),  # type: ignore
             ).compute(graphs, graphs_perturbed)
             results.append({"mmd": mmd, "std": std})
             # print(f"{mmd:.2f}")

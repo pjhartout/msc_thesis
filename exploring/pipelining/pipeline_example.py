@@ -52,7 +52,10 @@ def main():
     half = int(len(pdb_files) / 2)
 
     feature_pipeline = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
         ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
         ("knn_graph", KNNGraph(n_neighbors=4, n_jobs=N_JOBS)),
         (
@@ -134,7 +137,9 @@ def main():
         biased=False,
         squared=True,
         kernel=WeisfeilerLehmanGrakel(
-            n_jobs=N_JOBS, n_iter=3, node_label="residue",
+            n_jobs=N_JOBS,
+            n_iter=3,
+            node_label="residue",
         ),
     ).compute(graph_dist_1, graph_dist_2)
     # print(f"MMD computed from k-nn graphs is {mmd}")

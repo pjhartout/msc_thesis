@@ -54,7 +54,11 @@ N_JOBS = int(config["COMPUTE"]["N_JOBS"])
 @measure_memory
 def fastwlk_test(graphs):
     K = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+        n_jobs=N_JOBS,
+        n_iter=5,
+        normalize=False,
+        biased=True,
+        verbose=False,
     ).compute_gram_matrix(graphs)
 
 

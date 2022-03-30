@@ -10,6 +10,7 @@ import os
 from pathlib import Path, PosixPath
 from typing import List, Union
 
+import networkx as nx
 import numpy as np
 
 from .protein import Protein
@@ -61,7 +62,7 @@ def load_descriptor(
 
 def load_graphs(
     path_or_protein: Union[PosixPath, List[Protein]], graph_type: str
-):
+) -> List[nx.Graph]:
     if type(path_or_protein) == PosixPath:
         proteins = load_proteins(path_or_protein)
     else:

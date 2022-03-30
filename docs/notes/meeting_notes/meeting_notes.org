@@ -26,17 +26,9 @@
 * TODO <2022-03-25 Fri> Meeting with Tim
 ** Kernel composition of TDA and graph kernels.
 ** Mention MMD params
-** Sample X and Y independently (diff set of prots).
-** Think about helpers to choose kernels
-** add third homology dimension
-** Look into clash score/
-** Prio: dvc, bio descriptors
-** Linear, RBF/Laplace, W-L
-** Graph descriptors and biological descriptors
-** Perturbations: coordinates perturbation, node label perturbation, graph perturbations (edge rewiring and co.)
+** DONE Linear, RBF/Laplace, W-L
+** DONE Graph descriptors and biological descriptors
 ** Nice to have is the non-MMD
-** Negative eigenvalues
-** Place equations next to plots
 
 * TODO <2022-03-24 Thu> Weekly Tim meeting
 ** Wasserstein distance discussion

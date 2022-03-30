@@ -13,8 +13,8 @@ TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/libr
 
 import pickle
 from collections import Counter
-from pathlib import PosixPath
-from typing import List
+from pathlib import Path, PosixPath
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -28,31 +28,46 @@ from .utils.functions import flatten_lists
 
 
 class Protein:
-    """Main protein object to store data related to a protein"""
+    """Main protein object to store data related to a protein
+
+    TODO: make none of the elements in init required.
+    """
 
     def __init__(
         self,
-        name=None,
-        sequence: str = "",
-        coordinates=None,
-        contact_map=None,
-        knn_adj=None,
-        eps_adj=None,
+        name="",
+        sequence="",
+        coordinates=np.array([]),
+        N_coordinates=np.array([]),
+        C_coordinates=np.array([]),
+        CA_coordinates=np.array([]),
+        contact_map=np.array([]),
+        knn_adj=np.array([]),
+        eps_adj=np.array([]),
         knn_graph=None,
         eps_graph=None,
         contact_graph=None,
-        degree_histogram=None,
-        clustering_histogram=None,
-        laplacian_spectrum_histogram=None,
-        verbose: bool = False,
+        degree_histogram=np.array([]),
+        clustering_histogram=np.array([]),
+        laplacian_spectrum_histogram=np.array([]),
+        path=None,
+        phi_psi_angles=np.array([]),
+        verbose=False,
+        interatomic_clashes=float,
     ):
         # Basic protein descriptors
         self.name = name
+        self.path = path
         self.sequence = sequence
 
         # Processed data extracted from pdb
         self.coordinates = coordinates
+        self.N_coordinates = N_coordinates
+        self.C_coordinates = C_coordinates
+        self.CA_coordinates = CA_coordinates
         self.contact_map = contact_map
+        self.phi_psi_angles = phi_psi_angles
+        self.interatomic_clashes = interatomic_clashes
 
         # Adjacency matrices
         self.knn_adj = knn_adj
@@ -216,7 +231,10 @@ class Protein:
     ):
         pos = nx.spring_layout(G[sample])
         fig = nx.draw_networkx(
-            G[sample], pos=pos, with_labels=False, node_size=node_size,
+            G[sample],
+            pos=pos,
+            with_labels=False,
+            node_size=node_size,
         )
         for node, (x, y) in pos.items():
             text(x, y, node, fontsize=fontsize, ha="center", va="center")

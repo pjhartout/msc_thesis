@@ -685,7 +685,6 @@ transforming it to a similarity measure is not possible. (See Appendix A.)
 }
 #+end_src
 
-
 Gudhi references
 #+begin_src bibtex
 @book{gudhi:urm,
@@ -719,11 +718,6 @@ Persistence weighted Gaussian kernel (slower than Fisher-based kernel)
 }
 #+end_src
 
-** Check criteria to be admitted to pdb
-**** https://www.wwpdb.org/validation/2017/XrayValidationReportHelp
-
-****  This is all "relative (percentile rank) compared to the rest of the database"
-
 
 Survey of graph kernels
 #+begin_src bibtex
@@ -744,6 +738,10 @@ Kernel using Wasserstein distance
     year={2019}
   }
 #+end_src
+
+Check criteria to be admitted to pdb
+\href{https://www.wwpdb.org/validation/2017/XrayValidationReportHelp}{relative}
+This is all "relative (percentile rank) compared to the rest of the database"
 
 * References
 #+LaTeX: \printbibliography[heading=none]
