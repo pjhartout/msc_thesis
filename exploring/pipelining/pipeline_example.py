@@ -39,8 +39,8 @@ from proteinggnnmetrics.utils.functions import configure
 
 config = configure()
 
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
-REDUCE_DATA = config["DEBUG"]["REDUCE_DATA"]
+N_JOBS = 10
+REDUCE_DATA = False
 
 
 def main():

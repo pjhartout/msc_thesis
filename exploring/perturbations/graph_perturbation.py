@@ -44,8 +44,8 @@ from proteinggnnmetrics.utils.functions import configure, flatten_lists
 
 config = configure()
 
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
-REDUCE_DATA = bool(config["DEBUG"]["REDUCE_DATA"])
+N_JOBS = 10
+REDUCE_DATA = False
 
 
 def main():
@@ -70,7 +70,6 @@ def main():
         base_feature_steps, verbose=False
     )
     proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
-    proteins
 
 
 if __name__ == "__main__":

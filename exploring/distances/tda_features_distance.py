@@ -20,9 +20,7 @@ from proteinggnnmetrics.distance import (
 from proteinggnnmetrics.loaders import load_descriptor, load_proteins
 from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import configure, distribute_function
-
-config = configure()
+from proteinggnnmetrics.utils.functions import distribute_function
 
 
 def main():

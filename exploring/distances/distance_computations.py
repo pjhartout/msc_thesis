@@ -18,9 +18,7 @@ from proteinggnnmetrics.loaders import (
 )
 from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import configure, distribute_function
-
-config = configure()
+from proteinggnnmetrics.utils.functions import distribute_function
 
 
 def compute_wl_hashes(protein):
