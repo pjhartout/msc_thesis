@@ -7,7 +7,7 @@ Protein function to store protein-related data.
 The idea is to create an object holding all protein-specific data, keeping it
 pre-computed if already computed.
 
-TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/library/dataclasses.html is useful
+TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/library/dataclasses.html + Pydantic is useful
 """
 
 
