@@ -37,6 +37,7 @@ from proteinggnnmetrics.perturbations import (
     AddConnectedNodes,
     GaussianNoise,
     RemoveEdges,
+    Mutation,
 )
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.functions import configure, flatten_lists
@@ -55,9 +56,8 @@ def main():
         ("epsilon graph", EpsilonGraph(epsilon=4, n_jobs=N_JOBS)),
         (
             "rewire",
-            AddConnectedNodes(
-                n_nodes=10,
-                p_edge=0.1,
+            Mutation(
+                p_mutate=0.1,
                 n_jobs=N_JOBS,
                 graph_type="eps_graph",
                 random_state=np.random.RandomState(42),
