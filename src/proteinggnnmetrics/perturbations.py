@@ -16,11 +16,34 @@ from .loaders import load_graphs
 from .protein import Protein
 from .utils.functions import distribute_function
 
+AMINO_ACIDS = [
+    "GLU",
+    "VAL",
+    "LEU",
+    "LYS",
+    "ALA",
+    "THR",
+    "ASN",
+    "GLY",
+    "PHE",
+    "ASP",
+    "HIS",
+    "MET",
+    "TRP",
+    "SER",
+    "ILE",
+    "ARG",
+    "GLN",
+    "CYS",
+    "PRO",
+    "TYR",
+]
+
 
 class Perturbation(metaclass=ABCMeta):
     """Defines skeleton of perturbation classes classes"""
 
-    def __init__(self, random_state: int, n_jobs: int, verbose: bool):
+    def __init__(self, random_state, n_jobs: int, verbose: bool):
         self.random_state = random_state
         self.n_jobs = n_jobs
         self.verbose = verbose
@@ -60,7 +83,7 @@ class GaussianNoise(Perturbation):
     def fit(self, X: List[Protein]) -> None:
         pass
 
-    def transform(self, X: List[Protein]) -> None:
+    def transform(self, X: List[Protein]) -> List[Protein]:
         return X
 
     def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
@@ -243,6 +266,10 @@ class AddConnectedNodes(GraphPerturbation):
             # the index
             new_node = n_nodes
             graph.add_node(new_node)
+            # Adding node label residue, sampling from available amino acids
+            graph.nodes[new_node]["residue"] = self.random_state.choice(
+                AMINO_ACIDS
+            )
             nodes_idxs_to_attach = np.where(
                 self.random_state.binomial(1, self.p_edge, size=n_nodes)
             )[0]

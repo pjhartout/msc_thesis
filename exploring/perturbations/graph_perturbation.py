@@ -33,7 +33,11 @@ from proteinggnnmetrics.loaders import (
 )
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import GaussianNoise, RemoveEdges
+from proteinggnnmetrics.perturbations import (
+    AddConnectedNodes,
+    GaussianNoise,
+    RemoveEdges,
+)
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.functions import configure, flatten_lists
 
@@ -51,8 +55,9 @@ def main():
         ("epsilon graph", EpsilonGraph(epsilon=4, n_jobs=N_JOBS)),
         (
             "rewire",
-            RemoveEdges(
-                p_remove=0.1,
+            AddConnectedNodes(
+                n_nodes=10,
+                p_edge=0.1,
                 n_jobs=N_JOBS,
                 graph_type="eps_graph",
                 random_state=np.random.RandomState(42),
@@ -64,8 +69,8 @@ def main():
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=False
     )
-    proteins = base_feature_pipeline.fit_transform(pdb_files[:4])
-    proteins = base_feature_pipeline.fit_transform(pdb_files[4:8])
+    proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
+    proteins
 
 
 if __name__ == "__main__":
