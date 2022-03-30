@@ -179,6 +179,7 @@ class TopologicalDescriptor(Descriptor):
         tda_descriptor_type: str,
         epsilon: float,
         n_bins: int,
+        homology_dimensions: Tuple[int] = (1, 2, 3),
         order: int = 1,
         sigma: float = 0.01,
         weight_function: Callable = None,
@@ -191,6 +192,7 @@ class TopologicalDescriptor(Descriptor):
         self.sigma = sigma
         self.weight_function = weight_function
         self.n_bins = n_bins
+        self.homology_dimensions = homology_dimensions
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
@@ -198,7 +200,9 @@ class TopologicalDescriptor(Descriptor):
             (
                 "diagram",
                 homology.VietorisRipsPersistence(
-                    n_jobs=self.n_jobs, metric="precomputed"
+                    n_jobs=self.n_jobs,
+                    metric="precomputed",
+                    homology_dimensions=self.homology_dimensions,
                 ),
             )
         ]
