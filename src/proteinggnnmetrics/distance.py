@@ -9,10 +9,12 @@ TODO: docs, tests, citations.
 """
 
 from abc import ABCMeta
+from ctypes import Union
 from math import sqrt
 from typing import Any, Dict, Iterable, Tuple
 
 import numpy as np
+import numpy.typing as npt
 from grakel import WeisfeilerLehman
 from gtda.diagrams import PairwiseDistance
 from scipy.spatial.distance import minkowski
@@ -29,18 +31,7 @@ def positive_eig(K):
     return min_eig
 
 
-class DistanceFunction(metaclass=ABCMeta):
-    """Defines distance function"""
-
-    def __init__(self):
-        pass
-
-    def compute(X, Y):
-        """Computes distance between X and Y"""
-        pass
-
-
-class MaximumMeanDiscrepancy(DistanceFunction):
+class MaximumMeanDiscrepancy:
     """Implements maximum mean discrepancy
     Depending on the configuration, this class implements the following:
     - Unbiased MMD^2: see Lemma 6 of "A Kernel Two-Sample Test" [1]
@@ -70,20 +61,29 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         self.squared = squared
         self.verbose = verbose
 
-    def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
-        Xt = check_dist(X)
-        Yt = check_dist(Y)
+    def compute(self, *args) -> float:
 
-        # Following the original notation of the paper
-        m = len(Xt)
-        n = len(Yt)
+        if len(args) == 2:
+            Xt = check_dist(args[0])
+            Yt = check_dist(args[1])
 
-        K_XX = self.kernel.compute_gram_matrix(Xt)
-        K_YY = self.kernel.compute_gram_matrix(Yt)
-        K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
+        elif len(args) == 3:
+            K_XX = args[0]
+            K_YY = args[1]
+            K_XY = args[2]
+        else:
+            raise ValueError(
+                "MaximumMeanDiscrepancy.compute() takes either 2 arguments "
+                "(two distributions) or 3 arguments (precomputed kernel matrices)."
+            )
+
+        if len(args) <= 2:
+            K_XX = self.kernel.compute_gram_matrix(Xt)
+            K_YY = self.kernel.compute_gram_matrix(Yt)
+            K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
 
         if self.verbose:
-            # Print min_eig for K_XX and K_YY and K_XY
+            # Print min_eig for K_XX, K_YY and K_XY
             print(f"Kernel: {self.kernel.__class__.__name__}")
             print(f"K_XX min_eig: {positive_eig(K_XX)}")
             print(f"K_YY min_eig: {positive_eig(K_YY)}")
@@ -106,6 +106,9 @@ class MaximumMeanDiscrepancy(DistanceFunction):
             k_YY = np.sum(K_YY)
             k_XY = np.sum(K_XY)
 
+            m = K_XX.shape[0]
+            n = K_YY.shape[0]
+
             mmd = (
                 1 / (m * (m - 1)) * k_XX
                 + 1 / (n * (n - 1)) * k_YY
@@ -125,7 +128,7 @@ class MaximumMeanDiscrepancy(DistanceFunction):
         return sqrt(mmd)
 
 
-class MinkowskyDistance(DistanceFunction):
+class MinkowskyDistance:
     """Implements maximum mean discrepancy"""
 
     def __init__(self, p=2):
@@ -136,7 +139,7 @@ class MinkowskyDistance(DistanceFunction):
         return minkowski(X.flatten(), Y.flatten(), self.p)
 
 
-class SpearmanCorrelation(DistanceFunction):
+class SpearmanCorrelation:
     """Spearman correlation coefficient"""
 
     def __init__(self, p_value: bool = False):
@@ -150,7 +153,7 @@ class SpearmanCorrelation(DistanceFunction):
             return correlation
 
 
-class PearsonCorrelation(DistanceFunction):
+class PearsonCorrelation:
     """Spearman correlation coefficient"""
 
     def __init__(self, p_value: bool = False):
