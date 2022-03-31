@@ -40,14 +40,11 @@ from proteinggnnmetrics.perturbations import GaussianNoise
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.functions import (
-    configure,
     flatten_lists,
     networkx2grakel,
 )
 
-config = configure()
-
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
+N_JOBS = 10
 
 
 @timeit

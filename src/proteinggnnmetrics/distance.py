@@ -71,6 +71,7 @@ class MaximumMeanDiscrepancy:
             K_XX = args[0]
             K_YY = args[1]
             K_XY = args[2]
+
         else:
             raise ValueError(
                 "MaximumMeanDiscrepancy.compute() takes either 2 arguments "
@@ -81,6 +82,10 @@ class MaximumMeanDiscrepancy:
             K_XX = self.kernel.compute_gram_matrix(Xt)
             K_YY = self.kernel.compute_gram_matrix(Yt)
             K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
+
+        # Following the notation of the paper
+        m = K_XX.shape[0]
+        n = K_YY.shape[0]
 
         if self.verbose:
             # Print min_eig for K_XX, K_YY and K_XY
@@ -105,9 +110,6 @@ class MaximumMeanDiscrepancy:
             k_XX = np.sum(K_XX)
             k_YY = np.sum(K_YY)
             k_XY = np.sum(K_XY)
-
-            m = K_XX.shape[0]
-            n = K_YY.shape[0]
 
             mmd = (
                 1 / (m * (m - 1)) * k_XX

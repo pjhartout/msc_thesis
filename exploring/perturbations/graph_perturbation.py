@@ -10,45 +10,26 @@ import os
 import random
 from datetime import datetime
 
+import hydra
 import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
-import seaborn as sns
-from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
-from tqdm import tqdm
+from omegaconf import DictConfig
+from pyprojroot import here
 
-from proteinggnnmetrics.descriptors import DegreeHistogram
-from proteinggnnmetrics.distance import (
-    MaximumMeanDiscrepancy,
-    PearsonCorrelation,
-    SpearmanCorrelation,
-)
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
+from proteinggnnmetrics.loaders import list_pdb_files
+from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import (
-    AddConnectedNodes,
-    GaussianNoise,
-    RemoveEdges,
-    Mutation,
-)
-from proteinggnnmetrics.protein import Protein
-from proteinggnnmetrics.utils.functions import configure, flatten_lists
+from proteinggnnmetrics.perturbations import Mutation
 
 config = configure()
 
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
-REDUCE_DATA = bool(config["DEBUG"]["REDUCE_DATA"])
+N_JOBS = 10
+REDUCE_DATA = False
 
 
-def main():
+@hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
+def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     base_feature_steps = [
         ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
@@ -70,7 +51,6 @@ def main():
         base_feature_steps, verbose=False
     )
     proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
-    proteins
 
 
 if __name__ == "__main__":

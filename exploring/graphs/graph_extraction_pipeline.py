@@ -23,13 +23,11 @@ from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import configure
 
 random.seed(42)
-config = configure()
 
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
-REDUCE_DATA = config["DEBUG"]["REDUCE_DATA"]
+N_JOBS = 10
+REDUCE_DATA = True
 
 
 @measure_memory

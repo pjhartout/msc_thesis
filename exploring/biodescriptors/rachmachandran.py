@@ -15,9 +15,9 @@ from proteinggnnmetrics.utils.functions import configure
 
 config = configure()
 
-N_JOBS = int(config["COMPUTE"]["N_JOBS"])
-REDUCE_DATA = config["DEBUG"]["REDUCE_DATA"]
-VERBOSE = config["RUNTIME"]["VERBOSE"]
+N_JOBS = 10
+REDUCE_DATA = False
+VERBOSE = False
 
 
 def main():

@@ -32,13 +32,11 @@ from proteinggnnmetrics.paths import CACHE_DIR
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.functions import (
-    configure,
     distribute_function,
     flatten_lists,
     networkx2grakel,
 )
 
-config = configure()
 
 default_eigvalue_precision = float("-1e-5")
 
@@ -83,9 +81,7 @@ def precomputed_custom_biased(X, Y):
 def grakel_test(X, Y):
     X = networkx2grakel(X)
     Y = networkx2grakel(Y)
-    wl_kernel = WeisfeilerLehman(
-        n_jobs=int(config["COMPUTE"]["N_JOBS"]), n_iter=3
-    )
+    wl_kernel = WeisfeilerLehman(n_jobs=10, n_iter=3)
     KXY = wl_kernel.fit(X).transform(Y).T
     # positive_eig(KXY) Print shape of KXY
     print(f"Custom: {KXY.shape}")
@@ -116,7 +112,7 @@ def main():
     proteins = distribute_function(
         compute_wl_hashes,
         proteins,
-        int(config["COMPUTE"]["N_JOBS"]),
+        10,
         "Computing Weisfeiler-Lehman Hashes",
         show_tqdm=False,
     )

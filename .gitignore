@@ -1,7 +1,8 @@
 ### Project-specific ignored directories ###
 data/
 docs/literature/
-
+# Hide hydra output directories
+outputs
 
 ### Emacs ###
 # -*- mode: gitignore; -*-

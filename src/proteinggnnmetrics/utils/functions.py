@@ -144,12 +144,6 @@ def flatten_lists(lists: list) -> list:
     return result
 
 
-def configure() -> Dict:
-    config = configparser.ConfigParser()
-    config.read(here() / "setting.conf")
-    return config
-
-
 def chunks(lst, n):
     """returns lst divided into n chunks approx. the same size"""
     k, m = divmod(len(lst), n)
