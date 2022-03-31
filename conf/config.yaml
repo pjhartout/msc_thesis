@@ -1,5 +1,6 @@
 compute:
-  n_jobs: 2
+  n_jobs: 5
+  n_parallel_runs: 4
 
 random:
   state: 42
@@ -9,11 +10,9 @@ data:
 
 paths:
   experiment: "data/experiment_20220328-064300/"
+  multi_run_exp: "data/multi_run_exp"
 
 eps_var:
-  compute:
-    n_runs: 2
-
   eps:
     lower_bound: 3
     upper_bound: 4
