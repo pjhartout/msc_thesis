@@ -10,16 +10,14 @@ Plot multiple experiments
 import os
 from pathlib import Path
 
+import hydra
 import matplotlib as mpl
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from omegaconf import DictConfig
 from pyprojroot import here
-
-from proteinggnnmetrics.utils.functions import configure, flatten_lists
-
-config = configure()
 
 plt.rcParams["figure.figsize"] = (10.4, 6.8)
 plt.rcParams["savefig.dpi"] = 1200
@@ -32,12 +30,13 @@ mpl.rcParams["mathtext.fontset"] = "cm"
 mpl.rcParams["axes.unicode_minus"] = False
 
 
-def main():
+@hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
+def main(cfg: DictConfig):
     df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon"])
-    for fname in os.listdir(here() / config["EXPERIMENT"]["EXPERIMENT_PATH"]):
+    for fname in os.listdir(here() / cfg.paths.experiment):
         if "results" in fname:
             exp_run = pd.read_csv(
-                here() / config["EXPERIMENT"]["EXPERIMENT_PATH"] / Path(fname),
+                here() / cfg.paths.experiment / fname,
                 index_col=0,
             )
             exp_run["epsilon"] = int(".".join(fname.split("_")).split(".")[2])
@@ -62,7 +61,8 @@ def main():
     plt.tight_layout()
     plt.savefig(
         here()
-        / config["EXPERIMENT"]["PLOT_PATH"]
+        / cfg.paths.experiment
+        / "plots"
         / Path("plot_multiple_experiments.png")
     )
 

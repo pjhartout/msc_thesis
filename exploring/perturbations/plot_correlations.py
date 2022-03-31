@@ -10,16 +10,16 @@ extraction pipeline.
 
 from pathlib import Path
 
+import hydra
 import matplotlib as mpl
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.functions import configure, flatten_lists
-
-config = configure()
+from proteinggnnmetrics.utils.functions import flatten_lists
 
 plt.rcParams["figure.figsize"] = (6.4, 4.8)
 plt.rcParams["savefig.dpi"] = 1200
@@ -32,11 +32,11 @@ mpl.rcParams["mathtext.fontset"] = "cm"
 mpl.rcParams["axes.unicode_minus"] = False
 
 
-def main():
-
+@hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
+def main(cfg: DictConfig):
     # Load the data
     results = pd.read_csv(
-        here() / config["EXPERIMENT"]["CORR_EXPERIMENT_PATH"], index_col=0
+        here() / cfg.paths.experiment / "correlation.csv", index_col=0
     )
     spear_corr_name = "Spearman's Correlation Coefficient"
     pears_corr_name = "Pearson's Correlation Coefficient"
@@ -63,11 +63,7 @@ def main():
     plt.title(f"Correlation coefficient vs {epsilon_name}")
     print("Saving")
     plt.tight_layout()
-    plt.savefig(
-        here()
-        / config["EXPERIMENT"]["PLOT_PATH"]
-        / Path("plot_correlations.png")
-    )
+    plt.savefig(here() / exp / Path("plot_correlations.png"))
 
 
 if __name__ == "__main__":

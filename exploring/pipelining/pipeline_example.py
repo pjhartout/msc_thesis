@@ -10,12 +10,11 @@ Here we want to showcase the use of sklearn.pipeline to pipe operations in order
 import pickle
 import random
 
-import numpy as np
-import pandas as pd
+import hydra
 from fastwlk.kernel import WeisfeilerLehmanKernel
-from grakel import WeisfeilerLehman
 from gtda import pipeline
-from numpy import square
+from omegaconf import DictConfig
+from pyprojroot import here
 
 from proteinggnnmetrics.descriptors import (
     DegreeHistogram,
@@ -24,7 +23,6 @@ from proteinggnnmetrics.descriptors import (
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
 from proteinggnnmetrics.graphs import ContactMap, KNNGraph
 from proteinggnnmetrics.kernels import (
-    LinearKernel,
     PersistenceFisherKernel,
     WeisfeilerLehmanGrakel,
 )
@@ -35,18 +33,13 @@ from proteinggnnmetrics.loaders import (
 )
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.functions import configure
-
-config = configure()
-
-N_JOBS = 10
-REDUCE_DATA = False
 
 
-def main():
+@hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
+def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
-    if REDUCE_DATA:
+    if cfg.data.reduce_data:
         pdb_files = random.sample(pdb_files, 100)
 
     half = int(len(pdb_files) / 2)
@@ -54,13 +47,16 @@ def main():
     feature_pipeline = [
         (
             "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS),
+            Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
-        ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
-        ("knn_graph", KNNGraph(n_neighbors=4, n_jobs=N_JOBS)),
+        (
+            "contact map",
+            ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs),
+        ),
+        ("knn_graph", KNNGraph(n_neighbors=4, n_jobs=cfg.compute.n_jobs)),
         (
             "degree histogram",
-            DegreeHistogram("knn_graph", n_bins=30, n_jobs=N_JOBS),
+            DegreeHistogram("knn_graph", n_bins=30, n_jobs=cfg.compute.n_jobs),
         ),
         (
             "tda",
@@ -69,7 +65,7 @@ def main():
                 epsilon=0.01,
                 n_bins=100,
                 order=2,
-                n_jobs=N_JOBS,
+                n_jobs=cfg.compute.n_jobs,
                 landscape_layers=1,
             ),
         ),
@@ -105,7 +101,7 @@ def main():
     mmd = MaximumMeanDiscrepancy(
         biased=False,
         squared=True,
-        kernel=PersistenceFisherKernel(n_jobs=N_JOBS),
+        kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),
     ).compute(dist_1, dist_2)
 
     # dist_1 = load_descriptor(protein_dist_1, "degree_histogram", "knn_graph")
@@ -124,20 +120,20 @@ def main():
         biased=False,
         squared=True,
         kernel=WeisfeilerLehmanKernel(
-            n_jobs=N_JOBS,
+            n_jobs=cfg.compute.n_jobs,
             precomputed=False,
             n_iter=3,
             node_label="residue",
             normalize=False,
             biased=True,
-        ),
+        ),  # type: ignore
     ).compute(graph_dist_1, graph_dist_2)
 
     mmd = MaximumMeanDiscrepancy(
         biased=False,
         squared=True,
         kernel=WeisfeilerLehmanGrakel(
-            n_jobs=N_JOBS,
+            n_jobs=cfg.compute.n_jobs,
             n_iter=3,
             node_label="residue",
         ),

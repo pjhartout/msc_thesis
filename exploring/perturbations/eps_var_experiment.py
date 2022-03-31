@@ -1,21 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""perturbation_exploration.py
+"""eps_var.py
 
-Making some experiments with Gaussian noise
+The goal of this experiment is to see how the choice of epsilon affects the
+behaviour of MMD.
+
 """
 
 import os
 import random
 from datetime import datetime
 
+import hydra
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import seaborn as sns
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
+from omegaconf import DictConfig
+from pyprojroot import here
 from tqdm import tqdm
 
 from proteinggnnmetrics.descriptors import DegreeHistogram
@@ -35,38 +40,67 @@ from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise
 from proteinggnnmetrics.protein import Protein
+from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.functions import flatten_lists
-from proteinggnnmetrics.utils.debug import timeit, measure_memory
-
-N_JOBS = 10
-N_RUNS = 10
 
 
 @timeit
 @measure_memory
-def main():
+@hydra.main(config_path=here() / "conf/", config_name="config.yaml")
+def main(cfg: DictConfig):
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
     os.makedirs(CACHE_DIR / f"{now}", exist_ok=True)
     OUT_DIR = CACHE_DIR / f"{now}"
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
-    for run in tqdm(range(N_RUNS), position=0):
+    for run in tqdm(
+        range(cfg.eps_var.compute.n_runs), position=0, leave=False
+    ):
         correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
-        for epsilon in tqdm(range(4, 15, 1), position=1):
+        for epsilon in tqdm(
+            range(
+                cfg.eps_var.eps.lower_bound,
+                cfg.eps_var.eps.upper_bound,
+                cfg.eps_var.eps.step,
+            ),
+            position=1,
+            leave=False,
+        ):
             base_feature_steps = [
-                ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS)),
-                ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS)),
+                (
+                    "coordinates",
+                    Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
+                ),
+                (
+                    "contact map",
+                    ContactMap(
+                        metric="euclidean",
+                        n_jobs=cfg.compute.n_jobs,
+                    ),
+                ),
                 (
                     "epsilon graph",
-                    EpsilonGraph(epsilon=epsilon, n_jobs=N_JOBS),
+                    EpsilonGraph(epsilon=epsilon, n_jobs=cfg.compute.n_jobs),
                 ),
             ]
 
             base_feature_pipeline = pipeline.Pipeline(
                 base_feature_steps, verbose=False
             )
-            proteins = base_feature_pipeline.fit_transform(pdb_files[:200])
+            proteins = base_feature_pipeline.fit_transform(
+                pdb_files[
+                    cfg.eps_var.proteins.not_perturbed.lower_bound : cfg.eps_var.proteins.not_perturbed.upper_bound
+                ]
+            )
             results = list()
-            for std in tqdm(np.arange(0, 100, 5), position=2):
+            for std in tqdm(
+                np.arange(
+                    cfg.eps_var.std.lower_bound,
+                    cfg.eps_var.std.upper_bound,
+                    cfg.eps_var.std.step,
+                ),
+                position=2,
+                leave=False,
+            ):
                 perturb_feature_steps = flatten_lists(
                     [
                         base_feature_steps[:1]
@@ -77,7 +111,7 @@ def main():
                                     random_state=42,
                                     noise_mean=0,
                                     noise_variance=std,
-                                    n_jobs=N_JOBS,
+                                    n_jobs=cfg.compute.n_jobs,
                                     verbose=False,
                                 ),
                             )
@@ -90,7 +124,9 @@ def main():
                     perturb_feature_steps, verbose=False
                 )
                 proteins_perturbed = perturb_feature_pipeline.fit_transform(
-                    pdb_files[200:400]
+                    pdb_files[
+                        cfg.eps_var.proteins.perturbed.lower_bound : cfg.eps_var.proteins.perturbed.upper_bound
+                    ]
                 )
                 graphs = load_graphs(proteins, graph_type="eps_graph")
                 graphs_perturbed = load_graphs(
@@ -100,7 +136,10 @@ def main():
                     biased=True,
                     squared=True,
                     kernel=WeisfeilerLehmanKernel(
-                        n_jobs=N_JOBS, n_iter=5, normalize=True, biased=True
+                        n_jobs=cfg.compute.n_jobs,
+                        n_iter=5,
+                        normalize=True,
+                        biased=True,
                     ),  # type: ignore
                 ).compute(graphs, graphs_perturbed)
                 results.append({"mmd": mmd, "std": std})
@@ -109,12 +148,12 @@ def main():
             # Convert mmd and params to dataframe
             results = pd.DataFrame(data=results)
 
-            results.to_csv(OUT_DIR / f"results_epsilon_{epsilon}_{now}.csv")
+            results.to_csv(OUT_DIR / f"results_epsilon_{epsilon}_{now}.csv")  # type: ignore
             spearman_correlation = SpearmanCorrelation().compute(
-                results["mmd"].values, results["std"].values
+                results["mmd"].values, results["std"].values  # type: ignore
             )
             pearson_correlation = PearsonCorrelation().compute(
-                results["mmd"].values, results["std"].values
+                results["mmd"].values, results["std"].values  # type: ignore
             )
             correlations = pd.concat(
                 [
