@@ -7,20 +7,12 @@ Computes MMD test between two distributions
 
 """
 
-import pickle
-from collections import Counter
-from pathlib import Path, PosixPath
-from typing import Callable, Dict, List
 
-import fastwlk
 import numpy as np
-import scipy
-from grakel import WeisfeilerLehman
-from gtda import pipeline
 from fastwlk.kernel import WeisfeilerLehmanKernel
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
+from gtda import pipeline
+
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import Kernel
 from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
