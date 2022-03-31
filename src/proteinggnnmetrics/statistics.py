@@ -12,8 +12,9 @@ import pickle
 from collections import Counter
 from pathlib import Path, PosixPath
 from typing import Callable, Dict, List
-import scipy
+
 import numpy as np
+import scipy
 
 from proteinggnnmetrics.kernels import Kernel
 
@@ -33,33 +34,96 @@ class MMDTest:
         self.m = m
         self.kernel = kernel
 
-    def compute_p_value_from_mmd(self, original_mmd, K_XX, K_YY, K_XY):
+    def rank_statistic(self, original_mmd, K_XX, K_YY, K_XY):
         """Compute the p-value of the MMD test from the MMD value"""
 
         # Compute the p-value
         sampled_mmds = list()
-        for i in range(self.t):
+        trial_idx = 0
+        while trial_idx < self.t:
             # Sample m elements from upper triangular matrix of the original
             # data.
-            samples_x = np.random.choice(
-                K_XX.shape[0], size=self.m, replace=False
+            full_K = np.zeros(
+                (K_XX.shape[0] + K_YY.shape[0], K_XX.shape[0] + K_YY.shape[0])
             )
-            samples_y = np.random.choice(
-                K_YY.shape[0], size=self.m, replace=False
+            full_K[: K_XX.shape[0], : K_XX.shape[0]] = K_XX
+            full_K[K_XX.shape[0] :, K_XX.shape[0] :] = K_YY
+            full_K[K_XX.shape[0] :, : K_XX.shape[0]] = K_XY.T
+
+            # Sample m elements from the upper triangular matrix of the full
+            # data.
+            triu_K = np.triu_indices(full_K.shape[0], k=1)  # type: ignore
+            sampled_indices_rows = np.random.choice(
+                triu_K[1], size=self.m, replace=False
             )
-            sampled_K_XX = K_XX[samples_x, :][:, samples_x]
-            sampled_K_YY = K_YY[samples_y, :][:, samples_y]
-            sampled_K_XY = K_XY[samples_x, :][:, samples_y]
+            sampled_indices_cols = np.random.choice(
+                triu_K[0], size=self.m, replace=False
+            )
+
+            # Compute k_XX, k_YY, k_XY
+            sampled_K_XX = full_K[
+                sampled_indices_rows[
+                    np.logical_and(
+                        sampled_indices_rows < K_XX.shape[0],
+                        sampled_indices_cols < K_XX.shape[0],
+                    )
+                ],
+                sampled_indices_cols[
+                    np.logical_and(
+                        sampled_indices_rows < K_XX.shape[0],
+                        sampled_indices_cols < K_XX.shape[0],
+                    )
+                ],
+            ]
+            sampled_K_YY = full_K[
+                sampled_indices_rows[
+                    np.logical_and(
+                        sampled_indices_rows > K_XX.shape[0],
+                        sampled_indices_cols > K_XX.shape[0],
+                    )
+                ],
+                sampled_indices_cols[
+                    np.logical_and(
+                        sampled_indices_rows > K_XX.shape[0],
+                        sampled_indices_cols > K_XX.shape[0],
+                    )
+                ],
+            ]
+            sampled_K_XY = full_K[
+                sampled_indices_rows[
+                    np.logical_and(
+                        sampled_indices_rows < K_XX.shape[0],
+                        sampled_indices_cols >= K_XX.shape[0],
+                    )
+                ],
+                sampled_indices_cols[
+                    np.logical_and(
+                        sampled_indices_rows < K_XX.shape[0],
+                        sampled_indices_cols >= K_XX.shape[0],
+                    )
+                ],
+            ]
+
+            if len(sampled_K_XX) >= 2 and len(sampled_K_YY) >= 2:
+                trial_idx += 1
+            else:
+                break
 
             # Compute MMD on sampled data.
             sampled_mmds.append(
                 MaximumMeanDiscrepancy(
-                    self.kernel,
                     biased=False,
                     squared=True,
                     verbose=False,
-                ).compute(sampled_K_XX, sampled_K_YY, sampled_K_XY)
+                ).compute_from_sums(
+                    sampled_K_XX.sum(),
+                    sampled_K_YY.sum(),
+                    sampled_K_XY.sum(),
+                    len(sampled_K_XX),
+                    len(sampled_K_YY),
+                )
             )
+
         sampled_mmds.append(original_mmd)
         rank = np.where(np.sort(np.array(sampled_mmds)) == original_mmd)[0][0]
         p_value = (self.t + 1 - rank) / (self.t + 1)
@@ -80,6 +144,11 @@ class MMDTest:
         ).compute(K_XX, K_YY, K_XY)
 
         # Compute the p-value
-        p_value = self.compute_p_value_from_mmd(mmd_original, K_XX, K_YY, K_XY)
+        p_value = self.rank_statistic(
+            mmd_original,
+            K_XX,
+            K_YY,
+            K_XY,
+        )
 
         return p_value
