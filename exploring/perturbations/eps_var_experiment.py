@@ -46,7 +46,7 @@ from proteinggnnmetrics.utils.functions import flatten_lists
 
 @timeit
 @measure_memory
-@hydra.main(config_path=here() / "conf/", config_name="config.yaml")
+@hydra.main(config_path=str(here()) + "conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
     os.makedirs(CACHE_DIR / f"{now}", exist_ok=True)
