@@ -51,18 +51,19 @@ class MaximumMeanDiscrepancy:
 
     def __init__(
         self,
-        kernel: Kernel,
+        kernel: Kernel = None,
         biased: bool = False,
         squared: bool = True,
+        from_sum: bool = False,
         verbose: bool = False,
     ):
         self.kernel = kernel
         self.biased = biased
         self.squared = squared
+        self.from_sum = from_sum
         self.verbose = verbose
 
     def compute(self, *args) -> float:
-
         if len(args) == 2:
             Xt = check_dist(args[0])
             Yt = check_dist(args[1])
@@ -121,13 +122,42 @@ class MaximumMeanDiscrepancy:
             return mmd
 
         else:
-
             if mmd < 0:
                 mmd = 0
                 raise RuntimeWarning("Warning: MMD is negative, set to 0")
+            # See: https://twitter.com/karpathy/status/1430316576016793600?s=21
+            return sqrt(mmd)
 
-        # See: https://twitter.com/karpathy/status/1430316576016793600?s=21
-        return sqrt(mmd)
+    def compute_from_sums(
+        self,
+        k_XX,
+        k_XY,
+        k_YY,
+        m,
+        n,
+    ):
+
+        if self.biased:
+            mmd = (
+                1 / (m**2) * k_XX + 1 / (n**2) * k_YY - 2 / (m * n) * k_XY
+            )
+
+        else:
+            mmd = (
+                1 / (m * (m - 1)) * k_XX
+                + 1 / (n * (n - 1)) * k_YY
+                - 2 / (m * n) * k_XY
+            )
+
+        if self.squared:
+            return mmd
+
+        else:
+            if mmd < 0:
+                mmd = 0
+                raise RuntimeWarning("Warning: MMD is negative, set to 0")
+            # See: https://twitter.com/karpathy/status/1430316576016793600?s=21
+            return sqrt(mmd)
 
 
 class MinkowskyDistance:
