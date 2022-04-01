@@ -37,7 +37,7 @@ from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
 def execute_runs(cfg, run):
-    os.makedirs(here() / cfg.paths.multi_run_exp / run, exist_ok=True)
+    os.makedirs(here() / cfg.paths.multi_run_exp / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     for epsilon in tqdm(
@@ -56,10 +56,7 @@ def execute_runs(cfg, run):
             ),
             (
                 "contact map",
-                ContactMap(
-                    metric="euclidean",
-                    n_jobs=cfg.compute.n_jobs,
-                ),
+                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
             ),
             (
                 "epsilon graph",
@@ -132,7 +129,7 @@ def execute_runs(cfg, run):
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
 
-        results.to_csv(here() / cfg.paths.multi_run_exp / run / f"epsilon_{epsilon}.csv")  # type: ignore
+        results.to_csv(here() / cfg.paths.multi_run_exp / str(run) / f"epsilon_{epsilon}.csv")  # type: ignore
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values  # type: ignore
         )
@@ -152,24 +149,24 @@ def execute_runs(cfg, run):
             ]
         )
     correlations.to_csv(
-        here() / cfg.paths.multi_run_exp / run / f"correlations.csv"
+        here() / cfg.paths.multi_run_exp / str(run) / f"correlations.csv"
     )
 
 
 @timeit
 @measure_memory
-@hydra.main(config_path=str(here()) + "conf/", config_name="config.yaml")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
-    os.makedirs(cfg.paths.multi_run_exp, exist_ok=True)
+    os.makedirs(here() / cfg.paths.multi_run_exp, exist_ok=True)
     with tqdm_joblib(
         tqdm(
-            desc="Execute n_rubs",
+            desc="Execute n_runs",
             total=len(list(range(cfg.compute.n_parallel_runs))),
         )
     ) as progressbar:
-        Parallel(n_jobs=cfg.compute.n_jobs)(
+        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
             delayed(execute_runs)(cfg, run)
-            for run in range(cfg.compute.n_jobs)
+            for run in range(cfg.eps_var.n_runs)
         )
 
 
