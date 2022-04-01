@@ -65,33 +65,48 @@ class MMDTest:
             chosen_samples = triu_elements[chosen_samples]
 
             # Compute k_XX, k_YY, k_XY
-            sampled_K_XX = np.take(
-                full_K,
+            sampled_K_XX = full_K[
                 chosen_samples[
                     np.logical_and(
                         chosen_samples[:, 0] < K_XX.shape[0],
                         chosen_samples[:, 1] < K_XX.shape[0],
                     )
-                ],
-            )
-            sampled_K_YY = np.take(
-                full_K,
+                ][:, : K_XX.shape[0]][:, 0],
+                chosen_samples[
+                    np.logical_and(
+                        chosen_samples[:, 0] < K_XX.shape[0],
+                        chosen_samples[:, 1] < K_XX.shape[0],
+                    )
+                ][:, : K_XX.shape[0]][:, 1],
+            ]
+            sampled_K_YY = full_K[
                 chosen_samples[
                     np.logical_and(
                         chosen_samples[:, 0] > K_XX.shape[0],
                         chosen_samples[:, 1] > K_XX.shape[0],
                     )
-                ],
-            )
-            sampled_K_XY = np.take(
-                full_K,
+                ][:, : K_XX.shape[0]][:, 0],
+                chosen_samples[
+                    np.logical_and(
+                        chosen_samples[:, 0] > K_XX.shape[0],
+                        chosen_samples[:, 1] > K_XX.shape[0],
+                    )
+                ][:, : K_XX.shape[0]][:, 1],
+            ]
+            sampled_K_XY = full_K[
                 chosen_samples[
                     np.logical_and(
                         chosen_samples[:, 0] < K_XX.shape[0],
                         chosen_samples[:, 1] >= K_XX.shape[0],
                     )
-                ],
-            )
+                ][:, : K_XX.shape[0]][:, 0],
+                chosen_samples[
+                    np.logical_and(
+                        chosen_samples[:, 0] < K_XX.shape[0],
+                        chosen_samples[:, 1] >= K_XX.shape[0],
+                    )
+                ][:, : K_XX.shape[0]][:, 1],
+            ]
 
             if len(sampled_K_XX) >= 2 and len(sampled_K_YY) >= 2:
                 trial_idx += 1
