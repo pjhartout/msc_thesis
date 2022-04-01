@@ -27,12 +27,15 @@ class MMDTest:
 
     """
 
-    def __init__(self, alpha: float, m: int, t: int, kernel: Callable) -> None:
+    def __init__(
+        self, alpha: float, m: int, t: int, kernel: Callable, verbose: bool
+    ) -> None:
         # Following orignal notation in the paper
         self.alpha = alpha
         self.t = t
         self.m = m
         self.kernel = kernel
+        self.verbose = verbose
 
     def rank_statistic(self, original_mmd, K_XX, K_YY, K_XY):
         """Compute the p-value of the MMD test from the MMD value"""
@@ -48,64 +51,56 @@ class MMDTest:
             )
             full_K[: K_XX.shape[0], : K_XX.shape[0]] = K_XX
             full_K[K_XX.shape[0] :, K_XX.shape[0] :] = K_YY
-            full_K[K_XX.shape[0] :, : K_XX.shape[0]] = K_XY.T
+            full_K[: K_XX.shape[0], K_XX.shape[0] :] = K_XY
 
             # Sample m elements from the upper triangular matrix of the full
             # data.
             triu_K = np.triu_indices(full_K.shape[0], k=1)  # type: ignore
-            sampled_indices_rows = np.random.choice(
-                triu_K[1], size=self.m, replace=False
+            elems = np.array(
+                [[rows, cols] for rows, cols in zip(triu_K[0], triu_K[1])]
             )
-            sampled_indices_cols = np.random.choice(
-                triu_K[0], size=self.m, replace=False
+            chosen_samples = np.random.choice(
+                range(len(elems)), size=self.m, replace=False
             )
+            chosen_samples = elems[chosen_samples]
 
             # Compute k_XX, k_YY, k_XY
-            sampled_K_XX = full_K[
-                sampled_indices_rows[
+            sampled_K_XX = np.take(
+                full_K,
+                chosen_samples[
                     np.logical_and(
-                        sampled_indices_rows < K_XX.shape[0],
-                        sampled_indices_cols < K_XX.shape[0],
+                        chosen_samples[:, 0] < K_XX.shape[0],
+                        chosen_samples[:, 1] < K_XX.shape[0],
                     )
                 ],
-                sampled_indices_cols[
+            )
+            sampled_K_YY = np.take(
+                full_K,
+                chosen_samples[
                     np.logical_and(
-                        sampled_indices_rows < K_XX.shape[0],
-                        sampled_indices_cols < K_XX.shape[0],
+                        chosen_samples[:, 0] > K_XX.shape[0],
+                        chosen_samples[:, 1] > K_XX.shape[0],
                     )
                 ],
-            ]
-            sampled_K_YY = full_K[
-                sampled_indices_rows[
+            )
+            sampled_K_XY = np.take(
+                full_K,
+                chosen_samples[
                     np.logical_and(
-                        sampled_indices_rows > K_XX.shape[0],
-                        sampled_indices_cols > K_XX.shape[0],
+                        chosen_samples[:, 0] < K_XX.shape[0],
+                        chosen_samples[:, 1] >= K_XX.shape[0],
                     )
                 ],
-                sampled_indices_cols[
-                    np.logical_and(
-                        sampled_indices_rows > K_XX.shape[0],
-                        sampled_indices_cols > K_XX.shape[0],
-                    )
-                ],
-            ]
-            sampled_K_XY = full_K[
-                sampled_indices_rows[
-                    np.logical_and(
-                        sampled_indices_rows < K_XX.shape[0],
-                        sampled_indices_cols >= K_XX.shape[0],
-                    )
-                ],
-                sampled_indices_cols[
-                    np.logical_and(
-                        sampled_indices_rows < K_XX.shape[0],
-                        sampled_indices_cols >= K_XX.shape[0],
-                    )
-                ],
-            ]
+            )
 
             if len(sampled_K_XX) >= 2 and len(sampled_K_YY) >= 2:
                 trial_idx += 1
+                if self.verbose:
+                    print(
+                        "Trial {}/{}".format(trial_idx, self.t),
+                        flush=True,
+                        end="\r",
+                    )
             else:
                 break
 
@@ -137,7 +132,6 @@ class MMDTest:
         K_XY = self.kernel.compute_gram_matrix(dist_1, dist_2)
 
         mmd_original = MaximumMeanDiscrepancy(
-            kernel=self.kernel,
             biased=False,
             squared=True,
             verbose=False,

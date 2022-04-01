@@ -8,6 +8,8 @@ Computes MMD test between two distributions
 """
 
 
+from tabnanny import verbose
+
 import numpy as np
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
@@ -31,12 +33,12 @@ def main():
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=False
     )
-    proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
-    dist_1 = load_graphs(proteins[:60], "eps_graph")
-    dist_2 = load_graphs(proteins[60:], "eps_graph")
+    proteins = base_feature_pipeline.fit_transform(pdb_files[:300])
+    dist_1 = load_graphs(proteins[:130], "eps_graph")
+    dist_2 = load_graphs(proteins[130:], "eps_graph")
 
     p_value = MMDTest(
-        alpha=0.05, m=50, t=1000, kernel=WeisfeilerLehmanKernel(n_jobs=N_JOBS)  # type: ignore
+        alpha=0.05, m=100, t=100, kernel=WeisfeilerLehmanKernel(n_jobs=N_JOBS), verbose=True  # type: ignore
     ).compute_p_value(dist_1, dist_2)
     print(p_value)
 
