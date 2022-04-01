@@ -75,6 +75,7 @@ class MMDTest:
                 idx_k_XX[:, : K_XX.shape[0]][:, 0],
                 idx_k_XX[:, : K_XX.shape[0]][:, 1],
             ]
+
             idx_k_YY = chosen_samples[
                 np.logical_and(
                     chosen_samples[:, 0] > K_XX.shape[0],
@@ -85,6 +86,7 @@ class MMDTest:
                 idx_k_YY[:, : K_XX.shape[0]][:, 0],
                 idx_k_YY[:, : K_XX.shape[0]][:, 1],
             ]
+
             idx_k_XY = chosen_samples[
                 np.logical_and(
                     chosen_samples[:, 0] < K_XX.shape[0],
