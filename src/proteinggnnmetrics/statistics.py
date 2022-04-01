@@ -8,9 +8,11 @@ TODO: docs, tests, citations, type hints.
 """
 
 
+import itertools
 import pickle
 from collections import Counter
 from pathlib import Path, PosixPath
+from random import sample
 from typing import Callable, Dict, List
 
 import numpy as np
@@ -55,43 +57,37 @@ class MMDTest:
 
             # Sample m elements from the upper triangular matrix of the full
             # data.
-            triu_K = np.triu_indices(full_K.shape[0], k=1)  # type: ignore
-            triu_elements = np.array(
-                [[rows, cols] for rows, cols in zip(triu_K[0], triu_K[1])]
+            sample_x = np.random.choice(
+                range(K_XX.shape[0]), self.m, replace=False
             )
-            chosen_samples = np.random.choice(
-                range(len(triu_elements)), size=self.m, replace=False
+            sample_y = np.random.choice(
+                range(K_XX.shape[0]), self.m, replace=False
             )
-            chosen_samples = triu_elements[chosen_samples]
 
-            # Compute k_XX, k_YY, k_XY
-            sampled_K_XX = np.take(
-                full_K,
-                chosen_samples[
-                    np.logical_and(
-                        chosen_samples[:, 0] < K_XX.shape[0],
-                        chosen_samples[:, 1] < K_XX.shape[0],
-                    )
-                ],
+            idx_x = np.array(
+                [
+                    [el1, el2]
+                    for el1, el2 in itertools.product(sample_x, sample_x)
+                ]
             )
-            sampled_K_YY = np.take(
-                full_K,
-                chosen_samples[
-                    np.logical_and(
-                        chosen_samples[:, 0] > K_XX.shape[0],
-                        chosen_samples[:, 1] > K_XX.shape[0],
-                    )
-                ],
+
+            idx_y = np.array(
+                [
+                    [el1 + K_XX.shape[0], el2 + K_XX.shape[0]]
+                    for el1, el2 in itertools.product(sample_y, sample_y)
+                ]
             )
-            sampled_K_XY = np.take(
-                full_K,
-                chosen_samples[
-                    np.logical_and(
-                        chosen_samples[:, 0] < K_XX.shape[0],
-                        chosen_samples[:, 1] >= K_XX.shape[0],
-                    )
-                ],
+
+            idx_xy = np.array(
+                [
+                    [el1, el2 + K_XX.shape[0]]
+                    for el1, el2 in itertools.product(sample_x, sample_y)
+                ]
             )
+
+            sampled_K_XX = full_K[idx_x[:, 0], idx_x[:, 1]]
+            sampled_K_YY = full_K[idx_y[:, 0], idx_y[:, 1]]
+            sampled_K_XY = full_K[idx_xy[:, 0], idx_xy[:, 1]]
 
             if len(sampled_K_XX) >= 2 and len(sampled_K_YY) >= 2:
                 trial_idx += 1
