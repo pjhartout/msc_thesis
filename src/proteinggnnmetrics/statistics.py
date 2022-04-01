@@ -56,13 +56,13 @@ class MMDTest:
             # Sample m elements from the upper triangular matrix of the full
             # data.
             triu_K = np.triu_indices(full_K.shape[0], k=1)  # type: ignore
-            elems = np.array(
+            triu_elements = np.array(
                 [[rows, cols] for rows, cols in zip(triu_K[0], triu_K[1])]
             )
             chosen_samples = np.random.choice(
-                range(len(elems)), size=self.m, replace=False
+                range(len(triu_elements)), size=self.m, replace=False
             )
-            chosen_samples = elems[chosen_samples]
+            chosen_samples = triu_elements[chosen_samples]
 
             # Compute k_XX, k_YY, k_XY
             sampled_K_XX = np.take(
