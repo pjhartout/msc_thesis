@@ -11,7 +11,6 @@ from typing import Iterable, Union
 import numpy as np
 
 PI_HALF = np.pi / 2.0
-PI = np.pi
 TWO_PI = 2.0 * np.pi
 
 
@@ -200,59 +199,3 @@ def as_interval(element: Union[np.ndarray, float, Interval]) -> Interval:
         return element
     else:
         return Interval(element, element)
-
-
-def zeros_like(element) -> np.ndarray:
-    if isinstance(element, Interval):
-        return np.zeros_like(element.lower_bound)
-    else:
-        return np.zeros_like(element)
-
-
-def ones_like(element) -> np.ndarray:
-    if isinstance(element, Interval):
-        return np.ones_like(element.lower_bound)
-    else:
-        return np.ones_like(element)
-
-
-def encode_rotation_box2d(
-    points: np.ndarray, alpha: Interval, beta: Interval
-) -> Interval:
-    sin_a = sin(alpha)
-    cos_a = cos(alpha)
-    sin_b = sin(beta)
-    cos_b = cos(beta)
-    x = points[:, 0]
-    y = points[:, 1]
-    z = points[:, 2]
-    x_rotated = (cos_a * x) - (sin_a * cos_b * y) + (sin_a * sin_b * z)
-    y_rotated = (sin_a * x) + (cos_a * cos_b * y) - (cos_a * sin_b * z)
-    z_rotated = (sin_b * y) + (cos_b * z)
-    return stack([x_rotated, y_rotated, z_rotated], axis=1)
-
-
-def encode_rotation_box3d(
-    points: np.ndarray, alpha: Interval, beta: Interval, gamma: Interval
-) -> Interval:
-    sin_a = sin(alpha)
-    cos_a = cos(alpha)
-    sin_b = sin(beta)
-    cos_b = cos(beta)
-    sin_c = sin(gamma)
-    cos_c = cos(gamma)
-    x = points[:, 0]
-    y = points[:, 1]
-    z = points[:, 2]
-    x_rotated = (
-        (cos_a * cos_b) * x
-        + (cos_a * sin_b * sin_c - sin_a * cos_c) * y
-        + (cos_a * sin_b * cos_c + sin_a * sin_c) * z
-    )
-    y_rotated = (
-        (sin_a * cos_b) * x
-        + (sin_a * sin_b * sin_c + cos_a * cos_c) * y
-        + (sin_a * sin_b * cos_c - cos_a * sin_c) * z
-    )
-    z_rotated = (-sin_b) * x + (cos_b * sin_c) * y + (cos_b * cos_c) * z
-    return stack([x_rotated, y_rotated, z_rotated], axis=1)
