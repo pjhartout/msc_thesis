@@ -63,7 +63,7 @@ def main(cfg: DictConfig):
         hue="epsilon",
         palette=palette,
         err_style="bars",
-        ci=99,
+        ci=100,
     )
     plt.legend(title=r"$\varepsilon$")
     p.set_xlabel(r"Standard Deviation of Injected Noise")
@@ -73,7 +73,6 @@ def main(cfg: DictConfig):
     )
     print("Saving")
     plt.tight_layout()
-    plt.show()
     plt.savefig(
         here()
         / cfg.paths.experiment
