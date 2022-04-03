@@ -15,6 +15,7 @@ import numpy as np
 from .loaders import load_graphs
 from .protein import Protein
 from .utils.functions import distribute_function
+from .utils.interval import Interval, cos, sin, square, stack
 
 AMINO_ACIDS = [
     "GLU",
@@ -64,10 +65,7 @@ class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
     def __init__(
-        self,
-        noise_mean: float,
-        noise_variance: float,
-        **kwargs,
+        self, noise_mean: float, noise_variance: float, **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean
@@ -92,6 +90,130 @@ class GaussianNoise(Perturbation):
             X,
             self.n_jobs,
             "Adding Gaussian noise to proteins",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+# The point cloud perturbation methods used here are inspired from
+# https://github.com/eth-sri/3dcertify
+class Twist(Perturbation):
+    def __init__(
+        self, alpha: float, random_state: int, n_jobs: int, verbose: bool
+    ):
+        super().__init__(random_state, n_jobs, verbose)
+        self.alpha = alpha
+
+    def twist_protein(self, protein: Protein) -> Protein:
+        points = protein.coordinates
+        x = points[:, 0]
+        y = points[:, 1]
+        z = points[:, 2]
+        x_transformed = x * cos(self.alpha * z) - y * sin(self.alpha * z)
+        y_transformed = x * sin(self.alpha * z) + y * cos(self.alpha * z)
+        z_transformed = z
+        protein.coordinates = stack(
+            [x_transformed, y_transformed, z_transformed],
+            axis=1,
+            convert=isinstance(self.alpha, Interval),
+        )
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
+        X = distribute_function(
+            self.twist_protein,
+            X,
+            self.n_jobs,
+            "Twisting proteins",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+class Shear(Perturbation):
+    def __init__(
+        self,
+        shear_x: float,
+        shear_y: float,
+        random_state,
+        n_jobs: int,
+        verbose: bool,
+    ):
+        super().__init__(random_state, n_jobs, verbose)
+        self.shear_x = shear_x
+        self.shear_y = shear_y
+
+    def shear_protein(self, protein: Protein) -> Protein:
+        points = protein.coordinates
+        x = points[:, 0]
+        y = points[:, 1]
+        z = points[:, 2]
+        x_transformed = self.shear_x * z + x
+        y_transformed = self.shear_y * z + y
+        z_transformed = z
+        protein.coordinates = stack(
+            [x_transformed, y_transformed, z_transformed],
+            axis=1,
+            convert=isinstance(self.shear_x, Interval),
+        )
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
+        X = distribute_function(
+            self.shear_protein,
+            X,
+            self.n_jobs,
+            "Shearing proteins",
+            show_tqdm=self.verbose,
+        )
+        return X
+
+
+class Taper(Perturbation):
+    def __init__(self, a, b, random_state, n_jobs: int, verbose: bool):
+        super().__init__(random_state, n_jobs, verbose)
+        self.a = a
+        self.b = b
+
+    def taper_protein(self, protein: Protein) -> Protein:
+        points = protein.coordinates
+        x = points[:, 0]
+        y = points[:, 1]
+        z = points[:, 2]
+        x_transformed = (0.5 * square(self.a) * z + self.b * z + 1) * x
+        y_transformed = (0.5 * square(self.a) * z + self.b * z + 1) * y
+        z_transformed = z
+        protein.coordinates = stack(
+            [x_transformed, y_transformed, z_transformed],
+            axis=1,
+            convert=isinstance(self.a, Interval),
+        )
+        return protein
+
+    def fit(self, X: List[Protein]) -> None:
+        pass
+
+    def transform(self, X: List[Protein]) -> List[Protein]:
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None) -> List[Protein]:
+        X = distribute_function(
+            self.taper_protein,
+            X,
+            self.n_jobs,
+            "Taper proteins",
             show_tqdm=self.verbose,
         )
         return X
@@ -334,6 +456,9 @@ class Mutation(GraphPerturbation):
 
 __all__ = [
     "GaussianNoise",
+    "Twist",
+    "Shear",
+    "Taper",
     "RemoveEdges",
     "AddEdges",
     "RewireEdges",
