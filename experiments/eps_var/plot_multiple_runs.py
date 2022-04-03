@@ -44,7 +44,7 @@ def main(cfg: DictConfig):
                     header=0,
                 )
                 df["epsilon"] = int(".".join(fname.split("_")).split(".")[1])
-                df_run = df_run.append(df)
+                df_run = pd.concat([df_run, df], ignore_index=True)
         df_run["run"] = run
         df_run.reset_index(drop=True, inplace=True)
         df_plot.reset_index(drop=True, inplace=True)
@@ -75,7 +75,7 @@ def main(cfg: DictConfig):
     plt.tight_layout()
     plt.savefig(
         here()
-        / cfg.paths.experiment
+        / cfg.paths.multi_run_exp
         / "plots"
         / Path("plot_multiple_runs.png")
     )
