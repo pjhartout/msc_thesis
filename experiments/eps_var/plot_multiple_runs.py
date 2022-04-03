@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""plot_multiple_experiments.py
+"""plot_multiple_runs.py
 
-Plot multiple experiments
+Plot curves for multiple runs
 
 """
 
@@ -32,24 +32,38 @@ mpl.rcParams["axes.unicode_minus"] = False
 
 @hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
 def main(cfg: DictConfig):
-    df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon"])
-    for fname in os.listdir(here() / cfg.paths.experiment):
-        if "results" in fname:
-            exp_run = pd.read_csv(
-                here() / cfg.paths.experiment / fname,
-                index_col=0,
-            )
-            exp_run["epsilon"] = int(".".join(fname.split("_")).split(".")[2])
-            df_plot = pd.concat([df_plot, exp_run])
-    print("Plotting")
 
+    df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon", "run"])
+    for run in range(cfg.eps_var.n_runs):
+        df_run = pd.DataFrame(columns=["mmd", "std", "epsilon"])
+        for fname in os.listdir(here() / cfg.paths.multi_run_exp / str(run)):
+            if "epsilon" in fname:
+                df = pd.read_csv(
+                    here() / cfg.paths.multi_run_exp / str(run) / fname,
+                    index_col=0,
+                    header=0,
+                )
+                df["epsilon"] = int(".".join(fname.split("_")).split(".")[1])
+                df_run = df_run.append(df)
+        df_run["run"] = run
+        df_run.reset_index(drop=True, inplace=True)
+        df_plot.reset_index(drop=True, inplace=True)
+        df_plot = pd.concat([df_plot, df_run])
+    print("Plotting")
+    df_plot.reset_index(drop=True, inplace=True)
+    df_plot = df_plot.melt(id_vars=["epsilon", "mmd", "std"]).drop(
+        columns=["variable", "value"]
+    )
+    df_plot = df_plot.sort_values(by=["epsilon", "std"])
     palette = sns.color_palette("mako_r", len(df_plot["epsilon"].unique()))
     p = sns.lineplot(
-        data=df_plot.reset_index(drop=True),
+        data=df_plot,
         x="std",
         y="mmd",
         hue="epsilon",
         palette=palette,
+        err_style="bars",
+        ci=100,
     )
     plt.legend(title=r"$\varepsilon$")
     p.set_xlabel(r"Standard Deviation of Injected Noise")
@@ -63,7 +77,7 @@ def main(cfg: DictConfig):
         here()
         / cfg.paths.experiment
         / "plots"
-        / Path("plot_multiple_experiments.png")
+        / Path("plot_multiple_runs.png")
     )
 
 
