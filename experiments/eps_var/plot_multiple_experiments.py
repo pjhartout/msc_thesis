@@ -36,8 +36,7 @@ def main(cfg: DictConfig):
     for fname in os.listdir(here() / cfg.paths.experiment):
         if "results" in fname:
             exp_run = pd.read_csv(
-                here() / cfg.paths.experiment / fname,
-                index_col=0,
+                here() / cfg.paths.experiment / fname, index_col=0,
             )
             exp_run["epsilon"] = int(".".join(fname.split("_")).split(".")[2])
             df_plot = pd.concat([df_plot, exp_run])
