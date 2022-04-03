@@ -34,7 +34,7 @@ def main(cfg: DictConfig):
                 Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
             ),
             (
-                "shear",
+                "twist",
                 Twist(
                     alpha=i,
                     random_state=cfg.random.state,
