@@ -31,6 +31,7 @@ nx = "^0.0.0"
 black = "^22.3.0"
 hydra-core = "^1.1.1"
 plotly = "^5.6.0"
+pydantic = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
@@ -75,5 +76,3 @@ float_to_top = true
 
 [tool.mypy]
 python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
