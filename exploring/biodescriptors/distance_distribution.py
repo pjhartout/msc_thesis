@@ -16,7 +16,6 @@ from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, RachmachandranAngles
 
-
 N_JOBS = 10
 REDUCE_DATA = True
 VERBOSE = False

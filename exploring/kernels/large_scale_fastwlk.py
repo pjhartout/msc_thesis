@@ -39,10 +39,7 @@ from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import (
-    flatten_lists,
-    networkx2grakel,
-)
+from proteinggnnmetrics.utils.functions import flatten_lists, networkx2grakel
 
 N_JOBS = 10
 
@@ -51,11 +48,7 @@ N_JOBS = 10
 @measure_memory
 def fastwlk_test(graphs):
     K = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS,
-        n_iter=5,
-        normalize=False,
-        biased=True,
-        verbose=False,
+        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
     ).compute_gram_matrix(graphs)
 
 

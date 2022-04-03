@@ -37,7 +37,6 @@ from proteinggnnmetrics.utils.functions import (
     networkx2grakel,
 )
 
-
 default_eigvalue_precision = float("-1e-5")
 
 
@@ -65,9 +64,7 @@ def generate_simple_data():
 @measure_memory
 def precomputed_custom_biased(X, Y):
     wl_kernel = WeisfeilerLehmanKernel(
-        n_jobs=config["COMPUTE"]["N_JOBS"],
-        n_iter=4,
-        biased=True,
+        n_jobs=config["COMPUTE"]["N_JOBS"], n_iter=4, biased=True,
     )
     KXY = wl_kernel.fit_transform(X, Y)
     # positive_eig(KXY)
@@ -91,16 +88,11 @@ def grakel_test(X, Y):
 def graphkit_test(X, Y):
     graphkit_matrix = np.zeros((len(X), len(Y)))
     for idx_1, idx_2 in tqdm(
-        itertools.product(range(len(X)), range(len(Y))),
-        total=len(X) * len(Y),
+        itertools.product(range(len(X)), range(len(Y))), total=len(X) * len(Y),
     ):
         # Compute W-L kernel between two graphs
         wl_kernel, runtime = weisfeilerlehmankernel(
-            X[idx_1],
-            Y[idx_2],
-            node_label="residue",
-            height=3,
-            verbose=False,
+            X[idx_1], Y[idx_2], node_label="residue", height=3, verbose=False,
         )
         graphkit_matrix[idx_1, idx_2] = wl_kernel[0, 1]
     return graphkit_matrix
