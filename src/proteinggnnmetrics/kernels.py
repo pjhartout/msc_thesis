@@ -19,6 +19,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
 
+from .utils.functions import distance2similarity, networkx2grakel, positive_eig
 from .utils.metrics import (
     _persistence_fisher_distance,
     pairwise_persistence_diagram_kernels,
@@ -30,26 +31,6 @@ from .utils.preprocessing import (
 )
 
 default_eigvalue_precision = float("-1e-5")
-
-
-def positive_eig(K):
-    """Assert true if the calculated kernel matrix is valid."""
-    min_eig = np.real(np.min(np.linalg.eig(K)[0]))
-    np.testing.assert_array_less(default_eigvalue_precision, min_eig)
-
-
-def distance2similarity(K):
-    """
-    Convert distance matrix to similarity matrix using a strictly
-    monotone decreasing function.
-    """
-    K = np.exp(-K)
-    return K
-
-
-def networkx2grakel(X: Iterable) -> Iterable:
-    Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
-    return Xt
 
 
 class Kernel(metaclass=ABCMeta):
@@ -92,10 +73,7 @@ class GaussianKernel(Kernel):
 
 class WeisfeilerLehmanGrakel(Kernel):
     def __init__(
-        self,
-        n_jobs: int = 4,
-        n_iter: int = 3,
-        node_label: str = "residue",
+        self, n_jobs: int = 4, n_iter: int = 3, node_label: str = "residue",
     ):
         self.n_iter = n_iter
         self.node_label = node_label

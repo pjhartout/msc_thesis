@@ -6,40 +6,21 @@
 Large scale fastwlk test.
 
 """
-
-import os
-import random
 from datetime import datetime
 from tkinter import N
 
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
-import seaborn as sns
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from grakel.graph_kernels import WeisfeilerLehman
 from gtda import pipeline
-from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import DegreeHistogram
-from proteinggnnmetrics.distance import (
-    MaximumMeanDiscrepancy,
-    PearsonCorrelation,
-    SpearmanCorrelation,
-)
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
+from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
+from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import GaussianNoise
-from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import flatten_lists, networkx2grakel
+from proteinggnnmetrics.utils.functions import networkx2grakel, positive_eig
 
 N_JOBS = 10
 
@@ -79,10 +60,28 @@ def main():
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=False
     )
-    proteins = base_feature_pipeline.fit_transform(pdb_files[:100])
+    proteins = base_feature_pipeline.fit_transform(pdb_files[:20])
+    proteins_1 = base_feature_pipeline.fit_transform(pdb_files[20:25])
     graphs = load_graphs(proteins, graph_type="eps_graph")
-    grakel_test(graphs)
-    fastwlk_test(graphs)
+    graphs_1 = load_graphs(proteins_1, graph_type="eps_graph")
+    # grakel_test(graphs)
+    # fastwlk_test(graphs)
+    K_XX = WeisfeilerLehmanKernel(
+        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+    ).compute_gram_matrix(graphs, graphs)
+    K_YY = WeisfeilerLehmanKernel(
+        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+    ).compute_gram_matrix(graphs_1, graphs_1)
+    K_XY = WeisfeilerLehmanKernel(
+        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+    ).compute_gram_matrix(graphs, graphs_1)
+    full_K = np.zeros(
+        (K_XX.shape[0] + K_YY.shape[0], K_XX.shape[0] + K_YY.shape[0])
+    )
+    full_K[: K_XX.shape[0], : K_XX.shape[0]] = K_XX
+    full_K[K_XX.shape[0] :, K_XX.shape[0] :] = K_YY
+    full_K[: K_XX.shape[0], K_XX.shape[0] :] = K_XY
+    positive_eig(full_K)
 
 
 if __name__ == "__main__":

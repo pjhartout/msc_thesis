@@ -21,14 +21,8 @@ from scipy.spatial.distance import minkowski
 from scipy.stats import pearsonr, spearmanr
 
 from .kernels import Kernel
-from .utils.functions import networkx2grakel
+from .utils.functions import networkx2grakel, positive_eig
 from .utils.validation import check_dist
-
-
-def positive_eig(K):
-    """Assert true if the calculated kernel matrix is valid."""
-    min_eig = np.real(np.min(np.linalg.eig(K)[0]))
-    return min_eig
 
 
 class MaximumMeanDiscrepancy:
@@ -101,7 +95,7 @@ class MaximumMeanDiscrepancy:
             k_XY = np.sum(K_XY)
 
             mmd = (
-                1 / (m**2) * k_XX + 1 / (n**2) * k_YY - 2 / (m * n) * k_XY
+                1 / (m ** 2) * k_XX + 1 / (n ** 2) * k_YY - 2 / (m * n) * k_XY
             )
 
         else:
@@ -129,17 +123,12 @@ class MaximumMeanDiscrepancy:
             return sqrt(mmd)
 
     def compute_from_sums(
-        self,
-        k_XX,
-        k_XY,
-        k_YY,
-        m,
-        n,
+        self, k_XX, k_XY, k_YY, m, n,
     ):
 
         if self.biased:
             mmd = (
-                1 / (m**2) * k_XX + 1 / (n**2) * k_YY - 2 / (m * n) * k_XY
+                1 / (m ** 2) * k_XX + 1 / (n ** 2) * k_YY - 2 / (m * n) * k_XY
             )
 
         else:
@@ -192,10 +181,7 @@ class PearsonCorrelation:
         self.p_value = p_value  # p is two-sided here. No other choice.
 
     def compute(self, X: np.ndarray, Y: np.ndarray) -> float:
-        correlation, p = pearsonr(
-            X.flatten(),
-            Y.flatten(),
-        )
+        correlation, p = pearsonr(X.flatten(), Y.flatten(),)
         if self.p_value:
             return correlation, p
         else:
