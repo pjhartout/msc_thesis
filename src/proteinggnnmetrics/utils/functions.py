@@ -252,3 +252,23 @@ def pad_diagrams(Xt, homology_dimensions: Tuple = (0, 1)) -> np.ndarray:
 
     Xt = np.array([X_left, X_right])
     return Xt
+
+
+def positive_eig(K):
+    """Assert true if the calculated kernel matrix is valid."""
+    min_eig = np.real(np.min(np.linalg.eig(K)[0]))
+    return min_eig
+
+
+def distance2similarity(K):
+    """
+    Convert distance matrix to similarity matrix using a strictly
+    monotone decreasing function.
+    """
+    K = np.exp(-K)
+    return K
+
+
+def networkx2grakel(X: Iterable) -> Iterable:
+    Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
+    return Xt
