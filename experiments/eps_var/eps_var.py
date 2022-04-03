@@ -36,7 +36,7 @@ from proteinggnnmetrics.utils.debug import measure_memory, timeit
 from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
-def execute_runs(cfg, run):
+def execute_run(cfg, run):
     os.makedirs(here() / cfg.paths.multi_run_exp / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
@@ -48,6 +48,7 @@ def execute_runs(cfg, run):
         ),
         position=1,
         leave=False,
+        desc="Epsilon range",
     ):
         base_feature_steps = [
             (
@@ -81,6 +82,7 @@ def execute_runs(cfg, run):
             ),
             position=2,
             leave=False,
+            desc="STD range",
         ):
             perturb_feature_steps = flatten_lists(
                 [
@@ -165,8 +167,7 @@ def main(cfg: DictConfig):
         )
     ) as progressbar:
         Parallel(n_jobs=cfg.compute.n_parallel_runs)(
-            delayed(execute_runs)(cfg, run)
-            for run in range(cfg.eps_var.n_runs)
+            delayed(execute_run)(cfg, run) for run in range(cfg.eps_var.n_runs)
         )
 
 
