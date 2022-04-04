@@ -41,14 +41,14 @@ def main(cfg: DictConfig):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=False
     )
-    proteins = base_feature_pipeline.fit_transform(pdb_files[:300])
-    dist_1 = load_graphs(proteins[:130], "eps_graph")
-    dist_2 = load_graphs(proteins[130:], "eps_graph")
+    proteins = base_feature_pipeline.fit_transform(pdb_files[:240])
+    dist_1 = load_graphs(proteins[:120], "eps_graph")
+    dist_2 = load_graphs(proteins[120:], "eps_graph")
 
     p_value = MMDTest(
         alpha=0.05, m=100, t=100, kernel=WeisfeilerLehmanKernel(n_jobs=cfg.compute.n_jobs), verbose=True  # type: ignore
     ).compute_p_value(dist_1, dist_2)
-    print(p_value)
+    print(f"p-value: {p_value}")
 
 
 if __name__ == "__main__":
