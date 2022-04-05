@@ -54,7 +54,7 @@ class MMDTest:
             full_K[: K_XX.shape[0], : K_XX.shape[0]] = K_XX
             full_K[K_XX.shape[0] :, K_XX.shape[0] :] = K_YY
             full_K[: K_XX.shape[0], K_XX.shape[0] :] = K_XY
-
+            full_K[K_XX.shape[0] :, : K_XX.shape[0]] = K_XY.T
             # Sample m elements from the upper triangular matrix of the full
             # data.
             sample_x = np.random.choice(
@@ -103,9 +103,7 @@ class MMDTest:
             # Compute MMD on sampled data.
             sampled_mmds.append(
                 MaximumMeanDiscrepancy(
-                    biased=False,
-                    squared=True,
-                    verbose=False,
+                    biased=False, squared=True, verbose=False,
                 ).compute_from_sums(
                     sampled_K_XX.sum(),
                     sampled_K_YY.sum(),
@@ -128,17 +126,10 @@ class MMDTest:
         K_XY = self.kernel.compute_gram_matrix(dist_1, dist_2)
 
         mmd_original = MaximumMeanDiscrepancy(
-            biased=False,
-            squared=True,
-            verbose=False,
+            biased=False, squared=True, verbose=False,
         ).compute(K_XX, K_YY, K_XY)
 
         # Compute the p-value
-        p_value = self.rank_statistic(
-            mmd_original,
-            K_XX,
-            K_YY,
-            K_XY,
-        )
+        p_value = self.rank_statistic(mmd_original, K_XX, K_YY, K_XY,)
 
         return p_value
