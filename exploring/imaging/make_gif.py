@@ -88,11 +88,11 @@ def build_mutation(cfg: DictConfig):
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
-    # build_gaussian(cfg)
+    build_gaussian(cfg)
     build_twist(cfg)
-    # build_shear(cfg)
-    # build_taper(cfg)
-    # build_mutation(cfg)
+    build_shear(cfg)
+    build_taper(cfg)
+    build_mutation(cfg)
 
 
 if __name__ == "__main__":
