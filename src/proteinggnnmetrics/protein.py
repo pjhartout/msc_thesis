@@ -182,19 +182,19 @@ class Protein:
     def plot_point_cloud(self):
         scene = {
             "xaxis": {
-                "title": "0th",
+                "title": "x",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e",
             },
             "yaxis": {
-                "title": "1st",
+                "title": "y",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e",
             },
             "zaxis": {
-                "title": "2nd",
+                "title": "z",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e",
@@ -231,10 +231,7 @@ class Protein:
     ):
         pos = nx.spring_layout(G[sample])
         fig = nx.draw_networkx(
-            G[sample],
-            pos=pos,
-            with_labels=False,
-            node_size=node_size,
+            G[sample], pos=pos, with_labels=False, node_size=node_size,
         )
         for node, (x, y) in pos.items():
             text(x, y, node, fontsize=fontsize, ha="center", va="center")
