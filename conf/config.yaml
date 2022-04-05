@@ -34,9 +34,11 @@ eps_var:
       upper_bound: 200
 
 imaging:
+  protein_of_interest: 3
   images: "data/images"
   gifs: "data/images/gifs"
   gaussian_noise_path: "data/images/gaussian_noise"
   twist_path: "data/images/twist"
   shear_path: "data/images/shear"
   taper_path: "data/images/taper"
+  mutation_path: "data/images/mutation"

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""gaussian_noise.py
+"""muation.py
 
-Introduce gaussian noise to proteins and save resulting point cloud images.
+Introduce mutation and save resulting point cloud images.
 
 """
 
 import hydra
+import numpy as np
 from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
@@ -17,27 +18,34 @@ from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
 from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import GaussianNoise, Shear, Taper, Twist
+from proteinggnnmetrics.perturbations import (
+    GaussianNoise,
+    Mutation,
+    Shear,
+    Taper,
+    Twist,
+)
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
-    for i in tqdm(range(0, 50)):
+    for idx, i in tqdm(
+        enumerate(np.arange(0, 1, 0.01)), total=len(np.arange(0, 1, 0.01)),
+    ):
         base_feature_steps = [
             (
                 "coordinates",
                 Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
             ),
             (
-                "gaussian noise",
-                GaussianNoise(
-                    noise_mean=0,
-                    noise_variance=i,
+                "mutate",
+                Mutation(
+                    p_mutate=i,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=False,
-                    random_state=42,
+                    random_state=np.random.RandomState(42),
                 ),
             ),
         ]
@@ -45,14 +53,12 @@ def main(cfg: DictConfig):
             base_feature_steps, verbose=False
         )
         proteins = base_feature_pipeline.fit_transform(pdb_files[:4])
-        fig = proteins[cfg.imaging.idx_protein_of_interest].plot_point_cloud()
+        fig = proteins[3].plot_point_cloud(aa_as_color=True)
         camera = dict(eye=dict(x=1, y=2, z=1))
-        fig.update_layout(scene_camera=camera, title="Gaussian noise")
+        fig.update_layout(scene_camera=camera, title="Mutate")
 
         fig.write_image(
-            here()
-            / cfg.imaging.gaussian_noise_path
-            / f"protein_straight_{i}.png",
+            here() / cfg.imaging.mutation_path / f"protein_straight_{idx}.png",
             scale=5,
         )
 

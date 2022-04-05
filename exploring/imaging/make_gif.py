@@ -73,12 +73,26 @@ def build_taper(cfg: DictConfig):
     imageio.mimsave(here() / cfg.imaging.gifs / "taper.gif", images)
 
 
+def build_mutation(cfg: DictConfig):
+    images_fnames = list()
+    images = list()
+    for fname in tqdm(os.listdir(here() / cfg.imaging.mutation_path)):
+        images_fnames.append(fname)
+    images_fnames = natsorted(images_fnames)
+    for fname in tqdm(images_fnames):
+        images.append(
+            imageio.imread(here() / cfg.imaging.mutation_path / fname)
+        )
+    imageio.mimsave(here() / cfg.imaging.gifs / "mutation.gif", images)
+
+
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
     build_gaussian(cfg)
     build_twist(cfg)
     build_shear(cfg)
     build_taper(cfg)
+    build_mutation(cfg)
 
 
 if __name__ == "__main__":
