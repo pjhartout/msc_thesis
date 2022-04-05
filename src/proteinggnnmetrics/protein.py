@@ -14,11 +14,12 @@ TODO: docs, tests, citations, type hints., see if https://docs.python.org/3/libr
 import pickle
 from collections import Counter
 from pathlib import Path, PosixPath
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import plotly
 import plotly.graph_objs as gobj
 from matplotlib.pyplot import figure, text
 from scipy import sparse
@@ -32,6 +33,34 @@ class Protein:
 
     TODO: make none of the elements in init required.
     """
+
+    AMINO_ACIDS = [
+        "GLU",
+        "VAL",
+        "LEU",
+        "LYS",
+        "ALA",
+        "THR",
+        "ASN",
+        "GLY",
+        "PHE",
+        "ASP",
+        "HIS",
+        "MET",
+        "TRP",
+        "SER",
+        "ILE",
+        "ARG",
+        "GLN",
+        "CYS",
+        "PRO",
+        "TYR",
+    ]
+
+    AA2COLOR = {
+        aa: plotly.colors.qualitative.Alphabet[idx]
+        for idx, aa in enumerate(AMINO_ACIDS)
+    }
 
     def __init__(
         self,
@@ -179,7 +208,7 @@ class Protein:
         plt.colorbar()
         plt.show()
 
-    def plot_point_cloud(self):
+    def plot_point_cloud(self, aa_as_color: Optional[bool] = False, **kwargs):
         scene = {
             "xaxis": {
                 "title": "x",
@@ -204,20 +233,38 @@ class Protein:
         fig = gobj.Figure()
         fig.update_layout(scene=scene)
 
-        fig.add_trace(
-            gobj.Scatter3d(
-                x=self.coordinates[:, 0],
-                y=self.coordinates[:, 1],
-                z=self.coordinates[:, 2],
-                mode="markers",
-                marker={
-                    "size": 4,
-                    "color": list(range(self.coordinates.shape[0])),
-                    "colorscale": "Viridis",
-                    "opacity": 0.8,
-                },
+        if not aa_as_color:
+            fig.add_trace(
+                gobj.Scatter3d(
+                    x=self.coordinates[:, 0],
+                    y=self.coordinates[:, 1],
+                    z=self.coordinates[:, 2],
+                    mode="markers",
+                    marker={
+                        "size": 4,
+                        "color": list(range(self.coordinates.shape[0])),
+                        "colorscale": "Viridis",
+                        "opacity": 0.8,
+                    },
+                    **kwargs,
+                )
             )
-        )
+        else:
+            fig.add_trace(
+                gobj.Scatter3d(
+                    x=self.coordinates[:, 0],
+                    y=self.coordinates[:, 1],
+                    z=self.coordinates[:, 2],
+                    mode="markers",
+                    marker={
+                        "size": 4,
+                        "color": [self.AA2COLOR[aa] for aa in self.sequence],
+                        # "colorscale": "Viridis",
+                        "opacity": 0.8,
+                    },
+                    **kwargs,
+                )
+            )
         return fig
 
     @staticmethod

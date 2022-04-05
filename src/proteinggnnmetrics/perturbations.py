@@ -219,6 +219,41 @@ class Taper(Perturbation):
         return X
 
 
+class Mutation(Perturbation):
+    def __init__(self, p_mutate, **kwargs):
+        super().__init__(**kwargs)
+        self.p_mutate = p_mutate
+
+    def mutate(self, protein: Protein) -> Protein:
+        seq = protein.sequence
+        nodes_to_mutate = self.random_state.binomial(
+            1, self.p_mutate, size=len(seq)
+        )
+        node_indices_to_mutate = np.where(nodes_to_mutate == 1.0)[0]
+        for node_index in node_indices_to_mutate:
+            # Mutate node label
+            seq[node_index] = self.random_state.choice(AMINO_ACIDS)
+        protein.sequence = seq
+        return protein
+
+    def fit(self, proteins: List[Protein]) -> None:
+        return None
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
+        """Apply perturbation to graph or graph representation"""
+        proteins = distribute_function(
+            self.mutate,
+            proteins,
+            self.n_jobs,
+            "Mutation",
+            show_tqdm=self.verbose,
+        )
+        return proteins
+
+
 # Classes below are adapted from
 # https://github.com/BorgwardtLab/ggme/blob/main/src/perturbations.py
 
@@ -416,42 +451,6 @@ class AddConnectedNodes(GraphPerturbation):
             show_tqdm=self.verbose,
         )
         return X
-
-
-class Mutation(GraphPerturbation):
-    def __init__(self, p_mutate, **kwargs):
-        super().__init__(**kwargs)
-        self.p_mutate = p_mutate
-
-    def mutate(self, protein: Protein) -> Protein:
-        graph = protein.graphs[self.graph_type].copy()
-        nodes_to_mutate = self.random_state.binomial(
-            1, self.p_mutate, size=graph.number_of_nodes()
-        )
-        node_indices_to_mutate = np.where(nodes_to_mutate == 1.0)[0]
-        for node_index in node_indices_to_mutate:
-            node = graph.nodes[node_index]
-            # Mutate node label
-            node["residue"] = self.random_state.choice(AMINO_ACIDS)
-        protein.graphs[self.graph_type] = graph
-        return protein
-
-    def fit(self, proteins: List[Protein]) -> None:
-        return None
-
-    def transform(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
-
-    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
-        """Apply perturbation to graph or graph representation"""
-        proteins = distribute_function(
-            self.mutate,
-            proteins,
-            self.n_jobs,
-            "Mutation",
-            show_tqdm=self.verbose,
-        )
-        return proteins
 
 
 __all__ = [
