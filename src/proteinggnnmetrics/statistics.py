@@ -54,7 +54,7 @@ class MMDTest:
             full_K[: K_XX.shape[0], : K_XX.shape[0]] = K_XX
             full_K[K_XX.shape[0] :, K_XX.shape[0] :] = K_YY
             full_K[: K_XX.shape[0], K_XX.shape[0] :] = K_XY
-
+            full_K[K_XX.shape[0] :, : K_XX.shape[0]] = K_XY.T
             # Sample m elements from the upper triangular matrix of the full
             # data.
             sample_x = np.random.choice(
