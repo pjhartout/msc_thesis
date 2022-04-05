@@ -31,6 +31,8 @@ nx = "^0.0.0"
 black = "^22.3.0"
 hydra-core = "^1.1.1"
 plotly = "^5.6.0"
+imageio = "^2.16.1"
+natsort = "^8.1.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
