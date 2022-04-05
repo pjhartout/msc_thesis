@@ -45,7 +45,7 @@ def main(cfg: DictConfig):
             base_feature_steps, verbose=False
         )
         proteins = base_feature_pipeline.fit_transform(pdb_files[:4])
-        fig = proteins[3].plot_point_cloud()
+        fig = proteins[cfg.imaging.idx_protein_of_interest].plot_point_cloud()
         camera = dict(eye=dict(x=1, y=2, z=1))
         fig.update_layout(scene_camera=camera, title="Gaussian noise")
 
