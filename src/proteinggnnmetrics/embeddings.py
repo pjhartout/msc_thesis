@@ -8,8 +8,10 @@ TODO: check docstrings, citations
 """
 import random
 from abc import ABCMeta
+from argparse import ArgumentError
 from collections import Counter
 from curses.ascii import EM
+from faulthandler import disable
 from typing import Dict, List, Union
 
 import esm
@@ -56,7 +58,7 @@ class Embedding(metaclass=ABCMeta):
         """
         pass
 
-    def transform(self, sequences: List[Protein]) -> List[Protein]:
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
         """Transform the given sequences to embeddings.
 
         Args:
@@ -65,9 +67,9 @@ class Embedding(metaclass=ABCMeta):
         Returns:
             List[Protein]: list of embeddings for each sequence.
         """
-        pass
+        return proteins
 
-    def fit_transform(self, sequences: List[Protein]) -> List[Protein]:
+    def fit_transform(self, proteins: List[Protein]) -> List[Protein]:
         """Fit the embedding to the given sequences and transform them.
 
         Args:
@@ -76,14 +78,15 @@ class Embedding(metaclass=ABCMeta):
         Returns:
             List[Protein]: list of embeddings for each sequence.
         """
-        pass
+        return proteins
 
 
 class ESM(Embedding):
-    EMB_LAYER = 34
+    _size_options = ["M", "XL"]
 
-    def __init__(self, n_jobs, verbose) -> None:
+    def __init__(self, size: str, n_jobs: int, verbose: bool) -> None:
         super().__init__(n_jobs, verbose)
+        self.size = size
 
     def fit(self, sequences: List[Protein], y=None) -> None:
         """Fit the embedding to the given sequences.
@@ -116,19 +119,45 @@ class ESM(Embedding):
         Returns:
             List[Protein]: _description_
         """
-        model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
+        if self.verbose:
+            print("Computing embeddings with ESM...")
+            print("Loading model...")
+        if self.size == "M":
+            model, alphabet = esm.pretrained.esm1_t6_43M_UR50S()
+            repr_layer = 6
+        elif self.size == "XL":
+            model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
+            repr_layer = 33
+        else:
+            raise ArgumentError(
+                message=f"Size must be one of {self._size_options}",
+                argument=None,
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
         # TODO: See if distribution makes sense here.
-        proteins = proteins[:5]
-        sequences = [(protein.name, protein.sequence) for protein in proteins]
+        if self.verbose:
+            print("Getting sequences...")
+        sequences = [
+            (protein.name, protein.sequence)
+            for protein in tqdm(proteins, disable=not self.verbose)
+        ]
         _, _, batch_tokens = batch_converter(sequences)
+        if self.verbose:
+            print("Computing embeddings...")
         with torch.no_grad():
             results = model(
-                batch_tokens, repr_layers=[33], return_contacts=True
+                batch_tokens, repr_layers=[repr_layer], return_contacts=True
             )
-        token_representations = results["representations"][33]
-        for idx, protein in enumerate(proteins):
-            protein.embeddings["esm"] = token_representations[idx]
+        token_representations = results["representations"][repr_layer]
+        if self.verbose:
+            print("Post-processing embeddings...")
+        for idx, protein in tqdm(
+            enumerate(proteins), total=len(proteins), disable=not self.verbose
+        ):
+            protein.embeddings["esm"] = (
+                token_representations[idx].numpy().flatten()
+            )
+            print(protein.embeddings["esm"].shape)
         return proteins
