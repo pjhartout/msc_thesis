@@ -81,8 +81,9 @@ class Protein:
         laplacian_spectrum_histogram=np.array([]),
         path=None,
         phi_psi_angles=np.array([]),
-        verbose=False,
         interatomic_clashes=float,
+        embeddings: Dict = {},
+        verbose=False,
     ):
         # Basic protein descriptors
         self.name = name
@@ -127,6 +128,7 @@ class Protein:
                 # TDA stuff
             },
         }
+        self.embeddings = {"esm": None}
         self.verbose = verbose
 
     def set_nx_graph(self, graph_type: str):

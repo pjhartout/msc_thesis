@@ -142,11 +142,72 @@ class Coordinates:
             granularity (str, optional): [description]. Defaults to "CA".
 
         Returns:
-            List: list of arrays containing the coordinates for each file in fname_list
+            List[Protein]: list of protein objects containing the coordinates
+                for each file in fname_list
         """
 
         proteins = distribute_function(
             self.get_atom_coordinates,
+            fname_list,
+            self.n_jobs,
+            "Extracting coordinates from pdb files",
+            show_tqdm=self.verbose,
+        )
+
+        return proteins
+
+
+class Sequence:
+    def __init__(self, n_jobs: int, verbose: bool = False) -> None:
+        """Initializes Coordinates object
+
+        Args:
+            granularity (str, optional): granularity of the desired set of
+            coordinates. Can be N, CA, C, O, or all. Defaults to "CA".
+            n_jobs (int, optional): [description].
+        """
+        self.n_jobs = n_jobs
+        self.verbose = verbose
+
+    def get_sequence(self, fname: PosixPath) -> Protein:
+        """Extracts the sequence from the pdb file."""
+        parser = PDBParser()
+        structure = parser.get_structure(fname.stem, fname)
+        residues = [
+            r for r in structure.get_residues() if r.get_id()[0] == " "
+        ]
+        protein_name = Path(fname).name.split(".")[0]
+        sequence = list()
+        for residue in residues:
+            name = residue.get_resname()
+            sequence.append(name)
+
+        return Protein(name=protein_name, path=fname, sequence=sequence,)
+
+    def fit(self):
+        """required for sklearn compatibility"""
+        pass
+
+    def transform(self):
+        """required for sklearn compatibility"""
+        pass
+
+    def fit_transform(
+        self, fname_list: List[PosixPath], y=None
+    ) -> List[Protein]:
+        """Transform a set of pdb files to get their associated sequence.
+
+        Args:
+            fname_list (List[PosixPath]): [description]
+            granularity (str, optional): [description]. Defaults to "CA".
+
+        Returns:
+            List: list of arrays containing the sequence for each file in
+                fname_list
+        """
+
+        proteins = distribute_function(
+            self.get_sequence,
             fname_list,
             self.n_jobs,
             "Extracting coordinates from pdb files",
