@@ -739,9 +739,54 @@ Kernel using Wasserstein distance
   }
 #+end_src
 
+
+Some good work on persistent homology on proteins:
+#+begin_src bibtex
+@article{xia2014persistent,
+  title={Persistent homology analysis of protein structure, flexibility, and folding},
+  author={Xia, Kelin and Wei, Guo-Wei},
+  journal={International journal for numerical methods in biomedical engineering},
+  volume={30},
+  number={8},
+  pages={814--844},
+  year={2014},
+  publisher={Wiley Online Library}
+}
+#+end_src
+
+Persistent homology used to analyse protein folding states
+#+begin_src bibtex
+@article{ichinomiya2020protein,
+  title={Protein-folding analysis using features obtained by persistent homology},
+  author={Ichinomiya, Takashi and Obayashi, Ippei and Hiraoka, Yasuaki},
+  journal={Biophysical Journal},
+  volume={118},
+  number={12},
+  pages={2926--2937},
+  year={2020},
+  publisher={Elsevier}
+}
+#+end_src
+
+Reviews different types of PH and applies it to analyze DNA data.
+#+begin_src bibtex
+@article{meng2020weighted,
+  title={Weighted persistent homology for biomolecular data analysis},
+  author={Meng, Zhenyu and Anand, D Vijay and Lu, Yunpeng and Wu, Jie and Xia, Kelin},
+  journal={Scientific reports},
+  volume={10},
+  number={1},
+  pages={1--15},
+  year={2020},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
 Check criteria to be admitted to pdb
 \href{https://www.wwpdb.org/validation/2017/XrayValidationReportHelp}{relative}
 This is all "relative (percentile rank) compared to the rest of the database"
+
+
 
 * References
 #+LaTeX: \printbibliography[heading=none]
