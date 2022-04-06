@@ -41,7 +41,7 @@ def main(cfg: DictConfig):
     spear_corr_name = "Spearman's Correlation Coefficient"
     pears_corr_name = "Pearson's Correlation Coefficient"
     epsilon_name = r"$\varepsilon$"
-    results.columns = [epsilon_name, spear_corr_name, pears_corr_name]
+    results.columns = [epsilon_name, pears_corr_name, spear_corr_name]
 
     results = results.set_index(epsilon_name)
     results = results.reset_index().melt(
