@@ -8,11 +8,11 @@ random:
 data:
   reduce_data: True
 
-paths:
-  multi_run_exp: "data/multi_run_exp"
-
 eps_var:
   n_runs: 10
+  paths:
+    results: "data/eps_var"
+    images: "data/images/eps_var"
 
   eps:
     lower_bound: 4
