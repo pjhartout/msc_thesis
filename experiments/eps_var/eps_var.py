@@ -37,7 +37,7 @@ from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
 def execute_run(cfg, run):
-    os.makedirs(here() / cfg.paths.multi_run_exp / str(run), exist_ok=True)
+    os.makedirs(here() / cfg.eps_var.paths.results / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     for epsilon in tqdm(
@@ -131,7 +131,7 @@ def execute_run(cfg, run):
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
 
-        results.to_csv(here() / cfg.paths.multi_run_exp / str(run) / f"epsilon_{epsilon}.csv")  # type: ignore
+        results.to_csv(here() / cfg.eps_var.paths.results / str(run) / f"epsilon_{epsilon}.csv")  # type: ignore
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values  # type: ignore
         )
@@ -151,7 +151,7 @@ def execute_run(cfg, run):
             ]
         )
     correlations.to_csv(
-        here() / cfg.paths.multi_run_exp / str(run) / f"correlations.csv"
+        here() / cfg.eps_var.paths.results / str(run) / f"correlations.csv"
     )
 
 
@@ -159,7 +159,7 @@ def execute_run(cfg, run):
 @measure_memory
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
 def main(cfg: DictConfig):
-    os.makedirs(here() / cfg.paths.multi_run_exp, exist_ok=True)
+    os.makedirs(here() / cfg.eps_var.paths.results, exist_ok=True)
     with tqdm_joblib(
         tqdm(
             desc="Execute n_runs",

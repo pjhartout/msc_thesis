@@ -36,10 +36,10 @@ def main(cfg: DictConfig):
     df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon", "run"])
     for run in range(cfg.eps_var.n_runs):
         df_run = pd.DataFrame(columns=["mmd", "std", "epsilon"])
-        for fname in os.listdir(here() / cfg.paths.multi_run_exp / str(run)):
+        for fname in os.listdir(here() / cfg.eps_var.paths.results / str(run)):
             if "epsilon" in fname:
                 df = pd.read_csv(
-                    here() / cfg.paths.multi_run_exp / str(run) / fname,
+                    here() / cfg.eps_var.paths.results / str(run) / fname,
                     index_col=0,
                     header=0,
                 )
@@ -74,10 +74,7 @@ def main(cfg: DictConfig):
     print("Saving")
     plt.tight_layout()
     plt.savefig(
-        here()
-        / cfg.paths.multi_run_exp
-        / "plots"
-        / Path("plot_multiple_runs.png")
+        here() / cfg.eps_var.paths.images / Path("plot_multiple_runs.png")
     )
 
 

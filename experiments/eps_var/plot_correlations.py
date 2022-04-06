@@ -36,7 +36,7 @@ mpl.rcParams["axes.unicode_minus"] = False
 def main(cfg: DictConfig):
     # Load the data
     results = pd.read_csv(
-        here() / cfg.paths.experiment / "correlation.csv", index_col=0
+        here() / cfg.eps_var.paths.results / "0/correlations.csv", index_col=0
     )
     spear_corr_name = "Spearman's Correlation Coefficient"
     pears_corr_name = "Pearson's Correlation Coefficient"
@@ -63,7 +63,12 @@ def main(cfg: DictConfig):
     plt.title(f"Correlation coefficient vs {epsilon_name}")
     print("Saving")
     plt.tight_layout()
-    plt.savefig(here() / exp / Path("plot_correlations.png"))
+    plt.savefig(
+        here()
+        / cfg.eps_var.paths.images
+        / "plots"
+        / Path("plot_correlations.png")
+    )
 
 
 if __name__ == "__main__":

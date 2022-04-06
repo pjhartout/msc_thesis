@@ -33,7 +33,7 @@ mpl.rcParams["axes.unicode_minus"] = False
 @hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
 def main(cfg: DictConfig):
     df_plot = pd.DataFrame(columns=["mmd", "std", "epsilon"])
-    for fname in os.listdir(here() / cfg.paths.experiment):
+    for fname in os.listdir(here() / cfg.eps_var.paths.results):
         if "results" in fname:
             exp_run = pd.read_csv(
                 here() / cfg.paths.experiment / fname, index_col=0,
@@ -60,8 +60,7 @@ def main(cfg: DictConfig):
     plt.tight_layout()
     plt.savefig(
         here()
-        / cfg.paths.experiment
-        / "plots"
+        / cfg.eps_var.paths.images
         / Path("plot_multiple_experiments.png")
     )
 
