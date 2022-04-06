@@ -1,3 +1,5 @@
+verbose: True
+
 compute:
   n_jobs: 2
   n_parallel_runs: 10

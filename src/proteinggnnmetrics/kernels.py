@@ -50,9 +50,22 @@ class LinearKernel(Kernel):
         self.normalize = normalize
 
     def compute_gram_matrix(self, X: np.ndarray, Y: np.ndarray = None) -> Any:
-        if self.normalize:
-            return np.dot(X, Y) / np.sqrt(np.dot(X, X) * np.dot(Y, Y))
-        return np.dot(X, Y)
+        if Y is not None:
+            if self.normalize:
+                if X.shape == Y.shape:
+                    return np.dot(X, Y.T) / np.sqrt(
+                        np.dot(X, X.T) * np.dot(Y, Y.T)
+                    )
+                else:
+                    raise ValueError(
+                        "X and Y must have the same shape to normalize"
+                    )
+            return np.dot(X, Y.T)
+        else:
+            K_XX = np.dot(X, X.T)
+            if self.normalize:
+                return K_XX / np.sqrt(K_XX * K_XX)
+            return K_XX
 
 
 class GaussianKernel(Kernel):

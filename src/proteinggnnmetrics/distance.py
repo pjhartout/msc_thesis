@@ -87,7 +87,6 @@ class MaximumMeanDiscrepancy:
             print(f"Kernel: {self.kernel.__class__.__name__}")
             print(f"K_XX min_eig: {positive_eig(K_XX)}")
             print(f"K_YY min_eig: {positive_eig(K_YY)}")
-            print(f"K_XY min_eig: {positive_eig(K_XY)}")
 
         if self.biased:
             k_XX = np.sum(K_XX)
