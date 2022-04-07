@@ -331,7 +331,25 @@ class RachmachandranAngles(Descriptor):
             for idx_poly, poly in enumerate(polypeptides):
                 angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
 
-        protein.phi_psi_angles = flatten_lists(angles.values())
+        phi = np.array(flatten_lists(angles.values()), dtype=object)[
+            :, 0
+        ].astype(float)
+        phi = np.histogram(
+            phi[phi != None],
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )[0]
+        psi = np.array(flatten_lists(angles.values()), dtype=object)[
+            :, 1
+        ].astype(float)
+        psi = np.histogram(
+            psi[psi != None],
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )[0]
+        protein.phi_psi_angles = np.concatenate([phi, psi])
         return protein
 
     def get_angles_from_coordinates(self, protein: Protein) -> Protein:
@@ -364,14 +382,30 @@ class RachmachandranAngles(Descriptor):
             else:
                 psi = None
             phi_psi_angles.append((phi, psi))
-        protein.phi_psi_angles = phi_psi_angles
+        phi = np.histogram(
+            np.array(phi, dtype=object)[:, 0][
+                np.array(phi)[:, 0] != None
+            ].astype(float),
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )
+        psi = np.histogram(
+            np.array(psi, dtype=object)[:, 1][
+                np.array(psi)[:, 1] != None
+            ].astype(float),
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )
+        protein.phi_psi_angles = np.concatenate((phi, psi))
         return protein
 
     def fit(self):
         pass
 
     def transform(self):
-        ...
+        pass
 
     def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Gets the angles from the list of pdb files"""
