@@ -8,6 +8,7 @@ TODO: check docstrings, citations
 """
 
 from abc import ABCMeta
+from ctypes import Union
 from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
@@ -91,10 +92,9 @@ class ClusteringHistogram(Descriptor):
         normalize: bool = True,
         verbose: bool = False,
     ):
+        super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
-        self.n_jobs = n_jobs
         self.normalize = normalize
-        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -133,12 +133,11 @@ class LaplacianSpectrum(Descriptor):
         bin_range: Tuple = (0, 2),
         verbose: bool = False,
     ):
+        super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
         self.n_bins = n_bins
         self.density = density
         self.bin_range = bin_range
-        self.n_jobs = n_jobs
-        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -187,6 +186,7 @@ class TopologicalDescriptor(Descriptor):
         n_jobs: int = None,
         verbose: bool = False,
     ) -> None:
+        super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
         self.epsilon = epsilon
         self.sigma = sigma
@@ -314,11 +314,21 @@ class TopologicalDescriptor(Descriptor):
             return proteins
 
 
-class RachmachandranAngles(Descriptor):
-    def __init__(self, from_pdb: bool, n_jobs: int, verbose: bool) -> None:
+class RamachandranAngles(Descriptor):
+    def __init__(
+        self,
+        from_pdb: bool,
+        n_bins: int,
+        bin_range: Tuple[float, float],
+        n_jobs: int,
+        verbose: bool,
+        density: bool = True,
+    ) -> None:
+        super().__init__(n_jobs, verbose)
         self.from_pdb = from_pdb
-        self.n_jobs = n_jobs
-        self.verbose = verbose
+        self.n_bins = n_bins
+        self.density = density
+        self.bin_range = bin_range
 
     def get_angles_from_pdb(self, protein: Protein) -> Protein:
         """Assumes only one chain"""

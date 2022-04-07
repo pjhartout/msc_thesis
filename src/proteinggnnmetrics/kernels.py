@@ -36,8 +36,9 @@ default_eigvalue_precision = float("-1e-5")
 class Kernel(metaclass=ABCMeta):
     """Defines skeleton of descriptor classes"""
 
-    def __init__(self):
-        pass
+    def __init__(self, n_jobs: int, verbose: bool = False):
+        self.n_jobs = n_jobs
+        self.verbose = verbose
 
     def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
         """Apply transformation to apply kernel to X"""
@@ -45,7 +46,10 @@ class Kernel(metaclass=ABCMeta):
 
 
 class LinearKernel(Kernel):
-    def __init__(self, dense_output: bool = False, normalize: bool = False):
+    def __init__(
+        self, dense_output: bool = False, normalize: bool = False, **kwargs
+    ):
+        super().__init__(**kwargs)
         self.dense_output = dense_output
         self.normalize = normalize
 
@@ -69,8 +73,8 @@ class LinearKernel(Kernel):
 
 
 class GaussianKernel(Kernel):
-    def __init__(self, sigma, precomputed_product):
-        super().__init__()
+    def __init__(self, sigma, precomputed_product, **kwargs):
+        super().__init__(**kwargs)
         self.sigma = sigma
         self.precomputed_product = precomputed_product
 
@@ -85,12 +89,10 @@ class GaussianKernel(Kernel):
 
 
 class WeisfeilerLehmanGrakel(Kernel):
-    def __init__(
-        self, n_jobs: int = 4, n_iter: int = 3, node_label: str = "residue",
-    ):
+    def __init__(self, n_iter: int = 3, node_label: str = "residue", **kwargs):
+        super().__init__(**kwargs)
         self.n_iter = n_iter
         self.node_label = node_label
-        self.n_jobs = n_jobs
 
     def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
         wl_kernel_grakel = WeisfeilerLehman(
@@ -109,18 +111,14 @@ class WeisfeilerLehmanGrakel(Kernel):
 
 class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
     def __init__(
-        self,
-        bandwidth_fisher=1.0,
-        bandwidth=1.0,
-        kernel_approx=None,
-        n_jobs=None,
+        self, bandwidth_fisher=1.0, bandwidth=1.0, kernel_approx=None, **kwargs
     ):
+        super().__init__(**kwargs)
         self.bandwidth = bandwidth
         self.bandwidth_fisher, self.kernel_approx = (
             bandwidth_fisher,
             kernel_approx,
         )
-        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         self.diagrams_ = X
