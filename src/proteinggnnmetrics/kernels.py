@@ -171,3 +171,87 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
                 Ks.append(self.fit_transform(X_diag))
         # We take the average of the kernel matrices in each homology dimension
         return np.average(np.array(Ks), axis=0)
+
+
+class KernelComposition:
+    def __init__(
+        self,
+        kernels: List[Kernel],
+        composition_rule: Union[str, List[str]],
+        kernel2reps: List[int],
+    ):
+        self.kernels = kernels
+        self.composition_rule = composition_rule
+        self.kernel2reps = kernel2reps
+
+    def compute_gram_matrix(self, X_reps: List, Y_reps: List = None) -> Any:
+        """Because this kernel can operate on multiple representations of the data (graphs, embeddings, graph descriptors, sequence data, etc.), we provide an extra argument to the compute_gram_matrix method. This argument is a list that gives the index of the input vector to use with the kernel.
+
+        Example:
+        >>> kernel2reps = [0, 1, 2]
+        >>> X_reps = [X_graphs, X_embeddings, X_graph_descriptors]
+        >>> kernel = KernelComposition([Kernel1, Kernel2, Kernel3], composition_rule="product")
+        >>> kernel.compute_gram_matrix(X_reps, Y_reps, kernel2reps)
+
+        Args:
+            X_reps (List): representations of X
+            Y_reps (List): representations of Y
+            kernel2reps (Dict): index of representations to use
+
+        Raises:
+            ValueError: if supplied inputs are incorrect. See error messages.
+
+        Returns:
+            Any: composed kernel matrix
+        """
+        if Y_reps is None:
+            Y_reps = X_reps
+
+        if len(X_reps) != len(self.kernel2reps) or len(Y_reps) != len(
+            self.kernel2reps
+        ):
+            raise ValueError(
+                "The number of input representations must match the number of kernels."
+            )
+
+        # Compute kernel matrices using kernels
+        K_list = []
+        for idx, kernel in enumerate(self.kernels):
+            K_list.append(
+                kernel.compute_gram_matrix(
+                    X_reps[self.kernel2reps[idx]],
+                    Y_reps[self.kernel2reps[idx]],
+                )
+            )
+
+        # Compute the composition rule
+        if isinstance(self.composition_rule, str):
+            if self.composition_rule == "product":
+                return np.prod(K_list, axis=0)
+            elif self.composition_rule == "sum":
+                return np.sum(K_list, axis=0)
+            else:
+                raise ValueError(
+                    "The composition rule {} is not supported".format(
+                        self.composition_rule
+                    )
+                )
+        elif isinstance(self.composition_rule, list):
+            if len(self.composition_rule) != len(K_list) - 1:
+                raise ValueError(
+                    f"The length of the list of composition rules is incompatible with the number of kernels"
+                )
+            else:
+                K = K_list[0]
+                for k, rule in zip(K_list[1:], self.composition_rule):
+                    if rule == "sum":
+                        K += k
+                    elif rule == "product":
+                        K *= k
+                    else:
+                        raise ValueError(
+                            "The composition rule {} is not supported".format(
+                                rule
+                            )
+                        )
+                return K
