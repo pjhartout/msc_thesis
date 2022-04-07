@@ -8,6 +8,7 @@ TODO: check docstrings, citations
 """
 
 from abc import ABCMeta
+from ctypes import Union
 from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
@@ -91,10 +92,9 @@ class ClusteringHistogram(Descriptor):
         normalize: bool = True,
         verbose: bool = False,
     ):
+        super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
-        self.n_jobs = n_jobs
         self.normalize = normalize
-        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -133,12 +133,11 @@ class LaplacianSpectrum(Descriptor):
         bin_range: Tuple = (0, 2),
         verbose: bool = False,
     ):
+        super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
         self.n_bins = n_bins
         self.density = density
         self.bin_range = bin_range
-        self.n_jobs = n_jobs
-        self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -187,6 +186,7 @@ class TopologicalDescriptor(Descriptor):
         n_jobs: int = None,
         verbose: bool = False,
     ) -> None:
+        super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
         self.epsilon = epsilon
         self.sigma = sigma
@@ -314,11 +314,21 @@ class TopologicalDescriptor(Descriptor):
             return proteins
 
 
-class RachmachandranAngles(Descriptor):
-    def __init__(self, from_pdb: bool, n_jobs: int, verbose: bool) -> None:
+class RamachandranAngles(Descriptor):
+    def __init__(
+        self,
+        from_pdb: bool,
+        n_bins: int,
+        bin_range: Tuple[float, float],
+        n_jobs: int,
+        verbose: bool,
+        density: bool = True,
+    ) -> None:
+        super().__init__(n_jobs, verbose)
         self.from_pdb = from_pdb
-        self.n_jobs = n_jobs
-        self.verbose = verbose
+        self.n_bins = n_bins
+        self.density = density
+        self.bin_range = bin_range
 
     def get_angles_from_pdb(self, protein: Protein) -> Protein:
         """Assumes only one chain"""
@@ -331,7 +341,25 @@ class RachmachandranAngles(Descriptor):
             for idx_poly, poly in enumerate(polypeptides):
                 angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
 
-        protein.phi_psi_angles = flatten_lists(angles.values())
+        phi = np.array(flatten_lists(angles.values()), dtype=object)[
+            :, 0
+        ].astype(float)
+        phi = np.histogram(
+            phi[phi != None],
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )[0]
+        psi = np.array(flatten_lists(angles.values()), dtype=object)[
+            :, 1
+        ].astype(float)
+        psi = np.histogram(
+            psi[psi != None],
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )[0]
+        protein.phi_psi_angles = np.concatenate([phi, psi])
         return protein
 
     def get_angles_from_coordinates(self, protein: Protein) -> Protein:
@@ -364,14 +392,30 @@ class RachmachandranAngles(Descriptor):
             else:
                 psi = None
             phi_psi_angles.append((phi, psi))
-        protein.phi_psi_angles = phi_psi_angles
+        phi = np.histogram(
+            np.array(phi, dtype=object)[:, 0][
+                np.array(phi)[:, 0] != None
+            ].astype(float),
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )
+        psi = np.histogram(
+            np.array(psi, dtype=object)[:, 1][
+                np.array(psi)[:, 1] != None
+            ].astype(float),
+            bins=self.n_bins,
+            density=self.density,
+            range=self.bin_range,
+        )
+        protein.phi_psi_angles = np.concatenate((phi, psi))
         return protein
 
     def fit(self):
         pass
 
     def transform(self):
-        ...
+        pass
 
     def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Gets the angles from the list of pdb files"""

@@ -7,7 +7,7 @@ Test out Rachmachandran angles extraction.
 
 """
 
-from proteinggnnmetrics.descriptors import RachmachandranAngles
+from proteinggnnmetrics.descriptors import RamachandranAngles
 from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
@@ -28,7 +28,7 @@ def main():
     proteins = Coordinates(
         granularity="CA", n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(pdb_files)
-    proteins = RachmachandranAngles(
+    proteins = RamachandranAngles(
         from_pdb=True, n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(proteins)
     print(proteins[0].name)
@@ -38,7 +38,7 @@ def main():
     proteins = Coordinates(
         granularity="backbone", n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(pdb_files)
-    proteins = RachmachandranAngles(
+    proteins = RamachandranAngles(
         from_pdb=False, n_jobs=N_JOBS, verbose=VERBOSE
     ).fit_transform(proteins)
     print(proteins[0].name)
