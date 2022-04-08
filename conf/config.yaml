@@ -13,8 +13,8 @@ data:
 eps_var:
   n_runs: 10
   paths:
-    results: "data/eps_var"
-    images: "data/images/eps_var"
+    results: "data/experiments/eps_var"
+    images: "data/images/experiments/eps_var"
 
   eps:
     lower_bound: 4
