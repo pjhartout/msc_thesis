@@ -1,3 +1,5 @@
 defaults:
   - compute: compute
   - experiments: exp_1
+  - imaging: imaging
+  - seeding: seeding
