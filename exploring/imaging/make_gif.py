@@ -86,7 +86,7 @@ def build_mutation(cfg: DictConfig):
     imageio.mimsave(here() / cfg.imaging.gifs / "mutation.gif", images)
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
 def main(cfg: DictConfig):
     build_gaussian(cfg)
     build_twist(cfg)
