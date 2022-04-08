@@ -1,0 +1,174 @@
+%Metroplolis Beamer Theme: https://github.com/matze/mtheme
+\documentclass[aspectratio=169, 10pt, dvipsnames]{beamer}
+\usetheme{metropolis}
+\usepackage{appendixnumberbeamer, lmodern, bookmark,fontawesome}
+\usepackage{booktabs}
+% \usepackage[sorting=none]{biblatex}
+\usepackage[scale=2]{ccicons}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+\usepackage{bbm}
+\usepackage{tikz, graphicx}
+\usepackage{caption}
+\usepackage{multicol}
+% \usepackage[dvipsnames]{xcolor}
+\usepackage{animate}
+\usepackage{scalerel,xparse}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[style=british]{csquotes}
+
+\newcommand*\colourcheck[1]{%
+  \expandafter\newcommand\csname #1check\endcsname{\textcolor{#1}{\ding{52}}}%
+}
+\colourcheck{blue}
+
+\title{Progress update}
+% \subtitle{Lab Update}
+\date{\today}
+\author{Philip Hartout}
+
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=orange,
+  filecolor=orange,
+  urlcolor=orange,
+}
+
+\def\signed #1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip1em
+  \hbox{}\nobreak\hfill #1%
+  \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+
+\newsavebox\mybox
+\newenvironment{aquote}[1]
+  {\savebox\mybox{#1}\begin{quote}\openautoquote\hspace*{-.7ex}}
+  {\unskip\closeautoquote\vspace*{1mm}\signed{\usebox\mybox}\end{quote}}
+
+\titlegraphic{%
+  \includegraphics[width=.2\textwidth]{figures/mlcb-transparent.png}\hfill
+  \includegraphics[width=.2\textwidth]{figures/dbsse-transparent.png}\hfill
+  \includegraphics[width=.2\textwidth]{figures/eth-transparent.png}
+}
+
+\makeatletter
+\setbeamertemplate{title page}{
+  \begin{minipage}[b][\paperheight]{\textwidth}
+    \vfill%
+    \ifx\inserttitle\@empty\else\usebeamertemplate*{title}\fi
+    \ifx\insertsubtitle\@empty\else\usebeamertemplate*{subtitle}\fi
+    \usebeamertemplate*{title separator}
+    \ifx\beamer@shortauthor\@empty\else\usebeamertemplate*{author}\fi
+    \ifx\insertdate\@empty\else\usebeamertemplate*{date}\fi
+    \ifx\insertinstitute\@empty\else\usebeamertemplate*{institute}\fi
+    \vfill
+    \ifx\inserttitlegraphic\@empty\else\inserttitlegraphic\fi
+    \vspace*{1cm}
+  \end{minipage}
+}
+\makeatother
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{orangebox} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.5cm, draw=black, fill=orange!40]
+\tikzstyle{bluebox} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.5cm, draw=black, fill=blue!40]
+
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{frame}[fragile]{Overview}
+  \begin{itemize}
+  \item Recap of things done last week
+  \item Points of discussion
+  \item Next steps
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Laundry list}
+  \begin{itemize}
+  \item MMD test check
+  \pause
+\item W-L kernel positive semidefiniteness
+  \pause
+\item Geometric perturbations
+  \pause
+\item Experiments with error bars
+  \pause
+\item Add ESM embedding as feature (w/ Linear kernel it's PSD)
+  \pause
+\item Kernel composition
+  \pause
+\item Sliding window of hydrophobicity + other embeddings
+  \pause
+\item misc: log architecture improvements to accomodate multiple experiments,
+  see commit log (especially PRs) for overview of what's going on.
+  \pause
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple experiments with error bars}
+  \begin{figure}%
+    \centering
+    \includegraphics[width=.7\textwidth]{./figures/plot_multiple_runs.png}
+    \caption{Multiple runs of last week's plot -- 100\% confidence interval
+      over 10 runs.}%
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Twisting a protein}
+  \begin{figure}
+    \centering
+    \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/twist/protein_straight_}{0}{99}
+    \caption{Twisting a protein}
+    \label{fig:twist}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{To discuss}
+  \begin{itemize}
+  \item Find a way to encode transmembrane domains of $\approx18-21$ AAs long.
+  \item Taken care of to some extent by ESM
+  \item Sliding window of some sort?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Next steps}
+  \begin{itemize}
+  \item Experimentation with real-world settings
+    \pause
+  \item My ``picks'':
+    \begin{itemize}
+    \item ``Benchmarks?'' Graph kernels with graph perturbations.
+    \item Look at protein families and see if kernels/parameters can distinguish
+      between them
+    \item Geometric alterations to demonstrate power of TDA. Is it useful to
+      compare one set with itself, but perturbed? Why not? Argument for it:
+      shows metric behaviour in controlled environment
+    \item Mutations to test power of ESM
+    \item Compose perturbations and kernels
+    \end{itemize}
+    \pause
+  \item Any other feature requests for the library?
+    \pause
+  \item Suggestions of experiments to do first?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+
+  \bibliography{../../thesis/refs.bib}
+  \bibliographystyle{abbrv}
+
+\end{frame}
+
+\end{document}

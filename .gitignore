@@ -1,6 +1,8 @@
 ### Project-specific ignored directories ###
 data/
 docs/literature/
+docs/update_3/figures/twist/
+docs/update_3/update.pdf
 # Hide hydra output directories
 outputs
 
