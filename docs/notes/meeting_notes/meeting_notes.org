@@ -19,6 +19,24 @@
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
+* TODO <2022-04-08 Fri> Meeting with Tim
+** ESM1v
+** Epsilon value from literature
+** Empirical work to see which amino acids interact/make contacts
+** avg number of partners and distance required for interactions
+** parameters to "checkout"
+*** data parameters: k + epsilon (avg biologically +- 50%)
+*** perturbations; mutation, twist, graph
+*** descriptors: TDA, graph (degree), ESM, Ramachandran
+*** kernels: W-L, Linear, Gaussian, TDA
+*** parameters of kernels? n_iters for WL, Gaussian (gamma), TDA parameters
+**** for gamma: express gamma as function of median eucledian distance between all representations within the unperturbed set
+*** screen sample size as parameter
+*** 6*3*4*4+6+3
+*** subets of data (E-coli vs Human, Go by localization (membrane, cytoplasm, mitochondria...)), low priority
+*** sample for error bar
+*** on 100 CPU cores, should be doable
+** account for intra sample variance, so two different family (kernel needs to pick up perturbation on other unseen proteins)
 * TODO <2022-03-25 Fri> Meeting with Tim
 ** discuss min eigenvalues
 ** discuss min graph edit distance with halting
