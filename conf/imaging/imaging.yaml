@@ -1,0 +1,8 @@
+protein_of_interest: 3
+images: "data/images"
+gifs: "data/images/perturbation_illustration/gifs"
+gaussian_noise_path: "data/images/perturbation_illustration/gaussian_noise"
+twist_path: "data/images/perturbation_illustration/twist"
+shear_path: "data/images/perturbation_illustration/shear"
+taper_path: "data/images/perturbation_illustration/taper"
+mutation_path: "data/images/perturbation_illustration/mutation"

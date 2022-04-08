@@ -21,7 +21,7 @@ from proteinggnnmetrics.perturbations import GaussianNoise, Shear, Taper, Twist
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
 def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     for i in tqdm(range(0, 50)):
@@ -45,10 +45,18 @@ def main(cfg: DictConfig):
             base_feature_steps, verbose=False
         )
         proteins = base_feature_pipeline.fit_transform(pdb_files[:4])
-        fig = proteins[cfg.imaging.idx_protein_of_interest].plot_point_cloud()
+        fig = proteins[cfg.imaging.protein_of_interest].plot_point_cloud()
         camera = dict(eye=dict(x=1, y=2, z=1))
         fig.update_layout(scene_camera=camera, title="Gaussian noise")
-
+        fig.update_layout(
+            scene=dict(
+                xaxis=dict(range=[-120, 100],),
+                yaxis=dict(range=[-60, 60],),
+                zaxis=dict(range=[-120, 120],),
+                aspectmode="manual",
+                aspectratio=dict(x=1, y=0.5, z=1),
+            ),
+        )
         fig.write_image(
             here()
             / cfg.imaging.gaussian_noise_path
