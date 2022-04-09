@@ -786,6 +786,42 @@ Check criteria to be admitted to pdb
 \href{https://www.wwpdb.org/validation/2017/XrayValidationReportHelp}{relative}
 This is all "relative (percentile rank) compared to the rest of the database"
 
+* Matrix of experiments to perform
+| Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
+| --               | twist         | tda          | persistence fisher | human    |         100 |
+| --               | twist         | ramachandran | linear             | human    |         100 |
+| --               | mutation      | esm          | linear             | human    |         100 |
+| eps              | rewire        | degree       | linear             | human    |         100 |
+| eps              | rewire        | degree       | gaussian           | human    |         100 |
+| eps              | twist         | degree       | linear             | human    |         100 |
+| eps              | twist         | degree       | gaussian           | human    |         100 |
+| k-nn             | rewire        | degree       | linear             | human    |         100 |
+| k-nn             | rewire        | degree       | gaussian           | human    |         100 |
+| k-nn             | twist         | degree       | linear             | human    |         100 |
+| k-nn             | twist         | degree       | gaussian           | human    |         100 |
+| eps              | twist         | --           | w-l                | human    |         100 |
+| eps              | shear         | --           | w-l                | human    |         100 |
+| eps              | rewire        | --           | w-l                | human    |         100 |
+| k-nn             | twist         | --           | w-l                | human    |         100 |
+| k-nn             | shear         | --           | w-l                | human    |         100 |
+| k-nn             | rewire        | --           | w-l                | human    |         100 |
+| --               | twist         | tda          | persistence fisher | ecoli    |         100 |
+| --               | twist         | ramachandran | linear             | ecoli    |         100 |
+| --               | mutation      | esm          | linear             | ecoli    |         100 |
+| eps              | rewire        | degree       | linear             | ecoli    |         100 |
+| eps              | rewire        | degree       | gaussian           | ecoli    |         100 |
+| eps              | twist         | degree       | linear             | ecoli    |         100 |
+| eps              | twist         | degree       | gaussian           | ecoli    |         100 |
+| k-nn             | rewire        | degree       | linear             | ecoli    |         100 |
+| k-nn             | rewire        | degree       | gaussian           | ecoli    |         100 |
+| k-nn             | twist         | degree       | linear             | ecoli    |         100 |
+| k-nn             | twist         | degree       | gaussian           | ecoli    |         100 |
+| eps              | twist         | --           | w-l                | ecoli    |         100 |
+| eps              | shear         | --           | w-l                | ecoli    |         100 |
+| eps              | rewire        | --           | w-l                | ecoli    |         100 |
+| k-nn             | twist         | --           | w-l                | ecoli    |         100 |
+| k-nn             | shear         | --           | w-l                | ecoli    |         100 |
+| k-nn             | rewire        | --           | w-l                | ecoli    |         100 |
 
 
 * References
