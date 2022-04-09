@@ -17,6 +17,16 @@ perturbations:
     min: 0
     max: 0.1
     step: 0.02
+  mutation:
+    p_mut:
+      min: 0
+      max: 0.8
+      step: 0.1
+  graph:
+    rewire:
+      min: 0
+      max: 0.8
+      step: 0.1
 
 descriptors:
   degree_histogram:

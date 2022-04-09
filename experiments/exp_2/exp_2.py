@@ -36,7 +36,7 @@ from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
 def main(cfg: DictConfig):
-    print(OmegaConf.to_yaml(cfg))
+    print(cfg.gridsearch.data.organisms)
 
 
 if __name__ == "__main__":
