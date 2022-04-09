@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""eps_var.py
+"""exp_2.py
 
 The goal of this experiment is to see how the choice of epsilon affects the
 behaviour of MMD.
