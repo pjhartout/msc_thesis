@@ -1,0 +1,76 @@
+description: "Test out all combinations of parameters"
+
+n_runs: 10
+
+graphs:
+  eps:
+    min: 4
+    max: 16
+    step: 4
+  k:
+    min: 2
+    max: 6
+    step: 2
+
+perturbations:
+  twist:
+    min: 0
+    max: 0.1
+    step: 0.02
+  mutation:
+    p_mut:
+      min: 0
+      max: 0.8
+      step: 0.1
+  graph:
+    rewire:
+      min: 0
+      max: 0.8
+      step: 0.1
+
+descriptors:
+  degree_histogram:
+    n_bins: 30
+
+  tda:
+    epsilon:
+      cst: 0.01
+      min: 0.01
+      max: 0.5
+      step: 0.1
+
+  ramachandran:
+    n_bins: 30
+    bin_range:
+      low: -3.15
+      high: 3.15
+
+  esm:
+    size: "M"
+
+kernels:
+  wl:
+    n_iter:
+      min: 2
+      max: 6
+      step: 2
+
+  gaussian:
+    gamma:
+      min: 1
+      max: 10
+      step: 5
+
+  fisher:
+    bandwidth_fisher:
+      min: 1
+      max: 3
+      step: 1
+
+    bandwidth:
+      min: 1
+      max: 3
+      step: 1
+
+data:
+  organisms: ["human", "ecoli"]
