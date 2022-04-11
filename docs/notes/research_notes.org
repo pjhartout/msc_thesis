@@ -786,6 +786,17 @@ Check criteria to be admitted to pdb
 \href{https://www.wwpdb.org/validation/2017/XrayValidationReportHelp}{relative}
 This is all "relative (percentile rank) compared to the rest of the database"
 
+
+Good review of kernels, applications and other theoretical considerations
+#+begin_src bibtex
+@article{ghojogh2021reproducing,
+  title={Reproducing Kernel Hilbert Space, Mercer's Theorem, Eigenfunctions, Nystr$\backslash$" om Method, and Use of Kernels in Machine Learning: Tutorial and Survey},
+  author={Ghojogh, Benyamin and Ghodsi, Ali and Karray, Fakhri and Crowley, Mark},
+  journal={arXiv preprint arXiv:2106.08443},
+  year={2021}
+}
+#+end_src
+
 * Matrix of experiments to perform
 | Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
 | --               | twist         | tda          | persistence fisher | human    |         100 |
@@ -822,6 +833,8 @@ This is all "relative (percentile rank) compared to the rest of the database"
 | k-nn             | twist         | --           | w-l                | ecoli    |         100 |
 | k-nn             | shear         | --           | w-l                | ecoli    |         100 |
 | k-nn             | rewire        | --           | w-l                | ecoli    |         100 |
+
+
 
 
 * References
