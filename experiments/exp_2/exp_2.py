@@ -33,7 +33,7 @@ from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise, Twist
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
+from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
 from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
@@ -48,7 +48,13 @@ def main(cfg: DictConfig):
             "coordinates",
             Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
-        ("contact map", ContactMap(n_jobs=cfg.compute.n_jobs,),),
+        (
+            "contact map",
+            ContactMap(
+                n_jobs=cfg.compute.n_jobs,
+            ),
+        ),
+        ("sample", SamplePoints(frac=0.08)),
         (
             "tda",
             TopologicalDescriptor(
@@ -58,26 +64,26 @@ def main(cfg: DictConfig):
                 order=2,
                 n_jobs=cfg.compute.n_jobs,
                 landscape_layers=1,
+                verbose=cfg.debug.verbose,
             ),
         ),
     ]
 
     base_feature_pipeline = pipeline.Pipeline(
-        base_feature_steps, verbose=False
+        base_feature_steps, verbose=cfg.debug.verbose
     )
-    print("Fit unperturbed")
     proteins = base_feature_pipeline.fit_transform(
         pdb_files[
             cfg.experiments.proteins.not_perturbed.lower_bound : cfg.experiments.proteins.not_perturbed.upper_bound
             + 1
         ]
     )
-
+    results = list()
     for twist in tqdm(
         np.arange(
-            cfg.perturbations.twist.min,
-            cfg.perturbations.twist.max,
-            cfg.perturbations.twist.step,
+            cfg.experiments.perturbations.twist.min,
+            cfg.experiments.perturbations.twist.max,
+            cfg.experiments.perturbations.twist.step,
         ),
         position=1,
         leave=False,
@@ -85,7 +91,7 @@ def main(cfg: DictConfig):
     ):
         perturb_feature_steps = flatten_lists(
             [
-                base_feature_steps[:2]
+                base_feature_steps[:3]
                 + [
                     (
                         "twist",
@@ -93,19 +99,19 @@ def main(cfg: DictConfig):
                             alpha=twist,
                             random_state=42,
                             n_jobs=cfg.compute.n_jobs,
-                            verbose=False,
+                            verbose=cfg.debug.verbose,
                         ),
                     )
                 ]
-                + base_feature_steps[2:]
+                + base_feature_steps[3:]
             ]
         )
         perturb_feature_pipeline = pipeline.Pipeline(
-            base_feature_steps, verbose=False
+            base_feature_steps, verbose=cfg.debug.verbose
         )
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
             pdb_files[
-                cfg.eps_var.proteins.perturbed.lower_bound : cfg.eps_var.proteins.perturbed.upper_bound
+                cfg.experiments.proteins.perturbed.lower_bound : cfg.experiments.proteins.perturbed.upper_bound
                 + 1
             ]
         )
@@ -118,12 +124,16 @@ def main(cfg: DictConfig):
             protein.descriptors["contact_graph"]["diagram"]
             for protein in proteins_perturbed
         ]
-        # mmd = MaximumMeanDiscrepancy(
-        #     biased=True,
-        #     squared=True,
-        #     kernel=PersistenceFisherKernel(),  # type: ignore
-        # ).compute(graphs, graphs_perturbed)
-        # results.append({"mmd": mmd, "std": std})
+        kernel = PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs)
+        res = kernel.compute_gram_matrix(
+            np.array(diagrams), np.array(diagrams_perturbed)
+        )
+        mmd = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+        ).compute(diagrams, diagrams_perturbed)
+        results.append({"mmd": mmd, "twist": twist})
 
 
 if __name__ == "__main__":
