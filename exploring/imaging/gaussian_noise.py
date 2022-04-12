@@ -50,9 +50,15 @@ def main(cfg: DictConfig):
         fig.update_layout(scene_camera=camera, title="Gaussian noise")
         fig.update_layout(
             scene=dict(
-                xaxis=dict(range=[-120, 100],),
-                yaxis=dict(range=[-60, 60],),
-                zaxis=dict(range=[-120, 120],),
+                xaxis=dict(
+                    range=[-120, 100],
+                ),
+                yaxis=dict(
+                    range=[-60, 60],
+                ),
+                zaxis=dict(
+                    range=[-120, 120],
+                ),
                 aspectmode="manual",
                 aspectratio=dict(x=1, y=0.5, z=1),
             ),

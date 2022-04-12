@@ -57,7 +57,10 @@ def execute_run(cfg, run):
             ),
             (
                 "contact map",
-                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
+                ContactMap(
+                    metric="euclidean",
+                    n_jobs=cfg.compute.n_jobs,
+                ),
             ),
             (
                 "epsilon graph",

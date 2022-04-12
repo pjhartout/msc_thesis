@@ -65,7 +65,10 @@ class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
     def __init__(
-        self, noise_mean: float, noise_variance: float, **kwargs,
+        self,
+        noise_mean: float,
+        noise_variance: float,
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean

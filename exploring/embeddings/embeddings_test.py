@@ -29,7 +29,10 @@ def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     feat_pipeline = pipeline.Pipeline(
         [
-            ("sequence", Sequence(n_jobs=cfg.compute.n_jobs),),
+            (
+                "sequence",
+                Sequence(n_jobs=cfg.compute.n_jobs),
+            ),
             (
                 "esm",
                 ESM(size="M", n_jobs=cfg.compute.n_jobs, verbose=cfg.verbose),

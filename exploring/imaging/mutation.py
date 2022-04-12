@@ -32,7 +32,8 @@ from proteinggnnmetrics.utils.debug import measure_memory, timeit
 def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     for idx, i in tqdm(
-        enumerate(np.arange(0, 1, 0.01)), total=len(np.arange(0, 1, 0.01)),
+        enumerate(np.arange(0, 1, 0.01)),
+        total=len(np.arange(0, 1, 0.01)),
     ):
         base_feature_steps = [
             (
