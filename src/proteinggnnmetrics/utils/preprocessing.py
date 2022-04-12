@@ -35,7 +35,6 @@ class Padding(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         self.max_pts = max([len(diag) for diag in X])
-        return self
 
     def transform(self, X):
         """
