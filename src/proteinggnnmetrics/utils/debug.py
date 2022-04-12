@@ -26,13 +26,13 @@ class SamplePoints:
 
     """
 
-    def __init__(self, frac: float):
+    def __init__(self, n_points: float):
         """__init__ method
 
         Args:
             frac (int): number of points to sample
         """
-        self.frac = frac
+        self.n_points = n_points
 
     def fit(self, X, y=None):
         """fit method"""
@@ -45,9 +45,7 @@ class SamplePoints:
     def fit_transform(self, X: List[Protein], y=None):
         """fit_transform method"""
         for protein in X:
-            protein.coordinates = protein.coordinates[
-                : int(self.frac * len(protein.coordinates))
-            ]
+            protein.coordinates = protein.coordinates[: self.n_points]
         return X
 
 

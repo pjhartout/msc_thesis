@@ -196,15 +196,16 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.base_data_pipeline = [
+        self.base_tda_pipeline = [
             (
                 "diagram",
                 homology.VietorisRipsPersistence(
                     n_jobs=self.n_jobs,
-                    metric="precomputed",
                     homology_dimensions=self.homology_dimensions,
                 ),
-            ),
+            )
+        ]
+        self.tda_pipeline = [
             ("filter", diagrams.Filtering(epsilon=self.epsilon)),
             ("rescaler", diagrams.Scaler()),
         ]
@@ -219,7 +220,7 @@ class TopologicalDescriptor(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
 
         if self.tda_descriptor_type == "diagram":
-            self.tda_pipeline = self.base_data_pipeline
+            self.tda_pipeline = self.base_tda_pipeline
 
         elif self.tda_descriptor_type == "landscape":
             self.tda_pipeline.extend(
@@ -287,34 +288,29 @@ class TopologicalDescriptor(Descriptor):
                 'Wrong TDA pipeline specified, should be one of ["diagram", "landscape", "betti", "image"]'
             )
 
-        # Start executing pipeline
-        contact_maps = [protein.contact_map for protein in proteins]
-
-        diagrams = self.tda_pipeline[0][1].fit_transform(contact_maps)
-
+        coordinates = [protein.coordinates for protein in proteins]
+        diagram_data = pipeline.Pipeline(
+            self.base_tda_pipeline, verbose=True
+        ).fit_transform(coordinates)
         if self.tda_descriptor_type != "diagram":
-            features = pipeline.Pipeline(
-                self.tda_pipeline[1:], verbose=True
-            ).fit_transform(contact_maps)
+            tda_descriptors = pipeline.Pipeline(
+                self.tda_pipeline, verbose=self.verbose
+            ).fit_transform(diagram_data)
 
-        if self.tda_descriptor_type == "diagram":
-            for protein, diagram in zip(proteins, diagrams):
-                protein.descriptors["contact_graph"]["diagram"] = diagram
-
-        else:
-            descriptors = pipeline.Pipeline(
-                self.tda_pipeline[1:], verbose=True
-            ).fit_transform(diagrams)
-
-            for protein, diagram, descriptor in zip(
-                proteins, diagrams, descriptors
+            for protein, diagram, tda_descriptor in zip(
+                proteins, diagram_data, tda_descriptors
             ):
                 protein.descriptors["contact_graph"][
                     self.tda_descriptor_type
-                ] = descriptor
+                ] = tda_descriptor
                 protein.descriptors["contact_graph"]["diagram"] = diagram
 
-        return proteins
+            return proteins
+        else:
+            for protein, diagram in zip(proteins, diagram_data):
+                protein.descriptors["contact_graph"]["diagram"] = diagram
+
+            return proteins
 
 
 class RamachandranAngles(Descriptor):

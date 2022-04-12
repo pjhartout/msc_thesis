@@ -164,24 +164,16 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         Ks = list()
         for homology_dimension in X[0]["dim"].unique():
             # Get the diagrams for the homology dimension
-            X_dim = filter_dimension(X, homology_dimension)
+            X_diag = filter_dimension(X, homology_dimension)
             # X_diag = Padding(use=True).fit_transform(X_diag)
             if Y is not None:
-                Y_dim = filter_dimension(Y, homology_dimension)
+                Y_diag = filter_dimension(Y, homology_dimension)
                 # Y_diag = Padding(use=True).fit_transform(Y_diag)
-            padding = Padding(use=True)
-            if Y_dim is not None:
-                total = X_dim + Y_dim
-                padding.fit(total)
-                X_dim = padding.transform(X_dim)
-                Y_dim = padding.transform(Y_dim)
-            else:
-                padding.fit(X_dim).transform(X_dim)
 
             if Y is not None:
-                Ks.append(self.fit(X_dim).transform(Y_dim))
+                Ks.append(self.fit(X_diag).transform(Y_diag))
             else:
-                Ks.append(self.fit_transform(X_dim))
+                Ks.append(self.fit_transform(X_diag))
         # We take the average of the kernel matrices in each homology dimension
         return np.average(np.array(Ks), axis=0)
 
