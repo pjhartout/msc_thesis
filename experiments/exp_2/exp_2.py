@@ -8,6 +8,7 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 """
 
 import os
+import pickle
 
 import hydra
 import numpy as np
@@ -54,7 +55,7 @@ def main(cfg: DictConfig):
                 n_jobs=cfg.compute.n_jobs,
             ),
         ),
-        ("sample", SamplePoints(frac=0.08)),
+        ("sample", SamplePoints(n_points=100)),
         (
             "tda",
             TopologicalDescriptor(
@@ -124,6 +125,7 @@ def main(cfg: DictConfig):
             protein.descriptors["contact_graph"]["diagram"]
             for protein in proteins_perturbed
         ]
+
         kernel = PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs)
         res = kernel.compute_gram_matrix(
             np.array(diagrams), np.array(diagrams_perturbed)
