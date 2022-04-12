@@ -3,3 +3,4 @@ defaults:
   - experiments: exp_2
   - variables: variables
   - seeding: seeding
+  - debug: debug
