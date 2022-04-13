@@ -5,17 +5,17 @@ results: "data/experiments/tda_twist"
 proteins:
   not_perturbed:
     lower_bound: 0
-    upper_bound: 10
+    upper_bound: 100
 
   perturbed:
-    lower_bound: 11
-    upper_bound: 16
+    lower_bound: 101
+    upper_bound: 200
 
 perturbations:
   twist:
     min: 0
     max: 0.1
-    step: 0.04
+    step: 0.01
 
 
 descriptors:
