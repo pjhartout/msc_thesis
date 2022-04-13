@@ -1,10 +1,52 @@
 # -*- coding: utf-8 -*-
+
+"""debug.py
+
+This file provides some functions useful for debugging.
+
+
+"""
+
 import functools
 import time
 import tracemalloc
-from typing import Callable
+from typing import Callable, List
 
+import numpy as np
+
+from ..protein import Protein
 from .colors import bcolors
+
+
+class SamplePoints:
+    """SamplePoints class
+
+    This class is used to sample points from a given point cloud.
+    This accelerates processing during debugging
+
+    """
+
+    def __init__(self, n: float):
+        """__init__ method
+
+        Args:
+            frac (int): number of points to sample
+        """
+        self.n = n
+
+    def fit(self, X, y=None):
+        """fit method"""
+        pass
+
+    def transform(self, X):
+        """transform method"""
+        return X
+
+    def fit_transform(self, X: List[Protein], y=None):
+        """fit_transform method"""
+        for protein in X:
+            protein.coordinates = protein.coordinates[:: self.n]
+        return X
 
 
 def timeit(func: Callable) -> Callable:

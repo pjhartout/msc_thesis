@@ -35,11 +35,11 @@ from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 
 
-@hydra.main(config_path=str(here()) + "/conf", config_name="config.yaml")
+@hydra.main(config_path=str(here()) + "/conf", config_name="conf")
 def main(cfg: DictConfig):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
 
-    if cfg.data.reduce_data:
+    if cfg.debug.reduce_data:
         pdb_files = random.sample(pdb_files, 100)
 
     half = int(len(pdb_files) / 2)
@@ -73,15 +73,15 @@ def main(cfg: DictConfig):
 
     feature_pipeline = pipeline.Pipeline(feature_pipeline, verbose=100)
 
-    # protein_dist_1 = feature_pipeline.fit_transform(pdb_files[:10])
-    # protein_dist_2 = feature_pipeline.fit_transform(pdb_files[10:20])
+    protein_dist_1 = feature_pipeline.fit_transform(pdb_files[:2])
+    protein_dist_2 = feature_pipeline.fit_transform(pdb_files[3:5])
 
-    # # Save the feature pipeline
-    # with open(CACHE_DIR / "protein_dist_1.pkl", "wb") as f:
-    #     pickle.dump(protein_dist_1, f)
+    # Save the feature pipeline
+    with open(CACHE_DIR / "protein_dist_1.pkl", "wb") as f:
+        pickle.dump(protein_dist_1, f)
 
-    # with open(CACHE_DIR / "protein_dist_2.pkl", "wb") as f:
-    #     pickle.dump(protein_dist_2, f)
+    with open(CACHE_DIR / "protein_dist_2.pkl", "wb") as f:
+        pickle.dump(protein_dist_2, f)
 
     # Caching to accelerate debugging
     # Save protein_dist_1 and protein_dist_2

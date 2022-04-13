@@ -178,7 +178,7 @@ class TopologicalDescriptor(Descriptor):
         tda_descriptor_type: str,
         epsilon: float,
         n_bins: int,
-        homology_dimensions: Tuple[int] = (1, 2, 3),
+        homology_dimensions: Tuple[int] = (0, 1, 2),
         order: int = 1,
         sigma: float = 0.01,
         weight_function: Callable = None,
@@ -196,19 +196,14 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.base_tda_pipeline = [
+        self.base_tda_steps = [
             (
                 "diagram",
                 homology.VietorisRipsPersistence(
                     n_jobs=self.n_jobs,
-                    metric="precomputed",
                     homology_dimensions=self.homology_dimensions,
                 ),
             )
-        ]
-        self.tda_pipeline = [
-            ("filter", diagrams.Filtering(epsilon=self.epsilon)),
-            ("rescaler", diagrams.Scaler()),
         ]
         self.verbose = verbose
 
@@ -221,10 +216,10 @@ class TopologicalDescriptor(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
 
         if self.tda_descriptor_type == "diagram":
-            self.tda_pipeline = self.base_tda_pipeline
+            pass
 
         elif self.tda_descriptor_type == "landscape":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "landscape",
@@ -242,7 +237,7 @@ class TopologicalDescriptor(Descriptor):
             )
 
         elif self.tda_descriptor_type == "betti":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "betti",
@@ -264,7 +259,7 @@ class TopologicalDescriptor(Descriptor):
             )
 
         elif self.tda_descriptor_type == "image":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "image",
@@ -289,13 +284,13 @@ class TopologicalDescriptor(Descriptor):
                 'Wrong TDA pipeline specified, should be one of ["diagram", "landscape", "betti", "image"]'
             )
 
-        contact_maps = [protein.contact_map for protein in proteins]
+        coordinates = [protein.coordinates for protein in proteins]
         diagram_data = pipeline.Pipeline(
-            self.base_tda_pipeline, verbose=True
-        ).fit_transform(contact_maps)
+            self.base_tda_steps, verbose=True
+        ).fit_transform(coordinates)
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                self.tda_pipeline, verbose=self.verbose
+                self.base_tda_steps, verbose=self.verbose
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(

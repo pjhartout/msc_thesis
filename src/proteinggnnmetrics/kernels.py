@@ -19,7 +19,12 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
 
-from .utils.functions import distance2similarity, networkx2grakel, positive_eig
+from .utils.functions import (
+    distance2similarity,
+    flatten_lists,
+    networkx2grakel,
+    positive_eig,
+)
 from .utils.metrics import (
     _persistence_fisher_distance,
     pairwise_persistence_diagram_kernels,

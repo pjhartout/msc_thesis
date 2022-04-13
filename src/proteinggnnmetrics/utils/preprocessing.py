@@ -23,9 +23,13 @@ def filter_dimension(diags, dim):
     diags_filtered = list()
     for diag in diags:
         diag = pd.DataFrame(diag, columns=["birth", "death", "dim"])
-        diags_filtered.append(
-            diag[diag["dim"] == dim].drop(labels="dim", axis=1).values
-        )
+        filtered = diag[diag["dim"] == dim].drop(labels="dim", axis=1).values
+        if filtered.size != 0:
+            diags_filtered.append(filtered)
+        else:
+            # TODO: check if adding dummy is theoreitcally valid
+            diags_filtered.append(np.array([[1, 1]]))
+
     return diags_filtered
 
 
@@ -35,7 +39,6 @@ class Padding(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         self.max_pts = max([len(diag) for diag in X])
-        return self
 
     def transform(self, X):
         """

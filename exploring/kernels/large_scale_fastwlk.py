@@ -29,7 +29,11 @@ N_JOBS = 10
 @measure_memory
 def fastwlk_test(graphs):
     K = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+        n_jobs=N_JOBS,
+        n_iter=5,
+        normalize=False,
+        biased=True,
+        verbose=False,
     ).compute_gram_matrix(graphs)
 
 
@@ -67,13 +71,25 @@ def main():
     # grakel_test(graphs)
     # fastwlk_test(graphs)
     K_XX = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+        n_jobs=N_JOBS,
+        n_iter=5,
+        normalize=False,
+        biased=True,
+        verbose=False,
     ).compute_gram_matrix(graphs, graphs)
     K_YY = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+        n_jobs=N_JOBS,
+        n_iter=5,
+        normalize=False,
+        biased=True,
+        verbose=False,
     ).compute_gram_matrix(graphs_1, graphs_1)
     K_XY = WeisfeilerLehmanKernel(
-        n_jobs=N_JOBS, n_iter=5, normalize=False, biased=True, verbose=False,
+        n_jobs=N_JOBS,
+        n_iter=5,
+        normalize=False,
+        biased=True,
+        verbose=False,
     ).compute_gram_matrix(graphs, graphs_1)
     full_K = np.zeros(
         (K_XX.shape[0] + K_YY.shape[0], K_XX.shape[0] + K_YY.shape[0])

@@ -182,7 +182,11 @@ class Sequence:
             name = residue.get_resname()
             sequence.append(name)
 
-        return Protein(name=protein_name, path=fname, sequence=sequence,)
+        return Protein(
+            name=protein_name,
+            path=fname,
+            sequence=sequence,
+        )
 
     def fit(self):
         """required for sklearn compatibility"""
