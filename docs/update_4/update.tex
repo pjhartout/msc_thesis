@@ -20,6 +20,7 @@
 \usepackage{subfig}
 \usepackage{verbatim}
 \usepackage{minted}
+\usepackage{fontawesome}
 
 \newcommand*\colourcheck[1]{%
   \expandafter\newcommand\csname #1check\endcsname{\textcolor{#1}{\ding{52}}}%
@@ -80,7 +81,10 @@
 
 \tikzstyle{orangebox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
 height=0.5cm, draw=black, fill=YellowOrange!40, minimum height=12mm]
-\tikzstyle{bluebox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum height=0.5cm, draw=black, fill=blue!40]
+\tikzstyle{greenbox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
+height=0.5cm, draw=black, fill=YellowOrange!40, minimum height=12mm, fill=ForestGreen!40]
+\tikzstyle{bluebox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
+height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
@@ -248,5 +252,106 @@ height=0.5cm, draw=black, fill=YellowOrange!40, minimum height=12mm]
     \inputminted{python}{example_pipeline_with_noise.py}
   \end{minipage}
 \end{frame}
+
+% {\setbeamercolor{palette primary}{fg=black, bg=yellow}
+\begin{frame}[standout]
+  Reusable Components
+\end{frame}
+% }
+
+\begin{frame}[standout]
+  But I want results!
+\end{frame}
+
+
+\begin{frame}[fragile]{Multiple experiments with error bars}
+  \begin{figure}
+    \centering
+    \scalebox{0.75}{
+      \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+        \node (coords) [bluebox] {Get \\Coordinates};
+        \node (gauss) [bluebox, right of=coords, xshift=1.5cm] {Add \\gaussian noise};
+        \node (cmap) [bluebox, right of=gauss, xshift=1.5cm] {Get \\contact map};
+        \node (egraph) [bluebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
+        \node (wlk) [bluebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+        \node (mmd) [bluebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+        \draw [arrow] (coords) -- (gauss);
+        \draw [arrow] (gauss) -- (cmap);
+        \draw [arrow] (cmap) -- (egraph);
+        \draw [arrow] (egraph) -- (wlk);
+        \draw [arrow] (wlk) -- (mmd);
+      \end{tikzpicture}
+    }
+  \end{figure}
+  \begin{figure}%
+    \centering
+    \includegraphics[width=.6\textwidth]{./figures/plot_multiple_runs.png}
+    \caption{Multiple runs of last week's plot -- 100\% confidence interval
+      over 10 runs.}%
+  \end{figure}
+\end{frame}
+
+
+
+\begin{frame}[standout]{One-sentence takeway}
+  Use MMD to evaluate your protein generative protein model
+\end{frame}
+
+\begin{frame}[standout]
+  Backup slides
+\end{frame}
+
+\begin{frame}[fragile]{Detailed breakdown of modules}
+  \footnotesize{
+  \begin{minipage}{.45\textwidth}
+    Point clouds:
+    \begin{itemize}
+    \item Granularity can be set to $\alpha$-Carbon, $\beta$-Carbon, entire backbone or all-atom setting.
+    \end{itemize}
+    Graph Descriptors:
+    \begin{itemize}
+    \item Degree Histogram
+    \item Clustering Histogram
+    \item Laplacian spectrum
+    \end{itemize}
+    Topological Descriptors
+    \begin{itemize}
+      \item Persistence diagrams
+      \item Persistence landscape
+      \item Persistence image
+      \item Betti Curves
+    \end{itemize}
+    Sequence Embeddings (ESM, different sizes)
+  \end{minipage}
+  \hfill
+  \begin{minipage}{.45\textwidth}
+
+    Protein Descriptors
+      \begin{itemize}
+      \item Ramachandran angles
+      \item Interactomic clashes
+      \end{itemize}
+      Graph Kernels (Weisfeiler-Lehman Kernel)\\
+      Vector kernels (Linear, Gaussian)\\
+      TDA Kernel (Persistence Fisher Kernel)\\
+      Kernel composition ($\times$, +)\\
+      MMD (Squared, biased)\\
+      \newline
+      \textbf{Perturbations}\\
+      Graph level (rewire, add/remove edge)\\
+      Point cloud perturbations (twist, taper, shear)\\
+      Protein perturbations (mutate)\\
+      \textbf{All modules work on multiple proteins \\simultaneously}
+  \end{minipage}
+}
+\end{frame}
+
+\begin{frame}[fragile]{The admin stuff}
+  Message through slack for follow-up Qs\\
+  Extensive GitHub documentation \& up-to-date codebase at \\ \faGithub{}
+  \url{https://github.com/pjhartout/msc_thesis}\\
+  Private repo a.t.m., message me to request access.
+\end{frame}
+
 
 \end{document}
