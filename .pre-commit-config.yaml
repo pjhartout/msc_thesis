@@ -20,6 +20,7 @@ repos:
       - id: debug-statements
       - id: detect-private-key
       - id: fix-encoding-pragma
+        exclude: 'example_pipeline*'
       - id: mixed-line-ending
         args: ['--fix=lf']
       - id: sort-simple-yaml
