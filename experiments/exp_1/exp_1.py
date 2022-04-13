@@ -57,10 +57,7 @@ def execute_run(cfg, run):
             ),
             (
                 "contact map",
-                ContactMap(
-                    metric="euclidean",
-                    n_jobs=cfg.compute.n_jobs,
-                ),
+                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
             ),
             (
                 "epsilon graph",
@@ -94,7 +91,7 @@ def execute_run(cfg, run):
                         (
                             "gauss",
                             GaussianNoise(
-                                random_state=42,
+                                random_seed=42,
                                 noise_mean=0,
                                 noise_variance=std,
                                 n_jobs=cfg.compute.n_jobs,
