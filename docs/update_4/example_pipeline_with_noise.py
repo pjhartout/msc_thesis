@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 base_feature_pipeline = pipeline.Pipeline(
     [
         ("coordinates", Coordinates(granularity="CA", n_jobs=12),),
