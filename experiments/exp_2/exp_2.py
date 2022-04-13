@@ -49,13 +49,7 @@ def main(cfg: DictConfig):
             "coordinates",
             Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
-        (
-            "contact map",
-            ContactMap(
-                n_jobs=cfg.compute.n_jobs,
-            ),
-        ),
-        ("sample", SamplePoints(n_points=100)),
+        ("sample", SamplePoints(n=2)),
         (
             "tda",
             TopologicalDescriptor(
@@ -92,7 +86,7 @@ def main(cfg: DictConfig):
     ):
         perturb_feature_steps = flatten_lists(
             [
-                base_feature_steps[:3]
+                base_feature_steps[:1]
                 + [
                     (
                         "twist",
@@ -104,11 +98,11 @@ def main(cfg: DictConfig):
                         ),
                     )
                 ]
-                + base_feature_steps[3:]
+                + base_feature_steps[1:]
             ]
         )
         perturb_feature_pipeline = pipeline.Pipeline(
-            base_feature_steps, verbose=cfg.debug.verbose
+            perturb_feature_steps, verbose=cfg.debug.verbose
         )
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
             pdb_files[
@@ -136,6 +130,9 @@ def main(cfg: DictConfig):
             kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
         results.append({"mmd": mmd, "twist": twist})
+    results = pd.DataFrame(results).to_csv(
+        here() / cfg.experiments.results / "mmd_single_run_twist.csv"
+    )
 
 
 if __name__ == "__main__":
