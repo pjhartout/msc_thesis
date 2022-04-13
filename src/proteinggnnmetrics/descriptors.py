@@ -178,7 +178,7 @@ class TopologicalDescriptor(Descriptor):
         tda_descriptor_type: str,
         epsilon: float,
         n_bins: int,
-        homology_dimensions: Tuple[int] = (1, 2, 3),
+        homology_dimensions: Tuple[int] = (0, 1, 2),
         order: int = 1,
         sigma: float = 0.01,
         weight_function: Callable = None,
