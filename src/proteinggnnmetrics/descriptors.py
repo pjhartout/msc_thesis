@@ -196,7 +196,7 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.base_tda_pipeline = [
+        self.base_tda_steps = [
             (
                 "diagram",
                 homology.VietorisRipsPersistence(
@@ -204,10 +204,6 @@ class TopologicalDescriptor(Descriptor):
                     homology_dimensions=self.homology_dimensions,
                 ),
             )
-        ]
-        self.tda_pipeline = [
-            ("filter", diagrams.Filtering(epsilon=self.epsilon)),
-            ("rescaler", diagrams.Scaler()),
         ]
         self.verbose = verbose
 
@@ -220,10 +216,10 @@ class TopologicalDescriptor(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
 
         if self.tda_descriptor_type == "diagram":
-            self.tda_pipeline = self.base_tda_pipeline
+            pass
 
         elif self.tda_descriptor_type == "landscape":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "landscape",
@@ -241,7 +237,7 @@ class TopologicalDescriptor(Descriptor):
             )
 
         elif self.tda_descriptor_type == "betti":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "betti",
@@ -263,7 +259,7 @@ class TopologicalDescriptor(Descriptor):
             )
 
         elif self.tda_descriptor_type == "image":
-            self.tda_pipeline.extend(
+            self.base_tda_steps.extend(
                 [
                     (
                         "image",
@@ -290,11 +286,11 @@ class TopologicalDescriptor(Descriptor):
 
         coordinates = [protein.coordinates for protein in proteins]
         diagram_data = pipeline.Pipeline(
-            self.base_tda_pipeline, verbose=True
+            self.base_tda_steps, verbose=True
         ).fit_transform(coordinates)
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                self.tda_pipeline, verbose=self.verbose
+                self.base_tda_steps, verbose=self.verbose
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(

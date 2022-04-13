@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import seaborn as sns
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
+from gtda.homology import VietorisRipsPersistence
 from joblib import Parallel, delayed
 from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
@@ -50,18 +51,18 @@ def main(cfg: DictConfig):
             Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
         ("sample", SamplePoints(n=2)),
-        (
-            "tda",
-            TopologicalDescriptor(
-                "diagram",
-                epsilon=0.01,
-                n_bins=100,
-                order=2,
-                n_jobs=cfg.compute.n_jobs,
-                landscape_layers=1,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
+        # (
+        #     "tda",
+        #     TopologicalDescriptor(
+        #         "diagram",
+        #         epsilon=0.01,
+        #         n_bins=100,
+        #         order=2,
+        #         n_jobs=cfg.compute.n_jobs,
+        #         landscape_layers=1,
+        #         verbose=cfg.debug.verbose,
+        #     ),
+        # ),
     ]
 
     base_feature_pipeline = pipeline.Pipeline(
@@ -73,6 +74,14 @@ def main(cfg: DictConfig):
             + 1
         ]
     )
+
+    # Compute persistence diagrams
+    vrp = VietorisRipsPersistence(
+        n_jobs=cfg.compute.n_jobs, homology_dimensions=(0, 1, 2)
+    )
+    point_clouds = [protein.coordinates for protein in proteins]
+    persistence_diagrams = vrp.fit_transform(point_clouds)
+
     results = list()
     for twist in tqdm(
         np.arange(
