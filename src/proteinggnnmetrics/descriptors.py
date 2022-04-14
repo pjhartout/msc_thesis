@@ -565,7 +565,7 @@ class ESM(Embedding):
         if self.verbose:
             print("Getting sequences...")
         sequences = [
-            (protein.name, protein.sequence)
+            (protein.name, protein.sequence_as_str())
             for protein in tqdm(proteins, disable=not self.verbose)
         ]
         _, _, batch_tokens = batch_converter(sequences)
