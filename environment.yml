@@ -21,7 +21,15 @@ dependencies:
   - tqdm
   - pyprojroot
   - biopython
+  - pytorch
+  - plotly
+  - natsort
+  - mypy
+  - pre-commit
   - pip
   - pip:
     - giotto-tda
     - grakel
+    - hydra-core
+    - fastwlk
+    - fair-esm
