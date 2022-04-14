@@ -14,7 +14,6 @@ from curses.ascii import EM
 from faulthandler import disable
 from typing import Dict, List, Union
 
-import esm
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
