@@ -33,7 +33,10 @@ def main(cfg: DictConfig):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     base_feature_steps = [
-        ("sequence", Sequence(n_jobs=cfg.compute.n_jobs),),
+        (
+            "sequence",
+            Sequence(n_jobs=cfg.compute.n_jobs),
+        ),
         (
             "esm",
             ESM(
@@ -102,3 +105,7 @@ def main(cfg: DictConfig):
     results = pd.DataFrame(results).to_csv(
         here() / cfg.experiments.results / "mmd_single_run_twist.csv"
     )
+
+
+if __name__ == "__main__":
+    main()
