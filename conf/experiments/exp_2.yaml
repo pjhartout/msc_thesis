@@ -1,6 +1,6 @@
 description: "Look at the power of TDA to investigate geometric distortions of the protein"
 
-results: "data/experiments/tda_twist"
+results: "data/experiments/tda_twist/"
 
 proteins:
   not_perturbed:
@@ -16,7 +16,6 @@ perturbations:
     min: 0
     max: 0.1
     step: 0.01
-
 
 descriptors:
   tda:
