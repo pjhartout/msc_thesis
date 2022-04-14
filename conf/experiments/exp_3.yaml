@@ -1,4 +1,4 @@
-description: "Look at the power of TDA to investigate geometric distortions of the protein"
+description: "Look at the power of ESM to investigate ability to detect mutations"
 
 results: "data/experiments/esm_mutate/"
 
