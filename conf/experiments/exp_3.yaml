@@ -1,7 +1,7 @@
 description: "Look at the power of ESM to investigate ability to detect mutations"
 
 results: "data/experiments/esm_mutate/"
-
+n_runs: 10
 proteins:
   not_perturbed:
     lower_bound: 0
