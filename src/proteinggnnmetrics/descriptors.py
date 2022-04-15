@@ -511,9 +511,20 @@ class Embedding(metaclass=ABCMeta):
 class ESM(Embedding):
     _size_options = ["M", "XL"]
 
-    def __init__(self, size: str, n_jobs: int, verbose: bool) -> None:
+    def __init__(
+        self, size: str, longest_sequence: int, n_jobs: int, verbose: bool
+    ) -> None:
+        """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
+
+        Args:
+            size (str): size of the model used for embeddings
+            longest_sequence (int): dummy sequence used to make sure all       embeddings have the same size.
+            n_jobs (int): number of threads to use
+            verbose (bool): verbosity
+        """
         super().__init__(n_jobs, verbose)
         self.size = size
+        self.longest_sequence = longest_sequence
 
     def fit(self, sequences: List[Protein], y=None) -> None:
         """Fit the embedding to the given sequences.
@@ -568,14 +579,17 @@ class ESM(Embedding):
             (protein.name, protein.sequence_as_str())
             for protein in tqdm(proteins, disable=not self.verbose)
         ]
+        sequences.append(("dummy", "A" * self.longest_sequence))
         _, _, batch_tokens = batch_converter(sequences)
         if self.verbose:
             print("Computing embeddings...")
         with torch.no_grad():
             results = model(
-                batch_tokens, repr_layers=[repr_layer], return_contacts=True
+                batch_tokens, repr_layers=[repr_layer], return_contacts=False
             )
         token_representations = results["representations"][repr_layer]
+        # Remove dummy embedding
+        token_representations[-1]
         if self.verbose:
             print("Post-processing embeddings...")
         for idx, protein in tqdm(
@@ -584,5 +598,4 @@ class ESM(Embedding):
             protein.embeddings["esm"] = (
                 token_representations[idx].numpy().flatten()
             )
-            print(protein.embeddings["esm"].shape)
         return proteins
