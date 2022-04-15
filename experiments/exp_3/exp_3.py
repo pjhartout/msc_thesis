@@ -59,10 +59,7 @@ def main(cfg: DictConfig):
     dummy_longest = get_longest_protein_dummy_sequence(pdb_files, cfg)
 
     base_feature_steps = [
-        (
-            "sequence",
-            Sequence(n_jobs=cfg.compute.n_jobs),
-        ),
+        ("sequence", Sequence(n_jobs=cfg.compute.n_jobs),),
         (
             "esm",
             ESM(
@@ -133,7 +130,7 @@ def main(cfg: DictConfig):
                 squared=True,
                 kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
             ).compute(embeddings, embeddings_perturbed)
-            results.append({"mmd": mmd, "twist": mutation})
+            results.append({"mmd": mmd, "p_mutate": mutation})
 
         results = pd.DataFrame(results).to_csv(
             here()
