@@ -161,7 +161,7 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 \node [desc, fill=YellowOrange!10] (mmd) {MMD};
 \node [desc, continue chain=going below, fill=YellowOrange!20] (gkernels) {Graph Kernels};
 \begin{scope}[start branch=gkernels]
-  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernel};
+  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernels};
   \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {TDA Kernels};
   \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {Kernel Composition};
 \end{scope}
@@ -185,16 +185,16 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 \node [desc, xshift=2.25cm, xshift=-2.25cm, fill=YellowOrange!50] (PC) {Point Clouds};
 \begin{scope}[start branch=PC]
   \node[desc, on chain=going right, fill=YellowOrange!50](sequence) {Sequence};
-  \node[desc, on chain=going right, fill=PineGreen!20](gp) {Mutations};
-  \node[desc, on chain=going right, fill=PineGreen!20](gp) {Geometric \\Perturbations};
-  \node[desc, on chain=going right, fill=PineGreen!20](gn) {Gaussian Noise};
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Mutations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Geometric \\Perturbations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gn) {Gaussian Noise};
 \end{scope}
 \node [desc, fill=YellowOrange!60] (Files) {PDB Files};
 % \node [desc, xshift=2.25cm] (IO) {I/O from Sensors};
-
 \end{tikzpicture}
-\textcolor{PineGreen!90}{Green: perturbations}\\
-\textcolor{YellowOrange!90}{Orange: modules}
+\textcolor{YellowOrange!90}{orange: modules};
+ \textcolor{PineGreen!90}{green: perturbations}
+
 \end{frame}
 }
 
@@ -207,22 +207,16 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
       \node (coords) [orangebox] {Get \\Coordinates};
       \node (cmap) [orangebox, right of=coords, xshift=1.5cm] {Get \\contact map};
       \node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
-      \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
-      \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+      % \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+      % \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
       \draw [arrow] (coords) -- (cmap);
       \draw [arrow] (cmap) -- (egraph);
-      \draw [arrow] (egraph) -- (wlk);
-      \draw [arrow] (wlk) -- (mmd);
+      % \draw [arrow] (egraph) -- (wlk);
+      % \draw [arrow] (wlk) -- (mmd);
     \end{tikzpicture}
   }
   \end{figure}
-  \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline.py}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{.45\textwidth}
-    \pause \textbf{What if we now want to add noise?}
-  \end{minipage}
+  \inputminted{python}{example_pipeline.py}
 \end{frame}
 
 \begin{frame}[fragile]{Composable transformations \& using
@@ -245,11 +239,12 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
   }
   \end{figure}
   \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline.py}
+    \inputminted[firstline=1, lastline=15]{python}{example_pipeline_with_noise.py}
   \end{minipage}
   \hfill
+  \pause
   \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline_with_noise.py}
+    \inputminted[firstline=17, lastline=26]{python}{example_pipeline_with_noise.py}
   \end{minipage}
 \end{frame}
 
@@ -318,7 +313,7 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 
 
 \begin{frame}[standout]{1-sentence takeway}
-  Parametrize your MMD sensibly for your protein generative model.
+  Parametrize your MMD sensibly.
 \end{frame}
 
 \begin{frame}[standout]
