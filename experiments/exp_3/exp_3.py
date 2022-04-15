@@ -103,7 +103,7 @@ def main(cfg: DictConfig):
                             "mutate",
                             Mutation(
                                 p_mutate=mutation,
-                                random_state=np.random.RandomState(42),
+                                random_state=np.random.RandomState(run),
                                 n_jobs=cfg.compute.n_jobs,
                                 verbose=cfg.debug.verbose,
                             ),
