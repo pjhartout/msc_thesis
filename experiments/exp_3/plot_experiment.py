@@ -34,10 +34,11 @@ mpl.rcParams["axes.unicode_minus"] = False
 def main(cfg: DictConfig):
     df_plot = pd.DataFrame(columns=["mmd", "twist"])
     for fname in os.listdir(here() / cfg.experiments.results):
-        exp_run = pd.read_csv(
-            here() / cfg.experiments.results / fname, index_col=0,
-        )
-        df_plot = pd.concat([df_plot, exp_run])
+        if "single_run" in fname:
+            exp_run = pd.read_csv(
+                here() / cfg.experiments.results / fname, index_col=0,
+            )
+            df_plot = pd.concat([df_plot, exp_run])
     print("Plotting")
 
     # palette = sns.color_palette("mako_r", len(df_plot["epsilon"].unique()))
@@ -57,7 +58,8 @@ def main(cfg: DictConfig):
     plt.tight_layout()
     plt.savefig(
         here()
-        / cfg.eps_var.paths.images
+        / cfg.experiments.results
+        / "images"
         / Path("plot_multiple_experiments.png")
     )
 
