@@ -797,6 +797,20 @@ Good review of kernels, applications and other theoretical considerations
 }
 #+end_src
 
+Example of ramachandran plot
+#+begin_src bibtex
+@article{nayak2018identification,
+  title={Identification of potential inhibitors for mycobacterial uridine diphosphogalactofuranose-galactopyranose mutase enzyme: A novel drug target through in silico approach},
+  author={Nayak, Tapaswini and Jena, Lingaraja and Waghmare, Pranita and Harinath, Bhaskar C and others},
+  journal={International Journal of Mycobacteriology},
+  volume={7},
+  number={1},
+  pages={61},
+  year={2018},
+  publisher={Medknow Publications}
+}
+#+end_src
+
 * Matrix of experiments to perform
 | Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
 | --               | twist         | tda          | persistence fisher | human    |         100 |

@@ -24,11 +24,61 @@ acid sequence. Proteins support a vast array of functions in living organisms,
 such as catalysing metabolic reactions, DNA replication, providing structural
 support to cells, transporting molecules and sensing stimuli.
 
-Structurally, each protein is made up of one or more chains of amino acids,
-each of which contain a backbone and different side chains. The atoms in the
-backbone include a \textalpha-carbon,
+Each protein is made up of one or more chains of amino acids, each of which
+contain a backbone and different side chains. The atoms in the backbone include
+a \textalpha{}-carbon, another carbon and a nitrogen atom. An overview of the
+peptide backbone is shown in Figure \ref{fig:backbone}. Interestingly, a plane
+is forned by two alpha carbons, the carboxyl group, and the hydrogen atom attached
+to the nitrogen atom (see Figure \ref{fig:backbone}), making the peptide bond
+between the nitrogen and carbon atom resistant to twisting. That means that the
+rotations enabling the 3D folding of a protein is governed by the angle of the bonds linking
+the nitrogen atom to the \textalpha{}-carbon and the other carbon atom to the
+\textalpha{}-carbon, named \textphi{} and \textpsi{}. These angles' values are
+frequently used to validate proteins, characterise the secondary structure of proteins
+(i.e. structural features observed in certain segments of proteins), etc.
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.8\textwidth]{./figures/peptide_bond.png}
+  \caption{Schematic of the backbone of a protein. Two \textalpha{}-carbons are
+    shown as well as a \textbeta{}-carbon in the middle. R1 and R2 represent the
+    side chains of the amino acid. }
+  \label{fig:backbone}
+\end{figure}
+
+
+To visualize such angles, a Ramachandran plot can be constructed for any
+protein. Such a plot can reveal secondary structural features such as
+\textbeta{}-sheets, \textalpha{}-helices, etc. An example of such a plot together
+with a 3D model of a protein can be found in Figure \ref{fig:ramachandran}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.7\textwidth]{./figures/ramachandran_plot.jpg}
+  \caption{3D structure of uridine diphosphogalactofuranose-galactopyranose
+mutase with a corresponding Ramachandran plot. The \textalpha{} -helices can be
+found on the middle left part of the Ramachandran plot, the \textbeta{} sheets on
+the upper right quadrant, and the left handed \textalpha{}-helices can be found in
+the middle upper right part of the plot. This figure is adapted from
+\cite{nayak2018identification}.}
+  \label{fig:ramachandran}
+\end{figure}
 
 \subsection{Graphs}
+
+A graph $G$ is a pair of vertices $V$ and edges $E$ such that $G=(V, E)$,
+$|V|=n$ and $|E|=m$. Two vertices $i$ and $j$ are adjacent if there is an edge
+between them, i.e. $e_{ij}\in E$. The relationship between between edges can be
+represented as an $n\times n$ adjacency matrix $A$, where:
+\begin{equation}
+  \label{eq:adjacency}
+  A_{ij}=\begin{cases}
+    1, \quad\text{if } e_{ij}\in E\\
+    0, \quad\text{otherwise.}
+  \end{cases}
+\end{equation}
+The neighborhood of a node $v$ is the set of nodes with an edge directly to $v$
 
 \subsection{Topological Data Analysis}
 
