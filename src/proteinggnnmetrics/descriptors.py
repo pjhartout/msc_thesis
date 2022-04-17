@@ -12,10 +12,13 @@ from ctypes import Union
 from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
+import esm
 import networkx as nx
 import numpy as np
+import torch
 from Bio.PDB import PDBParser, PPBuilder, vectors
 from gtda import curves, diagrams, homology, pipeline
+from tqdm import tqdm
 
 from proteinggnnmetrics.loaders import load_descriptor
 
@@ -466,4 +469,133 @@ class InteratomicClash(Descriptor):
             show_tqdm=self.verbose,
         )
 
+        return proteins
+
+
+class Embedding(metaclass=ABCMeta):
+    def __init__(self, n_jobs, verbose) -> None:
+        self.n_jobs = n_jobs
+        self.verbose = verbose
+
+    def fit(self, sequences: List[Protein]) -> None:
+        """Fit the embedding to the given sequences.
+
+        Args:
+            sequences (List[Protein]): list of sequences to embed.
+        """
+        pass
+
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
+        """Transform the given sequences to embeddings.
+
+        Args:
+            sequences (List[Protein]): list of sequences to embed.
+
+        Returns:
+            List[Protein]: list of embeddings for each sequence.
+        """
+        return proteins
+
+    def fit_transform(self, proteins: List[Protein]) -> List[Protein]:
+        """Fit the embedding to the given sequences and transform them.
+
+        Args:
+            sequences (List[Protein]): list of sequences to embed.
+
+        Returns:
+            List[Protein]: list of embeddings for each sequence.
+        """
+        return proteins
+
+
+class ESM(Embedding):
+    _size_options = ["M", "XL"]
+
+    def __init__(
+        self, size: str, longest_sequence: int, n_jobs: int, verbose: bool
+    ) -> None:
+        """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
+
+        Args:
+            size (str): size of the model used for embeddings
+            longest_sequence (int): dummy sequence used to make sure all       embeddings have the same size.
+            n_jobs (int): number of threads to use
+            verbose (bool): verbosity
+        """
+        super().__init__(n_jobs, verbose)
+        self.size = size
+        self.longest_sequence = longest_sequence
+
+    def fit(self, sequences: List[Protein], y=None) -> None:
+        """Fit the embedding to the given sequences.
+
+        Args:
+            sequences (List[Protein]): list of sequences to embed.
+        """
+        pass
+
+    def transform(self, sequences: List[Protein], y=None) -> List[Protein]:
+        """Transform the given sequences to embeddings.
+
+        Args:
+            a (List[Protein]): list of sequences to embed.
+
+        Returns:
+            List[Protein]: list of embeddings for each sequence.
+        """
+        return sequences
+
+    def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
+        """Actual function used to compute embeddings of a list of
+        proteins.
+        The model is not fitted in this function but this is to ensure
+        consistency with the rest of the library
+
+        Args:
+            sequences (List[Protein]): _description_
+
+        Returns:
+            List[Protein]: _description_
+        """
+        if self.verbose:
+            print("Computing embeddings with ESM...")
+            print("Loading model...")
+        if self.size == "M":
+            model, alphabet = esm.pretrained.esm1_t6_43M_UR50S()
+            repr_layer = 6
+        elif self.size == "XL":
+            model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
+            repr_layer = 33
+        else:
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
+        batch_converter = alphabet.get_batch_converter()
+        model.eval()  # disables dropout for deterministic results
+        # TODO: See if distribution makes sense here.
+        if self.verbose:
+            print("Getting sequences...")
+        sequences = [
+            (protein.name, protein.sequence_as_str())
+            for protein in tqdm(proteins, disable=not self.verbose)
+        ]
+        sequences.append(("dummy", "A" * self.longest_sequence))
+        _, _, batch_tokens = batch_converter(sequences)
+        if self.verbose:
+            print("Computing embeddings...")
+        with torch.no_grad():
+            results = model(
+                batch_tokens, repr_layers=[repr_layer], return_contacts=False
+            )
+        token_representations = results["representations"][repr_layer]
+        # Remove dummy embedding
+        token_representations[-1]
+        if self.verbose:
+            print("Post-processing embeddings...")
+        for idx, protein in tqdm(
+            enumerate(proteins), total=len(proteins), disable=not self.verbose
+        ):
+            protein.embeddings["esm"] = (
+                token_representations[idx].numpy().flatten()
+            )
         return proteins

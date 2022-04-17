@@ -88,11 +88,58 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
+\usepackage{pgfplots}
+
+\definecolor{myellow}{RGB}{228,212,0}
+\definecolor{mgreen}{RGB}{5,104,57}
+
+\newcommand\funnel[3]{%
+  \pgfmathsetmacro\mwid{(2+\xi*.7)}
+  \pgfmathsetmacro\marc{\mwid-.4}
+  \begin{scope}[%
+    shift={(0,#1)},
+    line width=.05pt,
+    % x=5mm,
+    % scale=1.\xi,
+    yshift=\xi*12
+    ]
+    \draw[black,bottom color=#2, top color=#2] (-\mwid,0) -- (-\mwid+.4,-1) arc (190:350:\marc cm and 5mm) -- (\mwid,0);
+    \draw[black,fill=#3] (0,0) ellipse (\mwid cm and 5mm);
+    \path (-\mwid,0) -- (-\mwid+.4,-1) coordinate[midway] (a\xi);
+  \end{scope}
+}
 
 \begin{document}
 
 \maketitle
 
+\begin{frame}
+\begin{tikzpicture}%
+latent/.style={%
+        ,circle
+        ,draw
+        ,thick
+        ,minimum size=10mm
+        }
+
+\foreach \text
+        [%
+        count=\xi starting from 0,
+        evaluate=\xi as \shadecolor using int(25*\xi),
+        evaluate=\xi as \coord using int(\xi-12)
+        ]
+        in {%
+        On proteins,
+        Evaluation Problem,
+        Graph generative models,
+        Generative modelling
+    }{%
+        \funnel{\coord}{mgreen!\shadecolor !myellow}{mgreen!\shadecolor !myellow}
+        \node[align=right, anchor=east, inner sep=10pt, font=\scriptsize, text width=2cm] at (a\xi) {\text};
+    }
+
+\end{tikzpicture}
+\end{frame}
 
 {
   \setbeamercolor{background canvas}{bg=white}
@@ -161,7 +208,7 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 \node [desc, fill=YellowOrange!10] (mmd) {MMD};
 \node [desc, continue chain=going below, fill=YellowOrange!20] (gkernels) {Graph Kernels};
 \begin{scope}[start branch=gkernels]
-  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernel};
+  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernels};
   \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {TDA Kernels};
   \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {Kernel Composition};
 \end{scope}
@@ -185,16 +232,15 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
 \node [desc, xshift=2.25cm, xshift=-2.25cm, fill=YellowOrange!50] (PC) {Point Clouds};
 \begin{scope}[start branch=PC]
   \node[desc, on chain=going right, fill=YellowOrange!50](sequence) {Sequence};
-  \node[desc, on chain=going right, fill=PineGreen!20](gp) {Mutations};
-  \node[desc, on chain=going right, fill=PineGreen!20](gp) {Geometric \\Perturbations};
-  \node[desc, on chain=going right, fill=PineGreen!20](gn) {Gaussian Noise};
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Mutations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Geometric \\Perturbations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gn) {Gaussian Noise};
 \end{scope}
 \node [desc, fill=YellowOrange!60] (Files) {PDB Files};
 % \node [desc, xshift=2.25cm] (IO) {I/O from Sensors};
-
 \end{tikzpicture}
-\textcolor{PineGreen!90}{Green: perturbations}\\
-\textcolor{YellowOrange!90}{Orange: sequence embeddings}
+\textcolor{YellowOrange!90}{orange: modules};
+ \textcolor{PineGreen!90}{green: perturbations}
 \end{frame}
 }
 
@@ -207,22 +253,16 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
       \node (coords) [orangebox] {Get \\Coordinates};
       \node (cmap) [orangebox, right of=coords, xshift=1.5cm] {Get \\contact map};
       \node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
-      \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
-      \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+      % \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+      % \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
       \draw [arrow] (coords) -- (cmap);
       \draw [arrow] (cmap) -- (egraph);
-      \draw [arrow] (egraph) -- (wlk);
-      \draw [arrow] (wlk) -- (mmd);
+      % \draw [arrow] (egraph) -- (wlk);
+      % \draw [arrow] (wlk) -- (mmd);
     \end{tikzpicture}
   }
   \end{figure}
-  \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline.py}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{.45\textwidth}
-    \pause \textbf{What if we now want to add noise?}
-  \end{minipage}
+  \inputminted{python}{example_pipeline.py}
 \end{frame}
 
 \begin{frame}[fragile]{Composable transformations \& using
@@ -245,11 +285,12 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
   }
   \end{figure}
   \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline.py}
+    \inputminted[firstline=1, lastline=15]{python}{example_pipeline_with_noise.py}
   \end{minipage}
   \hfill
+  \pause
   \begin{minipage}{.45\textwidth}
-    \inputminted{python}{example_pipeline_with_noise.py}
+    \inputminted[firstline=17, lastline=26]{python}{example_pipeline_with_noise.py}
   \end{minipage}
 \end{frame}
 
@@ -284,11 +325,11 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
       \end{tikzpicture}
     }
   \end{figure}
-  \begin{figure}%
-    \centering
-    \includegraphics[width=.6\textwidth]{./figures/plot_multiple_runs.png}
-    \caption{MMD as gaussian noise is added. Each bar is the 100\% confidence interval over 10 runs.}%
-  \end{figure}
+  % \begin{figure}%
+  %   \centering
+  %   \includegraphics[width=.6\textwidth]{./figures/plot_multiple_runs.png}
+  %   \caption{MMD as gaussian noise is added. Each bar is the 100\% confidence interval over 10 runs.}%
+  % \end{figure}
 \end{frame}
 
 
@@ -309,16 +350,16 @@ height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
       \end{tikzpicture}
     }
   \end{figure}
-  \begin{figure}%
-    \centering
-    \includegraphics[width=.7\textwidth]{./figures/plot_run_twist.png}
-    \caption{MMD value as twist is progressively added to a separate set of proteins.}%
-  \end{figure}
+  % \begin{figure}%
+  %   \centering
+  %   \includegraphics[width=.7\textwidth]{./figures/plot_run_twist.png}
+  %   \caption{MMD value as twist is progressively added to a separate set of proteins.}%
+  % \end{figure}
 \end{frame}
 
 
 \begin{frame}[standout]{1-sentence takeway}
-  Parametrize your MMD sensibly for your protein generative model.
+  Parametrize your MMD sensibly.
 \end{frame}
 
 \begin{frame}[standout]

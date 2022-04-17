@@ -34,6 +34,28 @@ class Protein:
     TODO: make none of the elements in init required.
     """
 
+    AA_321 = {
+        "CYS": "C",
+        "ASP": "D",
+        "SER": "S",
+        "GLN": "Q",
+        "LYS": "K",
+        "ILE": "I",
+        "PRO": "P",
+        "THR": "T",
+        "PHE": "F",
+        "ASN": "N",
+        "GLY": "G",
+        "HIS": "H",
+        "LEU": "L",
+        "ARG": "R",
+        "TRP": "W",
+        "ALA": "A",
+        "VAL": "V",
+        "GLU": "E",
+        "TYR": "Y",
+        "MET": "M",
+    }
     AMINO_ACIDS = [
         "GLU",
         "VAL",
@@ -268,6 +290,12 @@ class Protein:
                 )
             )
         return fig
+
+    def sequence_as_str(self) -> str:
+        """Returns sequence as string
+        I.e. ['MET', 'PRO', 'GLU'] -> 'MPE'
+        """
+        return "".join([self.AA_321[aa] for aa in self.sequence])
 
     @staticmethod
     def plot_graph(
