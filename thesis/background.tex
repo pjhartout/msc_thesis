@@ -3,12 +3,10 @@
 This chapter introduces the core concepts built upon in this thesis and surveys
 recent literature tackling the evaluation of generative graph neural networks
 and the relevance of this problem in structural biology. Section
-\ref{sec:background} defines core mathematical and biological concepts that will
-be built upon in the thesis. Section \ref{sec:related} will discuss recent
+[\textbf{REVISE}] defines core mathematical and biological concepts that will
+be built upon in the thesis. Section [\textbf{REVISE}] will discuss recent
 advances in the design of measures used to evaluate generative graph neural
 networks and in structural biology.
-
-\section{Background}\label{sec:background}
 
 The set of methods investigated in this thesis lies at the interface of
 structural biology and machine learning. We start by defining some relevant
@@ -16,7 +14,7 @@ biological properties of proteins, followed by a survey various graph theoretica
 abstractions derived from the protein structure. We then move on to define
 generative models and the various classes of measures used to evaluate them.
 
-\subsection{Proteins}\label{background:proteins}
+\section{Proteins}\label{background:proteins}
 
 Proteins are large biomolecules that are formed from a sequence of amino acids,
 performing their functions as determined by their three-dimensional structure, and amino
@@ -65,7 +63,7 @@ the middle upper right part of the plot. This figure is adapted from
   \label{fig:ramachandran}
 \end{figure}
 
-\subsection{Graphs}
+\section{Graphs}\label{background:graphs}
 
 Proteins are often abstracted using graphs. A graph $G$ is a pair of vertices
 $V$ and edges $E$ such that $G=(V, E)$, $|V|=n$ and $|E|=m$. Two vertices $i$
@@ -100,9 +98,9 @@ $\varepsilon\in\mathbb{R^+}\setminus \{0\}$ of another node is connected. Both
 are graphs where each node is labeled with the residue name to which the
 \textalpha{}-carbon belongs and the edges are unlabeled.
 
-\subsection{Topological Data Analysis}
+\section{Topological Data Analysis}
 
-Although graphs are powerful abstractions of proteins, proteins can also be
+Although graphs are powerful representation of proteins, the latter can also be
 represented as \emph{point clouds}. One powerful field of study of topological
 properties of point clouds is \emph{topological data analysis}.
 
@@ -117,16 +115,147 @@ material providing an extensive and formal introduction to topology and
 persistent homology, please refer to~\citep{freedman2009algebraic,
 edelsbrunner2010computational}, and \citep{ghrist2008barcodes}.
 
+A powerful computational technique to analyse topological properties of point
+clouds is \emph{persistent homology}, which first requires us to define
+simplicial homology. Simplicial homology refers to a way of assigning
+connectivity information to topological objects, such as point clouds, which are
+represented by simplicial complexes. A simplicial complex $K$ is a set of
+simplices which correspond to vertices in dimension 0, edges in dimension 1 and
+triangles in dimension 2. The subsets of a simplex $\sigma\in K$ are referred to
+as its faces, and every face $\tau\in K$. Moreover, any non-empty intersection
+of two simplices also needs to be part of the simplicial complex, i.e.
+$\sigma\cap\sigma '\neq\emptyset$ for $\sigma,\sigma '\in K$ implies
+$\sigma\cap\sigma'\in K$, meaning that $K$ is closed under calculating the faces
+of a simplex.
+
+Persistent homology extends simplicial homology by employing filtrations to
+imbue $K$ with scale information. This process captures rich, mutli-scale
+topological information related to $K$ in a principled way. The filtration
+process is generally defined by a function $f: K\to\mathbb{R}$ satisfying some
+finite number of values $m$ and $f^{0}\leq f^{1}\leq\dots\leq f^{m-1}\leq
+f^{m}$. This allows us to sort $K$ using $f$, for instance by extending $f$
+linearly to higher-dimensional simplices via $f(\sigma):=\max_{v\in\sigma}f(v)$,
+leading to a nested sequence of simplicial complexes like so:
+\begin{equation}
+  \label{eq:nested_simplicial_complexes}
+  \emptyset=K^{(0)}\subseteq K^{(1)}\subseteq \dots\subseteq K^{(m-1)}\subseteq K^{(m)},
+\end{equation}
+where $K^{(i)}:=\{\sigma\in K\ |\ f(\sigma)\leq f^{(i)}\}$. This relationship
+enables tracking the appearance (i.e. a connected component arising) and the
+dissapearance (i.e. two connected components into one) of topological features
+across scales as one transitions from $K^{(i)}$ to $K^{(i+1)}$. The birth (i.e.
+appearance) and death (i.e. dissapearance) of topological features for different
+values of $f$ are usually summarized in a \emph{persistence diagram}, which is a
+multiset of tuples, each of which contains the values at which each features is
+born or dies.
+
+A common construction for obtaining such features is the Vietoris-Rips complex
+\citep{vietoris1927hoheren}. It requires a distance threshold $\varepsilon$ and
+a metric $\text{d}( \cdot, \cdot)$ (usually, the Euclidean distance, as we will
+use in this thesis). The Vietoris-Rips complex at scale $\varepsilon$ of an
+input protein point cloud is defined as
+$\mathcal{V}_{\varepsilon}(X):=\{\sigma\subseteq X| \text{d}(x(i),
+x(j))\leq\varepsilon\},\ \forall x(i),x(j)\in\sigma$, i.e.
+$\mathcal{V}_{\varepsilon}$ contains all subsets of the input space whose
+pairwise distances are less than or equal to $\varepsilon$.
+$\mathcal{V}_{\varepsilon}$ is conceptually very similar to the
+$\varepsilon$-graphs discussed in section \ref{background:graphs}, except that
+$\varepsilon$ here ranges over the entire space of possible distance values, and
+$\mathcal{V}_{\epsilon}$ also tracks topological features over all three
+dimensions, instead of only connected nodes\footnote{Technically, since our
+input consists of points (a.k.a. 0-simplicial complexes) exclusively (and not 1-
+or 2- simplicial complexes), we are actually primarily concerned with a
+subcomplex of $\mathcal{V}_{\varepsilon}(X)$ called the \v{C}ech complex.}.
+
+Note that the multiplicity of the persistence diagram corresponds to the number
+of homology dimensions under study. In this thesis, given proteins are
+represented as three-dimensional point clouds, we choose to track topological
+features across three homology dimension: 0,1 and 2. Effectively, this tracks
+connected components in dimension 0, circular holes in dimension 1 and two
+dimensional voids or cavities in dimension 2 as the filtration function is
+applied. For a more thorough introduction to homology and homology groups,
+please refer to \citet{edelsbrunner2010computational}.
+
+\section{Generative models}
+
+This thesis deals with measures to assess generative model performance, so we
+define generative models here. While discriminative machine learning techniques
+aim to learn some dependent variable $\mathcal{Y}$ from a set of (independent)
+features $\mathcal{X}$, generative machine learning models generate synthetic
+samples $\mathcal{X}'$ following the distribution of $\mathcal{X}$. Computing
+such probabilistic distributions through maximum likelihood estimation and
+related methods is intractable in many cases; as such, new learning paradigms
+were established to enable the modeling of complex, real-world distributions
+through gradient-based methods.
+
+One such seminal method was that of generative adversarial learning, pioneered
+by \citet{goodfellow2014generative}, where a (deep) generator is pitted against
+a (deep) discriminator. The former's goal is to generate samples identical to
+the training distribution, while the latter is to classify whether or not the
+sample originated from the generator or the training distribution.
+Simultaneously developed methods by \citet{kingma2013auto} generalized this idea
+further and introduced the variational auto-encoder, where instead of a
+discriminator, the second network leverages the representation of the generator
+to perform approximate inference. In both cases, the two networks (i.e. the
+generator and the discriminator/inference network) are jointly trained using
+backpropagation to minimize some appropriate loss function.
+
+\textbf{[ADD LOSS FUNCTIONS]}
+
+A recent review of the existing landscape of generative modelling methods has
+been provided by \citet{bond2021deep}.
+
+These techniques have been particularly successful in the image domain, where
+modern GANs have been able to tackle multiple practical challenges such as mode
+collapse and convergence failure to produce realistic images, such as the sample
+seen in Figure \ref{fig:styleganxl}. More pertinent to this thesis is the
+application of generative models to graphs. The application domain has been
+reviewed by \citet{zhou2020graph}. In short, graph generative networks are
+capable of operating on the highly versatile and extensible graph domain. It has
+been shown that they can produce small molecules, generate social networks,
+knowledge graphs, among many other real-world tasks. Generative networks can be
+grouped into two categories: those that generate nodes in each graph
+sequentially, such as GraphRNN by \cite{you2018graphrnn}, and those that generate
+graphs from some latent distribution directly, such as MolGAN by
+\cite{de2018molgan}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{./figures/representative_image.jpg}
+  \caption{Sample images generated by StyleGAN-XL, the state-of-the-art GAN
+by \citet{sauer2022stylegan} at the time of writing.}
+  \label{fig:styleganxl}
+\end{figure}
+
+Operating in the graph domain incurs some unique challenges. From a modelling
+standpoint, dealing with graphs means dealing with a much larger and variable
+output space. Specifically, when dealing when an undirected graph of $n$ nodes,
+at least $n^2/2$ values need to be specified. Additionally, the number of edges
+and nodes vary from sample to sample, which also needs to be accounted for in
+the model structure. Additionally, building a generative model generating graphs
+of up to $n$ nodes, $n!$ possible adjacency matrices can be generated. Such a
+high representation complexity is challenging to model, expensive to
+compute, and difficult for objective functions to optimize. The last
+modelling-related issue when dealing with graphs is that the presence of one
+edge is not independent from another, i.e. real-world graphs often exhibit
+patterns of local connectedness which need to be accounted for in the model.
+
+But perhaps the most significant problem plaguing all generative models is the
+evaluation problem. Concretely, this problem can be framed using the following
+question: how does the practitioner go about evaluating the quality of
+the set of samples generated? While sidestepping the problem is possible in the image
+domain by manually inspecting generated samples, a practice that might reveal
+interesting modelling pathologies, this cannot be done at scale, and for
+generative models operating in the graph domain.
 
 
-\subsection{Generative models}
 
-\subsection{Kernel methods}
+\section{Maximum Mean Discrepancy \& Kernel methods}\label{background:kernels}
 
-\section{Related Work}\label{sec:related}
+% \section{Related Work}\label{sec:related}
 
-\subsection{Structural Biology}
+% \subsection{Structural Biology}
 
-\subsection{Metrics for Generative Graph Models}
+% \subsection{Metrics for Generative Graph Models}
 
 \section{Summary}
