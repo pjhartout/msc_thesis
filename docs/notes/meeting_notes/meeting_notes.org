@@ -36,3 +36,17 @@
 *** sample for error bar
 *** on 100 CPU cores, should be doable
 ** account for intra sample variance, so two different family (kernel needs to pick up perturbation on other unseen proteins)
+
+
+* TODO <2022-04-21 Thu> Meeting with Tim
+** FID = MMD + embeddings? Conceptually
+** Is EMD kernel a valid kernel if W_p is not negative definite?
+** All reps on one line and rename to reps, isolate perturbations more clearly
+** Code at the end
+** Add the Unit
+** Intra variation of proteins
+*** (i) assess variation within random sample of proteins from proteome
+*** (ii) mutliple runs with different samples with different pertubation seeds
+*** (iii) multiple runs with same sample with different perturbation seeds.
+** Preliminary results are OK
+** Put emphasis on feedback side
