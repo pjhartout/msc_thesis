@@ -368,7 +368,7 @@ GNNs such as \cite{liao2019efficient, niu2020permutation}, and
 \cite{you2018graphrnn} have generally gravitated towards the maximum mean
 discrepancy (MMD) measure to evaluate the quality of the graph.
 
-\section{Maximum Mean Discrepancy \& Kernel Methods}\label{background:kernels}
+\section{Maximum Mean Discrepancy}\label{background:kernels}
 
 A significant part of this thesis is centered around investigating the MMD
 statistic, so we define and examine existing around MMD research here. Introduced by
@@ -393,8 +393,8 @@ properties:
   \forall\ c_i,c_j\in\R$.
 \end{itemize}
 
-Given $n$ samples from $X=\{x_1,\dots, x_n\}\subseteq\mathcal{X}$ and $m$
-samples from $Y=\{y_1,\dots, y_m\}\subseteq\mathcal{X}$, the biased estimate of $\MMD^2$ is given by:
+Given $n$ samples from $\bx=\{x_1,\dots, x_n\}\subseteq\mathcal{X}$ and $m$
+samples from $\by=\{y_1,\dots, y_m\}\subseteq\mathcal{X}$, the biased estimate of $\MMD^2$ is given by:
 
 \begin{equation}
   \label{eq:mmd}
@@ -420,30 +420,44 @@ representation using a range of commonly used descriptors such as:
 \item The Laplacian spectrum histogram \textbf{[DEFINE]}
 \end{itemize}
 
-Once such representations are computed, it is possible to compute a kernel
-between any two such vectorized representations using the following kernel
-functions:
+\section{Kernels}
+
+Once graph representations are computed, it is possible to compute a kernel
+between any two such vectorized representations using kernels. In the following
+definitions, we define
 
 \begin{itemize}
-\item The linear kernel \textbf{[DEFINE]}
-\item The Gaussian kernel \textbf{[DEFINE]}
+\item The linear kernel. Let $\bx,\by\subseteq \mathcal{X}\in\R^d$, where $d$
+  denotes the dimensionality of the graph descriptor (e.g. the number of bins in
+  the clustering histogram). Then, the linear kernel is defined as:
+  \begin{equation}
+    \label{eq:linear_kernel}
+    \tk(\bx, \by) = \bx^T \by + c
+  \end{equation}
+  with $c\in\R$.
+\item The Gaussian kernel, which is given by:
+  \begin{equation}
+    \label{eq:gaussian_kernel}
+    \tk(\bx, \by) = \exp\left( -{\lVert \bx-\by \rVert^2\over 2\sigma^2} \right)
+  \end{equation}
 \end{itemize}
 
-We will neglect certain kernels used in the literature either because they are not
+We will neglect certain kernels used in the literature, either because they are not
 positive semi-definite, such as the total variation kernel (see
 \cite{o2021evaluation}, Appendix A1 for a proof), or because they bring capture
 little more information compared to existing accepted alternatives, they are
 inefficient to compute and not recommended to evaluate generative GNNs, e.g. the
-Earth mover's distance kernel \citep{o2021evaluation}.
+Earth mover's distance-based kernel \citep{o2021evaluation}.
 
 We will, however, leverage two new classes of kernels that are applicable to
 models evaluating protein generative model performance. The first are graph
-kernels. In particular we will examine the most efficient to compute and rich
-graph descriptor used for biological data: the Weisfeiler-Lehmann kernel. The
-second class of kernels leveraged here operate directly on the persistence
-diagrams obtained using the filtration procedures described in section
-\ref{background:tda}, in particular the persistence Fisher kernel introduced by
-\cite{le2018persistence}. We define both in the next paragraphs
+kernels (reviewed by \cite{borgwardt2020graph}). In particular we will examine
+the most efficient to compute and rich graph descriptor used for biological
+data: the Weisfeiler-Lehmann kernel. The second class of kernels leveraged here
+operate directly on the persistence diagrams obtained using the filtration
+procedures described in section \ref{background:tda}, in particular the
+persistence Fisher kernel introduced by \cite{le2018persistence}. We define both
+in the next paragraphs
 
 % \section{Related Work}\label{sec:related}
 % \subsection{Structural Biology}
