@@ -1428,8 +1428,20 @@ GNNs are able to extract meaningful representations without any training:
 }
 #+end_src
 
-
 Empirical studies of graph neural networks are keys xu2018empirical and o2021evaluation
+
+Original Weisfeiler-Lehman paper.
+
+#+begin_src bibtex
+@article{shervashidze2011weisfeiler,
+  title={Weisfeiler-lehman graph kernels.},
+  author={Shervashidze, Nino and Schweitzer, Pascal and Van Leeuwen, Erik Jan and Mehlhorn, Kurt and Borgwardt, Karsten M},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  number={9},
+  year={2011}
+}
+#+end_src
 
 * References
 #+LaTeX: \printbibliography[heading=none]
