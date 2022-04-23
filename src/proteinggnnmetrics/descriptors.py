@@ -9,6 +9,7 @@ TODO: check docstrings, citations
 
 from abc import ABCMeta
 from ctypes import Union
+from lib2to3.pgen2 import token
 from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
@@ -557,6 +558,7 @@ class ESM(Embedding):
         Returns:
             List[Protein]: _description_
         """
+
         if self.verbose:
             print("Computing embeddings with ESM...")
             print("Loading model...")
@@ -567,11 +569,10 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
+
         # TODO: See if distribution makes sense here.
         if self.verbose:
             print("Getting sequences...")
@@ -592,10 +593,10 @@ class ESM(Embedding):
         token_representations[-1]
         if self.verbose:
             print("Post-processing embeddings...")
-        for idx, protein in tqdm(
-            enumerate(proteins), total=len(proteins), disable=not self.verbose
-        ):
+
+        for protein, token_rep in zip(proteins, token_representations):
             protein.embeddings["esm"] = (
-                token_representations[idx].numpy().flatten()
+                token_rep[1 : len(protein.sequence) + 1].mean(0).numpy()
             )
+
         return proteins
