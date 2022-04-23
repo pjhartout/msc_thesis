@@ -228,7 +228,7 @@ Full architecture
    #+end_src
 + GraphRNN, GRAN, Graph Score Matching.
 
-+ Graph Recurrent Attention Networks, also uses graph spectra for MMD.
++ Graph Recurrent Attention Networks, also uses graph spectra for MMD. GRAN.
   #+begin_src bibtex
 @article{liao2019efficient,
   title={Efficient graph generation with graph recurrent attention networks},
@@ -283,7 +283,8 @@ Full architecture
 The idea here is to use deeper representational layers of an ANN and used the squared Wasserstein metric to compare two multinomial Gaussians.
 Introduced 2017
 #+begin_src bibtex
-@article{heusel2017gans,
+@article{heusel2017gans
+,
   title={Gans trained by a two time-scale update rule converge to a local nash equilibrium},
   author={Heusel, Martin and Ramsauer, Hubert and Unterthiner, Thomas and Nessler, Bernhard and Hochreiter, Sepp},
   journal={Advances in neural information processing systems},
@@ -568,12 +569,6 @@ Increased the number of metrics by performing MMD directly with node and edge fe
 
 Randomly initialized CNN to evaluate generative models
 #+begin_src bibtex
-@article{xu2018empirical,
-  title={An empirical study on evaluation metrics of generative adversarial networks},
-  author={Xu, Qiantong and Huang, Gao and Yuan, Yang and Guo, Chuan and Sun, Yu and Wu, Felix and Weinberger, Kilian},
-  journal={arXiv preprint arXiv:1806.07755},
-  year={2018}
-}
 @inproceedings{naeem2020reliable,
   title={Reliable fidelity and diversity metrics for generative models},
   author={Naeem, Muhammad Ferjad and Oh, Seong Joon and Uh, Youngjung and Choi, Yunjey and Yoo, Jaejun},
@@ -797,6 +792,20 @@ Good review of kernels, applications and other theoretical considerations
 }
 #+end_src
 
+Example of ramachandran plot
+#+begin_src bibtex
+@article{nayak2018identification,
+  title={Identification of potential inhibitors for mycobacterial uridine diphosphogalactofuranose-galactopyranose mutase enzyme: A novel drug target through in silico approach},
+  author={Nayak, Tapaswini and Jena, Lingaraja and Waghmare, Pranita and Harinath, Bhaskar C and others},
+  journal={International Journal of Mycobacteriology},
+  volume={7},
+  number={1},
+  pages={61},
+  year={2018},
+  publisher={Medknow Publications}
+}
+#+end_src
+
 * Matrix of experiments to perform
 | Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
 | --               | twist         | tda          | persistence fisher | human    |         100 |
@@ -835,7 +844,604 @@ Good review of kernels, applications and other theoretical considerations
 | k-nn             | rewire        | --           | w-l                | ecoli    |         100 |
 
 
+List of references from TDA internship
+#+begin_src bibtex
+@article{toniolo2018patterns,
+  title={Patterns of cerebellar gray matter atrophy across Alzheimer’s disease progression},
+  author={Toniolo, Sofia and Serra, Laura and Olivito, Giusy and Marra, Camillo and Bozzali, Marco and Cercignani, Mara},
+  journal={Frontiers in Cellular Neuroscience},
+  volume={12},
+  pages={430},
+  year={2018},
+  publisher={Frontiers}
+}
+@article{amezquita2020shape,
+  title={The shape of things to come: Topological data analysis and biology, from molecules to organisms},
+  author={Am{\'e}zquita, Erik J and Quigley, Michelle Y and Ophelders, Tim and Munch, Elizabeth and Chitwood, Daniel H},
+  journal={Developmental Dynamics},
+  year={2020},
+  publisher={Wiley Online Library}
+}
+@article{world2017global,
+  title={Global action plan on the public health response to dementia 2017--2025},
+  author={WHO},
+  year={2017},
+  publisher={World Health Organization}
+}
+@article{sleeman2019escalating,
+  title={The escalating global burden of serious health-related suffering: projections to 2060 by world regions, age groups, and health conditions},
+  author={Sleeman, Katherine E and de Brito, Maja and Etkind, Simon and Nkhoma, Kennedy and Guo, Ping and Higginson, Irene J and Gomes, Barbara and Harding, Richard},
+  journal={The Lancet Global Health},
+  volume={7},
+  number={7},
+  pages={e883--e892},
+  year={2019},
+  publisher={Elsevier}
+}
+@article{yiannopoulou2020current,
+  title={Current and Future Treatments in Alzheimer Disease: An Update},
+  author={Yiannopoulou, Konstantina G and Papageorgiou, Sokratis G},
+  journal={Journal of Central Nervous System Disease},
+  volume={12},
+  pages={1179573520907397},
+  year={2020},
+  publisher={SAGE Publications Sage UK: London, England}
+}
+@article{mckhann2011diagnosis,
+  title={The diagnosis of dementia due to Alzheimer's disease: recommendations from the National Institute on Aging-Alzheimer's Association workgroups on diagnostic guidelines for Alzheimer's disease},
+  author={McKhann, Guy M and Knopman, David S and Chertkow, Howard and Hyman, Bradley T and Jack Jr, Clifford R and Kawas, Claudia H and Klunk, William E and Koroshetz, Walter J and Manly, Jennifer J and Mayeux, Richard and others},
+  journal={Alzheimer's \& dementia},
+  volume={7},
+  number={3},
+  pages={263--269},
+  year={2011},
+  publisher={Wiley Online Library}
+}
+@article{lehmann2016biomarkers,
+  title={Biomarkers of Alzheimer’s disease: The present and the future},
+  author={Lehmann, Sylvain and Teunissen, Charlotte Elisabeth},
+  journal={Frontiers in Neurology},
+  volume={7},
+  pages={158},
+  year={2016},
+  publisher={Frontiers}
+}
+@article{smits2012early,
+  title={Early onset Alzheimer's disease is associated with a distinct neuropsychological profile},
+  author={Smits, Lieke L and Pijnenburg, Yolande AL and Koedam, Esther LGE and van der Vlies, Annelies E and Reuling, Ilona EW and Koene, Teddy and Teunissen, Charlotte E and Scheltens, Philip and van der Flier, Wiesje M},
+  journal={Journal of Alzheimer's Disease},
+  volume=30,
+  number=1,
+  pages={101--108},
+  year=2012,
+  publisher={IOS Press}
+}
+@article{hur2020innate,
+  title={The innate immunity protein IFITM3 modulates $\gamma$-secretase in Alzheimer’s disease},
+  author={Hur, Ji-Yeun and Frost, Georgia R and Wu, Xianzhong and Crump, Christina and Pan, Si Jia and Wong, Eitan and Barros, Marilia and Li, Thomas and Nie, Pengju and Zhai, Yujia and others},
+  journal={Nature},
+  pages={1--6},
+  year={2020},
+  publisher={Nature Publishing Group}
+}
+@article{tharp2013origins,
+  title={Origins of amyloid-$\beta$},
+  author={Tharp, William G and Sarkar, Indra Neil},
+  journal={BMC genomics},
+  volume={14},
+  number={1},
+  pages={1--15},
+  year={2013},
+  publisher={BioMed Central}
+}
+@article{fulop2018can,
+  title={Can an infection hypothesis explain the beta amyloid hypothesis of Alzheimer’s disease?},
+  author={Fulop, Tamas and Witkowski, Jacek M and Bourgade, Karine and Khalil, Abdelouahed and Zerif, Echarki and Larbi, Anis and Hirokawa, Katsuiku and Pawelec, Graham and Bocti, Christian and Lacombe, Guy and others},
+  journal={Frontiers in aging neuroscience},
+  volume={10},
+  pages={224},
+  year={2018},
+  publisher={Frontiers}
+}
+@article{frisoni2010clinical,
+  title={The clinical use of structural MRI in Alzheimer disease},
+  author={Frisoni, Giovanni B and Fox, Nick C and Jack, Clifford R and Scheltens, Philip and Thompson, Paul M},
+  journal={Nature Reviews Neurology},
+  volume={6},
+  number={2},
+  pages={67--77},
+  year={2010},
+  publisher={Nature Publishing Group}
+}
+@article{dawkins2014insights,
+  title={Insights into the physiological function of the $\beta$-amyloid precursor protein: beyond Alzheimer's disease},
+  author={Dawkins, Edgar and Small, David H},
+  journal={Journal of neurochemistry},
+  volume={129},
+  number={5},
+  pages={756--769},
+  year={2014},
+  publisher={Wiley Online Library}
+}
+@article{da2016insights,
+  title={Insights on the pathophysiology of Alzheimer's disease: The crosstalk between amyloid pathology, neuroinflammation and the peripheral immune system},
+  author={D{\'a} Mesquita, Sandro and Ferreira, Ana Catarina and Sousa, Jo{\~a}o Carlos and Correia-Neves, Margarida and Sousa, Nuno and Marques, Fernanda},
+  journal={Neuroscience \& Biobehavioral Reviews},
+  volume={68},
+  pages={547--562},
+  year={2016},
+  publisher={Elsevier}
+}
+@article{poulakis2018heterogeneous,
+  title={Heterogeneous patterns of brain atrophy in Alzheimer's disease},
+  author={Poulakis, Konstantinos and Pereira, Joana B and Mecocci, Patrizia and Vellas, Bruno and Tsolaki, Magda and K{\l}oszewska, Iwona and Soininen, Hilkka and Lovestone, Simon and Simmons, Andrew and Wahlund, Lars-Olof and others},
+  journal={Neurobiology of aging},
+  volume={65},
+  pages={98--108},
+  year={2018},
+  publisher={Elsevier}
+}
+@book{poincare1895analysis,
+  title={Analysis situs},
+  author={Poincar{\'e}, Henri},
+  year={1895},
+  publisher={Gauthier-Villars}
+}
+@article{dey1999computational,
+  title={Computational topology},
+  author={Dey, Tamal K and Edelsbrunner, Herbert and Guha, Sumanta},
+  journal={Contemporary mathematics},
+  volume=223,
+  pages={109--144},
+  year=1999,
+  publisher={Providence, RI: American Mathematical Society}
+}
+@book{james1999history,
+  title={History of topology},
+  author={James, Ioan Mackenzie},
+  year={1999},
+  publisher={Elsevier}
+}
+@article{freedman2009algebraic,
+  title={Algebraic topology for computer vision},
+  author={Freedman, Daniel and Chen, Chao},
+  journal={Computer Vision},
+  pages={239--268},
+  year={2009}
+}
+@book{edelsbrunner2010computational,
+  title={Computational topology: an introduction},
+  author={Edelsbrunner, Herbert and Harer, John},
+  year={2010},
+  publisher={American Mathematical Soc.}
+}
+@article{adams2017persistence,
+  title={Persistence images: A stable vector representation of persistent homology},
+  author={Adams, Henry and Emerson, Tegan and Kirby, Michael and Neville, Rachel and Peterson, Chris and Shipman, Patrick and Chepushtanova, Sofya and Hanson, Eric and Motta, Francis and Ziegelmeier, Lori},
+  journal={The Journal of Machine Learning Research},
+  volume={18},
+  number={1},
+  pages={218--252},
+  year={2017},
+  publisher={JMLR. org}
+}
+@article{mileyko2011probability,
+  title={Probability measures on the space of persistence diagrams},
+  author={Mileyko, Yuriy and Mukherjee, Sayan and Harer, John},
+  journal={Inverse Problems},
+  volume={27},
+  number={12},
+  pages={124007},
+  year={2011},
+  publisher={IOP Publishing}
+}
+@article{ghrist2008barcodes,
+  title={Barcodes: the persistent topology of data},
+  author={Ghrist, Robert},
+  journal={Bulletin of the American Mathematical Society},
+  volume={45},
+  number={1},
+  pages={61--75},
+  year={2008}
+}
+@incollection{bubenik2020persistence,
+  title={The persistence landscape and some of its properties},
+  author={Bubenik, Peter},
+  booktitle={Topological Data Analysis},
+  pages={97--117},
+  year={2020},
+  publisher={Springer}
+}
+@article{bubenik2015statistical,
+  title={Statistical topological data analysis using persistence landscapes},
+  author={Bubenik, Peter},
+  journal={The Journal of Machine Learning Research},
+  volume={16},
+  number={1},
+  pages={77--102},
+  year={2015},
+  publisher={JMLR. org}
+}
+@article{bubenik2017persistence,
+  title={A persistence landscapes toolbox for topological statistics},
+  author={Bubenik, Peter and D{\l}otko, Pawe{\l}},
+  journal={Journal of Symbolic Computation},
+  volume={78},
+  pages={91--114},
+  year={2017},
+  publisher={Elsevier}
+}
+@article{berwald2018computing,
+  title={Computing Wasserstein distance for persistence diagrams on a quantum computer},
+  author={Berwald, Jesse J and Gottlieb, Joel M and Munch, Elizabeth},
+  journal={arXiv preprint arXiv:1809.06433},
+  year={2018}
+}
+@article{goedert2006century,
+  title={A century of Alzheimer's disease},
+  author={Goedert, Michel and Spillantini, Maria Grazia},
+  journal={science},
+  volume={314},
+  number={5800},
+  pages={777--781},
+  year={2006},
+  publisher={American Association for the Advancement of Science}
+}
+@article{jack2008alzheimer,
+  title={The Alzheimer's disease neuroimaging initiative (ADNI): MRI methods},
+  author={Jack Jr, Clifford R and Bernstein, Matt A and Fox, Nick C and Thompson, Paul and Alexander, Gene and Harvey, Danielle and Borowski, Bret and Britson, Paula J and L. Whitwell, Jennifer and Ward, Chadwick and others},
+  journal={Journal of Magnetic Resonance Imaging: An Official Journal of the International Society for Magnetic Resonance in Medicine},
+  volume={27},
+  number={4},
+  pages={685--691},
+  year={2008},
+  publisher={Wiley Online Library}
+}
+@misc{tauzin2020giottotda,
+      title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+      author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+      year={2020},
+      eprint={2004.02551},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+@misc{chollet2015keras,
+  title={Keras},
+  author={Chollet, Franpo\c{c}ois and others},
+  year={2015},
+  howpublished={\url{https://keras.io}},
+}
+@article{wen2020convolutional,
+  title={Convolutional Neural Networks for Classification of Alzheimer's Disease: Overview and Reproducible Evaluation},
+  author={Wen, Junhao and Thibeau-Sutre, Elina and Diaz-Melo, Mauricio and Samper-Gonz{\'a}lez, Jorge and Routier, Alexandre and Bottani, Simona and Dormont, Didier and Durrleman, Stanley and Burgos, Ninon and Colliot, Olivier and others},
+  journal={Medical Image Analysis},
+  pages={101694},
+  year={2020},
+  publisher={Elsevier}
+}
+@article{tijms2020pathophysiological,
+  title={Pathophysiological subtypes of Alzheimer's disease based on cerebrospinal fluid proteomics.},
+  author={Tijms, Betty M and Gobom, Johan and Reus, Lianne and Jansen, Iris and Hong, Shengjun and Dobricic, Valerija and Kilpert, Fabian and ten Kate, Mara and Barkhof, Frederik and Tsolaki, Magda and others},
+  journal={medRxiv},
+  year={2020},
+  publisher={Cold Spring Harbor Laboratory Press}
+}
+@article{poulakis2018heterogeneous,
+  title={Heterogeneous patterns of brain atrophy in Alzheimer's disease},
+  author={Poulakis, Konstantinos and Pereira, Joana B and Mecocci, Patrizia and Vellas, Bruno and Tsolaki, Magda and K{\l}oszewska, Iwona and Soininen, Hilkka and Lovestone, Simon and Simmons, Andrew and Wahlund, Lars-Olof and others},
+  journal={Neurobiology of aging},
+  volume={65},
+  pages={98--108},
+  year={2018},
+  publisher={Elsevier}
+}
+@article{min2018survey,
+  title={A survey of clustering with deep learning: From the perspective of network architecture},
+  author={Min, Erxue and Guo, Xifeng and Liu, Qiang and Zhang, Gen and Cui, Jianjing and Long, Jun},
+  journal={IEEE Access},
+  volume={6},
+  pages={39501--39514},
+  year={2018},
+  publisher={IEEE}
+}
+@inproceedings{hofer2017deep,
+  title={Deep learning with topological signatures},
+  author={Hofer, Christoph and Kwitt, Roland and Niethammer, Marc and Uhl, Andreas},
+  booktitle={Advances in Neural Information Processing Systems},
+  pages={1634--1644},
+  year={2017}
+}
+@article{scarmeas2004cognitive,
+  title={Cognitive reserve: implications for diagnosis and prevention of Alzheimer’s disease},
+  author={Scarmeas, Nikolaos and Stern, Yaakov},
+  journal={Current neurology and neuroscience reports},
+  volume={4},
+  number={5},
+  pages={374--380},
+  year={2004},
+  publisher={Springer}
+}
+@article{van2017neuroimaging,
+  title={A neuroimaging approach to capture cognitive reserve: application to Alzheimer's disease},
+  author={van Loenhoud, Anna C and Wink, Alle Meije and Groot, Colin and Verfaillie, Sander CJ and Twisk, Jos and Barkhof, Frederik and van Berckel, Bart and Scheltens, Philip and van der Flier, Wiesje M and Ossenkoppele, Rik},
+  journal={Human brain mapping},
+  volume={38},
+  number={9},
+  pages={4703--4715},
+  year={2017},
+  publisher={Wiley Online Library}
+}
+@article{gauthier2006mild,
+  title={Mild cognitive impairment},
+  author={Gauthier, Serge and Reisberg, Barry and Zaudig, Michael and Petersen, Ronald C and Ritchie, Karen and Broich, Karl and Belleville, Sylvie and Brodaty, Henry and Bennett, David and Chertkow, Howard and others},
+  journal={The lancet},
+  volume={367},
+  number={9518},
+  pages={1262--1270},
+  year={2006},
+  publisher={Elsevier}
+}
+@article{bruningk2020image,
+  title={Image analysis for Alzheimer's disease prediction: Embracing pathological hallmarks for model architecture design},
+  author={Br{\"u}ningk, Sarah C and Hensel, Felix and Jutzeler, Catherine R and Rieck, Bastian},
+  journal={arXiv preprint arXiv:2011.06531},
+  year={2020}
+}
+@article{liu2018anatomical,
+  title={Anatomical landmark based deep feature representation for MR images in brain disease diagnosis},
+  author={Liu, Mingxia and Zhang, Jun and Nie, Dong and Yap, Pew-Thian and Shen, Dinggang},
+  journal={IEEE journal of biomedical and health informatics},
+  volume={22},
+  number={5},
+  pages={1476--1485},
+  year={2018},
+  publisher={IEEE}
+}
+@article{mrabah2019deep,
+  title={Deep clustering with a dynamic autoencoder},
+  author={Mrabah, Nairouz and Khan, Naimul Mefraz and Ksantini, Riadh and Lachiri, Z},
+  journal={CoRR},
+  year={2019}
+}
+@article{collins19943d,
+  title={3D Model-based segmentation of individual brain structures from magnetic resonance imaging data},
+  author={Collins, D Louis},
+  year={1994},
+  publisher={McGill University}
+}
+@article{mann1947test,
+  title={On a test of whether one of two random variables is stochastically larger than the other},
+  author={Mann, Henry B and Whitney, Donald R},
+  journal={The annals of mathematical statistics},
+  pages={50--60},
+  year=1947,
+  publisher={JSTOR}
+}
+@article{halliday1998regional,
+  title={Regional specificity of brain atrophy in Huntington's disease},
+  author={Halliday, GM and McRitchie, DA and Macdonald, V and Double, KL and Trent, RJ and McCusker, E},
+  journal={Experimental neurology},
+  volume={154},
+  number={2},
+  pages={663--672},
+  year={1998},
+  publisher={Elsevier}
+}
+@article{kuhl1982cerebral,
+  title={Cerebral metabolism and atrophy in Huntington's disease determined by 18FDG and computed tomographic scan},
+  author={Kuhl, David E and Phelps, Michael E and Markham, Charles H and Metter, E Jeffrey and Riege, Walter H and Winter, James},
+  journal={Annals of Neurology: Official Journal of the American Neurological Association and the Child Neurology Society},
+  volume={12},
+  number={5},
+  pages={425--434},
+  year={1982},
+  publisher={Wiley Online Library}
+}
+@article{kassubek2004topography,
+  title={Topography of cerebral atrophy in early Huntington’s disease: a voxel based morphometric MRI study},
+  author={Kassubek, J and Juengling, FD and Kioschies, T and Henkel, K and Karitzky, J and Kramer, B and Ecker, D and Andrich, J and Saft, C and Kraus, P and others},
+  journal={Journal of Neurology, Neurosurgery \& Psychiatry},
+  volume={75},
+  number={2},
+  pages={213--220},
+  year={2004},
+  publisher={BMJ Publishing Group Ltd}
+}
+@article{pini2016brain,
+  title={Brain atrophy in Alzheimer’s disease and aging},
+  author={Pini, Lorenzo and Pievani, Michela and Bocchetta, Martina and Altomare, Daniele and Bosco, Paolo and Cavedo, Enrica and Galluzzi, Samantha and Marizzoni, Moira and Frisoni, Giovanni B},
+  journal={Ageing research reviews},
+  volume={30},
+  pages={25--48},
+  year={2016},
+  publisher={Elsevier}
+}
+@article{skraba2020wasserstein,
+  title={Wasserstein Stability for Persistence Diagrams},
+  author={Skraba, Primoz and Turner, Katharine},
+  journal={arXiv preprint arXiv:2006.16824},
+  year={2020}
+}
+@article{cohen2007stability,
+  title={Stability of persistence diagrams},
+  author={Cohen-Steiner, David and Edelsbrunner, Herbert and Harer, John},
+  journal={Discrete \& computational geometry},
+  volume={37},
+  number={1},
+  pages={103--120},
+  year={2007},
+  publisher={Springer}
+}
+@article{shapiro1965analysis,
+  title={An analysis of variance test for normality (complete samples)},
+  author={Shapiro, Samuel Sanford and Wilk, Martin B},
+  journal={Biometrika},
+  volume={52},
+  number={3/4},
+  pages={591--611},
+  year={1965},
+  publisher={JSTOR}
+}
+@article{vanherpe2016framework,
+  title={Framework for efficient synthesis of spatially embedded morphologies},
+  author={Vanherpe, Liesbeth and Kanari, Lida and Atenekeng, Guy and Palacios, Juan and Shillcock, Julian},
+  journal={Physical Review E},
+  volume=94,
+  number=2,
+  pages=023315,
+  year=2016,
+  publisher={APS}
+}
+#+end_src
 
+topology & geometrical analysis links
+#+begin_src bibtex
+@article{huguet2022time,
+  title={Time-inhomogeneous diffusion geometry and topology},
+  author={Huguet, Guillaume and Tong, Alexander and Rieck, Bastian and Huang, Jessie and Kuchroo, Manik and Hirn, Matthew and Wolf, Guy and Krishnaswamy, Smita},
+  journal={arXiv preprint arXiv:2203.14860},
+  year={2022}
+}
+#+end_src
+
+original paper from vietoris on VR complex filtrations
+#+begin_src bibtex
+@article{vietoris1927hoheren,
+  title={{{\"U}ber den h{\"o}heren Zusammenhang kompakter R{\"a}ume und eine Klasse von zusammenhangstreuen Abbildungen}},
+  author={Vietoris, Leopold},
+  journal={Mathematische Annalen},
+  volume={97},
+  number={1},
+  pages={454--472},
+  year={1927},
+  publisher={Springer}
+}
+#+end_src
+
+original paper by goodfellow on GANs
+#+begin_src bibtex
+@article{goodfellow2014generative,
+  title={Generative adversarial nets},
+  author={Goodfellow, Ian and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
+  journal={Advances in neural information processing systems},
+  volume={27},
+  year={2014}
+}
+#+end_src
+
+original VAE paper
+
+#+begin_src bibtex
+@article{kingma2013auto,
+  title={Auto-encoding variational bayes},
+  author={Kingma, Diederik P and Welling, Max},
+  journal={arXiv preprint arXiv:1312.6114},
+  year={2013}
+}
+#+end_src
+
+SOTA GAN
+#+begin_src bibtex
+@article{sauer2022stylegan,
+  title={StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets},
+  author={Sauer, Axel and Schwarz, Katja and Geiger, Andreas},
+  journal={arXiv preprint arXiv:2202.00273},
+  year={2022}
+}
+#+end_src
+
+Review of techniques used to do generative modelling
+#+begin_src bibtex
+@article{bond2021deep,
+  title={Deep generative modelling: A comparative review of vaes, gans, normalizing flows, energy-based and autoregressive models},
+  author={Bond-Taylor, Sam and Leach, Adam and Long, Yang and Willcocks, Chris G},
+  journal={arXiv preprint arXiv:2103.04922},
+  year={2021}
+}
+#+end_src
+
+Inception v3 (on arxiv) paper used as inputs to GANs. Network primarily used for
+object detection
+
+#+begin_src bibtex
+@article{szegedy2015rethinking,
+  title={Rethinking the inception architecture for computer vision. 2015},
+  author={Szegedy, Christian and Vanhoucke, Vincent and Ioffe, Sergey and Shlens, Jonathon and Wojna, Zbigniew},
+  journal={arXiv preprint arXiv:1512.00567},
+  year={2015},
+  publisher={CoRR}
+}
+#+end_src
+
+Graph embedding method review
+
+#+begin_src bibtex
+@article{xu2021understanding,
+  title={Understanding graph embedding methods and their applications},
+  author={Xu, Mengjia},
+  journal={SIAM Review},
+  volume={63},
+  number={4},
+  pages={825--853},
+  year={2021},
+  publisher={SIAM}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{preuer2018frechet,
+  title={Fr{\'e}chet ChemNet distance: a metric for generative models for molecules in drug discovery},
+  author={Preuer, Kristina and Renz, Philipp and Unterthiner, Thomas and Hochreiter, Sepp and Klambauer, G{\"u}nter},
+  journal={Journal of chemical information and modeling},
+  volume={58},
+  number={9},
+  pages={1736--1741},
+  year={2018},
+  publisher={ACS Publications}
+}
+#+end_src
+
+
+GNNs are able to extract meaningful representations without any training:
+#+begin_src bibtex
+
+@article{kipf2016semi,
+  title={Semi-supervised classification with graph convolutional networks},
+  author={Kipf, Thomas N and Welling, Max},
+  journal={arXiv preprint arXiv:1609.02907},
+  year={2016}
+}
+@inproceedings{morris2019weisfeiler,
+  title={Weisfeiler and leman go neural: Higher-order graph neural networks},
+  author={Morris, Christopher and Ritzert, Martin and Fey, Matthias and Hamilton, William L and Lenssen, Jan Eric and Rattan, Gaurav and Grohe, Martin},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={33},
+  number={01},
+  pages={4602--4609},
+  year={2019}
+}
+@article{xu2018powerful,
+  title={How powerful are graph neural networks?},
+  author={Xu, Keyulu and Hu, Weihua and Leskovec, Jure and Jegelka, Stefanie},
+  journal={arXiv preprint arXiv:1810.00826},
+  year={2018}
+}
+#+end_src
+
+Empirical studies of graph neural networks are keys xu2018empirical and o2021evaluation
+
+Original Weisfeiler-Lehman paper.
+
+#+begin_src bibtex
+@article{shervashidze2011weisfeiler,
+  title={Weisfeiler-lehman graph kernels.},
+  author={Shervashidze, Nino and Schweitzer, Pascal and Van Leeuwen, Erik Jan and Mehlhorn, Kurt and Borgwardt, Karsten M},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  number={9},
+  year={2011}
+}
+#+end_src
 
 * References
 #+LaTeX: \printbibliography[heading=none]

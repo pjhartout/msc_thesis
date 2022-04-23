@@ -325,11 +325,11 @@ latent/.style={%
       \end{tikzpicture}
     }
   \end{figure}
-  % \begin{figure}%
-  %   \centering
-  %   \includegraphics[width=.6\textwidth]{./figures/plot_multiple_runs.png}
-  %   \caption{MMD as gaussian noise is added. Each bar is the 100\% confidence interval over 10 runs.}%
-  % \end{figure}
+  \begin{figure}%
+    \centering
+    \includegraphics[width=.6\textwidth]{./figures/plot_multiple_runs.png}
+    \caption{MMD as gaussian noise is added. Each bar is the 100\% confidence interval over 10 runs.}%
+  \end{figure}
 \end{frame}
 
 
@@ -350,12 +350,37 @@ latent/.style={%
       \end{tikzpicture}
     }
   \end{figure}
-  % \begin{figure}%
-  %   \centering
-  %   \includegraphics[width=.7\textwidth]{./figures/plot_run_twist.png}
-  %   \caption{MMD value as twist is progressively added to a separate set of proteins.}%
-  % \end{figure}
+  \begin{figure}%
+    \centering
+    \includegraphics[width=.7\textwidth]{./figures/plot_run_twist.png}
+    \caption{MMD value as twist is progressively added to a separate set of proteins.}%
+  \end{figure}
 \end{frame}
+
+\begin{frame}[fragile]{ESM-based kernel captures perturbations of sequences}
+  \begin{figure}
+    \centering
+    \scalebox{0.75}{
+      \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+        \node (coords) [orangebox] {Get \\Coordinates};
+        \node (gauss) [orangebox, right of=coords, xshift=1.5cm] {Add \\mutation};
+        \node (egraph) [orangebox, right of=gauss, xshift=1.5cm] {Compute \\ESM embeddings};
+        \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+        \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+        \draw [arrow] (coords) -- (gauss);
+        \draw [arrow] (gauss) -- (egraph);
+        \draw [arrow] (egraph) -- (wlk);
+        \draw [arrow] (wlk) -- (mmd);
+      \end{tikzpicture}
+    }
+  \end{figure}
+  \begin{figure}%
+    \centering
+    \includegraphics[width=.6\textwidth]{./figures/plot_esm.png}
+    \caption{MMD value as mutations are progressively added to a separate set of sequences.}%
+  \end{figure}
+\end{frame}
+
 
 
 \begin{frame}[standout]{1-sentence takeway}
