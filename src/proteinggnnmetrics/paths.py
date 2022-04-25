@@ -26,20 +26,15 @@ def set_data_home() -> PosixPath:
     if os.path.isdir(FAST_DATA_HOME):
         # Use fast SSD in cluster
         print(f"Data path: {FAST_DATA_HOME}")
-        return Path(FAST_DATA_HOME) / "data"
+        return PosixPath(FAST_DATA_HOME) / "data"
     else:
         # Switch to default. Make sure repo is on fast SSD.
         data_home = REPO_HOME / "data"
         print(f"Data path: {data_home}")
-        return Path(data_home)
+        return PosixPath(data_home)
 
 
 DATA_HOME = set_data_home()
 CACHE_DIR = DATA_HOME / ".cache"
 HUMAN_PROTEOME = DATA_HOME / "UP000005640_9606_HUMAN_v2"
-HUMAN_PROTEOME_CA_GRAPHS = DATA_HOME / Path(
-    "UP000005640_9606_HUMAN_v2_CA_GRAPHS"
-)
-HUMAN_PROTEOME_CA_CONTACT_MAP = DATA_HOME / Path(
-    "data/UP000005640_9606_HUMAN_v2_CA_CONTACT_MAP/"
-)
+ECOLI_PROTEOME = DATA_HOME / "UP000000625_83333_ECOLI_v2"
