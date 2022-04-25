@@ -39,7 +39,7 @@ from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
 from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
 def main(cfg: DictConfig):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
