@@ -1443,5 +1443,25 @@ Original Weisfeiler-Lehman paper.
 }
 #+end_src
 
+Research questions:
++ How does MMD behave proteome-wide w/o perturbations?
+  * Proteome wide resampling w/o pertubations for e-coli + human
+  * WL kernel
+  * TDA
+  * ESM
+  * Subset for specific proteins (TM proteins)
++ Graph kernel performance:
+  * Vary epsilon
+  * degree histogram additiona
+  * add variance from data in runs
++ TDA performance:
+  * Add data variance
+  * Add comparison with other kernels
+  * Separate experiment with hyperparameters
+  * Compare to the biological descriptors
++ ESM:
+  * Mutation
+  * Other kernels like WL kernel
+
 * References
 #+LaTeX: \printbibliography[heading=none]
