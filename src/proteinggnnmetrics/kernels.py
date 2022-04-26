@@ -58,7 +58,9 @@ class LinearKernel(Kernel):
         self.dense_output = dense_output
         self.normalize = normalize
 
-    def compute_gram_matrix(self, X: np.ndarray, Y: np.ndarray = None) -> Any:
+    def compute_gram_matrix(
+        self, X: np.ndarray, Y: Union[np.ndarray, None] = None
+    ) -> Any:
         if Y is not None:
             if self.normalize:
                 if X.shape == Y.shape:
