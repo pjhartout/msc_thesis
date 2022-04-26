@@ -157,7 +157,7 @@ def execute_run(cfg, run):
 
 @timeit
 @measure_memory
-@hydra.main(config_path=str(here()) + "/conf/", config_name="con_1")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_1")
 def main(cfg: DictConfig):
     os.makedirs(here() / cfg.eps_var.paths.results, exist_ok=True)
     with tqdm_joblib(
