@@ -9,6 +9,7 @@ behaviour of MMD.
 """
 
 import os
+import random
 
 import hydra
 import numpy as np
@@ -33,12 +34,21 @@ from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
+from proteinggnnmetrics.utils.functions import (
+    flatten_lists,
+    remove_fragments,
+    tqdm_joblib,
+)
 
 
 def execute_run(cfg, run):
     os.makedirs(here() / cfg.eps_var.paths.results / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
+    sampled_files = random.Random(run).sample(
+        pdb_files, cfg.experiments.sample_size * 2
+    )
+    sampled_files = remove_fragments(sampled_files)
+    midpoint = int(cfg.experiments.sample_size / 2)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     for epsilon in tqdm(
         range(
@@ -69,9 +79,7 @@ def execute_run(cfg, run):
             base_feature_steps, verbose=False
         )
         proteins = base_feature_pipeline.fit_transform(
-            pdb_files[
-                cfg.eps_var.proteins.not_perturbed.lower_bound : cfg.eps_var.proteins.not_perturbed.upper_bound
-            ]
+            sampled_files[midpoint:]
         )
         results = list()
         for std in tqdm(
@@ -107,9 +115,7 @@ def execute_run(cfg, run):
                 perturb_feature_steps, verbose=False
             )
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
-                pdb_files[
-                    cfg.eps_var.proteins.perturbed.lower_bound : cfg.eps_var.proteins.perturbed.upper_bound
-                ]
+                sampled_files[:midpoint]
             )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
