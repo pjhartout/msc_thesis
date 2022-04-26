@@ -1450,6 +1450,7 @@ Research questions:
   * TDA
   * ESM
   * Subset for specific proteins (TM proteins)
+  * RQ: What is the MMD between two random sets of proteins using the Weisfeiler-Lehman kernel on the 8Angrstrom-graph extracted from the human and E. Coli proteome?
 + Graph kernel performance:
   * Vary epsilon
   * degree histogram additiona

@@ -50,7 +50,7 @@ def get_longest_protein_dummy_sequence(pdb_files, cfg: DictConfig) -> int:
     return longest_sequence
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_3")
 def main(cfg: DictConfig):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
