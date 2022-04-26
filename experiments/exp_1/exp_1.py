@@ -42,7 +42,7 @@ from proteinggnnmetrics.utils.functions import (
 
 
 def execute_run(cfg, run):
-    os.makedirs(here() / cfg.eps_var.paths.results / str(run), exist_ok=True)
+    os.makedirs(here() / cfg.experiments.results / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     sampled_files = random.Random(run).sample(
         pdb_files, cfg.experiments.sample_size * 2
@@ -52,9 +52,9 @@ def execute_run(cfg, run):
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     for epsilon in tqdm(
         range(
-            cfg.eps_var.eps.lower_bound,
-            cfg.eps_var.eps.upper_bound,
-            cfg.eps_var.eps.step,
+            cfg.experiments.eps.lower_bound,
+            cfg.experiments.eps.upper_bound,
+            cfg.experiments.eps.step,
         ),
         position=1,
         leave=False,
@@ -67,7 +67,10 @@ def execute_run(cfg, run):
             ),
             (
                 "contact map",
-                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
+                ContactMap(
+                    metric="euclidean",
+                    n_jobs=cfg.compute.n_jobs,
+                ),
             ),
             (
                 "epsilon graph",
@@ -84,9 +87,9 @@ def execute_run(cfg, run):
         results = list()
         for std in tqdm(
             np.arange(
-                cfg.eps_var.std.lower_bound,
-                cfg.eps_var.std.upper_bound,
-                cfg.eps_var.std.step,
+                cfg.experiments.std.lower_bound,
+                cfg.experiments.std.upper_bound,
+                cfg.experiments.std.step,
             ),
             position=2,
             leave=False,
@@ -99,7 +102,7 @@ def execute_run(cfg, run):
                         (
                             "gauss",
                             GaussianNoise(
-                                random_seed=42,
+                                random_seed=run,
                                 noise_mean=0,
                                 noise_variance=std,
                                 n_jobs=cfg.compute.n_jobs,
@@ -137,7 +140,12 @@ def execute_run(cfg, run):
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
 
-        results.to_csv(here() / cfg.eps_var.paths.results / str(run) / f"epsilon_{epsilon}.csv")  # type: ignore
+        results.to_csv(
+            here()
+            / cfg.experiments.results
+            / str(run)
+            / f"epsilon_ {epsilon}.csv"
+        )  # type: ignore
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values  # type: ignore
         )
@@ -157,7 +165,7 @@ def execute_run(cfg, run):
             ]
         )
     correlations.to_csv(
-        here() / cfg.eps_var.paths.results / str(run) / f"correlations.csv"
+        here() / cfg.experiments.results / str(run) / f"correlations.csv"
     )
 
 
@@ -165,7 +173,7 @@ def execute_run(cfg, run):
 @measure_memory
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf_1")
 def main(cfg: DictConfig):
-    os.makedirs(here() / cfg.eps_var.paths.results, exist_ok=True)
+    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     with tqdm_joblib(
         tqdm(
             desc="Execute n_runs",
@@ -173,7 +181,8 @@ def main(cfg: DictConfig):
         )
     ) as progressbar:
         Parallel(n_jobs=cfg.compute.n_parallel_runs)(
-            delayed(execute_run)(cfg, run) for run in range(cfg.eps_var.n_runs)
+            delayed(execute_run)(cfg, run)
+            for run in range(cfg.experiments.n_runs)
         )
 
 
