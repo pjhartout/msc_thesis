@@ -8,6 +8,7 @@ import configparser
 import contextlib
 import os
 from itertools import product
+from pathlib import PosixPath
 from random import choice
 from string import ascii_letters
 from typing import Any, Callable, Dict, Iterable, List, Tuple
@@ -24,6 +25,18 @@ from pyprojroot import here
 from tqdm import tqdm
 
 from .exception import UniquenessError
+
+
+def remove_fragments(files: List[PosixPath]) -> List[PosixPath]:
+    """Some proteins are too long for AlphaFold to process, so it breaks it up into overlapping fragments. This can introduce bias in our data, so we only keep one fragment per protein.
+
+    Args:
+        files (List[PosixPath]): list of files to filter
+
+    Returns:
+        List[PosixPath]: list of filtered files
+    """
+    return [file for file in files if "F1" in str(file)]
 
 
 def filter_pdb_files(lst_of_files: List[str]) -> List[str]:
