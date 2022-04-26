@@ -1,9 +1,7 @@
 exp_name: "Vary epsilon and use WL kernel to see the result"
 
-n_runs: 10
-paths:
-  results: "data/experiments/eps_var"
-  images: "data/images/experiments/eps_var"
+n_runs: 20
+results: "data/experiments/eps_var"
 
 eps:
   lower_bound: 4
