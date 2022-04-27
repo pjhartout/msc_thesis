@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "msc_thesis"
+name = "proteinmetrics"
 version = "0.1.0"
 description = "This is the virtual environment used for my MSc thesis"
 authors = ["Philip Hartout <philip.hartout@protonmail.com>"]
