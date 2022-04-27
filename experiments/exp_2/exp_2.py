@@ -10,7 +10,6 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 import os
 import pickle
 import random
-from audioop import bias
 
 import hydra
 import numpy as np
@@ -191,8 +190,9 @@ def execute_run(cfg, run):
 
         results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
 
+    print("Dumping results")
     results = pd.DataFrame(results).to_csv(
-        here() / cfg.experiments.results / "mmd_single_run_twist_run_{run}.csv"
+        here() / cfg.experiments.results / "mmd_single_run_twist_{run}.csv"
     )
 
 

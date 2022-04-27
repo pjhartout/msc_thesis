@@ -206,15 +206,6 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.base_tda_steps = [
-            (
-                "diagram",
-                homology.VietorisRipsPersistence(
-                    n_jobs=self.n_jobs,
-                    homology_dimensions=self.homology_dimensions,
-                ),
-            )
-        ]
         self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
@@ -295,9 +286,15 @@ class TopologicalDescriptor(Descriptor):
             )
 
         coordinates = [protein.coordinates for protein in proteins]
-        diagram_data = pipeline.Pipeline(
-            self.base_tda_steps, verbose=True
+        if self.verbose:
+            print("Starting Vietoris-Rips filtration process")
+        diagram_data = homology.VietorisRipsPersistence(
+            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
         ).fit_transform(coordinates)
+        if self.verbose:
+            print(
+                "Vietoris-Rips filtration process complete. Postprocessing..."
+            )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
                 self.base_tda_steps, verbose=self.verbose
@@ -310,12 +307,14 @@ class TopologicalDescriptor(Descriptor):
                     self.tda_descriptor_type
                 ] = tda_descriptor
                 protein.descriptors["contact_graph"]["diagram"] = diagram
-
+            if self.verbose:
+                print("TDA descriptor computation complete")
             return proteins
         else:
             for protein, diagram in zip(proteins, diagram_data):
                 protein.descriptors["contact_graph"]["diagram"] = diagram
-
+            if self.verbose:
+                print("TDA descriptor computation complete")
             return proteins
 
 
