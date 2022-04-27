@@ -15,15 +15,19 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from grakel import WeisfeilerLehman, graph_from_networkx
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
+from tqdm import tqdm
 
 from .utils.functions import (
     distance2similarity,
+    distribute_function,
     flatten_lists,
     networkx2grakel,
     positive_eig,
+    tqdm_joblib,
 )
 from .utils.metrics import (
     _persistence_fisher_distance,
@@ -163,8 +167,7 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         if Y is not None:
             Y = remove_giotto_pd_padding(Y)
 
-        Ks = list()
-        for homology_dimension in X[0]["dim"].unique():
+        def compute_kernel_in_homology_dimension(homology_dimension, X):
             # Get the diagrams for the homology dimension
             X_diag = filter_dimension(X, homology_dimension)
             # X_diag = Padding(use=True).fit_transform(X_diag)
@@ -176,6 +179,28 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
                 Ks.append(self.fit(X_diag).transform(Y_diag))
             else:
                 Ks.append(self.fit_transform(X_diag))
+
+        # with tqdm_joblib(
+        #     tqdm(
+        #         desc="Execute n_runs",
+        #         total=len(list(range(cfg.compute.n_parallel_runs))),
+        #     )
+        # ) as progressbar:
+        #     Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+        #         delayed(compute_kernel_in_homology_dimension)(
+        #             X, homology_dimension
+        #         )
+        #         for run in range(cfg.experiments.n_runs)
+        #     )
+        Ks = distribute_function(
+            compute_kernel_in_homology_dimension,
+            X[0]["dim"].unique(),
+            n_jobs=self.n_jobs,
+            tqdm_label="Computing Persistence Fisher Kernel",
+            show_tqdm=self.verbose,
+            X=X,
+        )
+
         # We take the average of the kernel matrices in each homology dimension
         return np.average(np.array(Ks), axis=0)
 

@@ -1,10 +1,10 @@
 description: "Look at the power of TDA to investigate geometric distortions of the protein"
 
-n_runs: 10
+n_runs: 5
 
 results: "data/experiments/tda_twist/"
 
-sample_size: 100
+sample_size: 5
 
 proteins:
   not_perturbed:

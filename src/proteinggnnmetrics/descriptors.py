@@ -295,9 +295,15 @@ class TopologicalDescriptor(Descriptor):
             )
 
         coordinates = [protein.coordinates for protein in proteins]
+        if self.verbose:
+            print("Starting Vietoris-Rips filtration process")
         diagram_data = pipeline.Pipeline(
             self.base_tda_steps, verbose=True
         ).fit_transform(coordinates)
+        if self.verbose:
+            print(
+                "Vietoris-Rips filtration process complete. Postprocessing..."
+            )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
                 self.base_tda_steps, verbose=self.verbose
@@ -310,12 +316,14 @@ class TopologicalDescriptor(Descriptor):
                     self.tda_descriptor_type
                 ] = tda_descriptor
                 protein.descriptors["contact_graph"]["diagram"] = diagram
-
+            if self.verbose:
+                print("TDA descriptor computation complete")
             return proteins
         else:
             for protein, diagram in zip(proteins, diagram_data):
                 protein.descriptors["contact_graph"]["diagram"] = diagram
-
+            if self.verbose:
+                print("TDA descriptor computation complete")
             return proteins
 
 
@@ -575,7 +583,9 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(f"Size must be one of {self._size_options}",)
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 

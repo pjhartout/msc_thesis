@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""exp_2.py
+"""tda_kernel_debug.py
 
-The goal of this experiment is to investigate the effect of twisting on MMD features derived from TDA.
+Here we want to debug the tda persistence fisher pipeline business
 
 """
 
 import os
 import pickle
 import random
+from operator import truediv
 
-import hydra
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -51,44 +51,31 @@ from proteinggnnmetrics.utils.functions import (
 )
 
 
-def execute_run(cfg, run):
-    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
+def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
-    sampled_files = random.Random(run).sample(
-        pdb_files, cfg.experiments.sample_size * 2
-    )
+    sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
     midpoint = int(len(sampled_files) / 2)
-
     base_feature_steps = [
         (
             "coordinates",
-            Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
+            Coordinates(granularity="CA", n_jobs=6),
         ),
         (
             "contact_map",
             ContactMap(
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
+                n_jobs=6,
+                verbose=True,
             ),
         ),
         (
             "epsilon_graph",
             EpsilonGraph(
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=6,
                 epsilon=8,
-                verbose=cfg.debug.verbose,
+                verbose=True,
             ),
         ),
-        # (
-        #     "clustering_histogram",
-        #     LaplacianSpectrum(
-        #         graph_type="eps_graph",
-        #         n_bins=100,
-        #         n_jobs=cfg.compute.n_jobs,
-        #         verbose=cfg.debug.verbose,
-        #     ),
-        # ),
         (
             "tda",
             TopologicalDescriptor(
@@ -96,16 +83,14 @@ def execute_run(cfg, run):
                 epsilon=0.01,
                 n_bins=100,
                 order=2,
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=6,
                 landscape_layers=1,
-                verbose=cfg.debug.verbose,
+                verbose=True,
             ),
         ),
     ]
 
-    base_feature_pipeline = pipeline.Pipeline(
-        base_feature_steps, verbose=cfg.debug.verbose
-    )
+    base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=True)
     proteins = base_feature_pipeline.fit_transform(
         sampled_files[midpoint:],
     )
@@ -130,17 +115,15 @@ def execute_run(cfg, run):
                         Twist(
                             alpha=twist,
                             random_state=42,
-                            n_jobs=cfg.compute.n_jobs,
-                            verbose=cfg.debug.verbose,
+                            n_jobs=6,
+                            verbose=True,
                         ),
                     )
                 ]
                 + base_feature_steps[1:]
             ]
         )
-        perturb_feature_pipeline = pipeline.Pipeline(
-            perturb_feature_steps, verbose=cfg.debug.verbose
-        )
+        perturb_feature_pipeline = pipeline.Pipeline(perturb_feature_steps)
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
             sampled_files[:midpoint]
         )
@@ -160,55 +143,14 @@ def execute_run(cfg, run):
             kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
 
-        graphs = load_graphs(proteins, graph_type="eps_graph")
-        graphs_perturbed = load_graphs(
-            proteins_perturbed, graph_type="eps_graph"
-        )
-
-        mmd_wl = MaximumMeanDiscrepancy(
-            biased=True,
-            squared=True,
-            kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, biased=True
-            ),  # type: ignore
-        ).compute(graphs, graphs_perturbed)
-
-        # spectrum = load_descriptor(
-        #     proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
-        # )
-        # spectrum_perturbed = load_descriptor(
-        #     proteins_perturbed,
-        #     "laplacian_spectrum_histogram",
-        #     graph_type="eps_graph",
-        # )
-
-        # mmd_wl = MaximumMeanDiscrepancy(
-        #     biased=True,
-        #     squared=True,
-        #     kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
-        # ).compute(spectrum, spectrum_perturbed)
-
-        results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
+        results.append({"mmd_tda": mmd_tda, "twist": twist})
 
     print("Dumping results")
     results = pd.DataFrame(results).to_csv(
-        here() / cfg.experiments.results / "mmd_single_run_twist_{run}.csv"
+        here()
+        / "data/experiments/tda_twist"
+        / "mmd_single_run_twist_{run}.csv"
     )
-
-
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
-def main(cfg: DictConfig):
-    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
-    with tqdm_joblib(
-        tqdm(
-            desc="Execute runs in parallel",
-            total=len(list(range(cfg.compute.n_parallel_runs))),
-        )
-    ) as progressbar:
-        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
-            delayed(execute_run)(cfg, run)
-            for run in range(cfg.experiments.n_runs)
-        )
 
 
 if __name__ == "__main__":
