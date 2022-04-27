@@ -92,13 +92,16 @@ class ClusteringHistogram(Descriptor):
     def __init__(
         self,
         graph_type: str,
+        n_bins: int,
+        density: bool,
         n_jobs: int,
-        normalize: bool = True,
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
         self.normalize = normalize
+        self.n_bins = n_bins
+        self.density = density
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -109,11 +112,15 @@ class ClusteringHistogram(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein):
             G = protein.graphs[self.graph_type]
-            degree_histogram = nx.degree_histogram(G)
+            coefficient_list = list(nx.clustering(G).values())
+            hist, _ = np.histogram(
+                coefficient_list,
+                bins=self.n_bins,
+                range=(0.0, 1.0),
+                density=self.density,
+            )
 
-            protein.descriptors[self.graph_type][
-                "clustering_histogram"
-            ] = degree_histogram
+            protein.descriptors[self.graph_type]["clustering_histogram"] = hist
 
             return protein
 
