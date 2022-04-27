@@ -167,7 +167,7 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         if Y is not None:
             Y = remove_giotto_pd_padding(Y)
 
-        def compute_kernel_in_homology_dimension(homology_dimension, X):
+        def compute_kernel_in_homology_dimension(homology_dimension):
             # Get the diagrams for the homology dimension
             X_diag = filter_dimension(X, homology_dimension)
             # X_diag = Padding(use=True).fit_transform(X_diag)
@@ -176,9 +176,9 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
                 # Y_diag = Padding(use=True).fit_transform(Y_diag)
 
             if Y is not None:
-                Ks.append(self.fit(X_diag).transform(Y_diag))
+                return self.fit(X_diag).transform(Y_diag)
             else:
-                Ks.append(self.fit_transform(X_diag))
+                return self.fit_transform(X_diag)
 
         # with tqdm_joblib(
         #     tqdm(
@@ -198,7 +198,6 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
             n_jobs=self.n_jobs,
             tqdm_label="Computing Persistence Fisher Kernel",
             show_tqdm=self.verbose,
-            X=X,
         )
 
         # We take the average of the kernel matrices in each homology dimension
