@@ -25,15 +25,22 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import TopologicalDescriptor
+from proteinggnnmetrics.descriptors import (
+    LaplacianSpectrum,
+    TopologicalDescriptor,
+)
 from proteinggnnmetrics.distance import (
     MaximumMeanDiscrepancy,
     PearsonCorrelation,
     SpearmanCorrelation,
 )
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import PersistenceFisherKernel
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
+from proteinggnnmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinggnnmetrics.loaders import (
+    list_pdb_files,
+    load_descriptor,
+    load_graphs,
+)
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise, Twist
@@ -69,6 +76,15 @@ def execute_run(cfg, run):
             EpsilonGraph(
                 n_jobs=cfg.compute.n_jobs,
                 epsilon=8,
+                verbose=cfg.debug.verbose,
+            ),
+        ),
+        (
+            "clustering_histogram",
+            LaplacianSpectrum(
+                graph_type="eps_graph",
+                n_bins=100,
+                n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
             ),
         ),
@@ -153,6 +169,21 @@ def execute_run(cfg, run):
                 n_jobs=cfg.compute.n_jobs, biased=True
             ),  # type: ignore
         ).compute(graphs, graphs_perturbed)
+
+        spectrum = load_descriptor(
+            proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
+        )
+        spectrum_perturbed = load_descriptor(
+            proteins_perturbed,
+            "laplacian_spectrum_histogram",
+            graph_type="eps_graph",
+        )
+
+        mmd_wl = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+        ).compute(spectrum, spectrum_perturbed)
 
         results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
 
