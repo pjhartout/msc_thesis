@@ -4,6 +4,8 @@ n_runs: 10
 
 results: "data/experiments/tda_twist/"
 
+sample_size: 100
+
 proteins:
   not_perturbed:
     lower_bound: 0
