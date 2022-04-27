@@ -31,13 +31,9 @@ from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import Mutation
-from proteinggnnmetrics.utils.functions import flatten_lists
+from proteinggnnmetrics.utils.functions import flatten_lists, remove_fragments
 
 log = logging.getLogger(__name__)
-
-
-def remove_fragments(files):
-    return [file for file in files if "F1" in str(file)]
 
 
 def variance_organism(organism, cfg):
@@ -63,10 +59,7 @@ def variance_organism(organism, cfg):
             ),
             (
                 "contact map",
-                ContactMap(
-                    metric="euclidean",
-                    n_jobs=cfg.compute.n_jobs,
-                ),
+                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
             ),
             (
                 "epsilon graph",

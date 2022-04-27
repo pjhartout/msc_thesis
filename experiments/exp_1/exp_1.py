@@ -9,6 +9,7 @@ behaviour of MMD.
 """
 
 import os
+import random
 
 import hydra
 import numpy as np
@@ -33,18 +34,27 @@ from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
+from proteinggnnmetrics.utils.functions import (
+    flatten_lists,
+    remove_fragments,
+    tqdm_joblib,
+)
 
 
 def execute_run(cfg, run):
-    os.makedirs(here() / cfg.eps_var.paths.results / str(run), exist_ok=True)
+    os.makedirs(here() / cfg.experiments.results / str(run), exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
+    sampled_files = random.Random(run).sample(
+        pdb_files, cfg.experiments.sample_size * 2
+    )
+    sampled_files = remove_fragments(sampled_files)
+    midpoint = int(cfg.experiments.sample_size / 2)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     for epsilon in tqdm(
         range(
-            cfg.eps_var.eps.lower_bound,
-            cfg.eps_var.eps.upper_bound,
-            cfg.eps_var.eps.step,
+            cfg.experiments.eps.lower_bound,
+            cfg.experiments.eps.upper_bound,
+            cfg.experiments.eps.step,
         ),
         position=1,
         leave=False,
@@ -57,7 +67,10 @@ def execute_run(cfg, run):
             ),
             (
                 "contact map",
-                ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs,),
+                ContactMap(
+                    metric="euclidean",
+                    n_jobs=cfg.compute.n_jobs,
+                ),
             ),
             (
                 "epsilon graph",
@@ -69,16 +82,14 @@ def execute_run(cfg, run):
             base_feature_steps, verbose=False
         )
         proteins = base_feature_pipeline.fit_transform(
-            pdb_files[
-                cfg.eps_var.proteins.not_perturbed.lower_bound : cfg.eps_var.proteins.not_perturbed.upper_bound
-            ]
+            sampled_files[midpoint:]
         )
         results = list()
         for std in tqdm(
             np.arange(
-                cfg.eps_var.std.lower_bound,
-                cfg.eps_var.std.upper_bound,
-                cfg.eps_var.std.step,
+                cfg.experiments.std.lower_bound,
+                cfg.experiments.std.upper_bound,
+                cfg.experiments.std.step,
             ),
             position=2,
             leave=False,
@@ -91,7 +102,7 @@ def execute_run(cfg, run):
                         (
                             "gauss",
                             GaussianNoise(
-                                random_seed=42,
+                                random_seed=run,
                                 noise_mean=0,
                                 noise_variance=std,
                                 n_jobs=cfg.compute.n_jobs,
@@ -107,9 +118,7 @@ def execute_run(cfg, run):
                 perturb_feature_steps, verbose=False
             )
             proteins_perturbed = perturb_feature_pipeline.fit_transform(
-                pdb_files[
-                    cfg.eps_var.proteins.perturbed.lower_bound : cfg.eps_var.proteins.perturbed.upper_bound
-                ]
+                sampled_files[:midpoint]
             )
             graphs = load_graphs(proteins, graph_type="eps_graph")
             graphs_perturbed = load_graphs(
@@ -131,7 +140,12 @@ def execute_run(cfg, run):
         # Convert mmd and params to dataframe
         results = pd.DataFrame(data=results)
 
-        results.to_csv(here() / cfg.eps_var.paths.results / str(run) / f"epsilon_{epsilon}.csv")  # type: ignore
+        results.to_csv(
+            here()
+            / cfg.experiments.results
+            / str(run)
+            / f"epsilon_ {epsilon}.csv"
+        )  # type: ignore
         spearman_correlation = SpearmanCorrelation().compute(
             results["mmd"].values, results["std"].values  # type: ignore
         )
@@ -151,15 +165,15 @@ def execute_run(cfg, run):
             ]
         )
     correlations.to_csv(
-        here() / cfg.eps_var.paths.results / str(run) / f"correlations.csv"
+        here() / cfg.experiments.results / str(run) / f"correlations.csv"
     )
 
 
 @timeit
 @measure_memory
-@hydra.main(config_path=str(here()) + "/conf/", config_name="con_1")
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_1")
 def main(cfg: DictConfig):
-    os.makedirs(here() / cfg.eps_var.paths.results, exist_ok=True)
+    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     with tqdm_joblib(
         tqdm(
             desc="Execute n_runs",
@@ -167,7 +181,8 @@ def main(cfg: DictConfig):
         )
     ) as progressbar:
         Parallel(n_jobs=cfg.compute.n_parallel_runs)(
-            delayed(execute_run)(cfg, run) for run in range(cfg.eps_var.n_runs)
+            delayed(execute_run)(cfg, run)
+            for run in range(cfg.experiments.n_runs)
         )
 
 

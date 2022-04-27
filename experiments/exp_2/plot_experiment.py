@@ -18,15 +18,9 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-plt.rcParams["figure.figsize"] = (8.4, 4.8)
-plt.rcParams["savefig.dpi"] = 1200
-mpl.rcParams["font.family"] = "serif"
-cmfont = font_manager.FontProperties(
-    fname=mpl.get_data_path() + "/fonts/ttf/cmr10.ttf"
-)
-mpl.rcParams["font.serif"] = cmfont.get_name()
-mpl.rcParams["mathtext.fontset"] = "cm"
-mpl.rcParams["axes.unicode_minus"] = False
+from proteinggnnmetrics.utils.plots import setup_plotting_parameters
+
+setup_plotting_parameters()
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
