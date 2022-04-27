@@ -6,7 +6,7 @@ authors = ["Philip Hartout <philip.hartout@protonmail.com>"]
 license = "BSD-3 Clause License"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "~3.9"
 pandas = "^1.4.0"
 pre-commit = "^2.17.0"
 matplotlib = "^3.5.1"
@@ -35,6 +35,7 @@ imageio = "^2.16.1"
 natsort = "^8.1.0"
 fair-esm = "^0.4.0"
 torch = "^1.11.0"
+scipy = "^1.8.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}

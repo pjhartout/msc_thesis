@@ -35,17 +35,17 @@ class Descriptor(metaclass=ABCMeta):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def fit(self):
+    def fit(self, protein: List[Protein]) -> None:
         """required for sklearn compatibility"""
         pass
 
-    def transform(self):
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
-        pass
+        return proteins
 
-    def fit_transform(self):
+    def fit_transform(self, proteins: List[Protein]) -> List[Protein]:
         """Applies descriptor to graph"""
-        pass
+        return proteins
 
 
 class DegreeHistogram(Descriptor):
@@ -92,16 +92,18 @@ class ClusteringHistogram(Descriptor):
     def __init__(
         self,
         graph_type: str,
+        n_bins: int,
+        density: bool,
         n_jobs: int,
-        normalize: bool = True,
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
-        self.normalize = normalize
+        self.n_bins = n_bins
+        self.density = density
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -109,11 +111,15 @@ class ClusteringHistogram(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein):
             G = protein.graphs[self.graph_type]
-            degree_histogram = nx.degree_histogram(G)
+            coefficient_list = list(nx.clustering(G).values())
+            hist, _ = np.histogram(
+                coefficient_list,
+                bins=self.n_bins,
+                range=(0.0, 1.0),
+                density=self.density,
+            )
 
-            protein.descriptors[self.graph_type][
-                "clustering_histogram"
-            ] = degree_histogram
+            protein.descriptors[self.graph_type]["clustering_histogram"] = hist
 
             return protein
 
@@ -134,7 +140,7 @@ class LaplacianSpectrum(Descriptor):
         n_bins: int,
         n_jobs: int,
         density: bool = False,
-        bin_range: Tuple = (0, 2),
+        bin_range: Tuple[int, int] = (0, 2),
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
@@ -153,7 +159,7 @@ class LaplacianSpectrum(Descriptor):
         def calculate_laplacian_spectrum(protein: Protein):
             G = protein.graphs[self.graph_type]
             spectrum = nx.normalized_laplacian_spectrum(G)
-            histogram = np.histogram(
+            hist, _ = np.histogram(
                 spectrum,
                 bins=self.n_bins,
                 density=self.density,
@@ -162,7 +168,7 @@ class LaplacianSpectrum(Descriptor):
 
             protein.descriptors[self.graph_type][
                 "laplacian_spectrum_histogram"
-            ] = histogram
+            ] = hist
 
             return protein
 
