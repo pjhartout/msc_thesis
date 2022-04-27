@@ -35,17 +35,17 @@ class Descriptor(metaclass=ABCMeta):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def fit(self):
+    def fit(self, protein: List[Protein]) -> None:
         """required for sklearn compatibility"""
         pass
 
-    def transform(self):
+    def transform(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
-        pass
+        return proteins
 
-    def fit_transform(self):
+    def fit_transform(self, proteins: List[Protein]) -> List[Protein]:
         """Applies descriptor to graph"""
-        pass
+        return proteins
 
 
 class DegreeHistogram(Descriptor):
@@ -99,12 +99,11 @@ class ClusteringHistogram(Descriptor):
     ):
         super().__init__(n_jobs, verbose)
         self.graph_type = graph_type
-        self.normalize = normalize
         self.n_bins = n_bins
         self.density = density
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -141,7 +140,7 @@ class LaplacianSpectrum(Descriptor):
         n_bins: int,
         n_jobs: int,
         density: bool = False,
-        bin_range: Tuple = (0, 2),
+        bin_range: Tuple[int, int] = (0, 2),
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
@@ -160,7 +159,7 @@ class LaplacianSpectrum(Descriptor):
         def calculate_laplacian_spectrum(protein: Protein):
             G = protein.graphs[self.graph_type]
             spectrum = nx.normalized_laplacian_spectrum(G)
-            histogram = np.histogram(
+            hist, _ = np.histogram(
                 spectrum,
                 bins=self.n_bins,
                 density=self.density,
@@ -169,7 +168,7 @@ class LaplacianSpectrum(Descriptor):
 
             protein.descriptors[self.graph_type][
                 "laplacian_spectrum_histogram"
-            ] = histogram
+            ] = hist
 
             return protein
 
