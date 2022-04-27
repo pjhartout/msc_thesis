@@ -13,6 +13,7 @@ import random
 import hydra
 import numpy as np
 import pandas as pd
+from fastwlk import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
@@ -21,10 +22,11 @@ from tqdm import tqdm
 
 from proteinggnnmetrics.descriptors import ESM
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
+from proteinggnnmetrics.graphs import ContactMap
 from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files
+from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Sequence
+from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import Mutation
 from proteinggnnmetrics.utils.functions import flatten_lists, remove_fragments
 
@@ -63,7 +65,18 @@ def execute_run(cfg, run):
     dummy_longest = get_longest_protein_dummy_sequence(pdb_files, cfg)
 
     base_feature_steps = [
-        ("sequence", Sequence(n_jobs=cfg.compute.n_jobs),),
+        (
+            "coordinates",
+            Coordinates(
+                n_jobs=cfg.compute.n_jobs,
+                granularity="CA",
+                verbose=cfg.debug.verbose,
+            ),
+        ),
+        (
+            "contact_map",
+            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose),
+        ),
         (
             "esm",
             ESM(
@@ -119,12 +132,31 @@ def execute_run(cfg, run):
             [protein.embeddings["esm"] for protein in proteins_perturbed]
         )
 
-        mmd = MaximumMeanDiscrepancy(
+        mmd_esm = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
             kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
         ).compute(embeddings, embeddings_perturbed)
-        results.append({"mmd": mmd, "p_mutate": mutation})
+
+        graphs = load_graphs(proteins, graph_type="eps_graph")
+        graphs_perturbed = load_graphs(
+            proteins_perturbed, graph_type="eps_graph"
+        )
+
+        mmd_wl = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=WeisfeilerLehmanKernel(
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=5,
+                verbose=cfg.debug.verbose,
+                biased=True,
+            ),  # type: ignore
+        ).compute(graphs, graphs_perturbed)
+
+        results.append(
+            {"mmd_esm": mmd_esm, "mmd_wl": mmd_wl, "p_mutate": mutation}
+        )
 
     results = pd.DataFrame(results).to_csv(
         here()
