@@ -9,6 +9,7 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 
 import os
 import pickle
+from audioop import bias
 
 import hydra
 import numpy as np
@@ -39,8 +40,7 @@ from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
 from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
-def main(cfg: DictConfig):
+def execute_run(cfg, run):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
@@ -50,7 +50,20 @@ def main(cfg: DictConfig):
             "coordinates",
             Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
-        ("sample", SamplePoints(n=2)),
+        (
+            "contact_map",
+            ContactMap(
+                n_jobs=cfg.compute.n_jobs, verbose=cfg.compute.verbose,
+            ),
+        ),
+        (
+            "epsilon_graph",
+            EpsilonGraph(
+                n_jobs=cfg.compute.n_jobs,
+                epsilon=8,
+                verbose=cfg.debug.verbose,
+            ),
+        ),
         (
             "tda",
             TopologicalDescriptor(
@@ -122,19 +135,45 @@ def main(cfg: DictConfig):
             for protein in proteins_perturbed
         ]
 
-        kernel = PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs)
-        res = kernel.compute_gram_matrix(
-            np.array(diagrams), np.array(diagrams_perturbed)
-        )
-        mmd = MaximumMeanDiscrepancy(
+        mmd_tda = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
             kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
-        results.append({"mmd": mmd, "twist": twist})
+
+        graphs = load_graphs(proteins, graph_type="eps_graph")
+        graphs_perturbed = load_graphs(
+            proteins_perturbed, graph_type="eps_graph"
+        )
+
+        mmd_wl = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=WeisfeilerLehmanKernel(
+                n_jobs=cfg.compute.n_jobs, biased=True
+            ),  # type: ignore
+        ).compute(graphs, graphs_perturbed)
+
+        results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
+
     results = pd.DataFrame(results).to_csv(
-        here() / cfg.experiments.results / "mmd_single_run_twist.csv"
+        here() / cfg.experiments.results / "mmd_single_run_twist_run_{run}.csv"
     )
+
+
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
+def main(cfg: DictConfig):
+    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
+    with tqdm_joblib(
+        tqdm(
+            desc="Execute runs in parallel",
+            total=len(list(range(cfg.compute.n_parallel_runs))),
+        )
+    ) as progressbar:
+        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+            delayed(execute_run)(cfg, run)
+            for run in range(cfg.experiments.n_runs)
+        )
 
 
 if __name__ == "__main__":
