@@ -1,0 +1,5 @@
+defaults:
+  - compute: compute
+  - variables: variables
+  - seeding: seeding
+  - debug: debug
