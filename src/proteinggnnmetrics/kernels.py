@@ -15,29 +15,16 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from grakel import WeisfeilerLehman, graph_from_networkx
-from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
-from tqdm import tqdm
 
-from .utils.functions import (
-    distance2similarity,
-    distribute_function,
-    flatten_lists,
-    networkx2grakel,
-    positive_eig,
-    tqdm_joblib,
-)
+from .utils.functions import distribute_function, networkx2grakel
 from .utils.metrics import (
     _persistence_fisher_distance,
     pairwise_persistence_diagram_kernels,
 )
-from .utils.preprocessing import (
-    Padding,
-    filter_dimension,
-    remove_giotto_pd_padding,
-)
+from .utils.preprocessing import filter_dimension, remove_giotto_pd_padding
 
 default_eigvalue_precision = float("-1e-5")
 
@@ -180,18 +167,6 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
             else:
                 return self.fit_transform(X_diag)
 
-        # with tqdm_joblib(
-        #     tqdm(
-        #         desc="Execute n_runs",
-        #         total=len(list(range(cfg.compute.n_parallel_runs))),
-        #     )
-        # ) as progressbar:
-        #     Parallel(n_jobs=cfg.compute.n_parallel_runs)(
-        #         delayed(compute_kernel_in_homology_dimension)(
-        #             X, homology_dimension
-        #         )
-        #         for run in range(cfg.experiments.n_runs)
-        #     )
         Ks = distribute_function(
             compute_kernel_in_homology_dimension,
             X[0]["dim"].unique(),
