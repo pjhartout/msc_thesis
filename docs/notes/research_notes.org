@@ -807,6 +807,7 @@ Example of ramachandran plot
 #+end_src
 
 * Matrix of experiments to perform
+
 | Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
 | --               | twist         | tda          | persistence fisher | human    |         100 |
 | --               | twist         | ramachandran | linear             | human    |         100 |
@@ -843,6 +844,7 @@ Example of ramachandran plot
 | k-nn             | shear         | --           | w-l                | ecoli    |         100 |
 | k-nn             | rewire        | --           | w-l                | ecoli    |         100 |
 
+Filter by relevant sections
 
 List of references from TDA internship
 #+begin_src bibtex
