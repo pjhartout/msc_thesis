@@ -55,12 +55,11 @@ from proteinggnnmetrics.utils.functions import (
 def execute_run(cfg, run):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
-    correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
+    pdb_files = remove_fragments(pdb_files)
     sampled_files = random.Random(run).sample(
         pdb_files, cfg.experiments.sample_size * 2
     )
-    sampled_files = remove_fragments(sampled_files)
-    midpoint = int(len(pdb_files) / 2)
+    midpoint = int(len(sampled_files) / 2)
 
     base_feature_steps = [
         (
