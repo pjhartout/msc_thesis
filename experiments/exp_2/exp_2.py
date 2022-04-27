@@ -9,6 +9,7 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 
 import os
 import pickle
+import random
 from audioop import bias
 
 import hydra
@@ -37,13 +38,22 @@ from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise, Twist
 from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
-from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
+from proteinggnnmetrics.utils.functions import (
+    flatten_lists,
+    remove_fragments,
+    tqdm_joblib,
+)
 
 
 def execute_run(cfg, run):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
+    sampled_files = random.Random(run).sample(
+        pdb_files, cfg.experiments.sample_size
+    )
+    sampled_files = remove_fragments(sampled_files)
+    midpoint = int(cfg.experiments.sample_size / 2)
 
     base_feature_steps = [
         (
@@ -52,10 +62,7 @@ def execute_run(cfg, run):
         ),
         (
             "contact_map",
-            ContactMap(
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
+            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,),
         ),
         (
             "epsilon_graph",
@@ -82,12 +89,7 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(
-        pdb_files[
-            cfg.experiments.proteins.not_perturbed.lower_bound : cfg.experiments.proteins.not_perturbed.upper_bound
-            + 1
-        ]
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
 
     results = list()
     for twist in tqdm(
@@ -121,10 +123,7 @@ def execute_run(cfg, run):
             perturb_feature_steps, verbose=cfg.debug.verbose
         )
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
-            pdb_files[
-                cfg.experiments.proteins.perturbed.lower_bound : cfg.experiments.proteins.perturbed.upper_bound
-                + 1
-            ]
+            sampled_files[:midpoint]
         )
 
         diagrams = [
