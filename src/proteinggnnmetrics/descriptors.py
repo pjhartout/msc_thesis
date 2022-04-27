@@ -206,15 +206,6 @@ class TopologicalDescriptor(Descriptor):
         self.order = order
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
-        self.base_tda_steps = [
-            (
-                "diagram",
-                homology.VietorisRipsPersistence(
-                    n_jobs=self.n_jobs,
-                    homology_dimensions=self.homology_dimensions,
-                ),
-            )
-        ]
         self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
@@ -297,8 +288,8 @@ class TopologicalDescriptor(Descriptor):
         coordinates = [protein.coordinates for protein in proteins]
         if self.verbose:
             print("Starting Vietoris-Rips filtration process")
-        diagram_data = pipeline.Pipeline(
-            self.base_tda_steps, verbose=True
+        diagram_data = homology.VietorisRipsPersistence(
+            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
         ).fit_transform(coordinates)
         if self.verbose:
             print(
@@ -583,9 +574,7 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
