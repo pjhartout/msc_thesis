@@ -8,6 +8,7 @@ The goal of this experiment is to investigate the effect of mutation on MMD feat
 """
 
 import os
+import random
 
 import hydra
 import numpy as np
@@ -25,7 +26,7 @@ from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Sequence
 from proteinggnnmetrics.perturbations import Mutation
-from proteinggnnmetrics.utils.functions import flatten_lists
+from proteinggnnmetrics.utils.functions import flatten_lists, remove_fragments
 
 
 def get_longest_protein_dummy_sequence(pdb_files, cfg: DictConfig) -> int:
@@ -52,6 +53,11 @@ def get_longest_protein_dummy_sequence(pdb_files, cfg: DictConfig) -> int:
 
 def execute_run(cfg, run):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
+    sampled_files = random.Random(run).sample(
+        pdb_files, cfg.experiments.sample_size * 2
+    )
+    sampled_files = remove_fragments(sampled_files)
+    midpoint = int(cfg.experiments.sample_size / 2)
 
     # Get longest proteins of proteins and proteins_perturbed
     dummy_longest = get_longest_protein_dummy_sequence(pdb_files, cfg)
@@ -71,12 +77,7 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(
-        pdb_files[
-            cfg.experiments.proteins.not_perturbed.lower_bound : cfg.experiments.proteins.not_perturbed.upper_bound
-            + 1
-        ]
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:])
     results = list()
     for mutation in tqdm(
         np.arange(
@@ -109,10 +110,7 @@ def execute_run(cfg, run):
             perturb_feature_steps, verbose=cfg.debug.verbose
         )
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
-            pdb_files[
-                cfg.experiments.proteins.perturbed.lower_bound : cfg.experiments.proteins.perturbed.upper_bound
-                + 1
-            ]
+            sampled_files[:midpoint]
         )
         embeddings = np.array(
             [protein.embeddings["esm"] for protein in proteins]
