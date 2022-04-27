@@ -57,7 +57,7 @@ def execute_run(cfg, run):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
     sampled_files = random.Random(run).sample(
-        pdb_files, cfg.experiments.sample_size
+        pdb_files, cfg.experiments.sample_size * 2
     )
     sampled_files = remove_fragments(sampled_files)
     midpoint = int(cfg.experiments.sample_size / 2)
