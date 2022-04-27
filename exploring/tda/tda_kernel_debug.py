@@ -57,25 +57,9 @@ def main():
     sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
-        (
-            "coordinates",
-            Coordinates(granularity="CA", n_jobs=6),
-        ),
-        (
-            "contact_map",
-            ContactMap(
-                n_jobs=6,
-                verbose=True,
-            ),
-        ),
-        (
-            "epsilon_graph",
-            EpsilonGraph(
-                n_jobs=6,
-                epsilon=8,
-                verbose=True,
-            ),
-        ),
+        ("coordinates", Coordinates(granularity="CA", n_jobs=6),),
+        ("contact_map", ContactMap(n_jobs=6, verbose=True,),),
+        ("epsilon_graph", EpsilonGraph(n_jobs=6, epsilon=8, verbose=True,),),
         (
             "tda",
             TopologicalDescriptor(
@@ -91,20 +75,11 @@ def main():
     ]
 
     base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=True)
-    proteins = base_feature_pipeline.fit_transform(
-        sampled_files[midpoint:],
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
 
     results = list()
     for twist in tqdm(
-        np.arange(
-            cfg.experiments.perturbations.twist.min,
-            cfg.experiments.perturbations.twist.max,
-            cfg.experiments.perturbations.twist.step,
-        ),
-        position=1,
-        leave=False,
-        desc="Twist range",
+        np.arange(0, 0.1, 0.01,), position=1, leave=False, desc="Twist range",
     ):
         perturb_feature_steps = flatten_lists(
             [
@@ -140,7 +115,7 @@ def main():
         mmd_tda = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
-            kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+            kernel=PersistenceFisherKernel(n_jobs=6),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
 
         results.append({"mmd_tda": mmd_tda, "twist": twist})
