@@ -69,7 +69,10 @@ def execute_run(cfg, run):
         ),
         (
             "contact_map",
-            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,),
+            ContactMap(
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
         ),
         (
             "epsilon_graph",
@@ -79,15 +82,15 @@ def execute_run(cfg, run):
                 verbose=cfg.debug.verbose,
             ),
         ),
-        (
-            "clustering_histogram",
-            LaplacianSpectrum(
-                graph_type="eps_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
+        # (
+        #     "clustering_histogram",
+        #     LaplacianSpectrum(
+        #         graph_type="eps_graph",
+        #         n_bins=100,
+        #         n_jobs=cfg.compute.n_jobs,
+        #         verbose=cfg.debug.verbose,
+        #     ),
+        # ),
         (
             "tda",
             TopologicalDescriptor(
@@ -105,7 +108,9 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
+    proteins = base_feature_pipeline.fit_transform(
+        sampled_files[midpoint:],
+    )
 
     results = list()
     for twist in tqdm(
@@ -170,20 +175,20 @@ def execute_run(cfg, run):
             ),  # type: ignore
         ).compute(graphs, graphs_perturbed)
 
-        spectrum = load_descriptor(
-            proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
-        )
-        spectrum_perturbed = load_descriptor(
-            proteins_perturbed,
-            "laplacian_spectrum_histogram",
-            graph_type="eps_graph",
-        )
+        # spectrum = load_descriptor(
+        #     proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
+        # )
+        # spectrum_perturbed = load_descriptor(
+        #     proteins_perturbed,
+        #     "laplacian_spectrum_histogram",
+        #     graph_type="eps_graph",
+        # )
 
-        mmd_wl = MaximumMeanDiscrepancy(
-            biased=True,
-            squared=True,
-            kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
-        ).compute(spectrum, spectrum_perturbed)
+        # mmd_wl = MaximumMeanDiscrepancy(
+        #     biased=True,
+        #     squared=True,
+        #     kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+        # ).compute(spectrum, spectrum_perturbed)
 
         results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
 
