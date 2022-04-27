@@ -60,7 +60,7 @@ def execute_run(cfg, run):
         pdb_files, cfg.experiments.sample_size * 2
     )
     sampled_files = remove_fragments(sampled_files)
-    midpoint = int(cfg.experiments.sample_size / 2)
+    midpoint = int(len(pdb_files) / 2)
 
     base_feature_steps = [
         (
