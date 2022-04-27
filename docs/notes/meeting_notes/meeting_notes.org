@@ -18,35 +18,3 @@
 #+OPTIONS: toc:nil
 #+STARTUP: latexpreview
 #+LATEX_COMPILER: pdflatexorg-mode restarted
-
-* TODO <2022-04-08 Fri> Meeting with Tim
-** ESM1v
-** Epsilon value from literature
-** Empirical work to see which amino acids interact/make contacts
-** avg number of partners and distance required for interactions
-** parameters to "checkout"
-*** data parameters: k + epsilon (avg biologically +- 50%)
-*** perturbations; mutation, twist, graph
-*** descriptors: TDA, graph (degree), ESM, Ramachandran
-*** kernels: W-L, Linear, Gaussian, TDA
-*** parameters of kernels? n_iters for WL, Gaussian (gamma), TDA parameters
-**** for gamma: express gamma as function of median eucledian distance between all representations within the unperturbed set
-*** screen sample size as parameter
-*** subets of data (E-coli vs Human, Go by localization (membrane, cytoplasm, mitochondria...)), low priority
-*** sample for error bar
-*** on 100 CPU cores, should be doable
-** account for intra sample variance, so two different family (kernel needs to pick up perturbation on other unseen proteins)
-
-
-* TODO <2022-04-21 Thu> Meeting with Tim
-** FID = MMD + embeddings? Conceptually
-** Is EMD kernel a valid kernel if W_p is not negative definite?
-** All reps on one line and rename to reps, isolate perturbations more clearly
-** Code at the end
-** Add the Unit
-** Intra variation of proteins
-*** (i) assess variation within random sample of proteins from proteome
-*** (ii) mutliple runs with different samples with different pertubation seeds
-*** (iii) multiple runs with same sample with different perturbation seeds.
-** Preliminary results are OK
-** Put emphasis on feedback side
