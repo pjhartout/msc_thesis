@@ -9,6 +9,8 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 
 import os
 import pickle
+import random
+from audioop import bias
 
 import hydra
 import numpy as np
@@ -23,34 +25,69 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import TopologicalDescriptor
+from proteinggnnmetrics.descriptors import (
+    LaplacianSpectrum,
+    TopologicalDescriptor,
+)
 from proteinggnnmetrics.distance import (
     MaximumMeanDiscrepancy,
     PearsonCorrelation,
     SpearmanCorrelation,
 )
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import PersistenceFisherKernel
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
+from proteinggnnmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinggnnmetrics.loaders import (
+    list_pdb_files,
+    load_descriptor,
+    load_graphs,
+)
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise, Twist
 from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
-from proteinggnnmetrics.utils.functions import flatten_lists, tqdm_joblib
+from proteinggnnmetrics.utils.functions import (
+    flatten_lists,
+    remove_fragments,
+    tqdm_joblib,
+)
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
-def main(cfg: DictConfig):
+def execute_run(cfg, run):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     correlations = pd.DataFrame(columns=["epsilon", "pearson", "spearman"])
+    sampled_files = random.Random(run).sample(
+        pdb_files, cfg.experiments.sample_size
+    )
+    sampled_files = remove_fragments(sampled_files)
+    midpoint = int(cfg.experiments.sample_size / 2)
 
     base_feature_steps = [
         (
             "coordinates",
             Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
         ),
-        ("sample", SamplePoints(n=2)),
+        (
+            "contact_map",
+            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,),
+        ),
+        (
+            "epsilon_graph",
+            EpsilonGraph(
+                n_jobs=cfg.compute.n_jobs,
+                epsilon=8,
+                verbose=cfg.debug.verbose,
+            ),
+        ),
+        (
+            "clustering_histogram",
+            LaplacianSpectrum(
+                graph_type="eps_graph",
+                n_bins=100,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        ),
         (
             "tda",
             TopologicalDescriptor(
@@ -68,12 +105,7 @@ def main(cfg: DictConfig):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(
-        pdb_files[
-            cfg.experiments.proteins.not_perturbed.lower_bound : cfg.experiments.proteins.not_perturbed.upper_bound
-            + 1
-        ]
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
 
     results = list()
     for twist in tqdm(
@@ -107,10 +139,7 @@ def main(cfg: DictConfig):
             perturb_feature_steps, verbose=cfg.debug.verbose
         )
         proteins_perturbed = perturb_feature_pipeline.fit_transform(
-            pdb_files[
-                cfg.experiments.proteins.perturbed.lower_bound : cfg.experiments.proteins.perturbed.upper_bound
-                + 1
-            ]
+            sampled_files[:midpoint]
         )
 
         diagrams = [
@@ -122,19 +151,60 @@ def main(cfg: DictConfig):
             for protein in proteins_perturbed
         ]
 
-        kernel = PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs)
-        res = kernel.compute_gram_matrix(
-            np.array(diagrams), np.array(diagrams_perturbed)
-        )
-        mmd = MaximumMeanDiscrepancy(
+        mmd_tda = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
             kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
-        results.append({"mmd": mmd, "twist": twist})
+
+        graphs = load_graphs(proteins, graph_type="eps_graph")
+        graphs_perturbed = load_graphs(
+            proteins_perturbed, graph_type="eps_graph"
+        )
+
+        mmd_wl = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=WeisfeilerLehmanKernel(
+                n_jobs=cfg.compute.n_jobs, biased=True
+            ),  # type: ignore
+        ).compute(graphs, graphs_perturbed)
+
+        spectrum = load_descriptor(
+            proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
+        )
+        spectrum_perturbed = load_descriptor(
+            proteins_perturbed,
+            "laplacian_spectrum_histogram",
+            graph_type="eps_graph",
+        )
+
+        mmd_wl = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+        ).compute(spectrum, spectrum_perturbed)
+
+        results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
+
     results = pd.DataFrame(results).to_csv(
-        here() / cfg.experiments.results / "mmd_single_run_twist.csv"
+        here() / cfg.experiments.results / "mmd_single_run_twist_run_{run}.csv"
     )
+
+
+@hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
+def main(cfg: DictConfig):
+    os.makedirs(here() / cfg.experiments.results, exist_ok=True)
+    with tqdm_joblib(
+        tqdm(
+            desc="Execute runs in parallel",
+            total=len(list(range(cfg.compute.n_parallel_runs))),
+        )
+    ) as progressbar:
+        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+            delayed(execute_run)(cfg, run)
+            for run in range(cfg.experiments.n_runs)
+        )
 
 
 if __name__ == "__main__":
