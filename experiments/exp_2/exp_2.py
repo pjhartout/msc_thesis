@@ -53,7 +53,8 @@ def execute_run(cfg, run):
         (
             "contact_map",
             ContactMap(
-                n_jobs=cfg.compute.n_jobs, verbose=cfg.compute.verbose,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
             ),
         ),
         (
