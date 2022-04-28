@@ -26,7 +26,7 @@ class SamplePoints:
 
     """
 
-    def __init__(self, n: float):
+    def __init__(self, n: int):
         """__init__ method
 
         Args:
