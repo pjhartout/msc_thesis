@@ -50,16 +50,36 @@ from proteinggnnmetrics.utils.functions import (
     tqdm_joblib,
 )
 
+N_JOBS = 12
 
+
+@timeit
 def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
-    sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
+    sampled_files = random.Random(42).sample(pdb_files, 12 * 2)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=6),),
-        ("contact_map", ContactMap(n_jobs=6, verbose=True,),),
-        ("epsilon_graph", EpsilonGraph(n_jobs=6, epsilon=8, verbose=True,),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        ("sample", SamplePoints(n=2)),
+        (
+            "contact_map",
+            ContactMap(
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
+        ),
+        (
+            "epsilon_graph",
+            EpsilonGraph(
+                n_jobs=N_JOBS,
+                epsilon=8,
+                verbose=True,
+            ),
+        ),
         (
             "tda",
             TopologicalDescriptor(
@@ -75,11 +95,20 @@ def main():
     ]
 
     base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=True)
-    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
+    proteins = base_feature_pipeline.fit_transform(
+        sampled_files[midpoint:],
+    )
 
     results = list()
     for twist in tqdm(
-        np.arange(0, 0.1, 0.5,), position=1, leave=False, desc="Twist range",
+        np.arange(
+            0,
+            0.1,
+            0.05,
+        ),
+        position=1,
+        leave=False,
+        desc="Twist range",
     ):
         perturb_feature_steps = flatten_lists(
             [
@@ -90,7 +119,7 @@ def main():
                         Twist(
                             alpha=twist,
                             random_state=42,
-                            n_jobs=6,
+                            n_jobs=N_JOBS,
                             verbose=True,
                         ),
                     )
@@ -115,7 +144,7 @@ def main():
         mmd_tda = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
-            kernel=PersistenceFisherKernel(n_jobs=6),  # type: ignore
+            kernel=PersistenceFisherKernel(n_jobs=N_JOBS),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
 
         results.append({"mmd_tda": mmd_tda, "twist": twist})
@@ -124,7 +153,7 @@ def main():
     results = pd.DataFrame(results).to_csv(
         here()
         / "data/experiments/tda_twist"
-        / "mmd_single_run_twist_{run}.csv"
+        / "mmd_single_run_twist_exploring.csv"
     )
 
 
