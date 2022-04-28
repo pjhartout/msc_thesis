@@ -8,9 +8,14 @@ TODO: check docstrings, citations
 """
 
 
+import os
+import shutil
+import uuid
 from abc import ABCMeta
 from ctypes import Union
+from http.client import OK
 from lib2to3.pgen2 import token
+from pathlib import Path
 from tabnanny import verbose
 from typing import Any, Callable, List, Tuple
 
@@ -19,14 +24,24 @@ import networkx as nx
 import numpy as np
 import torch
 from Bio.PDB import PDBParser, PPBuilder, vectors
+from genericpath import exists
 from gtda import curves, diagrams, homology, pipeline
+from imageio import save
 from tqdm import tqdm
+from yaml import load
 
 from proteinggnnmetrics.loaders import load_descriptor
 
+from .paths import CACHE_DIR, DATA_HOME
 from .protein import Protein
 from .utils.exception import TDAPipelineError
-from .utils.functions import chunks, distribute_function, flatten_lists
+from .utils.functions import (
+    chunks,
+    distribute_function,
+    flatten_lists,
+    load_obj,
+    save_obj,
+)
 
 
 class Descriptor(metaclass=ABCMeta):
@@ -150,8 +165,8 @@ class LaplacianSpectrum(Descriptor):
         self.density = density
         self.bin_range = bin_range
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -196,6 +211,7 @@ class TopologicalDescriptor(Descriptor):
         landscape_layers: int = None,
         n_jobs: int = None,
         verbose: bool = False,
+        use_caching: bool = True,
     ) -> None:
         super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
@@ -208,6 +224,7 @@ class TopologicalDescriptor(Descriptor):
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
         self.verbose = verbose
+        self.use_caching = use_caching
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -291,13 +308,48 @@ class TopologicalDescriptor(Descriptor):
                 0
             ]
 
-        diagram_data = distribute_function(
-            compute_persistence_diagram_for_point_cloud,
-            coordinates,
-            n_jobs=self.n_jobs,
-            tqdm_label="Computing persistence diagrams in parallel",
-            show_tqdm=self.verbose,
-        )
+        if self.use_caching:
+            if self.verbose:
+                print("Caching to accelerate operation.")
+            diagram_cache = (
+                # The uuid is useful if this descriptor is called multiple
+                # times
+                CACHE_DIR
+                / f"diagram_compute_cache_{uuid.uuid4().hex}/"
+            )
+            diagram_cache.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+            n_chunks = (
+                int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
+            )
+            cks = chunks(coordinates, n_chunks)
+            for i, ck in enumerate(cks):
+                diagram_data = distribute_function(
+                    compute_persistence_diagram_for_point_cloud,
+                    ck,
+                    n_jobs=self.n_jobs,
+                    tqdm_label="Computing persistence diagrams in parallel",
+                    show_tqdm=self.verbose,
+                )
+                save_obj(
+                    diagram_cache / f"diagram_part_{i}",
+                    diagram_data,
+                )
+            diagram_data = list()
+            for elem in os.listdir(diagram_cache):
+                diagram_data.append(load_obj(diagram_cache / elem))
+            diagram_data = flatten_lists(diagram_data)
+            shutil.rmtree(diagram_cache)
+        else:
+            diagram_data = distribute_function(
+                compute_persistence_diagram_for_point_cloud,
+                coordinates,
+                n_jobs=self.n_jobs,
+                tqdm_label="Computing persistence diagrams in parallel",
+                show_tqdm=self.verbose,
+            )
 
         if self.verbose:
             print(
@@ -588,7 +640,9 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(f"Size must be one of {self._size_options}",)
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
