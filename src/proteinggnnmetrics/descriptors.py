@@ -7,6 +7,7 @@ Graph descriptors essentially extract fixed-length representation of a graph
 TODO: check docstrings, citations
 """
 
+
 from abc import ABCMeta
 from ctypes import Union
 from lib2to3.pgen2 import token
@@ -278,9 +279,22 @@ class TopologicalDescriptor(Descriptor):
         coordinates = [protein.coordinates for protein in proteins]
         if self.verbose:
             print("Starting Vietoris-Rips filtration process")
-        diagram_data = homology.VietorisRipsPersistence(
-            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
-        ).fit_transform(coordinates)
+
+        def compute_persistence_diagram_for_point_cloud(coordinate):
+            """Since I can't be bothered to fix giotto's implementation, I am parallelizing the process of computing diagrams for large collections of point clouds using my own function."""
+            return homology.VietorisRipsPersistence(
+                n_jobs=1,  # But we do this across n threads
+                homology_dimensions=self.homology_dimensions,
+            ).fit_transform(coordinate)
+
+        diagram_data = distribute_function(
+            compute_persistence_diagram_for_point_cloud,
+            coordinates,
+            n_jobs=self.n_jobs,
+            tqdm_label="Computing persistence diagrams in parallel",
+            show_tqdm=self.verbose,
+        )
+
         if self.verbose:
             print(
                 "Vietoris-Rips filtration process complete. Postprocessing..."
