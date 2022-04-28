@@ -75,7 +75,7 @@ def execute_twist(
                     Twist(
                         alpha=twist,
                         random_state=42,
-                        n_jobs=cfg.compute.n_jobs,
+                        n_jobs=cfg.experiments.compute.n_jobs,
                         verbose=cfg.debug.verbose,
                     ),
                 )
@@ -101,7 +101,7 @@ def execute_twist(
     mmd_tda = MaximumMeanDiscrepancy(
         biased=True,
         squared=True,
-        kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+        kernel=PersistenceFisherKernel(n_jobs=cfg.experiments.compute.n_jobs),  # type: ignore
     ).compute(diagrams, diagrams_perturbed)
 
     graphs = load_graphs(proteins, graph_type="eps_graph")
@@ -111,16 +111,18 @@ def execute_twist(
         biased=True,
         squared=True,
         kernel=WeisfeilerLehmanKernel(
-            n_jobs=cfg.compute.n_jobs, biased=True
+            n_jobs=cfg.experiments.compute.n_jobs, biased=True
         ),  # type: ignore
     ).compute(graphs, graphs_perturbed)
     return {"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist}
 
 
 def execute_run(cfg, run):
+    log.info("Start run {run}")
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
+    log.info(f"Number of files left {len(pdb_files)}")
     sampled_files = random.Random(run).sample(
         pdb_files, cfg.experiments.sample_size * 2
     )
@@ -129,16 +131,21 @@ def execute_run(cfg, run):
     base_feature_steps = [
         (
             "coordinates",
-            Coordinates(granularity="CA", n_jobs=cfg.compute.n_jobs),
+            Coordinates(
+                granularity="CA", n_jobs=cfg.experiments.compute.n_jobs
+            ),
         ),
         (
             "contact_map",
-            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,),
+            ContactMap(
+                n_jobs=cfg.experiments.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
         ),
         (
             "epsilon_graph",
             EpsilonGraph(
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=cfg.experiments.compute.n_jobs,
                 epsilon=8,
                 verbose=cfg.debug.verbose,
             ),
@@ -150,7 +157,7 @@ def execute_run(cfg, run):
                 epsilon=0.01,
                 n_bins=100,
                 order=2,
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=cfg.experiments.compute.n_jobs,
                 landscape_layers=1,
                 verbose=cfg.debug.verbose,
             ),
@@ -160,7 +167,9 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
+    proteins = base_feature_pipeline.fit_transform(
+        sampled_files[midpoint:],
+    )
     log.info(f"Starting twist execution for run {run}")
     results = distribute_function(
         execute_twist,
@@ -169,7 +178,9 @@ def execute_run(cfg, run):
             cfg.experiments.perturbations.twist.max,
             cfg.experiments.perturbations.twist.step,
         ),
-        n_jobs=cfg.compute.n_jobs,
+        n_jobs=cfg.experiments.compute.n_pipelines,
+        tqdm_label="Distribute twists",
+        show_tqdm=cfg.debug.verbose,
         base_feature_steps=base_feature_steps,
         cfg=cfg,
         sampled_files=sampled_files,
@@ -179,20 +190,21 @@ def execute_run(cfg, run):
 
     log.info("Dumping results")
     results = pd.DataFrame(results).to_csv(
-        here() / cfg.experiments.results / "mmd_single_run_twist_{run}.csv"
+        here() / cfg.experiments.results / f"mmd_single_run_twist_{run}.csv"
     )
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
 def main(cfg: DictConfig):
+    log.info("Info level message")
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     with tqdm_joblib(
         tqdm(
             desc="Execute runs in parallel",
-            total=len(list(range(cfg.compute.n_parallel_runs))),
+            total=len(list(range(cfg.experiments.compute.n_parallel_runs))),
         )
     ) as progressbar:
-        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+        Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
             delayed(execute_run)(cfg, run)
             for run in range(cfg.experiments.n_runs)
         )
