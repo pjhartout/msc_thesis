@@ -181,6 +181,13 @@ def execute_run(cfg, run):
         n_jobs=cfg.experiments.compute.n_pipelines,
         tqdm_label="Distribute twists",
         show_tqdm=cfg.debug.verbose,
+        total=len(
+            np.arange(
+                cfg.experiments.perturbations.twist.min,
+                cfg.experiments.perturbations.twist.max,
+                cfg.experiments.perturbations.twist.step,
+            )
+        ),
         base_feature_steps=base_feature_steps,
         cfg=cfg,
         sampled_files=sampled_files,
