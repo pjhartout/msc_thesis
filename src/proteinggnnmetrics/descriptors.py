@@ -220,65 +220,55 @@ class TopologicalDescriptor(Descriptor):
             pass
 
         elif self.tda_descriptor_type == "landscape":
-            self.base_tda_steps.extend(
-                [
-                    (
-                        "landscape",
-                        diagrams.PersistenceLandscape(
-                            n_layers=self.landscape_layers,
-                            n_bins=self.n_bins,
-                            n_jobs=self.n_jobs,
-                        ),
+            tda_pipeline = [
+                (
+                    "landscape",
+                    diagrams.PersistenceLandscape(
+                        n_layers=self.landscape_layers,
+                        n_bins=self.n_bins,
+                        n_jobs=self.n_jobs,
                     ),
-                    (
-                        "curves",
-                        curves.StandardFeatures("max", n_jobs=self.n_jobs),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "curves",
+                    curves.StandardFeatures("max", n_jobs=self.n_jobs),
+                ),
+            ]
 
         elif self.tda_descriptor_type == "betti":
-            self.base_tda_steps.extend(
-                [
-                    (
-                        "betti",
-                        diagrams.BettiCurve(
-                            n_bins=self.n_bins, n_jobs=self.n_jobs
-                        ),
+            tda_pipeline = [
+                (
+                    "betti",
+                    diagrams.BettiCurve(
+                        n_bins=self.n_bins, n_jobs=self.n_jobs
                     ),
-                    (
-                        "derivative",
-                        curves.Derivative(
-                            order=self.order, n_jobs=self.n_jobs
-                        ),
-                    ),
-                    (
-                        "featurizer",
-                        curves.StandardFeatures("max", n_jobs=self.n_jobs),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "derivative",
+                    curves.Derivative(order=self.order, n_jobs=self.n_jobs),
+                ),
+                (
+                    "featurizer",
+                    curves.StandardFeatures("max", n_jobs=self.n_jobs),
+                ),
+            ]
 
         elif self.tda_descriptor_type == "image":
-            self.base_tda_steps.extend(
-                [
-                    (
-                        "image",
-                        diagrams.PersistenceImage(
-                            sigma=0.1,
-                            n_bins=self.n_bins,
-                            weight_function=self.weight_function,
-                            n_jobs=self.n_jobs,
-                        ),
+            tda_pipeline = [
+                (
+                    "image",
+                    diagrams.PersistenceImage(
+                        sigma=0.1,
+                        n_bins=self.n_bins,
+                        weight_function=self.weight_function,
+                        n_jobs=self.n_jobs,
                     ),
-                    (
-                        "featureizer",
-                        curves.StandardFeatures(
-                            "identity", n_jobs=self.n_jobs
-                        ),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "featureizer",
+                    curves.StandardFeatures("identity", n_jobs=self.n_jobs),
+                ),
+            ]
 
         else:
             raise TDAPipelineError(
@@ -297,7 +287,7 @@ class TopologicalDescriptor(Descriptor):
             )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                self.base_tda_steps, verbose=self.verbose
+                tda_pipeline, verbose=self.verbose
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(
