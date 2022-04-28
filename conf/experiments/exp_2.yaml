@@ -1,19 +1,15 @@
 description: "Look at the power of TDA to investigate geometric distortions of the protein"
 
-n_runs: 10
+n_runs: 4
 
 results: "data/experiments/tda_twist/"
 
-sample_size: 100
+compute:
+  n_parallel_runs: 4
+  n_jobs: 4
+  n_pipelines: 4
 
-proteins:
-  not_perturbed:
-    lower_bound: 0
-    upper_bound: 100
-
-  perturbed:
-    lower_bound: 101
-    upper_bound: 200
+sample_size: 10
 
 perturbations:
   twist:
