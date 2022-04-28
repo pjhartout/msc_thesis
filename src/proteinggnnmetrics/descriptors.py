@@ -285,7 +285,9 @@ class TopologicalDescriptor(Descriptor):
             return homology.VietorisRipsPersistence(
                 n_jobs=1,  # But we do this across n threads
                 homology_dimensions=self.homology_dimensions,
-            ).fit_transform(coordinate)
+            ).fit_transform(
+                coordinate.reshape(1, coordinate.shape[0], coordinate.shape[1])
+            )
 
         diagram_data = distribute_function(
             compute_persistence_diagram_for_point_cloud,
@@ -584,9 +586,7 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
