@@ -133,10 +133,7 @@ def execute_run(cfg, run):
         ),
         (
             "contact_map",
-            ContactMap(
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
+            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,),
         ),
         (
             "epsilon_graph",
@@ -163,10 +160,8 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(
-        sampled_files[midpoint:],
-    )
-
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
+    log.info(f"Starting twist execution for run {run}")
     results = distribute_function(
         execute_twist,
         np.arange(

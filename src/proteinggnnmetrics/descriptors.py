@@ -254,24 +254,21 @@ class TopologicalDescriptor(Descriptor):
             ]
 
         elif self.tda_descriptor_type == "image":
-            tda_pipeline =  [
-                    (
-                        "image",
-                        diagrams.PersistenceImage(
-                            sigma=0.1,
-                            n_bins=self.n_bins,
-                            weight_function=self.weight_function,
-                            n_jobs=self.n_jobs,
-                        ),
+            tda_pipeline = [
+                (
+                    "image",
+                    diagrams.PersistenceImage(
+                        sigma=0.1,
+                        n_bins=self.n_bins,
+                        weight_function=self.weight_function,
+                        n_jobs=self.n_jobs,
                     ),
-                    (
-                        "featureizer",
-                        curves.StandardFeatures(
-                            "identity", n_jobs=self.n_jobs
-                        ),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "featureizer",
+                    curves.StandardFeatures("identity", n_jobs=self.n_jobs),
+                ),
+            ]
 
         else:
             raise TDAPipelineError(
@@ -282,8 +279,7 @@ class TopologicalDescriptor(Descriptor):
         if self.verbose:
             print("Starting Vietoris-Rips filtration process")
         diagram_data = homology.VietorisRipsPersistence(
-            n_jobs=self.n_jobs,
-            homology_dimensions=self.homology_dimensions,
+            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
         ).fit_transform(coordinates)
         if self.verbose:
             print(
@@ -568,9 +564,7 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
