@@ -287,7 +287,9 @@ class TopologicalDescriptor(Descriptor):
                 homology_dimensions=self.homology_dimensions,
             ).fit_transform(
                 coordinate.reshape(1, coordinate.shape[0], coordinate.shape[1])
-            )
+            )[
+                0
+            ]
 
         diagram_data = distribute_function(
             compute_persistence_diagram_for_point_cloud,
