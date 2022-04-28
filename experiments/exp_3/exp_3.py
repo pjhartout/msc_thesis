@@ -13,7 +13,7 @@ import random
 import hydra
 import numpy as np
 import pandas as pd
-from fastwlk import WeisfeilerLehmanKernel
+from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
