@@ -220,48 +220,41 @@ class TopologicalDescriptor(Descriptor):
             pass
 
         elif self.tda_descriptor_type == "landscape":
-            self.base_tda_steps.extend(
-                [
-                    (
-                        "landscape",
-                        diagrams.PersistenceLandscape(
-                            n_layers=self.landscape_layers,
-                            n_bins=self.n_bins,
-                            n_jobs=self.n_jobs,
-                        ),
+            tda_pipeline = [
+                (
+                    "landscape",
+                    diagrams.PersistenceLandscape(
+                        n_layers=self.landscape_layers,
+                        n_bins=self.n_bins,
+                        n_jobs=self.n_jobs,
                     ),
-                    (
-                        "curves",
-                        curves.StandardFeatures("max", n_jobs=self.n_jobs),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "curves",
+                    curves.StandardFeatures("max", n_jobs=self.n_jobs),
+                ),
+            ]
 
         elif self.tda_descriptor_type == "betti":
-            self.base_tda_steps.extend(
-                [
-                    (
-                        "betti",
-                        diagrams.BettiCurve(
-                            n_bins=self.n_bins, n_jobs=self.n_jobs
-                        ),
+            tda_pipeline = [
+                (
+                    "betti",
+                    diagrams.BettiCurve(
+                        n_bins=self.n_bins, n_jobs=self.n_jobs
                     ),
-                    (
-                        "derivative",
-                        curves.Derivative(
-                            order=self.order, n_jobs=self.n_jobs
-                        ),
-                    ),
-                    (
-                        "featurizer",
-                        curves.StandardFeatures("max", n_jobs=self.n_jobs),
-                    ),
-                ]
-            )
+                ),
+                (
+                    "derivative",
+                    curves.Derivative(order=self.order, n_jobs=self.n_jobs),
+                ),
+                (
+                    "featurizer",
+                    curves.StandardFeatures("max", n_jobs=self.n_jobs),
+                ),
+            ]
 
         elif self.tda_descriptor_type == "image":
-            self.base_tda_steps.extend(
-                [
+            tda_pipeline =  [
                     (
                         "image",
                         diagrams.PersistenceImage(
@@ -289,7 +282,8 @@ class TopologicalDescriptor(Descriptor):
         if self.verbose:
             print("Starting Vietoris-Rips filtration process")
         diagram_data = homology.VietorisRipsPersistence(
-            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
+            n_jobs=self.n_jobs,
+            homology_dimensions=self.homology_dimensions,
         ).fit_transform(coordinates)
         if self.verbose:
             print(
@@ -297,7 +291,7 @@ class TopologicalDescriptor(Descriptor):
             )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                self.base_tda_steps, verbose=self.verbose
+                tda_pipeline, verbose=self.verbose
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(
@@ -574,7 +568,9 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(f"Size must be one of {self._size_options}",)
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
