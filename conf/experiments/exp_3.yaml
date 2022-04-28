@@ -1,15 +1,15 @@
 description: "Look at the power of ESM to investigate ability to detect mutations"
 
+compute:
+  n_jobs: 32
+  n_parallel_runs: 2
+  
 results: "data/experiments/esm_mutate/"
-n_runs: 10
-proteins:
-  not_perturbed:
-    lower_bound: 0
-    upper_bound: 100
 
-  perturbed:
-    lower_bound: 101
-    upper_bound: 200
+n_runs: 10
+
+sample_size: 100
+
 
 perturbations:
   mutation:
