@@ -25,7 +25,7 @@ from proteinggnnmetrics.loaders import load_descriptor
 
 from .protein import Protein
 from .utils.exception import TDAPipelineError
-from .utils.functions import distribute_function, flatten_lists
+from .utils.functions import chunks, distribute_function, flatten_lists
 
 
 class Descriptor(metaclass=ABCMeta):
@@ -508,7 +508,12 @@ class ESM(Embedding):
     _size_options = ["M", "XL"]
 
     def __init__(
-        self, size: str, longest_sequence: int, n_jobs: int, verbose: bool
+        self,
+        size: str,
+        longest_sequence: int,
+        n_jobs: int,
+        verbose: bool,
+        n_chunks: int,
     ) -> None:
         """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
 
@@ -521,6 +526,7 @@ class ESM(Embedding):
         super().__init__(n_jobs, verbose)
         self.size = size
         self.longest_sequence = longest_sequence
+        self.n_chunks = n_chunks
 
     def fit(self, sequences: List[Protein], y=None) -> None:
         """Fit the embedding to the given sequences.
@@ -564,7 +570,9 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(f"Size must be one of {self._size_options}",)
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
@@ -579,11 +587,20 @@ class ESM(Embedding):
         _, _, batch_tokens = batch_converter(sequences)
         if self.verbose:
             print("Computing embeddings...")
-        with torch.no_grad():
-            results = model(
-                batch_tokens, repr_layers=[repr_layer], return_contacts=False
-            )
-        token_representations = results["representations"][repr_layer]
+
+        cks = chunks(proteins, self.n_chunks)
+
+        reps = list()
+        for ck in cks:
+            with torch.no_grad():
+                results = model(
+                    batch_tokens,
+                    repr_layers=[repr_layer],
+                    return_contacts=False,
+                )
+            token_representations = results["representations"][repr_layer]
+            reps.append(token_representations)
+        token_representations = flatten_lists(reps)
         # Remove dummy embedding
         token_representations[-1]
         if self.verbose:
