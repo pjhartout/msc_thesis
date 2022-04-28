@@ -308,6 +308,9 @@ class TopologicalDescriptor(Descriptor):
                 0
             ]
 
+        def load_diagram(path, diagram_cache):
+            return load_obj(diagram_cache / elem)
+
         if self.use_caching:
             if self.verbose:
                 print("Caching to accelerate operation.")
@@ -338,8 +341,16 @@ class TopologicalDescriptor(Descriptor):
                     diagram_data,
                 )
             diagram_data = list()
-            for elem in os.listdir(diagram_cache):
-                diagram_data.append(load_obj(diagram_cache / elem))
+
+            diagram_data = distribute_function(
+                load_diagram,
+                os.listdir(diagram_cache),
+                n_jobs=self.n_jobs,
+                tqdm_label="Computing persistence diagrams in parallel",
+                show_tqdm=self.verbose,
+                diagram_cache=diagram_cache,
+            )
+
             diagram_data = flatten_lists(diagram_data)
             shutil.rmtree(diagram_cache)
         else:

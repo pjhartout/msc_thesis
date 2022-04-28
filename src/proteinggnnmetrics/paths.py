@@ -15,7 +15,7 @@ REPO_HOME = here()
 
 # Location of fast ssd cache disk
 FAST_DATA_HOME = "/local0/scratch/phartout"
-FORCE_NETWORK_STORAGE = True
+FORCE_NETWORK_STORAGE = False
 
 
 def set_data_home() -> PosixPath:
