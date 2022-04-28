@@ -15,6 +15,7 @@ REPO_HOME = here()
 
 # Location of fast ssd cache disk
 FAST_DATA_HOME = "/local0/scratch/phartout"
+FORCE_NETWORK_STORAGE = True
 
 
 def set_data_home() -> PosixPath:
@@ -23,7 +24,7 @@ def set_data_home() -> PosixPath:
     Returns:
         PosixPath: path where the data should be located.
     """
-    if os.path.isdir(FAST_DATA_HOME):
+    if os.path.isdir(FAST_DATA_HOME) and not FORCE_NETWORK_STORAGE:
         # Use fast SSD in cluster
         print(f"Data path: {FAST_DATA_HOME}")
         return PosixPath(FAST_DATA_HOME) / "data"

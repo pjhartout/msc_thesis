@@ -79,7 +79,7 @@ def main():
 
     results = list()
     for twist in tqdm(
-        np.arange(0, 0.1, 0.01,), position=1, leave=False, desc="Twist range",
+        np.arange(0, 0.1, 0.5,), position=1, leave=False, desc="Twist range",
     ):
         perturb_feature_steps = flatten_lists(
             [
