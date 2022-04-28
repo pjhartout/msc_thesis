@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
+from joblib import Parallel, delayed
 from omegaconf import DictConfig
 from pyprojroot import here
 from torch import embedding
@@ -28,28 +29,17 @@ from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import Mutation
-from proteinggnnmetrics.utils.functions import flatten_lists, remove_fragments
+from proteinggnnmetrics.utils.functions import (
+    flatten_lists,
+    remove_fragments,
+    tqdm_joblib,
+)
 
 
-def get_longest_protein_dummy_sequence(pdb_files, cfg: DictConfig) -> int:
+def get_longest_protein_dummy_sequence(sampled_files, cfg: DictConfig) -> int:
     seq = Sequence(n_jobs=cfg.compute.n_jobs)
-    seq_normal = seq.fit_transform(
-        pdb_files[
-            cfg.experiments.proteins.not_perturbed.lower_bound : cfg.experiments.proteins.not_perturbed.upper_bound
-            + 1
-        ]
-    )
-
-    seq_perturbed = seq.fit_transform(
-        pdb_files[
-            cfg.experiments.proteins.perturbed.lower_bound : cfg.experiments.proteins.perturbed.upper_bound
-            + 1
-        ]
-    )
-    longest_sequence = max(
-        max([len(protein.sequence) for protein in seq_normal]),
-        max([len(protein.sequence) for protein in seq_perturbed]),
-    )
+    sequences = seq.fit_transform(sampled_files)
+    longest_sequence = max([len(protein.sequence) for protein in sequences])
     return longest_sequence
 
 
@@ -62,7 +52,7 @@ def execute_run(cfg, run):
     midpoint = int(cfg.experiments.sample_size / 2)
 
     # Get longest proteins of proteins and proteins_perturbed
-    dummy_longest = get_longest_protein_dummy_sequence(pdb_files, cfg)
+    dummy_longest = get_longest_protein_dummy_sequence(sampled_files, cfg)
 
     base_feature_steps = [
         (
@@ -70,7 +60,7 @@ def execute_run(cfg, run):
             Coordinates(
                 granularity="CA",
                 n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.compute.verbose,
+                verbose=cfg.debug.verbose,
             ),
         ),
         (
@@ -179,7 +169,18 @@ def execute_run(cfg, run):
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf_3")
 def main(cfg: DictConfig):
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
-    execute_run(cfg, run=cfg.experiments.n_runs)
+    # for run in range(cfg.experiments.n_runs):
+    #     execute_run(cfg, run)
+    with tqdm_joblib(
+        tqdm(
+            desc="Execute runs in parallel",
+            total=len(list(range(cfg.compute.n_parallel_runs))),
+        )
+    ) as progressbar:
+        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+            delayed(execute_run)(cfg, run)
+            for run in range(cfg.experiments.n_runs)
+        )
 
 
 if __name__ == "__main__":
