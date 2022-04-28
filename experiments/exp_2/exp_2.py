@@ -7,9 +7,11 @@ The goal of this experiment is to investigate the effect of twisting on MMD feat
 
 """
 
+import logging
 import os
 import pickle
 import random
+from typing import Dict, List
 
 import hydra
 import numpy as np
@@ -43,12 +45,76 @@ from proteinggnnmetrics.loaders import (
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.perturbations import GaussianNoise, Twist
+from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
 from proteinggnnmetrics.utils.functions import (
+    distribute_function,
     flatten_lists,
     remove_fragments,
     tqdm_joblib,
 )
+
+log = logging.getLogger(__name__)
+
+
+def execute_twist(
+    twist: float,
+    base_feature_steps,
+    cfg,
+    sampled_files,
+    midpoint,
+    proteins: List[Protein],
+) -> Dict:
+    log.info("Starting experiment with twist {twist}")
+    perturb_feature_steps = flatten_lists(
+        [
+            base_feature_steps[:1]
+            + [
+                (
+                    "twist",
+                    Twist(
+                        alpha=twist,
+                        random_state=42,
+                        n_jobs=cfg.compute.n_jobs,
+                        verbose=cfg.debug.verbose,
+                    ),
+                )
+            ]
+            + base_feature_steps[1:]
+        ]
+    )
+    perturb_feature_pipeline = pipeline.Pipeline(
+        perturb_feature_steps, verbose=cfg.debug.verbose
+    )
+    proteins_perturbed = perturb_feature_pipeline.fit_transform(
+        sampled_files[:midpoint]
+    )
+
+    diagrams = [
+        protein.descriptors["contact_graph"]["diagram"] for protein in proteins
+    ]
+    diagrams_perturbed = [
+        protein.descriptors["contact_graph"]["diagram"]
+        for protein in proteins_perturbed
+    ]
+
+    mmd_tda = MaximumMeanDiscrepancy(
+        biased=True,
+        squared=True,
+        kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+    ).compute(diagrams, diagrams_perturbed)
+
+    graphs = load_graphs(proteins, graph_type="eps_graph")
+    graphs_perturbed = load_graphs(proteins_perturbed, graph_type="eps_graph")
+
+    mmd_wl = MaximumMeanDiscrepancy(
+        biased=True,
+        squared=True,
+        kernel=WeisfeilerLehmanKernel(
+            n_jobs=cfg.compute.n_jobs, biased=True
+        ),  # type: ignore
+    ).compute(graphs, graphs_perturbed)
+    return {"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist}
 
 
 def execute_run(cfg, run):
@@ -80,15 +146,6 @@ def execute_run(cfg, run):
                 verbose=cfg.debug.verbose,
             ),
         ),
-        # (
-        #     "clustering_histogram",
-        #     LaplacianSpectrum(
-        #         graph_type="eps_graph",
-        #         n_bins=100,
-        #         n_jobs=cfg.compute.n_jobs,
-        #         verbose=cfg.debug.verbose,
-        #     ),
-        # ),
         (
             "tda",
             TopologicalDescriptor(
@@ -110,87 +167,22 @@ def execute_run(cfg, run):
         sampled_files[midpoint:],
     )
 
-    results = list()
-    for twist in tqdm(
+    results = distribute_function(
+        execute_twist,
         np.arange(
             cfg.experiments.perturbations.twist.min,
             cfg.experiments.perturbations.twist.max,
             cfg.experiments.perturbations.twist.step,
         ),
-        position=1,
-        leave=False,
-        desc="Twist range",
-    ):
-        perturb_feature_steps = flatten_lists(
-            [
-                base_feature_steps[:1]
-                + [
-                    (
-                        "twist",
-                        Twist(
-                            alpha=twist,
-                            random_state=42,
-                            n_jobs=cfg.compute.n_jobs,
-                            verbose=cfg.debug.verbose,
-                        ),
-                    )
-                ]
-                + base_feature_steps[1:]
-            ]
-        )
-        perturb_feature_pipeline = pipeline.Pipeline(
-            perturb_feature_steps, verbose=cfg.debug.verbose
-        )
-        proteins_perturbed = perturb_feature_pipeline.fit_transform(
-            sampled_files[:midpoint]
-        )
+        n_jobs=cfg.compute.n_jobs,
+        base_feature_steps=base_feature_steps,
+        cfg=cfg,
+        sampled_files=sampled_files,
+        midpoint=midpoint,
+        proteins=proteins,
+    )
 
-        diagrams = [
-            protein.descriptors["contact_graph"]["diagram"]
-            for protein in proteins
-        ]
-        diagrams_perturbed = [
-            protein.descriptors["contact_graph"]["diagram"]
-            for protein in proteins_perturbed
-        ]
-
-        mmd_tda = MaximumMeanDiscrepancy(
-            biased=True,
-            squared=True,
-            kernel=PersistenceFisherKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
-        ).compute(diagrams, diagrams_perturbed)
-
-        graphs = load_graphs(proteins, graph_type="eps_graph")
-        graphs_perturbed = load_graphs(
-            proteins_perturbed, graph_type="eps_graph"
-        )
-
-        mmd_wl = MaximumMeanDiscrepancy(
-            biased=True,
-            squared=True,
-            kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, biased=True
-            ),  # type: ignore
-        ).compute(graphs, graphs_perturbed)
-
-        # spectrum = load_descriptor(
-        #     proteins, "laplacian_spectrum_histogram", graph_type="eps_graph"
-        # )
-        # spectrum_perturbed = load_descriptor(
-        #     proteins_perturbed,
-        #     "laplacian_spectrum_histogram",
-        #     graph_type="eps_graph",
-        # )
-
-        # mmd_wl = MaximumMeanDiscrepancy(
-        #     biased=True,
-        #     squared=True,
-        #     kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
-        # ).compute(spectrum, spectrum_perturbed)
-
-        results.append({"mmd_tda": mmd_tda, "mmd_wl": mmd_wl, "twist": twist})
-
-    print("Dumping results")
+    log.info("Dumping results")
     results = pd.DataFrame(results).to_csv(
         here() / cfg.experiments.results / "mmd_single_run_twist_{run}.csv"
     )
