@@ -118,7 +118,7 @@ def execute_twist(
 
 
 def execute_run(cfg, run):
-    log.info("Start run {run}")
+    log.info(f"Start run {run}")
     os.makedirs(here() / cfg.experiments.results, exist_ok=True)
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
