@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 from proteinggnnmetrics.descriptors import ESM
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap
+from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
 from proteinggnnmetrics.kernels import LinearKernel
 from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
@@ -68,14 +68,25 @@ def execute_run(cfg, run):
         (
             "coordinates",
             Coordinates(
-                n_jobs=cfg.compute.n_jobs,
                 granularity="CA",
-                verbose=cfg.debug.verbose,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.compute.verbose,
             ),
         ),
         (
             "contact_map",
-            ContactMap(n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose),
+            ContactMap(
+                n_jobs=cfg.experiments.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        ),
+        (
+            "epsilon_graph",
+            EpsilonGraph(
+                n_jobs=cfg.experiments.compute.n_jobs,
+                epsilon=8,
+                verbose=cfg.debug.verbose,
+            ),
         ),
         (
             "esm",
