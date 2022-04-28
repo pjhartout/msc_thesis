@@ -7,6 +7,7 @@ Provides various utilities useful for the project
 import configparser
 import contextlib
 import os
+import pickle
 from itertools import product
 from pathlib import PosixPath
 from random import choice
@@ -285,3 +286,14 @@ def distance2similarity(K):
 def networkx2grakel(X: Iterable) -> Iterable:
     Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
     return Xt
+
+
+def save_obj(path: PosixPath, obj) -> None:
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
+
+
+def load_obj(path: PosixPath) -> Any:
+    with open(path, "rb") as f:
+        obj = pickle.load(f)
+    return obj
