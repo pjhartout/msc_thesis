@@ -124,14 +124,14 @@ def distribute_function(
     func: Callable,
     X: Iterable,
     n_jobs: int,
-    tqdm_label: str = None,
+    tqdm_label: str = "",
     total: int = 1,
     show_tqdm: bool = True,
     **kwargs,
 ) -> Any:
     """Simply distributes the execution of func across multiple cores to process X faster"""
     if total == 1:
-        total = len(X)
+        total = len(X)  # type: ignore
 
     if show_tqdm:
         with tqdm_joblib(tqdm(desc=tqdm_label, total=total)) as progressbar:
@@ -146,7 +146,7 @@ def networkx2grakel(X: Iterable) -> Iterable:
     return Xt
 
 
-def flatten_lists(lists: list) -> list:
+def flatten_lists(lists: List) -> List:
     """Removes nested lists"""
     result = list()
     for _list in lists:
@@ -265,7 +265,7 @@ def pad_diagrams(Xt, homology_dimensions: Tuple = (0, 1)) -> np.ndarray:
         )
 
     Xt = np.array([X_left, X_right])
-    return Xt
+    return Xt  # typing: ignore
 
 
 def positive_eig(K):
@@ -281,11 +281,6 @@ def distance2similarity(K):
     """
     K = np.exp(-K)
     return K
-
-
-def networkx2grakel(X: Iterable) -> Iterable:
-    Xt = list(graph_from_networkx(X, node_labels_tag="residue"))
-    return Xt
 
 
 def save_obj(path: PosixPath, obj) -> None:

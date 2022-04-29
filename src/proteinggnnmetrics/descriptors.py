@@ -12,28 +12,19 @@ import os
 import shutil
 import uuid
 from abc import ABCMeta
-from ctypes import Union
-from http.client import OK
-from lib2to3.pgen2 import token
-from pathlib import Path
-from tabnanny import verbose
-from traceback import print_tb
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, List, Tuple, Union
 
 import esm
 import networkx as nx
 import numpy as np
 import torch
 from Bio.PDB import PDBParser, PPBuilder, vectors
-from genericpath import exists
 from gtda import curves, diagrams, homology, pipeline
-from imageio import save
 from tqdm import tqdm
-from yaml import load
 
 from proteinggnnmetrics.loaders import load_descriptor
 
-from .paths import CACHE_DIR, DATA_HOME
+from .paths import CACHE_DIR
 from .protein import Protein
 from .utils.exception import TDAPipelineError
 from .utils.functions import (
@@ -74,8 +65,8 @@ class DegreeHistogram(Descriptor):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -83,7 +74,7 @@ class DegreeHistogram(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein, normalize=True):
             G = protein.graphs[self.graph_type]
-            degrees = np.array([val for (node, val) in G.degree()])
+            degrees = np.array([val for (node, val) in G.degree()])  # type: ignore
             histogram = np.bincount(degrees, minlength=self.n_bins + 1)
 
             if normalize:
@@ -205,12 +196,12 @@ class TopologicalDescriptor(Descriptor):
         tda_descriptor_type: str,
         epsilon: float,
         n_bins: int,
-        homology_dimensions: Tuple[int] = (0, 1, 2),
+        homology_dimensions: Tuple = (0, 1, 2),
         order: int = 1,
         sigma: float = 0.01,
-        weight_function: Callable = None,
-        landscape_layers: int = None,
-        n_jobs: int = None,
+        weight_function: Union[None, Callable] = None,
+        landscape_layers: Union[None, int] = None,
+        n_jobs: int = 1,
         verbose: bool = False,
         use_caching: bool = True,
     ) -> None:
@@ -227,8 +218,8 @@ class TopologicalDescriptor(Descriptor):
         self.verbose = verbose
         self.use_caching = use_caching
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -369,7 +360,7 @@ class TopologicalDescriptor(Descriptor):
             )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                tda_pipeline, verbose=self.verbose
+                tda_pipeline, verbose=self.verbose  # type: ignore
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(
@@ -409,7 +400,7 @@ class RamachandranAngles(Descriptor):
     def get_angles_from_pdb(self, protein: Protein) -> Protein:
         """Assumes only one chain"""
         parser = PDBParser()
-        structure = parser.get_structure(protein.path.stem, protein.path)
+        structure = parser.get_structure(protein.path.stem, protein.path)  # type: ignore
 
         angles = dict()
         for idx_model, model in enumerate(structure):
@@ -417,18 +408,22 @@ class RamachandranAngles(Descriptor):
             for idx_poly, poly in enumerate(polypeptides):
                 angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
 
-        phi = np.array(flatten_lists(angles.values()), dtype=object)[
+        phi = np.array(flatten_lists(angles.values()), dtype=object)[  # type: ignore
             :, 0
-        ].astype(float)
+        ].astype(
+            float
+        )
         phi = np.histogram(
             phi[phi != None],
             bins=self.n_bins,
             density=self.density,
             range=self.bin_range,
         )[0]
-        psi = np.array(flatten_lists(angles.values()), dtype=object)[
+        psi = np.array(flatten_lists(angles.values()), dtype=object)[  # type: ignore
             :, 1
-        ].astype(float)
+        ].astype(
+            float
+        )
         psi = np.histogram(
             psi[psi != None],
             bins=self.n_bins,
@@ -469,16 +464,16 @@ class RamachandranAngles(Descriptor):
                 psi = None
             phi_psi_angles.append((phi, psi))
         phi = np.histogram(
-            np.array(phi, dtype=object)[:, 0][
-                np.array(phi)[:, 0] != None
+            np.array(phi, dtype=object)[:, 0][  # type: ignore
+                np.array(phi)[:, 0] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
             range=self.bin_range,
         )
         psi = np.histogram(
-            np.array(psi, dtype=object)[:, 1][
-                np.array(psi)[:, 1] != None
+            np.array(psi, dtype=object)[:, 1][  # type: ignore
+                np.array(psi)[:, 1] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
