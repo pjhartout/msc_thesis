@@ -150,9 +150,9 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         # Remove points where birth = death
         # Loop over homology dimensions
 
-        X = remove_giotto_pd_padding(X)
-        if Y is not None:
-            Y = remove_giotto_pd_padding(Y)
+        # X = remove_giotto_pd_padding(X)
+        # if Y is not None:
+        #     Y = remove_giotto_pd_padding(Y)
 
         def compute_kernel_in_homology_dimension(homology_dimension):
             # Get the diagrams for the homology dimension
@@ -169,14 +169,14 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
 
         Ks = distribute_function(
             compute_kernel_in_homology_dimension,
-            X[0]["dim"].unique(),
+            np.unique(X[0][:, 2]),
             n_jobs=self.n_jobs,
             tqdm_label="Computing Persistence Fisher Kernel",
             show_tqdm=self.verbose,
         )
 
         # We take the average of the kernel matrices in each homology dimension
-        return np.average(np.array(Ks), axis=0)
+        return np.product(np.array(Ks), axis=0)
 
 
 class KernelComposition:

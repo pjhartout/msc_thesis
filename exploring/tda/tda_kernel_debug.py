@@ -50,14 +50,14 @@ from proteinggnnmetrics.utils.functions import (
     tqdm_joblib,
 )
 
-N_JOBS = 12
+N_JOBS = 4
 
 
 @timeit
 def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
-    sampled_files = random.Random(42).sample(pdb_files, 12 * 2)
+    sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
         (
@@ -90,6 +90,7 @@ def main():
                 n_jobs=6,
                 landscape_layers=1,
                 verbose=True,
+                use_caching=True,
             ),
         ),
     ]

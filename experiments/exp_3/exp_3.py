@@ -37,7 +37,7 @@ from proteinggnnmetrics.utils.functions import (
 
 
 def get_longest_protein_dummy_sequence(sampled_files, cfg: DictConfig) -> int:
-    seq = Sequence(n_jobs=cfg.compute.n_jobs)
+    seq = Sequence(n_jobs=cfg.experiments.compute.n_jobs)
     sequences = seq.fit_transform(sampled_files)
     longest_sequence = max([len(protein.sequence) for protein in sequences])
     return longest_sequence
@@ -59,7 +59,7 @@ def execute_run(cfg, run):
             "coordinates",
             Coordinates(
                 granularity="CA",
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=cfg.experiments.compute.n_jobs,
                 verbose=cfg.debug.verbose,
             ),
         ),
@@ -82,9 +82,10 @@ def execute_run(cfg, run):
             "esm",
             ESM(
                 size="M",
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=cfg.experiments.compute.n_jobs,
                 verbose=cfg.debug.verbose,
                 longest_sequence=dummy_longest,
+                n_chunks=cfg.experiments.n_chunks,
             ),
         ),
     ]
@@ -112,7 +113,7 @@ def execute_run(cfg, run):
                         Mutation(
                             p_mutate=mutation,
                             random_state=np.random.RandomState(run),
-                            n_jobs=cfg.compute.n_jobs,
+                            n_jobs=cfg.experiments.compute.n_jobs,
                             verbose=cfg.debug.verbose,
                         ),
                     )
@@ -136,7 +137,7 @@ def execute_run(cfg, run):
         mmd_esm = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
-            kernel=LinearKernel(n_jobs=cfg.compute.n_jobs),  # type: ignore
+            kernel=LinearKernel(n_jobs=cfg.experiments.compute.n_jobs),  # type: ignore
         ).compute(embeddings, embeddings_perturbed)
 
         graphs = load_graphs(proteins, graph_type="eps_graph")
@@ -148,7 +149,7 @@ def execute_run(cfg, run):
             biased=True,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
+                n_jobs=cfg.experiments.compute.n_jobs,
                 n_iter=5,
                 verbose=cfg.debug.verbose,
                 biased=True,
@@ -164,6 +165,7 @@ def execute_run(cfg, run):
         / cfg.experiments.results
         / f"mmd_single_run_mutation_run_{run}.csv"
     )
+    return "ok"
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf_3")
@@ -174,13 +176,14 @@ def main(cfg: DictConfig):
     with tqdm_joblib(
         tqdm(
             desc="Execute runs in parallel",
-            total=len(list(range(cfg.compute.n_parallel_runs))),
+            total=len(list(range(cfg.experiments.compute.n_parallel_runs))),
         )
     ) as progressbar:
-        Parallel(n_jobs=cfg.compute.n_parallel_runs)(
+        res = Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
             delayed(execute_run)(cfg, run)
             for run in range(cfg.experiments.n_runs)
         )
+    print(res)
 
 
 if __name__ == "__main__":

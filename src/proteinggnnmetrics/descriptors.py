@@ -7,11 +7,12 @@ Graph descriptors essentially extract fixed-length representation of a graph
 TODO: check docstrings, citations
 """
 
+
+import os
+import shutil
+import uuid
 from abc import ABCMeta
-from ctypes import Union
-from lib2to3.pgen2 import token
-from tabnanny import verbose
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, List, Tuple, Union
 
 import esm
 import networkx as nx
@@ -23,9 +24,16 @@ from tqdm import tqdm
 
 from proteinggnnmetrics.loaders import load_descriptor
 
+from .paths import CACHE_DIR
 from .protein import Protein
 from .utils.exception import TDAPipelineError
-from .utils.functions import distribute_function, flatten_lists
+from .utils.functions import (
+    chunks,
+    distribute_function,
+    flatten_lists,
+    load_obj,
+    save_obj,
+)
 
 
 class Descriptor(metaclass=ABCMeta):
@@ -57,8 +65,8 @@ class DegreeHistogram(Descriptor):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -66,7 +74,7 @@ class DegreeHistogram(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
         def calculate_degree_histogram(protein: Protein, normalize=True):
             G = protein.graphs[self.graph_type]
-            degrees = np.array([val for (node, val) in G.degree()])
+            degrees = np.array([val for (node, val) in G.degree()])  # type: ignore
             histogram = np.bincount(degrees, minlength=self.n_bins + 1)
 
             if normalize:
@@ -149,8 +157,8 @@ class LaplacianSpectrum(Descriptor):
         self.density = density
         self.bin_range = bin_range
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -188,13 +196,14 @@ class TopologicalDescriptor(Descriptor):
         tda_descriptor_type: str,
         epsilon: float,
         n_bins: int,
-        homology_dimensions: Tuple[int] = (0, 1, 2),
+        homology_dimensions: Tuple = (0, 1, 2),
         order: int = 1,
         sigma: float = 0.01,
-        weight_function: Callable = None,
-        landscape_layers: int = None,
-        n_jobs: int = None,
+        weight_function: Union[None, Callable] = None,
+        landscape_layers: Union[None, int] = None,
+        n_jobs: int = 1,
         verbose: bool = False,
+        use_caching: bool = True,
     ) -> None:
         super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
@@ -207,9 +216,10 @@ class TopologicalDescriptor(Descriptor):
         self.landscape_layers = landscape_layers
         self.n_jobs = n_jobs
         self.verbose = verbose
+        self.use_caching = use_caching
 
-    def fit(self, proteins: List[Protein]) -> List[Protein]:
-        return proteins
+    def fit(self, proteins: List[Protein]) -> None:
+        pass
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -278,16 +288,79 @@ class TopologicalDescriptor(Descriptor):
         coordinates = [protein.coordinates for protein in proteins]
         if self.verbose:
             print("Starting Vietoris-Rips filtration process")
-        diagram_data = homology.VietorisRipsPersistence(
-            n_jobs=self.n_jobs, homology_dimensions=self.homology_dimensions,
-        ).fit_transform(coordinates)
+
+        def compute_persistence_diagram_for_point_cloud(coordinate):
+            """Since I can't be bothered to fix giotto's implementation, I am parallelizing the process of computing diagrams for large collections of point clouds using my own function."""
+            return homology.VietorisRipsPersistence(
+                n_jobs=1,  # But we do this across n threads
+                homology_dimensions=self.homology_dimensions,
+            ).fit_transform(
+                coordinate.reshape(1, coordinate.shape[0], coordinate.shape[1])
+            )[
+                0
+            ]
+
+        def load_diagram(path, diagram_cache):
+            return load_obj(diagram_cache / path)
+
+        if self.use_caching:
+            if self.verbose:
+                print("Caching to accelerate operation.")
+            diagram_cache = (
+                # The uuid is useful if this descriptor is called multiple
+                # times
+                CACHE_DIR
+                / f"diagram_compute_cache_{uuid.uuid4().hex}/"
+            )
+            diagram_cache.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+            n_chunks = (
+                int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
+            )
+            cks = chunks(coordinates, n_chunks)
+            for i, ck in enumerate(cks):
+                diagram_data = distribute_function(
+                    compute_persistence_diagram_for_point_cloud,
+                    ck,
+                    n_jobs=self.n_jobs,
+                    tqdm_label="Computing persistence diagrams in parallel",
+                    show_tqdm=self.verbose,
+                )
+                save_obj(
+                    diagram_cache / f"diagram_part_{i}.pkl",
+                    diagram_data,
+                )
+            diagram_data = list()
+
+            diagram_data = distribute_function(
+                load_diagram,
+                os.listdir(diagram_cache),
+                n_jobs=self.n_jobs,
+                tqdm_label="Computing persistence diagrams in parallel",
+                show_tqdm=self.verbose,
+                diagram_cache=diagram_cache,
+            )
+
+            diagram_data = flatten_lists(diagram_data)
+            shutil.rmtree(diagram_cache)
+        else:
+            diagram_data = distribute_function(
+                compute_persistence_diagram_for_point_cloud,
+                coordinates,
+                n_jobs=self.n_jobs,
+                tqdm_label="Computing persistence diagrams in parallel",
+                show_tqdm=self.verbose,
+            )
+
         if self.verbose:
             print(
                 "Vietoris-Rips filtration process complete. Postprocessing..."
             )
         if self.tda_descriptor_type != "diagram":
             tda_descriptors = pipeline.Pipeline(
-                tda_pipeline, verbose=self.verbose
+                tda_pipeline, verbose=self.verbose  # type: ignore
             ).fit_transform(diagram_data)
 
             for protein, diagram, tda_descriptor in zip(
@@ -327,7 +400,7 @@ class RamachandranAngles(Descriptor):
     def get_angles_from_pdb(self, protein: Protein) -> Protein:
         """Assumes only one chain"""
         parser = PDBParser()
-        structure = parser.get_structure(protein.path.stem, protein.path)
+        structure = parser.get_structure(protein.path.stem, protein.path)  # type: ignore
 
         angles = dict()
         for idx_model, model in enumerate(structure):
@@ -335,18 +408,22 @@ class RamachandranAngles(Descriptor):
             for idx_poly, poly in enumerate(polypeptides):
                 angles[f"{idx_model}_{idx_poly}"] = poly.get_phi_psi_list()
 
-        phi = np.array(flatten_lists(angles.values()), dtype=object)[
+        phi = np.array(flatten_lists(angles.values()), dtype=object)[  # type: ignore
             :, 0
-        ].astype(float)
+        ].astype(
+            float
+        )
         phi = np.histogram(
             phi[phi != None],
             bins=self.n_bins,
             density=self.density,
             range=self.bin_range,
         )[0]
-        psi = np.array(flatten_lists(angles.values()), dtype=object)[
+        psi = np.array(flatten_lists(angles.values()), dtype=object)[  # type: ignore
             :, 1
-        ].astype(float)
+        ].astype(
+            float
+        )
         psi = np.histogram(
             psi[psi != None],
             bins=self.n_bins,
@@ -387,16 +464,16 @@ class RamachandranAngles(Descriptor):
                 psi = None
             phi_psi_angles.append((phi, psi))
         phi = np.histogram(
-            np.array(phi, dtype=object)[:, 0][
-                np.array(phi)[:, 0] != None
+            np.array(phi, dtype=object)[:, 0][  # type: ignore
+                np.array(phi)[:, 0] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
             range=self.bin_range,
         )
         psi = np.histogram(
-            np.array(psi, dtype=object)[:, 1][
-                np.array(psi)[:, 1] != None
+            np.array(psi, dtype=object)[:, 1][  # type: ignore
+                np.array(psi)[:, 1] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
@@ -508,7 +585,12 @@ class ESM(Embedding):
     _size_options = ["M", "XL"]
 
     def __init__(
-        self, size: str, longest_sequence: int, n_jobs: int, verbose: bool
+        self,
+        size: str,
+        longest_sequence: int,
+        n_jobs: int,
+        verbose: bool,
+        n_chunks: int,
     ) -> None:
         """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
 
@@ -521,6 +603,7 @@ class ESM(Embedding):
         super().__init__(n_jobs, verbose)
         self.size = size
         self.longest_sequence = longest_sequence
+        self.n_chunks = n_chunks
 
     def fit(self, sequences: List[Protein], y=None) -> None:
         """Fit the embedding to the given sequences.
@@ -564,7 +647,9 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(f"Size must be one of {self._size_options}",)
+            raise RuntimeError(
+                f"Size must be one of {self._size_options}",
+            )
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
@@ -579,11 +664,20 @@ class ESM(Embedding):
         _, _, batch_tokens = batch_converter(sequences)
         if self.verbose:
             print("Computing embeddings...")
-        with torch.no_grad():
-            results = model(
-                batch_tokens, repr_layers=[repr_layer], return_contacts=False
-            )
-        token_representations = results["representations"][repr_layer]
+
+        cks = chunks(proteins, self.n_chunks)
+
+        reps = list()
+        for ck in cks:
+            with torch.no_grad():
+                results = model(
+                    batch_tokens,
+                    repr_layers=[repr_layer],
+                    return_contacts=False,
+                )
+            token_representations = results["representations"][repr_layer]
+            reps.append(token_representations)
+        token_representations = flatten_lists(reps)
         # Remove dummy embedding
         token_representations[-1]
         if self.verbose:
