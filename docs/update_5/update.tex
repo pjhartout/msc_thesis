@@ -1,0 +1,143 @@
+%Metroplolis Beamer Theme: https://github.com/matze/mtheme
+\documentclass[aspectratio=169, 10pt, dvipsnames]{beamer}
+\usetheme{metropolis}
+\usepackage{appendixnumberbeamer, lmodern, bookmark,fontawesome}
+\usepackage{booktabs}
+% \usepackage[sorting=none]{biblatex}
+\usepackage[scale=2]{ccicons}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+\usepackage{bbm}
+\usepackage{tikz, graphicx}
+\usepackage{caption}
+\usepackage{multicol}
+% \usepackage[dvipsnames]{xcolor}
+\usepackage{animate}
+\usepackage{scalerel,xparse}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage{verbatim}
+\usepackage{minted}
+\usepackage{fontawesome}
+
+\newcommand*\colourcheck[1]{%
+  \expandafter\newcommand\csname #1check\endcsname{\textcolor{#1}{\ding{52}}}%
+}
+\colourcheck{blue}
+
+\title{Presentation outline }
+% \subtitle{Lab Update}
+\date{\today}
+\author{Philip Hartout}
+
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=orange,
+  filecolor=orange,
+  urlcolor=orange,
+}
+
+\setminted[python]{fontsize=\tiny}
+
+
+\def\signed #1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip1em
+  \hbox{}\nobreak\hfill #1%
+  \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+
+\newsavebox\mybox
+\newenvironment{aquote}[1]
+  {\savebox\mybox{#1}\begin{quote}\openautoquote\hspace*{-.7ex}}
+  {\unskip\closeautoquote\vspace*{1mm}\signed{\usebox\mybox}\end{quote}}
+
+\titlegraphic{%
+  \includegraphics[width=.2\textwidth]{figures/mlcb-transparent.png}\hfill
+  \includegraphics[width=.2\textwidth]{figures/dbsse-transparent.png}\hfill
+  \includegraphics[width=.2\textwidth]{figures/eth-transparent.png}
+}
+
+\makeatletter
+\setbeamertemplate{title page}{
+  \begin{minipage}[b][\paperheight]{\textwidth}
+    \vfill%
+    \ifx\inserttitle\@empty\else\usebeamertemplate*{title}\fi
+    \ifx\insertsubtitle\@empty\else\usebeamertemplate*{subtitle}\fi
+    \usebeamertemplate*{title separator}
+    \ifx\beamer@shortauthor\@empty\else\usebeamertemplate*{author}\fi
+    \ifx\insertdate\@empty\else\usebeamertemplate*{date}\fi
+    \ifx\insertinstitute\@empty\else\usebeamertemplate*{institute}\fi
+    \vfill
+    \ifx\inserttitlegraphic\@empty\else\inserttitlegraphic\fi
+    \vspace*{1cm}
+  \end{minipage}
+}
+\makeatother
+
+\usetikzlibrary{shapes.geometric, arrows, chains, positioning, decorations.pathreplacing,decorations.pathmorphing,shapes,%
+  matrix,shapes.symbols}
+
+\tikzstyle{orangebox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
+height=0.5cm, draw=black, fill=YellowOrange!40, minimum height=12mm]
+\tikzstyle{greenbox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
+height=0.5cm, draw=black, fill=YellowOrange!40, minimum height=12mm, fill=ForestGreen!40]
+\tikzstyle{bluebox} = [rectangle, very thick, rounded corners, minimum width=2cm, minimum
+height=0.5cm, draw=black, minimum height=12mm, fill=ProcessBlue!40]
+
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\usepackage{pgfplots}
+
+\definecolor{myellow}{RGB}{228,212,0}
+\definecolor{mgreen}{RGB}{5,104,57}
+
+\newcommand\funnel[3]{%
+  \pgfmathsetmacro\mwid{(2+\xi*.7)}
+  \pgfmathsetmacro\marc{\mwid-.4}
+  \begin{scope}[%
+    shift={(0,#1)},
+    line width=.05pt,
+    % x=5mm,
+    % scale=1.\xi,
+    yshift=\xi*12
+    ]
+    \draw[black,bottom color=#2, top color=#2] (-\mwid,0) -- (-\mwid+.4,-1) arc (190:350:\marc cm and 5mm) -- (\mwid,0);
+    \draw[black,fill=#3] (0,0) ellipse (\mwid cm and 5mm);
+    \path (-\mwid,0) -- (-\mwid+.4,-1) coordinate[midway] (a\xi);
+  \end{scope}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{Outline of presentations}
+  \begin{enumerate}
+    \item Introduction
+    \item Library outline
+    \item How can graph kernels capture random noise in a protein point cloud?
+How does the graph representation of the protein influence MMD behaviour?
+    \begin{itemize}
+      \item Vary $\varepsilon$ and add gaussian noise to point cloud prior to
+        graph extraction
+    \end{itemize}
+    \pause\item How can we leverage kernels to capture geometric changes in a protein?
+    \begin{itemize}
+    \item Topological features \& kernels
+    \item Compare with W-L kernel
+    \item Compare also with Ramachandran descriptors
+    \end{itemize}
+    \pause\item How can we capture sequence changes in a kernel?
+    \begin{itemize}
+    \item ESM
+    \item W-L kernel
+    \item Spectrum kernel? Essentially very close to the W-L kernel.
+    \end{itemize}
+    \pause\item W-L speed improvement
+  \end{enumerate}
+\end{frame}
+
+
+\end{document}
