@@ -17,6 +17,7 @@ from http.client import OK
 from lib2to3.pgen2 import token
 from pathlib import Path
 from tabnanny import verbose
+from traceback import print_tb
 from typing import Any, Callable, List, Tuple
 
 import esm
@@ -309,7 +310,7 @@ class TopologicalDescriptor(Descriptor):
             ]
 
         def load_diagram(path, diagram_cache):
-            return load_obj(diagram_cache / elem)
+            return load_obj(diagram_cache / path)
 
         if self.use_caching:
             if self.verbose:
@@ -337,7 +338,7 @@ class TopologicalDescriptor(Descriptor):
                     show_tqdm=self.verbose,
                 )
                 save_obj(
-                    diagram_cache / f"diagram_part_{i}",
+                    diagram_cache / f"diagram_part_{i}.pkl",
                     diagram_data,
                 )
             diagram_data = list()
