@@ -212,8 +212,7 @@ def main(cfg: DictConfig):
         )
     ) as progressbar:
         Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
-            delayed(execute_run)(cfg, run)
-            for run in range(cfg.experiments.n_runs)
+            delayed(execute_run)(cfg, run) for run in [4, 5, 7, 8, 9]
         )
 
 
