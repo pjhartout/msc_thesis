@@ -167,9 +167,7 @@ def execute_run(cfg, run):
     base_feature_pipeline = pipeline.Pipeline(
         base_feature_steps, verbose=cfg.debug.verbose
     )
-    proteins = base_feature_pipeline.fit_transform(
-        sampled_files[midpoint:],
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
     log.info(f"Starting twist execution for run {run}")
     results = distribute_function(
         execute_twist,
@@ -212,7 +210,7 @@ def main(cfg: DictConfig):
         )
     ) as progressbar:
         Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
-            delayed(execute_run)(cfg, run) for run in [4, 5, 7, 8, 9]
+            delayed(execute_run)(cfg, run) for run in cfg.experiments.n_runs
         )
 
 
