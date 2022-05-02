@@ -3,6 +3,7 @@ data/
 docs/literature/
 docs/update_3/figures/twist/
 docs/update_3/update.pdf
+docs/midterm_presentation/figures/gaussian_noise/
 # Hide hydra output directories
 outputs
 
