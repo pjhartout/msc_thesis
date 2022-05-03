@@ -52,11 +52,11 @@ def main(cfg: DictConfig):
         y="mmd",
         hue="epsilon",
         palette=palette,
-        err_style="bars",
+        # err_style="bars",
         ci=100,
     )
     plt.legend(title=r"$\varepsilon$")
-    p.set_xlabel(r"Standard Deviation of Injected Noise")
+    p.set_xlabel(r"Standard Deviation of Injected Noise (Å)")
     p.set_ylabel("Maximum Mean Discrepancy")
     plt.title(
         "Multiple experiments of MMD vs gausian noise injection \n with varying levels of epsilon."
