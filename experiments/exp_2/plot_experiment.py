@@ -78,7 +78,7 @@ def main(cfg: DictConfig):
     plt.legend(title=r"Kernel")
     p.set_xlabel(r"Twist (rad/$\mathring{A}$)")
     p.set_ylabel("MMD (normalized)")
-    plt.title("MMD as twist is added to a different set of proteins.")
+    plt.title("MMD as twist is added to different sets of proteins.")
     plt.tight_layout()
     os.makedirs(here() / cfg.experiments.results / "images", exist_ok=True)
     plt.savefig(here() / cfg.experiments.results / "images/results.png")
