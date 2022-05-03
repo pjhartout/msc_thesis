@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 
 def setup_plotting_parameters(
-    resolution: int = 600, size: Tuple[float, float] = (6.4, 4.8)
+    resolution: int = 600, size: Tuple[float, float] = (7.8, 5.8)
 ) -> None:
     plt.rcParams["figure.figsize"] = size
     plt.rcParams["savefig.dpi"] = resolution
