@@ -24,23 +24,41 @@ from proteinggnnmetrics.utils.plots import setup_plotting_parameters
 setup_plotting_parameters()
 
 
-@hydra.main(config_path=str(here()) + "/conf", config_name="conf")
+@hydra.main(config_path=str(here()) + "/conf", config_name="conf_3")
 def main(cfg: DictConfig):
-    df_plot = pd.DataFrame(columns=["mmd", "twist"])
+    df_plot = pd.DataFrame()
+
     for fname in os.listdir(here() / cfg.experiments.results):
-        if "single_run" in fname:
+        if "single_run" in fname and "other_kernels" not in fname:
             exp_run = pd.read_csv(
                 here() / cfg.experiments.results / fname, index_col=0,
             )
+            exp_run["run"] = int(".".join(fname.split("_")).split(".")[-2])
             df_plot = pd.concat([df_plot, exp_run])
-    print("Plotting")
 
-    # palette = sns.color_palette("mako_r", len(df_plot["epsilon"].unique()))
+    print("Plotting")
+    df_plot = df_plot.assign(
+        mmd_esm=(df_plot["mmd_esm"] - df_plot["mmd_esm"].min())
+        / (df_plot["mmd_esm"].max() - df_plot["mmd_esm"].min()),
+        mmd_wl=(df_plot["mmd_wl"] - df_plot["mmd_wl"].min())
+        / (df_plot["mmd_wl"].max() - df_plot["mmd_wl"].min()),
+    )
+
+    df_plot = df_plot.rename(
+        columns={
+            "mmd_esm": "MMD from ESM embeddings",
+            "mmd_wl": "MMD from Weisfeiler-Lehman kernel",
+        }
+    )
+    df_plot = df_plot.melt(id_vars=["p_mutate", "run"])
+    palette = sns.color_palette("mako_r", len(df_plot["variable"].unique()))
     p = sns.lineplot(
         data=df_plot.reset_index(drop=True),
-        x="twist",
-        y="mmd",
-        # palette=palette,
+        x="p_mutate",
+        y="value",
+        hue="variable",
+        palette=palette,
+        ci=100,
     )
     # plt.legend(title=r"$\varepsilon$")
     p.set_xlabel("Mutation probability")
@@ -50,6 +68,7 @@ def main(cfg: DictConfig):
     )
     print("Saving")
     plt.tight_layout()
+    os.makedirs(here() / cfg.experiments.results / "images", exist_ok=True)
     plt.savefig(
         here()
         / cfg.experiments.results
