@@ -121,7 +121,7 @@ def execute_run(cfg, run):
         (
             "coodinates",
             Coordinates(
-                granularity="CA",
+                granularity="backbone",
                 n_jobs=cfg.experiments.compute.n_jobs,
                 verbose=cfg.debug.verbose,
             ),
@@ -129,7 +129,7 @@ def execute_run(cfg, run):
         (
             "ramachandran",
             RamachandranAngles(
-                from_pdb=True,
+                from_pdb=False,
                 n_jobs=cfg.experiments.compute.n_jobs,
                 verbose=cfg.debug.verbose,
                 n_bins=100,
@@ -173,6 +173,7 @@ def execute_run(cfg, run):
         / cfg.experiments.results
         / f"mmd_single_run_twist_{run}_ramachandran.csv"
     )
+    return "ok"
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf_2")
@@ -185,7 +186,7 @@ def main(cfg: DictConfig):
             total=len(list(range(cfg.experiments.compute.n_parallel_runs))),
         )
     ) as progressbar:
-        Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
+        res = Parallel(n_jobs=cfg.experiments.compute.n_parallel_runs)(
             delayed(execute_run)(cfg, run)
             for run in range(cfg.experiments.n_runs)
         )
