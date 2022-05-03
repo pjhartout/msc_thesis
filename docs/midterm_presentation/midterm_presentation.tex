@@ -266,20 +266,20 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 \end{frame}
 
 \begin{frame}[fragile]{Maximum Mean Discrepancy (MMD) -- continued}
-  \small Currently accepted method to evaluate GNNs.
-  Advantages:
+  \pause\small Currently accepted method to evaluate GNNs.
+  \pause Advantages:
   \begin{enumerate}
-  \item \small It's possible to leverage decades of kernel research!\\ Both a
+    \pause\item \small It's possible to leverage decades of kernel research!\\ Both a
     \textcolor{PineGreen}{blessing} and a \textcolor{YellowOrange}{curse}:
     \begin{itemize}
-    \item[\textcolor{PineGreen}{Blessing}] Flexibility, Computation on
+      \pause\item[\textcolor{PineGreen}{Blessing}] Flexibility, Computation on
       multiple representations
-    \item[\textcolor{YellowOrange}{Curse}] Instability (see Leslie's ICLR work), hyperparameter tuning.
+      \pause\item[\textcolor{YellowOrange}{Curse}] Instability (see Leslie's ICLR work), hyperparameter tuning.
     \end{itemize}
-  \item \small Possibility of statistical testing.
-  \item \small Possibility of leveraging multiple representations.
+  \pause\item \small Possibility of statistical testing.
+  \pause\item \small Possibility of leveraging multiple representations.
     \begin{itemize}
-    \item[] \emph{Foreshadowing...}
+      \pause\item[] \emph{Foreshadowing...}
     \end{itemize}
   \end{enumerate}
 \end{frame}
@@ -367,7 +367,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \end{enumerate}
 \end{frame}
 
-% { UNCOMMENT
+% {
 %   \setbeamercolor{background canvas}{bg=white}
 % \begin{frame}[fragile]{Experiment 1 -- Gaussian Noise}
 %   \begin{figure}
@@ -441,5 +441,35 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \end{minipage}
 \end{frame}
 
+{
+  \setbeamercolor{background canvas}{bg=white}
+\begin{frame}[fragile]{Experiment 1 -- Gaussian Noise}
+  \begin{figure}
+    \centering
+    \scalebox{0.75}{
+      \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+        \node (coords) [orangebox] {Get \\Coordinates};
+        \onslide<1->\node (twist) [orangebox, right of=coords, xshift=1.5cm, fill=PineGreen!60] {Add \\gaussian noise};
+        \draw [arrow] (coords) -- (twist);
+        \onslide<2-> \node (cmap) [orangebox, right of=twist, xshift=1.5cm] {Get \\contact map};
+        \draw [arrow] (twist) -- (cmap);
+        \onslide<3->\node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
+        \draw [arrow] (cmap) -- (egraph);
+        \onslide<4->\node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+        \draw [arrow] (egraph) -- (wlk);
+        \onslide<5->\node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+        \draw [arrow] (wlk) -- (mmd);
+      \end{tikzpicture}
+    }
+  \end{figure}
+  \begin{figure}
+    \centering
+    \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/twist/protein_straight_}{0}{99}
+    \caption{Adding Gaussian Noise. Protein is color-coded according to the
+      index of each amino acid.}
+    \label{fig:twist}
+  \end{figure}
+\end{frame}
+}
 
 \end{document}
