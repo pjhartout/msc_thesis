@@ -91,10 +91,10 @@ def execute_twist(
         sampled_files[:midpoint]
     )
 
-    ramachandran = [protein.phi_psi_angles for protein in proteins]
-    ramachandran_perturbed = [
-        protein.phi_psi_angles for protein in proteins_perturbed
-    ]
+    ramachandran = np.array([protein.phi_psi_angles for protein in proteins])
+    ramachandran_perturbed = np.array(
+        [protein.phi_psi_angles for protein in proteins_perturbed]
+    )
 
     mmd_rama = MaximumMeanDiscrepancy(
         biased=True,
