@@ -30,11 +30,23 @@ def main(cfg: DictConfig):
     df_plot = pd.DataFrame(columns=["mmd_tda", "mmd_wl", "twist"])
     for parent, current, files in os.walk(here() / cfg.experiments.results):
         for file in files:
-            if "mmd" in file:
+            if "mmd" in file and "ramachandran" not in file:
                 exp_run = pd.read_csv(Path(parent) / file, index_col=0,)
                 exp_run["run"] = int(".".join(file.split("_")).split(".")[-2])
                 df_plot = pd.concat([df_plot, exp_run])
+            elif "ramachandran" in file:
+                exp_run = pd.read_csv(Path(parent) / file, index_col=0,)
+                exp_run["run"] = int(".".join(file.split("_")).split(".")[-3])
+                df_plot = pd.concat([df_plot, exp_run])
 
+    # Collapse dataframe
+    df_plot = pd.merge(
+        df_plot[["mmd_tda", "mmd_wl", "twist", "run"]].dropna(),
+        df_plot[["mmd_rama", "twist", "run"]].dropna(),
+        left_on=["run", "twist"],
+        right_on=["run", "twist"],
+        how="inner",
+    )
     # Plot the data
     df_plot = df_plot.reset_index(drop=True)
     # Normalize mmd values
@@ -43,11 +55,14 @@ def main(cfg: DictConfig):
         / (df_plot["mmd_tda"].max() - df_plot["mmd_tda"].min()),
         mmd_wl=(df_plot["mmd_wl"] - df_plot["mmd_wl"].min())
         / (df_plot["mmd_wl"].max() - df_plot["mmd_wl"].min()),
+        mmd_rama=(df_plot["mmd_rama"] - df_plot["mmd_rama"].min())
+        / (df_plot["mmd_rama"].max() - df_plot["mmd_rama"].min()),
     )
     df_plot = df_plot.rename(
         columns={
-            "mmd_wl": r"MMD Weisfeiler-Lehman on 8$\mathring{A}$-graph",
-            "mmd_tda": "MMD Persistence Fisher on persistence diagrams",
+            "mmd_wl": r"MMD Weisfeiler-Lehman Kernel on 8$\mathring{A}$-graph",
+            "mmd_tda": "MMD Persistence Fisher Kernel on Persistence Diagrams",
+            "mmd_rama": "MMD Linear Kernel from Ramachandran Descriptor",
         }
     )
     df_plot = df_plot.melt(id_vars=["twist", "run"])
@@ -63,7 +78,7 @@ def main(cfg: DictConfig):
     plt.legend(title=r"Kernel")
     p.set_xlabel(r"Twist (rad/$\mathring{A}$)")
     p.set_ylabel("MMD (normalized)")
-    plt.title("MMD as twist is added to a different set of proteins.")
+    plt.title("MMD as twist is added to different sets of proteins.")
     plt.tight_layout()
     os.makedirs(here() / cfg.experiments.results / "images", exist_ok=True)
     plt.savefig(here() / cfg.experiments.results / "images/results.png")

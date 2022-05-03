@@ -65,10 +65,7 @@ class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
     def __init__(
-        self,
-        noise_mean: float,
-        noise_variance: float,
-        **kwargs,
+        self, noise_mean: float, noise_variance: float, **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean
@@ -107,20 +104,31 @@ class Twist(Perturbation):
         super().__init__(random_state, n_jobs, verbose)
         self.alpha = alpha
 
-    def twist_protein(self, protein: Protein) -> Protein:
-        points = protein.coordinates
+    def twist_matrix(self, points):
         x = points[:, 0]
         y = points[:, 1]
         z = points[:, 2]
         x_transformed = x * cos(self.alpha * z) - y * sin(self.alpha * z)
         y_transformed = x * sin(self.alpha * z) + y * cos(self.alpha * z)
         z_transformed = z
-        protein.coordinates = stack(
+        return stack(
             [x_transformed, y_transformed, z_transformed],
             axis=1,
             convert=isinstance(self.alpha, Interval),
         )
-        return protein
+
+    def twist_protein(self, protein: Protein) -> Protein:
+        if protein.coordinates.size > 0:
+            protein.coordinates = self.twist_matrix(protein.coordinates)
+            return protein
+
+        elif protein.N_coordinates.size > 0:
+            protein.N_coordinates = self.twist_matrix(protein.N_coordinates)
+            protein.CA_coordinates = self.twist_matrix(protein.CA_coordinates)
+            protein.C_coordinates = self.twist_matrix(protein.C_coordinates)
+            return protein
+        else:  # pragma: no cover
+            raise ValueError("Invalid protein")
 
     def fit(self, X: List[Protein]) -> None:
         pass

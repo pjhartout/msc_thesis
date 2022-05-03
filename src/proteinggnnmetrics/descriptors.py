@@ -313,8 +313,7 @@ class TopologicalDescriptor(Descriptor):
                 / f"diagram_compute_cache_{uuid.uuid4().hex}/"
             )
             diagram_cache.mkdir(
-                parents=True,
-                exist_ok=True,
+                parents=True, exist_ok=True,
             )
             n_chunks = (
                 int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
@@ -329,8 +328,7 @@ class TopologicalDescriptor(Descriptor):
                     show_tqdm=self.verbose,
                 )
                 save_obj(
-                    diagram_cache / f"diagram_part_{i}.pkl",
-                    diagram_data,
+                    diagram_cache / f"diagram_part_{i}.pkl", diagram_data,
                 )
             diagram_data = list()
 
@@ -463,17 +461,17 @@ class RamachandranAngles(Descriptor):
             else:
                 psi = None
             phi_psi_angles.append((phi, psi))
-        phi = np.histogram(
-            np.array(phi, dtype=object)[:, 0][  # type: ignore
-                np.array(phi)[:, 0] != None  # type: ignore
+        phi, _ = np.histogram(
+            np.array(phi_psi_angles, dtype=object)[:, 0][  # type: ignore
+                np.array(phi_psi_angles, dtype=object)[:, 0] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
             range=self.bin_range,
         )
-        psi = np.histogram(
-            np.array(psi, dtype=object)[:, 1][  # type: ignore
-                np.array(psi)[:, 1] != None  # type: ignore
+        psi, _ = np.histogram(
+            np.array(phi_psi_angles, dtype=object)[:, 1][  # type: ignore
+                np.array(phi_psi_angles, dtype=object)[:, 1] != None  # type: ignore
             ].astype(float),
             bins=self.n_bins,
             density=self.density,
@@ -647,9 +645,7 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
