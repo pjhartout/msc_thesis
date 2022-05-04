@@ -19,7 +19,10 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.plots import setup_plotting_parameters
+from proteinggnnmetrics.utils.plots import (
+    setup_annotations,
+    setup_plotting_parameters,
+)
 
 setup_plotting_parameters()
 
@@ -75,13 +78,17 @@ def main(cfg: DictConfig):
         palette=palette,
         ci=100,
     )
-    plt.legend(title=r"Kernel")
-    p.set_xlabel(r"Twist (rad/$\mathring{A}$)")
-    p.set_ylabel("MMD (normalized)")
-    plt.title("MMD as twist is added to different sets of proteins.")
+    p = setup_annotations(
+        p,
+        title="MMD vs. Twist Added to Different Sets of Proteins.",
+        x_label=r"Twist (rad/$\mathring{A}$)",
+        y_label="Maximum Mean Discrepancy (Normalized)",
+        legend_title="Kernel",
+    )
+
     plt.tight_layout()
     os.makedirs(here() / cfg.experiments.results / "images", exist_ok=True)
-    plt.savefig(here() / cfg.experiments.results / "images/results.png")
+    plt.savefig(here() / cfg.experiments.results / "images/twist.png")
 
 
 if __name__ == "__main__":

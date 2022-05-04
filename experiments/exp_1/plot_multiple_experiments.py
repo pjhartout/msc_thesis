@@ -17,7 +17,10 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.plots import setup_plotting_parameters
+from proteinggnnmetrics.utils.plots import (
+    setup_annotations,
+    setup_plotting_parameters,
+)
 
 setup_plotting_parameters()
 
@@ -55,19 +58,17 @@ def main(cfg: DictConfig):
         # err_style="bars",
         ci=100,
     )
-    plt.legend(title=r"$\varepsilon$")
-    p.set_xlabel(r"Standard Deviation of Injected Noise (Å)")
-    p.set_ylabel("Maximum Mean Discrepancy")
-    plt.title(
-        "Multiple experiments of MMD vs gausian noise injection \n with varying levels of epsilon."
+    p = setup_annotations(
+        p,
+        title=r"MMD vs. Gaussian Noise Added to Different Sets of Proteins across varying values of $\varepsilon$.",
+        x_label=r"Standard Deviation of Injected Noise ($\mathring{A}$)",
+        y_label="Maximum Mean Discrepancy",
+        legend_title=r"$\varepsilon$",
     )
     print("Saving")
     plt.tight_layout()
     plt.savefig(
-        here()
-        / cfg.experiments.results
-        / "images"
-        / Path("plot_multiple_experiments.png")
+        here() / cfg.experiments.results / "images" / Path("gaussian.png")
     )
 
 
