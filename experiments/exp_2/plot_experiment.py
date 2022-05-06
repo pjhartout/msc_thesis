@@ -65,7 +65,7 @@ def main(cfg: DictConfig):
         columns={
             "mmd_wl": r"MMD Weisfeiler-Lehman Kernel on 8$\mathring{A}$-graph",
             "mmd_tda": "MMD Persistence Fisher Kernel on Persistence Diagrams",
-            "mmd_rama": "MMD Linear Kernel from Ramachandran Descriptor",
+            "mmd_rama": "MMD Linear Kernel from Dihedral Descriptor",
         }
     )
     df_plot = df_plot.melt(id_vars=["twist", "run"])

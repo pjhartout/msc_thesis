@@ -20,7 +20,10 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.plots import setup_plotting_parameters
+from proteinggnnmetrics.utils.plots import (
+    setup_annotations,
+    setup_plotting_parameters,
+)
 
 setup_plotting_parameters()
 
@@ -31,7 +34,7 @@ def main(cfg: DictConfig):
 
     df_plot = pd.DataFrame(columns=["mmd", "size", "organism"])
     for fname in os.listdir(here() / cfg.experiments.results):
-        if "human" in fname:
+        if "ecoli" not in fname and "mmd" in fname:
             df = pd.read_csv(
                 here() / cfg.experiments.results / fname,
                 names=["mmd", "size"],
@@ -66,12 +69,14 @@ def main(cfg: DictConfig):
         palette="mako_r",
         split=True,
     )
-    plt.legend(title="Organism")
-    p.set_xlabel(r"Size of each set of proteins.")
-    p.set_ylabel("Maximum Mean Discrepancy")
-    plt.title(
-        "Maximum Mean Discrepancy of random proteins samples from the Human Proteome and E. Coli Proteome"
+    p = setup_annotations(
+        p,
+        title="MMD of random samples from Human and E. Coli Proteome.",
+        x_label="Size of each set of proteins.",
+        y_label="Maximum Mean Discrepancy",
+        legend_title="Organism",
     )
+
     print("Saving")
     plt.tight_layout()
     plt.savefig(
