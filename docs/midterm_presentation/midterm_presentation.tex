@@ -20,6 +20,10 @@
 \usepackage[style=british]{csquotes}
 \usepackage{pgfplots}
 \usepackage[outline]{contour}
+\usepackage{minted}
+\usepackage[font=tiny]{caption}
+
+
 \newcommand*\colourcheck[1]{%
   \expandafter\newcommand\csname #1check\endcsname{\textcolor{#1}{\ding{52}}}%
 }
@@ -27,7 +31,7 @@
 \colourcheck{blue}
 \contourlength{1.2pt}
 
-\title{Building a library to evaluate protein generative models}
+\title{Building a library to evaluate generative protein models}
 % \subtitle{Lab Update}
 \date{\today}
 \author{Philip Hartout}
@@ -110,6 +114,9 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 }
 \newcommand\arrowfromto[5][blue]{%
   \draw[#1] #2 -- ( $ #2!#4!#3 $ ) node [midway, sloped, above] {#5}}
+
+\setminted[python]{fontsize=\tiny}
+
 \begin{document}
 
 % define gaussian pdf and cdf
@@ -162,11 +169,12 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 \begin{frame}[fragile]{Generative Protein Modelling}
   \begin{minipage}{0.48\textwidth}
     \begin{alert}{Proteins}
-    \begin{itemize}
-      \pause \item can be engineered
-      \pause \item are well-defined
-    \end{itemize}
+      \begin{itemize}
+        \pause \item well-defined (sequence)
+        \pause \item large databases
+      \end{itemize}
     \end{alert}
+
     \pause\begin{alert}{Generative Model}
       \begin{itemize}
         \pause\item captures $P(X)$
@@ -225,10 +233,10 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
         \draw [-latex](0,0.25) -- (0.8,0.25);
       \end{tikzpicture}
       \hfill
-      \pause\includegraphics[width=0.3\textwidth]{./figures/ribbon.png}
+      \includegraphics[width=0.3\textwidth]{./figures/ribbon.png}
     \end{figure}
     \end{minipage}
-    \end{center}
+  \end{center}
 
   \end{minipage}
   \hfill
@@ -239,7 +247,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \end{itemize}
     \end{alert}
 
-    \pause\begin{figure}
+    \begin{figure}
     \centering
       \begin{tikzpicture}[scale=0.7]
   \message{Test statistics^^J}
@@ -297,17 +305,13 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 % \end{figure}
 \end{frame}
 
-\begin{frame}[standout]
-  What makes a good protein?
-\end{frame}
+% \begin{frame}[standout]
+%   What makes a good protein?
+% \end{frame}
 
 \begin{frame}[fragile]{Maximum Mean Discrepancy (MMD)}
-  \begin{equation*}
-    \text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \sum_{i,j=1}^{n}k(y_i, y_j) - {2\over nm} \sum_{i=1}^{n}\sum_{j=1}^{m}k(x_i, y_j)
-  \end{equation*}
-  \begin{minipage}{0.28\textwidth}
-    \begin{figure}
-      \begin{flushleft}
+  \begin{figure}
+    \centering
       \begin{tikzpicture}
         \pgfmathsetseed{2}
         \node (0) at (0,0) {$\mathcal{H}$};
@@ -320,122 +324,75 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
         \arrowfromto[-latex,black, thick]{(0)}{(b)}{4cm}{};
         \arrowfromto[latex-latex,dotted,black, thick]{(c)}{(0)}{2cm}{};
       \end{tikzpicture}
-    \end{flushleft}
-  \end{figure}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{0.65\textwidth}
-    where:
-    \begin{itemize}
-    \item $\mathcal{X}$ is some non-empty set.
-    \item  $x_i, x_j \subseteq \mathcal{X}$, $n$ is the number of samples in $\mathbf{x}$;
-    \item  $y_i, y_j \subseteq \mathcal{X}$, $m$ is the number of samples in $\mathbf{y}$;
-    \item $k: \mathcal{X}\times\mathcal{X}\to\mathbb{R}$ is a valid kernel.
-    \end{itemize}
+    \end{figure}
+    \begin{center}
+      \small MMD captures the distance between 2 sets on \emph{any} RKHS $\mathcal{H}$.
+    \end{center}
 
-    \small MMD captures the distance between 2 sets on \emph{any} RKHS $\mathcal{H}$.
-
-  \end{minipage}
 \end{frame}
 
-\begin{frame}[fragile]{Maximum Mean Discrepancy (MMD) -- continued}
-  \pause\small Currently accepted method to evaluate GNNs.
 
-  \pause Advantages:
-  \begin{enumerate}
-    \pause\item \small It's possible to leverage decades of kernel research!\\ Both a
+\begin{frame}[fragile]{Maximum Mean Discrepancy (MMD) -- continued}
+  \begin{minipage}{0.68\textwidth}
+  \pause\small Currently accepted method to evaluate generative GNNs.
+  \pause\begin{figure}
+    \centering
+    \scalebox{0.75}{
+      \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+        \node (graphs) [orangebox] {Graphs};
+        \node (descriptor) [orangebox, right of=graphs, xshift=1.5cm] {Extract graph\\ descriptor};
+        \draw [arrow] (graphs) -- (descriptor);
+        \node (kernel) [orangebox, right of=descriptor, xshift=1.5cm] {Compute kernel};
+        \draw [arrow] (descriptor) -- (kernel);
+        \node (mmd) [orangebox, right of=kernel, xshift=1.5cm] {Compute \\MMD};
+        \draw [arrow] (kernel) -- (mmd);
+      \end{tikzpicture}
+    }
+  \end{figure}
+    \pause\small It's possible to leverage decades of kernel research!\\
+    \pause Both a
     \textcolor{PineGreen}{blessing} and a \textcolor{YellowOrange}{curse}:
     \begin{itemize}
       \pause\item[\textcolor{PineGreen}{Blessing}] Flexibility, Computation on
       multiple representations
-      \pause\item[\textcolor{YellowOrange}{Curse}] Instability (see Leslie's ICLR work), hyperparameter tuning.
+      \pause\item[\textcolor{YellowOrange}{Curse}] Instability (see Obray et
+      al (2021)), hyperparameter tuning.
     \end{itemize}
-  \pause\item \small Possibility of statistical testing.
-  \pause\item \small Possibility of leveraging multiple representations.
-  \end{enumerate}
+
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.28\textwidth}
+  \begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{./figures/leslie_work.pdf}
+    \caption{MMD computed from a clustering coefficient on synthetic graphs. TV:
+    total variation kernel, RBF: radial basis function, EMD: earth mover's distance.}
+\end{figure}
+\vspace{-14pt}
+  \begin{figure}
+    \centering
+    \includegraphics[width=.7\textwidth]{./figures/ideal.pdf}
+    \caption{Ideal MMD behaviour.}
+  \end{figure}
+  \end{minipage}
 \end{frame}
+
 
 \begin{frame}[standout]
   -- Thesis Goal -- \\
-  Build a library to evaluate protein generative models
-\end{frame}
-  \begin{frame}[fragile]{Overview}
-\begin{tikzpicture}[
-	scale=0.75,
-	start chain=1 going below,
-	start chain=2 going right,
-	node distance=1mm,
-	desc/.style={
-		scale=0.75,
-		on chain=2,
-		rectangle,
-		rounded corners,
-		draw=black,
-		very thick,
-		text centered,
-		text width=3cm,
-		minimum height=12mm,
-		fill=blue!30
-  },
-	it/.style={
-		fill=blue!10
-	},
-	level/.style={
-		scale=0.75,
-		on chain=1,
-		minimum height=12mm,
-		text width=2.5cm,
-		text centered,
-	},
-	every node/.style={font=\sffamily}
-]
-
-\onslide<6->\node [level] (Level 5) {Measures};
-\onslide<5->\node [level] (Level 4) {Kernels};
-\onslide<4->\node [level] (Level 3) {Descriptors};
-\onslide<3->\node [level] (Level 2) {Pertubations};
-\onslide<2->\node [level] (Level 1) {Representations};
-\onslide<1->\node [level] (Level 0) {Files};
-
-\chainin (Level 5);
-\onslide<6->\node [desc, fill=YellowOrange!10] (mmd) {MMD};
-\onslide<5->\node [desc, continue chain=going below, fill=YellowOrange!20] (gkernels) {Graph Kernels};
-\begin{scope}[start branch=gkernels]
-  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernels};
-  \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {TDA Kernels};
-  \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {Kernel Composition};
-\end{scope}
-\onslide<4-> \node [desc, fill=YellowOrange!30] (gdescriptors) {Graph Descriptors};
-\begin{scope}[start branch=gdescriptors]
-  \node[desc, fill=YellowOrange!30, on chain=going right](tdadescriptors) {TDA Descriptors};
-  \node[desc, on chain=going right, fill=YellowOrange!30](sequence) {Sequence \\Embeddings};
-  \node[desc, on chain=going right, fill=YellowOrange!30](sequence) {Protein descriptors};
-\end{scope}
-\onslide<3->\node [desc, xshift=2.25cm, xshift=-2.25cm, fill=PineGreen!50] (pert) {Graph \\Perturbations};
-\begin{scope}[start branch= pert]
-  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Mutations};
-  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Geometric \\Perturbations};
-  \node[desc, on chain=going right, fill=PineGreen!50](gn) {Gaussian Noise};
-\end{scope}
-\onslide<2->\node [desc, fill=YellowOrange!40] (Graphs) {$\varepsilon$ graphs};
-\begin{scope}[start branch=Graphs]
-  \node[desc, on chain=going right, fill=YellowOrange!40](knn) {$k$-NN graphs};
-  \node[desc, on chain=going right, fill=YellowOrange!40] (PC) {Point Clouds};
-  \node[desc, on chain=going right, fill=YellowOrange!40] (Seq) {Sequence};
-\end{scope}
-\onslide<1-> \node [desc, fill=YellowOrange!60] (Files) {PDB Files};
-\end{tikzpicture}
+  Build a library to evaluate generative protein models
 \end{frame}
 
 \begin{frame}[fragile]{Experimental setup}
-  We will study the following settings:
+  Take 10 sets of 100 proteins from Alphafold DB (easy to work with)
+
+  \pause We will study the following settings:
   \begin{enumerate}
-  \pause\item Add gaussian noise to the point cloud and use graph kernels
-  \pause\item Add twist to proteins to the point cloud and see the results on
-    different kernels
-  \pause\item Add mutations to proteins to the point cloud and see the results on
-    different kernels
+    \pause\item Add gaussian noise
+    \pause\item Add twist
+    \pause\item Add mutations
   \end{enumerate}
+
 \end{frame}
 
 {
@@ -448,21 +405,21 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
         \node (coords) [orangebox] {Get \\Coordinates};
         \onslide<1->\node (gauss) [orangebox, right of=coords, xshift=1.5cm, fill=PineGreen!60] {Add \\gaussian noise};
         \draw [arrow] (coords) -- (gauss);
-        \onslide<2-> \node (cmap) [orangebox, right of=gauss, xshift=1.5cm] {Get \\contact map};
-        \draw [arrow] (gauss) -- (cmap);
-        \onslide<3->\node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
-        \draw [arrow] (cmap) -- (egraph);
-        \onslide<4->\node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
-        \draw [arrow] (egraph) -- (wlk);
-        \onslide<5->\node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
-        \draw [arrow] (wlk) -- (mmd);
+        % \onslide<2-> \node (cmap) [orangebox, right of=gauss, xshift=1.5cm] {Get \\contact map};
+        % \draw [arrow] (gauss) -- (cmap);
+        % \onslide<3->\node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
+        % \draw [arrow] (cmap) -- (egraph);
+        % \onslide<4->\node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+        % \draw [arrow] (egraph) -- (wlk);
+        % \onslide<5->\node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
+        % \draw [arrow] (wlk) -- (mmd);
       \end{tikzpicture}
     }
   \end{figure}
   \begin{figure}
     \centering
-    % \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{49}
-    \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{1}
+    \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{49}
+    % \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{1}
 
     \caption{Adding Gaussian Noise. Protein is color-coded according to the
       index of each amino acid.}
@@ -477,13 +434,13 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \scalebox{0.75}{
       \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
         \node (coords) [orangebox] {Get \\Coordinates};
-        \node (gauss) [orangebox, right of=coords, xshift=1.5cm, fill=PineGreen!60] {Add \\gaussian noise};
+        \node (gauss) [orangebox, right of=coords, xshift=1.5cm] {Add \\gaussian noise};
         \draw [arrow] (coords) -- (gauss);
         \node (cmap) [orangebox, right of=gauss, xshift=1.5cm] {Get \\contact map};
         \draw [arrow] (gauss) -- (cmap);
-        \node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
+        \node (egraph) [orangebox, right of=cmap, xshift=1.5cm, fill=Turquoise!60] {Get \\ $\epsilon$-graph};
         \draw [arrow] (cmap) -- (egraph);
-        \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
+        \node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute Weisfeiler-\\ Lehman kernel};
         \draw [arrow] (egraph) -- (wlk);
         \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
         \draw [arrow] (wlk) -- (mmd);
@@ -498,7 +455,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \end{figure}
   \end{minipage}
   \begin{minipage}{0.38\linewidth}
-    \pause $n=10$ runs
+    Each curve: different $\varepsilon$.\\
 
     \pause\small 2 sources of variance:
     \begin{itemize}
@@ -518,7 +475,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 
 {
   \setbeamercolor{background canvas}{bg=white}
-  \begin{frame}[fragile]{Introduction}
+  \begin{frame}[fragile]{Dihedral angles}
     \begin{minipage}{0.7\textwidth}
       \begin{figure}
         \centering
@@ -527,7 +484,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \end{minipage}
     \hfill
     \begin{minipage}{0.25\textwidth}
-      \small These angles \emph{define} the shape of the protein
+      \small These angles \emph{define} the shape of the protein.
     \end{minipage}
   \end{frame}
 }
@@ -537,8 +494,8 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \begin{minipage}{0.7\textwidth}
     \begin{figure}
       \centering
-%       \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{149}%
-\animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{1}
+      \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{149}%
+% \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{1}
       \label{fig:cech}
     \end{figure}
   \end{minipage}
@@ -552,9 +509,11 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 {
   \setbeamercolor{background canvas}{bg=white}
   \begin{frame}[fragile]{Experiment 2 -- Twist}
+    \begin{minipage}{0.58\textwidth}
+
   \begin{figure}
     \centering
-    \scalebox{0.75}{
+    \scalebox{0.55}{
     \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
       \node (coords) [orangebox] {Get \\Coordinates};
       \node (twist) [orangebox, right of=coords, xshift=1.5cm, fill=PineGreen!60] {Add \\twist};
@@ -565,7 +524,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \draw [arrow] (pd) -- (wlk);
       \node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
       \draw [arrow] (wlk) -- (mmd);
-      \node (rama) [orangebox, below of=pd, yshift=-0.5cm] {Get \\Ramachandran \\Angles Histogram};
+      \node (rama) [orangebox, below of=pd, yshift=-0.5cm] {Get \\Dihedral Angles\\ Histogram};
       \draw [arrow] (twist) |- (rama);
       \node (lin) [orangebox, right of=rama, xshift=1.5cm] {Compute \\Linear Kernel};
       \draw [arrow] (rama) -- (lin);
@@ -574,14 +533,18 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \end{tikzpicture}
     }
   \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.38\textwidth}
   \begin{figure}
     \centering
-    % \animategraphics[loop,controls,width=0.4\linewidth]{10}{./figures/twist/protein_straight_}{0}{99}
-    \animategraphics[loop,controls,width=0.4\linewidth]{10}{./figures/twist/protein_straight_}{0}{1}
+    \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{99}
+    % \animategraphics[loop,controls,width=0.4\linewidth]{10}{./figures/twist/protein_straight_}{0}{1}
     % \caption{Adding Gaussian Noise. Protein is color-coded according to the
-    %   index of each amino acid.}
+    % index of each amino acid.}
     \label{fig:twist}
   \end{figure}
+\end{minipage}
 \end{frame}
 }
 
@@ -595,7 +558,6 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \end{figure}
   \end{minipage}
   \begin{minipage}{0.38\linewidth}
-    \pause $n=10$ runs
 
     \pause\small 1 source of variance:
     \begin{itemize}
@@ -604,14 +566,15 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 
   \begin{alert}{Conclusions}
     \begin{enumerate}
-      \pause\item Weisfeiler-Lehman kernel is not best to capture geometrical perturbations
-      \pause\item TDA was difficult to compute but behaves very well
-      \pause\item Ramachrandran descriptors capture geometric perturbations very well
+      \pause\item TDA behaves very well, computationally complex
+      \pause\item Dihedral descriptor behave well, fast to compute
+      \pause\item Weisfeiler-Lehman kernel does not capture global shape changes
     \end{enumerate}
   \end{alert}
   \end{minipage}
 \end{frame}
 }
+
 
 {
   \setbeamercolor{background canvas}{bg=white}
@@ -645,7 +608,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \end{figure}
   \end{minipage}
   \begin{minipage}{0.38\linewidth}
-    \pause $n=10$ runs
+    % \pause $n=10$ runs
 
     \pause\small 2 sources of variance:
     \begin{itemize}
@@ -653,14 +616,123 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \pause\small\item Mutation seed
   \end{itemize}
 
-  \begin{alert}{Conclusions}
+  \pause\begin{alert}{Conclusions}
     \begin{enumerate}
-      \pause\item Weisfeiler-Lehman kernel does capture node label changes well
-      \pause\item ESM also looks ok, but might carry bias from the data.
+      \pause\item Weisfeiler-Lehman kernel captures changes but noisy
+      \pause\item ESM captures changes.
+      \pause\item Further study with lower mutation probabilities.
     \end{enumerate}
   \end{alert}
   \end{minipage}
 \end{frame}
+}
+
+\begin{frame}[fragile]{Questions - Overview}
+\begin{tikzpicture}[
+	scale=0.75,
+	start chain=1 going below,
+	start chain=2 going right,
+	node distance=1mm,
+	desc/.style={
+		scale=0.75,
+		on chain=2,
+		rectangle,
+		rounded corners,
+		draw=black,
+		very thick,
+		text centered,
+		text width=3cm,
+		minimum height=12mm,
+		fill=blue!30
+  },
+	it/.style={
+		fill=blue!10
+	},
+	level/.style={
+		scale=0.75,
+		on chain=1,
+		minimum height=12mm,
+		text width=2.5cm,
+		text centered,
+	},
+	every node/.style={font=\sffamily}
+]
+
+\node [level] (Level 5) {Measures};
+\node [level] (Level 4) {Kernels};
+\node [level] (Level 3) {Descriptors};
+\node [level] (Level 2) {Pertubations};
+\node [level] (Level 1) {Representations};
+\node [level] (Level 0) {Files};
+
+\chainin (Level 5);
+\node [desc, fill=YellowOrange!10] (mmd) {MMD};
+\node [desc, continue chain=going below, fill=YellowOrange!20] (gkernels) {Graph Kernels};
+\begin{scope}[start branch=gkernels]
+  \node[desc, on chain=going right, fill=YellowOrange!20](vkernels) {Vector Kernels};
+  \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {TDA Kernels};
+  \node[desc, on chain=going right, fill=YellowOrange!20](tdakernels) {Kernel Composition};
+\end{scope}
+\node [desc, fill=YellowOrange!30] (gdescriptors) {Graph Descriptors};
+\begin{scope}[start branch=gdescriptors]
+  \node[desc, fill=YellowOrange!30, on chain=going right](tdadescriptors) {TDA Descriptors};
+  \node[desc, on chain=going right, fill=YellowOrange!30](sequence) {Sequence \\Embeddings};
+  \node[desc, on chain=going right, fill=YellowOrange!30](sequence) {Protein descriptors};
+\end{scope}
+\node [desc, xshift=2.25cm, xshift=-2.25cm, fill=PineGreen!50] (pert) {Graph \\Perturbations};
+\begin{scope}[start branch= pert]
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Mutations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gp) {Geometric \\Perturbations};
+  \node[desc, on chain=going right, fill=PineGreen!50](gn) {Gaussian Noise};
+\end{scope}
+\node [desc, fill=YellowOrange!40] (Graphs) {$\varepsilon$ graphs};
+\begin{scope}[start branch=Graphs]
+  \node[desc, on chain=going right, fill=YellowOrange!40](knn) {$k$-NN graphs};
+  \node[desc, on chain=going right, fill=YellowOrange!40] (PC) {Point Clouds};
+  \node[desc, on chain=going right, fill=YellowOrange!40] (Seq) {Sequence};
+\end{scope}
+\node [desc, fill=YellowOrange!60] (Files) {PDB Files};
+\end{tikzpicture}
+\end{frame}
+
+
+
+
+
+\begin{frame}[fragile]{Maximum Mean Discrepancy (MMD)}
+  \begin{equation*}
+    \text{MMD}(X, Y) := {1\over n^2} \sum_{i,j=1}^{n}k(x_i, x_j) + {1\over m^2} \sum_{i,j=1}^{n}k(y_i, y_j) - {2\over nm} \sum_{i=1}^{n}\sum_{j=1}^{m}k(x_i, y_j)
+  \end{equation*}
+    where:
+    \begin{itemize}
+    \item $\mathcal{X}$ is some non-empty set.
+    \item  $x_i, x_j \subseteq \mathcal{X}$, $n$ is the number of samples in $\mathbf{x}$;
+    \item  $y_i, y_j \subseteq \mathcal{X}$, $m$ is the number of samples in $\mathbf{y}$;
+    \item $k: \mathcal{X}\times\mathcal{X}\to\mathbb{R}$ is a valid kernel.
+    \end{itemize}
+
+    \small MMD captures the distance between 2 sets on \emph{any} RKHS $\mathcal{H}$.
+  \end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=white}
+  \begin{frame}[fragile]{API}
+    \begin{minipage}{.45\textwidth}
+      \inputminted[firstline=1, lastline=15]{python}{example_pipeline_with_noise.py}
+    \end{minipage}
+    \hfill
+    \pause
+    \begin{minipage}{.45\textwidth}
+      \inputminted[firstline=17, lastline=26]{python}{example_pipeline_with_noise.py}
+    \end{minipage}
+  \end{frame}
+
+  \begin{frame}[fragile]{MMD with 8-$\mathring{A}$-MMD with Weisfeiler-Lehman kernel}
+    \begin{figure}
+      \centering
+      \includegraphics[height=\textheight]{./figures/mmd_variance_baseline.png}
+    \end{figure}
+  \end{frame}
 }
 
 \end{document}
