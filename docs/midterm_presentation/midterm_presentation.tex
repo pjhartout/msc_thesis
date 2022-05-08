@@ -12,17 +12,16 @@
 \usepackage{bbm}
 \usepackage{tikz, graphicx}
 \usepackage{multicol}
-% \usepackage[dvipsnames]{xcolor}
 \usepackage{animate}
 \usepackage{scalerel,xparse}
 \usepackage{amsmath}
-\usepackage{subfig}
 \usepackage[style=british]{csquotes}
 \usepackage{pgfplots}
 \usepackage[outline]{contour}
 \usepackage{minted}
 \usepackage[font=tiny]{caption}
-
+\usepackage{subcaption}
+\usepackage[export]{adjustbox}
 
 \newcommand*\colourcheck[1]{%
   \expandafter\newcommand\csname #1check\endcsname{\textcolor{#1}{\ding{52}}}%
@@ -452,7 +451,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 % \end{frame}
 % }
 
-\begin{frame}[fragile]{Experiment 1 -- Gaussian Noise \includegraphics[height=28pt]{./figures/gaussian_noise/thumbnail_protein_straight_9.png}}
+\begin{frame}[fragile]{Experiment 1 -- Gaussian Noise}
   \begin{figure}
     \centering
     \scalebox{0.75}{
@@ -475,7 +474,16 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \pause\begin{minipage}{0.6\linewidth}
     \begin{figure}
       \centering
-      \includegraphics[width=\textwidth]{./figures/gaussian.png}
+      \includegraphics[width=.9\textwidth]{./figures/gaussian.png}
+      \begin{minipage}{0.9\textwidth}
+        \centering
+        \includegraphics[height=14pt]{./figures/gaussian_noise/start_protein_straight_0.png}
+        \begin{tikzpicture}
+          \node (0) at (0,0) {};
+          \draw [-latex, fill=White](0,0.1) -- (5.0,0.1);
+        \end{tikzpicture}
+        \includegraphics[height=14pt]{./figures/gaussian_noise/end_protein_straight_46.png}
+      \end{minipage}
     \end{figure}
   \end{minipage}
   \begin{minipage}{0.38\linewidth}
@@ -500,15 +508,32 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 {
   \setbeamercolor{background canvas}{bg=white}
   \begin{frame}[fragile]{Dihedral angles}
-    \begin{minipage}{0.7\textwidth}
-      \begin{figure}
-        \centering
-        \includegraphics[width=\textwidth]{./figures/phi_psi.png}
-      \end{figure}
+    \begin{minipage}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{./figures/phi_psi.png}
     \end{minipage}
-    \hfill
-    \begin{minipage}{0.25\textwidth}
-      \small These angles \emph{define} the shape of the protein.
+    \pause\begin{minipage}{0.3\textwidth}
+      \begin{adjustbox}{minipage=\linewidth,scale=0.8}
+        \begin{figure}
+          \centering
+          \begin{subfigure}{\textwidth}
+            \includegraphics[width=\textwidth]{./figures/dehedral_dist_psi.png}
+          \end{subfigure}
+          \begin{subfigure}{\textwidth}
+            \includegraphics[width=\textwidth]{./figures/dehedral_dist_phi.png}
+          \end{subfigure}
+        \end{figure}
+      \end{adjustbox}
+    \end{minipage}
+    \pause\begin{minipage}{0.28\textwidth}
+      \begin{alert}{Use in MMD}
+        \begin{itemize}
+        \item\small Concatenate
+        \item\small Compute kernel
+        \item\small Can be Gaussian, Linear, ...
+        \end{itemize}
+
+      \end{alert}
     \end{minipage}
   \end{frame}
 }
@@ -518,8 +543,8 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \begin{minipage}{0.7\textwidth}
     \begin{figure}
       \centering
-      \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{149}%
-% \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{1}
+      % \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{149}%
+      \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/cech_filtration/something-}{0}{1}
       \label{fig:cech}
     \end{figure}
   \end{minipage}
@@ -562,8 +587,8 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 \begin{minipage}{0.38\textwidth}
   \begin{figure}
     \centering
-    \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{99}
-    % \animategraphics[loop,controls,width=0.4\linewidth]{10}{./figures/twist/protein_straight_}{0}{1}
+    % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{99}
+    \animategraphics[loop,controls,width=0.4\linewidth]{10}{./figures/twist/protein_straight_}{0}{1}
     % \caption{Adding Gaussian Noise. Protein is color-coded according to the
     % index of each amino acid.}
     \label{fig:twist}
