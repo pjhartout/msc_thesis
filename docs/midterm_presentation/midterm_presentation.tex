@@ -175,15 +175,15 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \end{itemize}
     \end{alert}
 
-    \pause\begin{alert}{Generative Model}
+    \pause\begin{alert}{Generative Models}
       \begin{itemize}
-        \pause\item captures $P(X)$
+        \pause\item capture $P(X)$
         \pause\item generate samples following  $P(X)$
       \end{itemize}
     \end{alert}
     \begin{center}
     \begin{minipage}{0.7\textwidth}
-    \pause\begin{figure}
+    \begin{figure}
       \centering
       \begin{tikzpicture}
         \message{Cumulative probability^^J}
@@ -367,17 +367,17 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 
 \begin{frame}[standout]
   -- Thesis Goal -- \\
-  Build a library to evaluate generative protein models
+  Building a library to evaluate generative protein models
 \end{frame}
 
 {
   \setbeamercolor{background canvas}{bg=white}
-  \begin{frame}[fragile]{Experimental setup}
+  \begin{frame}[fragile]{Experimental Setup -- Perturbations to Assess MMD}
     \begin{enumerate}
-    \item $10$ pairs of 100 proteins from Alphafold DB (easy to work
+      \item $10$ pairs of 100 proteins from Alphafold DB (easy to work
       with)
-    \item Apply perturbation to 1 of the pairs.
-    \item Calculate MMD
+      \item Apply perturbation to 1 of the datasets in each pair.
+      \item Calculate MMD
     \end{enumerate}
 
   \begin{minipage}{0.3\textwidth}
@@ -385,7 +385,6 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \centering
       \animategraphics[loop,controls,width=\textwidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{49}
       % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{1}
-
       \caption{Adding Gaussian Noise. Color-coded according to the index.}
       \label{fig:gaussian}
     \end{figure}
@@ -413,38 +412,6 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 \end{frame}
 }
 
-% {
-%   \setbeamercolor{background canvas}{bg=white}
-% \begin{frame}[fragile]{Experiment 1 -- Gaussian Noise}
-%   \begin{figure}
-%     \centering
-%     \scalebox{0.75}{
-%       \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
-%         \node (coords) [orangebox] {Get \\Coordinates};
-%         \onslide<1->\node (gauss) [orangebox, right of=coords, xshift=1.5cm, fill=PineGreen!60] {Add \\gaussian noise};
-%         \draw [arrow] (coords) -- (gauss);
-%         % \onslide<2-> \node (cmap) [orangebox, right of=gauss, xshift=1.5cm] {Get \\contact map};
-%         % \draw [arrow] (gauss) -- (cmap);
-%         % \onslide<3->\node (egraph) [orangebox, right of=cmap, xshift=1.5cm] {Get \\$\epsilon$-graph};
-%         % \draw [arrow] (cmap) -- (egraph);
-%         % \onslide<4->\node (wlk) [orangebox, right of=egraph, xshift=1.5cm] {Compute \\kernel};
-%         % \draw [arrow] (egraph) -- (wlk);
-%         % \onslide<5->\node (mmd) [orangebox, right of=wlk, xshift=1.5cm] {Compute \\MMD};
-%         % \draw [arrow] (wlk) -- (mmd);
-%       \end{tikzpicture}
-%     }
-%   \end{figure}
-%   \begin{figure}
-%     \centering
-%     % \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{49}
-%     \animategraphics[loop,controls,width=0.5\linewidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{1}
-
-%     \caption{Adding Gaussian Noise. Protein is color-coded according to the
-%       index of each amino acid.}
-%     \label{fig:twist}
-%   \end{figure}
-% \end{frame}
-% }
 
 \begin{frame}[fragile]{Experiment 1 -- Gaussian Noise}
   \begin{figure}
@@ -490,7 +457,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \pause\small\item Noise
   \end{itemize}
 
-  \begin{alert}{Conclusions}
+  \pause\begin{alert}{Conclusions}
     \begin{enumerate}
       \pause\item MMD is stable using the Weisfeiler-Lehman kernel
       \pause\item Choice of representation influences MMD
@@ -537,11 +504,11 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \begin{minipage}{0.3\textwidth}
     \begin{figure}
       \centering
-      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/cech_filtration/something-}{0}{149}%
-      % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/cech_filtration/something-}{0}{1}
-      \caption{\v{C}ech filtrations captures connected components, cycles and holes
+      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/viet_filtration/something-}{0}{149}%
+      % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/viet_filtration/something-}{0}{1}
+      \caption{Vietoris-Rips filtrations captures connected components, cycles and holes
         by varying $\varepsilon$.}
-      \label{fig:cech}
+      \label{fig:viet}
     \end{figure}
   \end{minipage}
   \hfill
@@ -567,60 +534,69 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 
   {
   \setbeamercolor{background canvas}{bg=white}
-\begin{frame}[fragile]{Experiment 2 -- Twist}
-  \begin{minipage}{0.6\linewidth}
+  \begin{frame}[fragile]{Experiment 2 -- Twist}
     \begin{figure}
       \centering
-      \includegraphics[width=\textwidth]{./figures/twist.png}
-    \end{figure}
-    \centering
-    \begin{minipage}{0.9\textwidth}
-      \centering
-      \begin{minipage}{0.05\textwidth}
-        \includegraphics[height=14pt]{./figures/twist/start_protein_straight_0.png}
-      \end{minipage}
-      \hfill
-      \begin{minipage}{0.85\textwidth}
-        \begin{tikzpicture}
-          \node (0) at (0,0) {};
-          \draw [-latex, fill=White](0,0.1) -- (5.5,0.1);
+      \scalebox{0.75}{
+        \begin{tikzpicture}[align=center, node distance=1.5cm, align=center]
+          \node (coords) [orangebox] {Get \\Coordinates};
+          \node (twist) [orangebox, right of=coords, xshift=1.5cm] {Add \\Twist};
+          \draw [arrow] (coords) -- (twist);
+          \node (feat) [orangebox, right of=twist, xshift=2.5cm] {Compute TDA features \\ \& Dihedral angles};
+          \draw [arrow] (twist) -- (feat);
+          \node (kernel) [orangebox, right of=feat, xshift=3.5cm] {Compute relevant kernel};
+          \draw [arrow] (feat) -- (kernel);
+          \node (mmd) [orangebox, right of=kernel, xshift=2.5cm] {Compute \\MMD};
+          \draw [arrow] (kernel) -- (mmd);
         \end{tikzpicture}
-        \includegraphics[height=14pt]{./figures/twist/end_protein_straight_99.png}
-      \end{minipage}
-      \hfill
-      \begin{minipage}{0.05\textwidth}
-      \end{minipage}
+
+      }
+    \end{figure}
+    \pause\begin{minipage}{0.6\textwidth}
+      \begin{figure}
+        \includegraphics[width=.9\textwidth]{./figures/twist.png}
+      \end{figure}
+      \vspace{-28pt}
+      \begin{flushright}
+        \begin{minipage}{0.9\textwidth}
+          \includegraphics[height=14pt]{./figures/twist/start_protein_straight_0.png}
+          \begin{tikzpicture}
+            \node (0) at (0,0) {};
+            \draw [-latex, fill=White](0,0.1) -- (5.5,0.1);
+          \end{tikzpicture}
+          \includegraphics[height=14pt]{./figures/twist/end_protein_straight_99.png}
+        \end{minipage}
+      \end{flushright}
     \end{minipage}
-  \end{minipage}
-  \begin{minipage}{0.38\linewidth}
+    \hfill
+    \begin{minipage}{0.38\textwidth}
 
-    \pause\small 1 source of variance:
-    \begin{itemize}
-      \pause\small\item Data
-  \end{itemize}
+      \pause\small 1 source of variance:
+      \begin{itemize}
+        \pause\small\item Data
+      \end{itemize}
 
-  \begin{alert}{Conclusions}
-    \begin{enumerate}
-      \pause\item TDA behaves very well, computationally complex
-      \pause\item Dihedral descriptor behave well, fast to compute
-      \pause\item Weisfeiler-Lehman kernel does not capture global shape changes
-    \end{enumerate}
-  \end{alert}
-  \end{minipage}
-\end{frame}
+      \begin{alert}{Conclusions}
+        \begin{enumerate}
+          \pause\item TDA behaves very well, computationally complex
+          \pause\item Dihedral descriptor behave well, fast to compute
+          \pause\item Weisfeiler-Lehman kernel does not capture global shape changes
+        \end{enumerate}
+      \end{alert}
+    \end{minipage}
+  \end{frame}
 }
 
 \begin{frame}[fragile]{Outlook -- Next steps}
   \begin{minipage}{0.48\textwidth}
     More realistic perturbations.
     \begin{itemize}
-    \pause \item Mutations
-    \pause \item ...
+      \pause \item Mutations (for engineering)
     \end{itemize}
-
-    \pause Deal with failure modes.
+    Data \& Failure modes
     \begin{itemize}
-      \pause \item Mode dropping/collapse
+      \pause \item MMD with different protein families
+      \pause \item Mode dropping/collapse (tweak mix of each protein families?)
       \pause \item Copy problem (w/ graph edit distance derivative?)
     \end{itemize}
 
@@ -628,10 +604,10 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
   \hfill
   \begin{minipage}{0.48\textwidth}
     \begin{itemize}
-      \item Systematic assessment of pipelines
-      \item Refactor
-      \item Publish on PyPI.
-    \end{itemize}
+      \pause\item Systematic assessment of kernels \& hyperparameters
+      \pause\item Devise strategies to recommend best pipeline(s).
+      % \pause\item Publish library?
+     \end{itemize}
   \end{minipage}
 \end{frame}
 
