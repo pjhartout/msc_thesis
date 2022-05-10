@@ -74,8 +74,8 @@ def main(cfg: DictConfig):
         df_plot, kind="kde", rug=True, color=palette, height=3, aspect=1
     )
 
-    plt.title("Phi Distribution")
-    plt.xlabel("Phi (rad)")
+    plt.title(r"$\phi$ Distribution")
+    plt.xlabel(r"$\phi$ (rad)")
     plt.ylabel("Density")
     plt.tight_layout()
     plt.savefig(
@@ -86,8 +86,8 @@ def main(cfg: DictConfig):
     p = sns.displot(
         df_plot, kind="kde", rug=True, color=palette, height=3, aspect=1
     )
-    plt.title("Psi Distribution")
-    plt.xlabel("Psi (rad)")
+    plt.title(r"$\psi$ Distribution")
+    plt.xlabel(r"$\psi$ (rad)")
     plt.ylabel("Density")
     plt.tight_layout()
     plt.savefig(
