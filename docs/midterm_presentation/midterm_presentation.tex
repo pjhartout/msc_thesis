@@ -1,5 +1,5 @@
 %Metroplolis Beamer Theme: https://github.com/matze/mtheme
-\documentclass[aspectratio=169, 10pt, dvipsnames]{beamer}
+\documentclass[aspectratio=169, 10pt, dvipsnames, handout]{beamer}
 \usetheme{metropolis}
 \usepackage{appendixnumberbeamer, lmodern, bookmark,fontawesome}
 \usepackage{booktabs}
@@ -380,35 +380,35 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
       \item Calculate MMD
     \end{enumerate}
 
-  \begin{minipage}{0.3\textwidth}
+  \begin{minipage}{0.45\textwidth}
     \begin{figure}
       \centering
-      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{49}
+      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{20}
       % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/gaussian_noise/protein_straight_}{0}{1}
       \caption{Adding Gaussian Noise. Color-coded according to the index.}
       \label{fig:gaussian}
     \end{figure}
   \end{minipage}
   \hfill
-  \begin{minipage}{0.3\textwidth}
+  \begin{minipage}{0.45\textwidth}
     \begin{figure}
       \centering
-      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{99}
+      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{20}
       % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/twist/protein_straight_}{0}{1}
       \caption{Adding Twist. Color-coded according to the index.}
       \label{fig:twist}
     \end{figure}
   \end{minipage}
-  \hfill
-  \begin{minipage}{0.3\textwidth}
-    \begin{figure}
-      \centering
-      \animategraphics[loop,controls,width=\textwidth]{10}{./figures/mutation/protein_straight_}{0}{99}
-      % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/mutation/protein_straight_}{0}{1}
-      \caption{Adding Mutations. Color-coded according to amino acid type.}
-      \label{fig:mutation}
-    \end{figure}
-  \end{minipage}
+  % \hfill
+  % \begin{minipage}{0.3\textwidth}
+  %   \begin{figure}
+  %     \centering
+  %     \animategraphics[loop,controls,width=\textwidth]{10}{./figures/mutation/protein_straight_}{0}{99}
+  %     % \animategraphics[loop,controls,width=\textwidth]{10}{./figures/mutation/protein_straight_}{0}{1}
+  %     \caption{Adding Mutations. Color-coded according to amino acid type.}
+  %     \label{fig:mutation}
+  %   \end{figure}
+  % \end{minipage}
 \end{frame}
 }
 
@@ -469,7 +469,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 
 {
   \setbeamercolor{background canvas}{bg=white}
-  \begin{frame}[fragile]{Experiment 3 Preliminaries 1/2 - Dihedral Angles}
+  \begin{frame}[fragile]{Experiment 2 Preliminaries 1/2 - Dihedral Angles}
     \begin{minipage}{0.4\textwidth}
       \centering
       \includegraphics[width=\textwidth]{./figures/phi_psi.png}
@@ -500,7 +500,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
 }
 
 
-\begin{frame}[fragile]{Experiment 3 Preliminaries 2/2 -Topological Data Analysis}
+\begin{frame}[fragile]{Experiment 2 Preliminaries 2/2 -Topological Data Analysis}
   \begin{minipage}{0.3\textwidth}
     \begin{figure}
       \centering
@@ -593,7 +593,7 @@ height=0.5cm, draw=black, fill=YellowOrange!60, very thick]
     \begin{itemize}
       \pause \item Mutations (for engineering)
     \end{itemize}
-    Data \& Failure modes
+    \pause Data \& Failure modes
     \begin{itemize}
       \pause \item MMD with different protein families
       \pause \item Mode dropping/collapse (tweak mix of each protein families?)
