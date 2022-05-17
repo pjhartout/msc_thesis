@@ -3,3 +3,5 @@ defaults:
   - variables: variables
   - seeding: seeding
   - debug: debug
+  - meta: meta
+  - paths: paths

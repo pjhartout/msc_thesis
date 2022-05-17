@@ -1,0 +1,44 @@
+# This contains all the elements necessary to create the ensemble of experiments to run.
+
+representations:
+  - eps_graphs: [8, 16, 32]
+  - knn_graphs: [2, 6, 8]
+  - point_cloud: ["backbone", "CA"]
+  - persistence_diagram: [""]
+  - sequence: [""]
+
+perturbations:
+  [
+    "twist",
+    "shear",
+    "taper",
+    "mutate",
+    "gaussian",
+    "remove_edges",
+    "create_edges",
+    "rewire_edges",
+    "add_nodes",
+  ]
+
+descriptors:
+  [
+    "persistence_diagram",
+    "angles",
+    "degree_histogram",
+    "laplacian_spectrum",
+    "clustering_histogram",
+    "esm",
+  ]
+
+kernels:
+  - persistence_fisher:
+      - bandwidth: [0.5, 1, 1.5]
+      - bandwidth_fisher: [0.5, 1, 1.5]
+  - gaussian:
+      - bandwidth: [0.5, 1, 1.5]
+  - linear:
+      - params: None
+  - weisfeiler-lehman:
+      - n_iter: [3, 5, 10]
+
+organisms: ["humans", "ecoli"]
