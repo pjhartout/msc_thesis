@@ -46,6 +46,7 @@ data:
   n_runs: 10
   sample_size: 100
   data_split_dir: "data/systematic/run_idx/"
+  time_estimates_dir: "data/systematic/time/"
 
 # compute:
 #   representations:
