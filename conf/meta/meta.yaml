@@ -4,7 +4,6 @@ representations:
   - eps_graphs: [8, 16, 32]
   - knn_graphs: [2, 6, 8]
   - point_cloud: ["backbone", "CA"]
-  - persistence_diagram: [""]
   - sequence: [""]
 
 perturbations:
@@ -47,3 +46,24 @@ data:
   n_runs: 10
   sample_size: 100
   data_split_dir: "data/systematic/run_idx/"
+
+# compute:
+#   representations:
+#     graphs:
+#     point_cloud:
+#     sequence:
+#     persistence_diagram:
+#   perturbations:
+#     geometric:
+#     mutation:
+#     graphs:
+#   descriptors:
+#     esm:
+#     graph_descriptors:
+
+#   # graph_pipeline_gaussian:
+#   # graph_pipeline_linear:
+#   # graph_pipeline_wlk:
+#   # tda_pipeline:
+#   # esm_pipeline:
+#   # angles_pipeline:
