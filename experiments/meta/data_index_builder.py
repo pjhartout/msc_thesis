@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""experiment_combination_builder.py
+"""data_index_builder.py
 
-This script generates all the combination of experiments to compute
+This script generates the paths to the proteins that we are going to use in our experiments.
 
 """
 
