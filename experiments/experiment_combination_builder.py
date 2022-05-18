@@ -197,11 +197,12 @@ def main(cfg):
     all_opts = angles_filter(all_opts)
     all_opts = all_opts.reset_index(drop=True)
 
-    # We remove those experiments pertaining to TDA and replace it with
-    # the curated list of experiments
+    # Remove params column since it's a dummy placeholder for a parameter-free
+    # kernel
+    all_opts = all_opts.drop(columns="params")
+
     # Create directory
     make_dir(str(here() / "systematic"))
-
     all_opts.to_csv(
         here() / "data" / "systematic" / "experimental_configurations.csv"
     )
