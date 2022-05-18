@@ -19,7 +19,10 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.plots import setup_plotting_parameters
+from proteinggnnmetrics.utils.plots import (
+    setup_annotations,
+    setup_plotting_parameters,
+)
 
 setup_plotting_parameters()
 
@@ -46,7 +49,7 @@ def main(cfg: DictConfig):
 
     df_plot = df_plot.rename(
         columns={
-            "mmd_esm": "MMD from ESM embeddings",
+            "mmd_esm": "MMD with Linear Kernel from ESM embeddings",
             "mmd_wl": "MMD from Weisfeiler-Lehman kernel",
         }
     )
@@ -60,20 +63,18 @@ def main(cfg: DictConfig):
         palette=palette,
         ci=100,
     )
-    # plt.legend(title=r"$\varepsilon$")
-    p.set_xlabel("Mutation probability")
-    p.set_ylabel("Maximum Mean Discrepancy")
-    plt.title(
-        "Multiple experiments of MMD vs mutation as captured through ESM embeddings."
+    p = setup_annotations(
+        p,
+        title="MMD vs. Mutations Added to Different Sets of Proteins.",
+        x_label="Mutation Probability",
+        y_label="Maximum Mean Discrepancy (Normalized)",
+        legend_title="Kernel",
     )
+
     print("Saving")
-    plt.tight_layout()
     os.makedirs(here() / cfg.experiments.results / "images", exist_ok=True)
     plt.savefig(
-        here()
-        / cfg.experiments.results
-        / "images"
-        / Path("plot_multiple_experiments.png")
+        here() / cfg.experiments.results / "images" / Path("mutation.png")
     )
 
 

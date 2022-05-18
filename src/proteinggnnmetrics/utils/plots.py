@@ -26,3 +26,14 @@ def setup_plotting_parameters(
     mpl.rcParams["font.serif"] = cmfont.get_name()
     mpl.rcParams["mathtext.fontset"] = "cm"
     mpl.rcParams["axes.unicode_minus"] = False
+
+
+def setup_annotations(
+    p, title: str, x_label: str, y_label: str, legend_title: str,
+):
+    p.set_xlabel(x_label)
+    p.set_ylabel(y_label)
+    plt.legend(title=legend_title, loc="best")
+    plt.title(title)
+    plt.tight_layout()
+    return p
