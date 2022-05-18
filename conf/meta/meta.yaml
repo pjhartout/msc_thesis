@@ -42,3 +42,8 @@ kernels:
       - n_iter: [3, 5, 10]
 
 organisms: ["humans", "ecoli"]
+
+data:
+  n_runs: 10
+  sample_size: 100
+  data_split_dir: "data/systematic/run_idx/"
