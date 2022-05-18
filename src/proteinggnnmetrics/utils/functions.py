@@ -25,6 +25,7 @@ from networkx.readwrite.graph6 import n_to_data
 from pyprojroot import here
 from tqdm import tqdm
 
+from ..pdb import Sequence
 from .exception import UniquenessError
 
 
@@ -292,3 +293,10 @@ def load_obj(path: PosixPath) -> Any:
     with open(path, "rb") as f:
         obj = pickle.load(f)
     return obj
+
+
+def get_longest_protein_dummy_sequence(sampled_files, n_jobs) -> int:
+    seq = Sequence(n_jobs=n_jobs)
+    sequences = seq.fit_transform(sampled_files)
+    longest_sequence = max([len(protein.sequence) for protein in sequences])
+    return longest_sequence
