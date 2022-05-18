@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""timings.py
+"""time_estimator.py
 
 Here we want to get an accurate time estimate of the computation time for some tasks.
 
@@ -10,6 +10,8 @@ Here we want to get an accurate time estimate of the computation time for some t
 import time
 
 import hydra
+import pandas as pd
+from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf.dictconfig import DictConfig
 from pyprojroot import here
@@ -22,7 +24,16 @@ from proteinggnnmetrics.descriptors import (
     TopologicalDescriptor,
 )
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.loaders import list_pdb_files
+from proteinggnnmetrics.kernels import (
+    GaussianKernel,
+    LinearKernel,
+    PersistenceFisherKernel,
+)
+from proteinggnnmetrics.loaders import (
+    list_pdb_files,
+    load_descriptor,
+    load_graphs,
+)
 from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
@@ -189,6 +200,88 @@ def desc_benchmarks(proteins):
     )
 
 
+@timeit
+def linear_k_benchmark(left, right):
+    start = time.perf_counter()
+    kernel = LinearKernel().compute_matrix(left, right)
+    time_elapsed = time.perf_counter() - start
+    return kernel, time_elapsed
+
+
+@timeit
+def gaussian_k_benchmark(left, right):
+    # this this the worst-case scenario
+    start = time.perf_counter()
+    kernel = GaussianKernel(
+        sigma=1, pre_computed_difference=False, return_product=False
+    ).compute_matrix(left, right)
+    time_elapsed = time.perf_counter() - start
+    return kernel, time_elapsed
+
+
+@timeit
+def wl_k_benchmark(left, right):
+    start = time.perf_counter()
+    kernel = WeisfeilerLehmanKernel(n_jobs=10, n_iter=4).compute_matrix(
+        left, right
+    )
+    time_elapsed = time.perf_counter() - start
+    return kernel, time_elapsed
+
+
+@timeit
+def persistence_fisher_k_benchmark(left, right):
+    start = time.perf_counter()
+    kernel = PersistenceFisherKernel(n_jobs=10, n_iter=4).compute_matrix(
+        left, right
+    )
+    time_elapsed = time.perf_counter() - start
+    return kernel, time_elapsed
+
+
+def ker_benchmarks(proteins):
+
+    half = int(len(proteins) / 2)
+    left = proteins[:half]
+    right = proteins[half:]
+
+    # Get fixed-length vector reps
+    left_deg_hist = load_descriptor(left, "degree_histogram", "eps_graph")
+    right_deg_hist = load_descriptor(right, "degree_histogram", "eps_graph")
+
+    # Linear
+    _, linear_k_time_elapsed = linear_k_benchmark(
+        left_deg_hist, right_deg_hist
+    )
+
+    # Gaussian
+    _, gaussian_k_time_elapsed = gaussian_k_benchmark(
+        left_deg_hist, right_deg_hist
+    )
+
+    # W-L
+    left_graphs = load_graphs(proteins[:half], "eps_graph")
+    right_graphs = load_graphs(proteins[half:], "eps_graph")
+    _, wl_k_time_elapsed = wl_k_benchmark(left_graphs, right_graphs)
+
+    # persistence_fisher
+    left_pd = [
+        protein.descriptors["contact_graph"]["persistence_diagram"]
+        for protein in proteins[:half]
+    ]
+    right_pd = [
+        protein.descriptors["contact_graph"]["persistence_diagram"]
+        for protein in proteins[half:]
+    ]
+    _, pf_k_time_elapsed = persistence_fisher_k_benchmark(left_pd, right_pd)
+    return (
+        linear_k_time_elapsed,
+        gaussian_k_time_elapsed,
+        wl_k_time_elapsed,
+        pf_k_time_elapsed,
+    )
+
+
 @hydra.main(config_path=str(here()) + "/conf", config_name="conf")
 def main(cfg: DictConfig):
     # Potential performance improvements in the real world:
@@ -201,18 +294,63 @@ def main(cfg: DictConfig):
         tda_time_elapsed,
         esm_time_elapsed,
         graph_time_elapsed,
-    ) = reps_benchmarks(list_pdb_files(HUMAN_PROTEOME)[:20])
+    ) = reps_benchmarks(list_pdb_files(HUMAN_PROTEOME)[:5])
+
+    representation_benchmarks = pd.DataFrame(
+        data=[tda_time_elapsed, esm_time_elapsed, graph_time_elapsed],
+        index=["tda", "esm", "graph"],
+        columns=["representation"],
+    )
+
+    representation_benchmarks.to_csv(
+        here()
+        / cfg.meta.data.time_estimates_dir
+        / "representation_benchmarks.csv"
+    )
 
     # Descriptor benchmarks
 
     (
         proteins,
-        tda_time_elapsed,
-        esm_time_elapsed,
-        graph_time_elapsed,
+        degree_time_elapsed,
+        clustering_time_elapsed,
+        laplacian_time_elapsed,
     ) = desc_benchmarks(proteins)
 
-    #
+    descriptor_benchmarks = pd.DataFrame(
+        data=[
+            degree_time_elapsed,
+            clustering_time_elapsed,
+            laplacian_time_elapsed,
+        ],
+        index=["degree", "clustering", "laplacian"],
+        columns=["descriptor"],
+    )
+    representation_benchmarks.to_csv(
+        here() / cfg.meta.data.time_estimates_dir / "descriptor_benchmarks.csv"
+    )
+
+    # kernel benchmarks
+    (
+        linear_k_time_elapsed,
+        gaussian_k_time_elapsed,
+        wl_k_time_elapsed,
+        pf_k_time_elapsed,
+    ) = ker_benchmarks(proteins)
+
+    kernel_benchmarks = pd.DataFrame(
+        data=[
+            linear_k_time_elapsed,
+            gaussian_k_time_elapsed,
+            wl_k_time_elapsed,
+            pf_k_time_elapsed,
+        ],
+        index=["linear", "gaussian", "wl", "pf"],
+        columns=["kernel"],
+    )
+    kernel_benchmarks.to_csv(
+        here() / cfg.meta.data.time_estimates_dir / "kernel_benchmarks.csv"
+    )
 
 
 if __name__ == "__main__":
