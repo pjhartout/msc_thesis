@@ -17,7 +17,6 @@ repos:
       - id: check-symlinks
       - id: destroyed-symlinks
       - id: check-vcs-permalinks
-      - id: debug-statements
       - id: detect-private-key
       - id: fix-encoding-pragma
         exclude: 'example_pipeline*'
