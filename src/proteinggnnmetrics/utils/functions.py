@@ -9,10 +9,10 @@ import contextlib
 import os
 import pickle
 from itertools import product
-from pathlib import PosixPath
+from pathlib import Path
 from random import choice
 from string import ascii_letters
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import joblib
 import networkx as nx
@@ -20,12 +20,10 @@ import numpy as np
 import pandas as pd
 from grakel import graph_from_networkx
 from joblib import Parallel, delayed
-from matplotlib.path import Path
 from networkx.readwrite.graph6 import n_to_data
 from pyprojroot import here
 from tqdm import tqdm
 
-from ..pdb import Sequence
 from .exception import UniquenessError
 
 
