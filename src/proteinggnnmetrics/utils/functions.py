@@ -79,7 +79,10 @@ def make_dir(directory: Union[str, Path]) -> None:
     """
 
     try:
-        os.mkdir(directory)
+        if type(directory) == str:
+            directory = Path(directory)
+
+        directory.mkdir(parents=True)
     except OSError:
         print(
             f"Creation of the directory {directory} failed, probably already "
