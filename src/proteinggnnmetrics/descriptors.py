@@ -668,7 +668,8 @@ class ESM(Embedding):
         cks = chunks(proteins, self.n_chunks)
 
         reps = list()
-        for ck in cks:
+
+        def execute_chunk(ck):
             with torch.no_grad():
                 results = model(
                     batch_tokens,
@@ -676,7 +677,17 @@ class ESM(Embedding):
                     return_contacts=False,
                 )
             token_representations = results["representations"][repr_layer]
-            reps.append(token_representations)
+            return token_representations
+
+        if self.verbose:
+            for ck in tqdm(cks, total=divmod(len(proteins), self.n_chunks)[0]):
+                token_representations = execute_chunk(ck)
+                reps.append(token_representations)
+        else:
+            for ck in cks:
+                token_representations = execute_chunk(ck)
+                reps.append(token_representations)
+
         token_representations = flatten_lists(reps)
         # Remove dummy embedding
         token_representations[-1]
