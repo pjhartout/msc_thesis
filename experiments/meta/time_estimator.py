@@ -34,24 +34,44 @@ from proteinggnnmetrics.loaders import (
     load_descriptor,
     load_graphs,
 )
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
+from proteinggnnmetrics.paths import DATA_HOME, HUMAN_PROTEOME
+from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import (
-    get_longest_protein_dummy_sequence,
-)
+from proteinggnnmetrics.utils.functions import make_dir
 
-N_JOBS = 4
+N_JOBS = 10
+N_SAMPLES = 100
+
+
+def get_longest_protein_dummy_sequence(sampled_files, n_jobs) -> int:
+    # TODO: figure out where to place this sensibly in the library to avoid circular imports
+    seq = Sequence(n_jobs=n_jobs)
+    sequences = seq.fit_transform(sampled_files)
+    longest_sequence = max([len(protein.sequence) for protein in sequences])
+    return longest_sequence
 
 
 @timeit
 def tda_benchmark(pdb_files):
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
-        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True,),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        (
+            "contact_map",
+            ContactMap(
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
+        ),
         (
             "epsilon_graph",
-            EpsilonGraph(n_jobs=N_JOBS, epsilon=8, verbose=True,),
+            EpsilonGraph(
+                n_jobs=N_JOBS,
+                epsilon=8,
+                verbose=True,
+            ),
         ),
         (
             "tda",
@@ -79,7 +99,11 @@ def esm_benchmark(pdb_files):
     base_feature_steps = [
         (
             "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=True,),
+            Coordinates(
+                granularity="CA",
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
         ),
         (
             "esm",
@@ -105,9 +129,21 @@ def esm_benchmark(pdb_files):
 @timeit
 def graphs_benchmark(pdb_files):
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
-        ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS,),),
-        ("epsilon graph", EpsilonGraph(epsilon=8, n_jobs=N_JOBS),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        (
+            "contact map",
+            ContactMap(
+                metric="euclidean",
+                n_jobs=N_JOBS,
+            ),
+        ),
+        (
+            "epsilon graph",
+            EpsilonGraph(epsilon=8, n_jobs=N_JOBS),
+        ),
     ]
     start = time.perf_counter()
     proteins = pipeline.Pipeline(
@@ -139,7 +175,10 @@ def reps_benchmarks(pdb_files):
 def degree_histogram_benchmark(proteins):
     start = time.perf_counter()
     proteins = DegreeHistogram(
-        graph_type="eps_graph", n_bins=100, n_jobs=N_JOBS, verbose=True,
+        graph_type="eps_graph",
+        n_bins=100,
+        n_jobs=N_JOBS,
+        verbose=True,
     ).fit_transform(proteins)
     time_elapsed = time.perf_counter() - start
     return proteins, time_elapsed
@@ -163,7 +202,10 @@ def clustering_histogram_benchmark(proteins):
 def laplacian_spectrum_histogram_benchmark(proteins):
     start = time.perf_counter()
     proteins = LaplacianSpectrum(
-        graph_type="eps_graph", n_bins=100, n_jobs=N_JOBS, verbose=True,
+        graph_type="eps_graph",
+        n_bins=100,
+        n_jobs=N_JOBS,
+        verbose=True,
     ).fit_transform(proteins)
     time_elapsed = time.perf_counter() - start
     return proteins, time_elapsed
@@ -185,11 +227,13 @@ def desc_benchmarks(proteins):
     ):
         protein = degree_protein
         protein.descriptors["eps_graph"][
-            "clustering"
-        ] = clustering_protein.descriptors["clustering"]
+            "clustering_histogram"
+        ] = clustering_protein.descriptors["eps_graph"]["clustering_histogram"]
         protein.descriptors["eps_graph"][
-            "laplacian"
-        ] = laplacian_protein.descriptors["eps_graph"]["laplacian"]
+            "laplacian_spectrum_histogram"
+        ] = laplacian_protein.descriptors["eps_graph"][
+            "laplacian_spectrum_histogram"
+        ]
         proteins.append(protein)
 
     return (
@@ -203,7 +247,9 @@ def desc_benchmarks(proteins):
 @timeit
 def linear_k_benchmark(left, right):
     start = time.perf_counter()
-    kernel = LinearKernel().compute_matrix(left, right)
+    kernel = LinearKernel(n_jobs=N_JOBS, verbose=True).compute_matrix(
+        left, right
+    )
     time_elapsed = time.perf_counter() - start
     return kernel, time_elapsed
 
@@ -213,7 +259,11 @@ def gaussian_k_benchmark(left, right):
     # this this the worst-case scenario
     start = time.perf_counter()
     kernel = GaussianKernel(
-        sigma=1, pre_computed_difference=False, return_product=False
+        n_jobs=N_JOBS,
+        verbose=True,
+        sigma=1,
+        pre_computed_difference=False,
+        return_product=False,
     ).compute_matrix(left, right)
     time_elapsed = time.perf_counter() - start
     return kernel, time_elapsed
@@ -232,9 +282,9 @@ def wl_k_benchmark(left, right):
 @timeit
 def persistence_fisher_k_benchmark(left, right):
     start = time.perf_counter()
-    kernel = PersistenceFisherKernel(n_jobs=10, n_iter=4).compute_matrix(
-        left, right
-    )
+    kernel = PersistenceFisherKernel(
+        n_jobs=N_JOBS, bandwidth=1, bandwidth_fisher=1.5, verbose=True
+    ).compute_matrix(left, right)
     time_elapsed = time.perf_counter() - start
     return kernel, time_elapsed
 
@@ -266,11 +316,11 @@ def ker_benchmarks(proteins):
 
     # persistence_fisher
     left_pd = [
-        protein.descriptors["contact_graph"]["persistence_diagram"]
+        protein.descriptors["contact_graph"]["diagram"]
         for protein in proteins[:half]
     ]
     right_pd = [
-        protein.descriptors["contact_graph"]["persistence_diagram"]
+        protein.descriptors["contact_graph"]["diagram"]
         for protein in proteins[half:]
     ]
     _, pf_k_time_elapsed = persistence_fisher_k_benchmark(left_pd, right_pd)
@@ -289,6 +339,9 @@ def main(cfg: DictConfig):
     # Potential performance improvements in the real world:
     # - not a representative RAM footprint
     # - not a fully representative scaling/sample size
+    print(f"Looking for data in {HUMAN_PROTEOME}")
+    print(f"Test existence of {len(list_pdb_files(HUMAN_PROTEOME))} files")
+    make_dir(here() / cfg.meta.data.time_estimates_dir)
 
     # Reprensentations benchmarks
     (
@@ -296,12 +349,15 @@ def main(cfg: DictConfig):
         tda_time_elapsed,
         esm_time_elapsed,
         graph_time_elapsed,
-    ) = reps_benchmarks(list_pdb_files(HUMAN_PROTEOME)[:5])
+    ) = reps_benchmarks(list_pdb_files(HUMAN_PROTEOME)[:N_SAMPLES])
 
     representation_benchmarks = pd.DataFrame(
         data=[tda_time_elapsed, esm_time_elapsed, graph_time_elapsed],
         index=["tda", "esm", "graph"],
         columns=["representation"],
+    )
+    representation_benchmarks = representation_benchmarks / (
+        N_JOBS * N_SAMPLES
     )
 
     representation_benchmarks.to_csv(
@@ -328,6 +384,9 @@ def main(cfg: DictConfig):
         index=["degree", "clustering", "laplacian"],
         columns=["descriptor"],
     )
+    representation_benchmarks = representation_benchmarks / (
+        N_JOBS * N_SAMPLES
+    )
     representation_benchmarks.to_csv(
         here() / cfg.meta.data.time_estimates_dir / "descriptor_benchmarks.csv"
     )
@@ -350,6 +409,7 @@ def main(cfg: DictConfig):
         index=["linear", "gaussian", "wl", "pf"],
         columns=["kernel"],
     )
+    kernel_benchmarks = kernel_benchmarks / (N_JOBS * N_SAMPLES)
     kernel_benchmarks.to_csv(
         here() / cfg.meta.data.time_estimates_dir / "kernel_benchmarks.csv"
     )
