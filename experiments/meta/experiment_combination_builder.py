@@ -153,7 +153,9 @@ def angles_filter(opts):
     return pd.concat([opts, angles_experiments])
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(
+    version_base=None, config_path=str(here()) + "/conf/", config_name="conf"
+)
 def main(cfg):
     options_to_consider = [k for k in cfg.meta.keys() if "_" not in k]
 

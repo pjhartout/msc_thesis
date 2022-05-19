@@ -16,7 +16,9 @@ from omegaconf import DictConfig
 from pyprojroot import here
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(
+    version_base=None, config_path=str(here()) + "/conf/", config_name="conf"
+)
 def main(cfg):
     experiments = pd.read_csv(
         here() / "data" / "systematic" / "experimental_configurations.csv"

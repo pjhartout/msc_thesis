@@ -20,7 +20,9 @@ from proteinggnnmetrics.paths import HUMAN_PROTEOME
 from proteinggnnmetrics.utils.functions import make_dir
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(
+    version_base=None, config_path=str(here()) + "/conf/", config_name="conf"
+)
 def main(cfg):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     make_dir(here() / cfg.meta.data.data_split_dir)

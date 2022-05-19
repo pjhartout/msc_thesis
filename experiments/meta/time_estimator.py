@@ -282,7 +282,9 @@ def ker_benchmarks(proteins):
     )
 
 
-@hydra.main(config_path=str(here()) + "/conf", config_name="conf")
+@hydra.main(
+    version_base=None, config_path=str(here()) + "/conf", config_name="conf"
+)
 def main(cfg: DictConfig):
     # Potential performance improvements in the real world:
     # - not a representative RAM footprint
