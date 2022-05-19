@@ -84,11 +84,14 @@ class GaussianKernel(Kernel):
         self.return_product = return_product
 
     def compute_matrix(
-        self, X: np.ndarray, Y: np.ndarray = None
+        self, X: np.ndarray, Y: np.ndarray
     ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
-
         if self.pre_computed_difference:
-            P = np.dot(X - Y, X - Y)
+            # This assumes that X = vec_1 - vec_2
+            P = np.dot(X, X)
+
+        else:
+            P = np.dot(X - Y, (X - Y).T)
         if self.return_product:
             return np.exp(-self.sigma * P), P
         else:
