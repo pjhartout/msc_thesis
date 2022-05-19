@@ -204,7 +204,7 @@ def main(cfg):
     all_opts = all_opts.drop(columns="params")
 
     # Create directory
-    make_dir(str(here() / "systematic"))
+    make_dir(str(here() / "data/systematic"))
     all_opts.to_csv(
         here() / "data" / "systematic" / "experimental_configurations.csv"
     )
