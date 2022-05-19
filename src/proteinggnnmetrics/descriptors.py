@@ -11,6 +11,7 @@ TODO: check docstrings, citations
 import os
 import shutil
 import uuid
+import warnings
 from abc import ABCMeta
 from typing import Any, Callable, List, Tuple, Union
 
@@ -34,6 +35,9 @@ from .utils.functions import (
     load_obj,
     save_obj,
 )
+
+# Ignore warnings from networkx about a change they have not implemented yet.
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 class Descriptor(metaclass=ABCMeta):
