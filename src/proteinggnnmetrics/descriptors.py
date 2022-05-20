@@ -317,8 +317,7 @@ class TopologicalDescriptor(Descriptor):
                 / f"diagram_compute_cache_{uuid.uuid4().hex}/"
             )
             diagram_cache.mkdir(
-                parents=True,
-                exist_ok=True,
+                parents=True, exist_ok=True,
             )
             n_chunks = (
                 int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
@@ -333,8 +332,7 @@ class TopologicalDescriptor(Descriptor):
                     show_tqdm=self.verbose,
                 )
                 save_obj(
-                    diagram_cache / f"diagram_part_{i}.pkl",
-                    diagram_data,
+                    diagram_cache / f"diagram_part_{i}.pkl", diagram_data,
                 )
             diagram_data = list()
 
@@ -651,9 +649,7 @@ class ESM(Embedding):
             model, alphabet = esm.pretrained.esm1b_t33_650M_UR50S()
             repr_layer = 33
         else:
-            raise RuntimeError(
-                f"Size must be one of {self._size_options}",
-            )
+            raise RuntimeError(f"Size must be one of {self._size_options}",)
         batch_converter = alphabet.get_batch_converter()
         model.eval()  # disables dropout for deterministic results
 
