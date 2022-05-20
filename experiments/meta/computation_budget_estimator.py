@@ -80,8 +80,12 @@ def main(cfg):
     N_PERTURB = 50
     experiments["budget"] = experiments["budget"] * N_PERTURB * N_SAMPLES
 
-    
-    experiments
+    experiments.to_csv(
+        here()
+        / "data"
+        / "systematic"
+        / "experimental_configurations_w_budget.csv"
+    )
 
 
 if __name__ == "__main__":
