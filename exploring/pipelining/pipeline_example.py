@@ -133,9 +133,7 @@ def main(cfg: DictConfig):
         biased=False,
         squared=True,
         kernel=WeisfeilerLehmanGrakel(
-            n_jobs=cfg.compute.n_jobs,
-            n_iter=3,
-            node_label="residue",
+            n_jobs=cfg.compute.n_jobs, n_iter=3, node_label="residue",
         ),
     ).compute(graph_dist_1, graph_dist_2)
     # print(f"MMD computed from k-nn graphs is {mmd}")
