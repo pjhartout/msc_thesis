@@ -54,24 +54,11 @@ def get_longest_protein_dummy_sequence(sampled_files, n_jobs) -> int:
 @timeit
 def tda_benchmark(pdb_files):
     base_feature_steps = [
-        (
-            "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS),
-        ),
-        (
-            "contact_map",
-            ContactMap(
-                n_jobs=N_JOBS,
-                verbose=True,
-            ),
-        ),
+        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
+        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True,),),
         (
             "epsilon_graph",
-            EpsilonGraph(
-                n_jobs=N_JOBS,
-                epsilon=8,
-                verbose=True,
-            ),
+            EpsilonGraph(n_jobs=N_JOBS, epsilon=8, verbose=True,),
         ),
         (
             "tda",
@@ -99,11 +86,7 @@ def esm_benchmark(pdb_files):
     base_feature_steps = [
         (
             "coordinates",
-            Coordinates(
-                granularity="CA",
-                n_jobs=N_JOBS,
-                verbose=True,
-            ),
+            Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=True,),
         ),
         (
             "esm",
@@ -129,21 +112,9 @@ def esm_benchmark(pdb_files):
 @timeit
 def graphs_benchmark(pdb_files):
     base_feature_steps = [
-        (
-            "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS),
-        ),
-        (
-            "contact map",
-            ContactMap(
-                metric="euclidean",
-                n_jobs=N_JOBS,
-            ),
-        ),
-        (
-            "epsilon graph",
-            EpsilonGraph(epsilon=8, n_jobs=N_JOBS),
-        ),
+        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
+        ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS,),),
+        ("epsilon graph", EpsilonGraph(epsilon=8, n_jobs=N_JOBS),),
     ]
     start = time.perf_counter()
     proteins = pipeline.Pipeline(
@@ -175,10 +146,7 @@ def reps_benchmarks(pdb_files):
 def degree_histogram_benchmark(proteins):
     start = time.perf_counter()
     proteins = DegreeHistogram(
-        graph_type="eps_graph",
-        n_bins=100,
-        n_jobs=N_JOBS,
-        verbose=True,
+        graph_type="eps_graph", n_bins=100, n_jobs=N_JOBS, verbose=True,
     ).fit_transform(proteins)
     time_elapsed = time.perf_counter() - start
     return proteins, time_elapsed
@@ -202,10 +170,7 @@ def clustering_histogram_benchmark(proteins):
 def laplacian_spectrum_histogram_benchmark(proteins):
     start = time.perf_counter()
     proteins = LaplacianSpectrum(
-        graph_type="eps_graph",
-        n_bins=100,
-        n_jobs=N_JOBS,
-        verbose=True,
+        graph_type="eps_graph", n_bins=100, n_jobs=N_JOBS, verbose=True,
     ).fit_transform(proteins)
     time_elapsed = time.perf_counter() - start
     return proteins, time_elapsed

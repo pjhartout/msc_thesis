@@ -76,9 +76,6 @@ def main(cfg):
         budgets.append(budget)
 
     experiments["budget"] = budgets
-    N_SAMPLES = 100
-    N_PERTURB = 50
-    experiments["budget"] = experiments["budget"] * N_PERTURB * N_SAMPLES
 
     experiments.to_csv(
         here()
