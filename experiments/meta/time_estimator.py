@@ -384,10 +384,8 @@ def main(cfg: DictConfig):
         index=["degree", "clustering", "laplacian"],
         columns=["descriptor"],
     )
-    representation_benchmarks = representation_benchmarks / (
-        N_JOBS * N_SAMPLES
-    )
-    representation_benchmarks.to_csv(
+    descriptor_benchmarks = descriptor_benchmarks / (N_JOBS * N_SAMPLES)
+    descriptor_benchmarks.to_csv(
         here() / cfg.meta.data.time_estimates_dir / "descriptor_benchmarks.csv"
     )
 
