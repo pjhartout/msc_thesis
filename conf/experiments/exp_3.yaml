@@ -3,7 +3,7 @@ description: "Look at the power of ESM to investigate ability to detect mutation
 compute:
   n_jobs: 32
   n_parallel_runs: 2
-  
+
 results: "data/experiments/esm_mutate/"
 
 n_runs: 10
