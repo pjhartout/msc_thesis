@@ -103,7 +103,7 @@ class Protein:
         laplacian_spectrum_histogram=np.array([]),
         path=None,
         phi_psi_angles=np.array([]),
-        interatomic_clashes=float,
+        distance_hist=np.ndarray([]),
         embeddings: Dict = {},
         verbose=False,
     ):
@@ -119,7 +119,7 @@ class Protein:
         self.CA_coordinates = CA_coordinates
         self.contact_map = contact_map
         self.phi_psi_angles = phi_psi_angles
-        self.interatomic_clashes = interatomic_clashes
+        self.distance_hist = distance_hist
 
         # Adjacency matrices
         self.knn_adj = knn_adj

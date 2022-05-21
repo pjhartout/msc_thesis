@@ -513,18 +513,19 @@ class RamachandranAngles(Descriptor):
         return proteins
 
 
-class InteratomicClash(Descriptor):
-    def __init__(self, threshold, n_jobs, verbose):
+class DistanceHistogram(Descriptor):
+    def __init__(self, n_bins, n_jobs, verbose):
         super().__init__(n_jobs, verbose)
-        self.threshold = threshold
+        self.n_bins = n_bins
 
-    def get_clashes(self, protein: Protein) -> Protein:
+    def get_histogram(self, protein: Protein) -> Protein:
         """Gets the interatomic clashes"""
-        clashes = np.where(protein.contact_map < self.threshold, 1, 0)
-        np.fill_diagonal(clashes, 0)
-        protein.interatomic_clashes = clashes.sum() / (
-            (len(protein.sequence)) ** 2 - len(protein.sequence)
+        triu = np.triu(protein.contact_map)
+        triu = triu[triu != 0]  # Why not reduce the amount of processing by 2?
+        hist, _ = np.histogram(
+            triu, bins=self.n_bins, range=(0.0, 1.0), density=True,
         )
+        protein.distance_hist = hist
         return protein
 
     def fit(self):
@@ -534,13 +535,13 @@ class InteratomicClash(Descriptor):
         ...
 
     def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
-        """Gets the angles from the list of pdb files"""
+        """Gets the distance histograms from the contact graph"""
 
         proteins = distribute_function(
-            self.get_clashes,
+            self.get_histogram,
             proteins,
             self.n_jobs,
-            "Extracting interatomic clashes",
+            "Extracting interatomic distance_histogram",
             show_tqdm=self.verbose,
         )
 

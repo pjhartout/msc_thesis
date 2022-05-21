@@ -11,12 +11,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+from proteinggnnmetrics.descriptors import DistanceHistogram
 from proteinggnnmetrics.graphs import ContactMap
+from proteinggnnmetrics.kernels import LinearKernel
 from proteinggnnmetrics.loaders import list_pdb_files
 from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, RachmachandranAngles
+from proteinggnnmetrics.pdb import Coordinates
 
-N_JOBS = 10
+N_JOBS = 4
 REDUCE_DATA = True
 VERBOSE = False
 
@@ -33,21 +35,14 @@ def main():
         proteins
     )
 
-    distances = [protein.contact_map.flatten() for protein in proteins]
-    # Plot histogram of distances.
-    sns.set()
-    plt.xlabel("Distance (Angstrom)")
-    plt.ylabel("Count")
-    plt.title("Distance Distributions of the Alpha Carbon Atoms")
-    plt.hist(
-        np.concatenate(distances),
-        bins=500,
-        density=True,
-        facecolor="g",
-        histtype="stepfilled",
-    )
-    plt.tight_layout()
-    plt.show()
+    proteins = DistanceHistogram(
+        n_bins=100, n_jobs=N_JOBS, verbose=VERBOSE
+    ).fit_transform(proteins)
+
+    hists = np.array([protein.distance_hist for protein in proteins])
+    lk = LinearKernel(n_jobs=N_JOBS, verbose=VERBOSE)
+    res = lk.compute_matrix(hists)
+    print(res.shape)
 
 
 if __name__ == "__main__":
