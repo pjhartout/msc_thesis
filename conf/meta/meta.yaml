@@ -31,41 +31,54 @@ descriptors:
 
 kernels:
   - persistence_fisher:
-      - bandwidth: [0.5, 1, 1.5]
-      - bandwidth_fisher: [0.5, 1, 1.5]
+      - bandwidth:
+          [
+            1.e-05,
+            1.e-04,
+            1.e-03,
+            1.e-02,
+            1.e-01,
+            1,
+            1.e+02,
+            1.e+03,
+            1.e+04,
+            1.e+05,
+          ]
+      - bandwidth_fisher:
+          [
+            1.e-05,
+            1.e-04,
+            1.e-03,
+            1.e-02,
+            1.e-01,
+            1,
+            1.e+02,
+            1.e+03,
+            1.e+04,
+            1.e+05,
+          ]
   - gaussian:
-      - bandwidth: [0.5, 1, 1.5]
+      - bandwidth:
+          [
+            1.e-05,
+            1.e-04,
+            1.e-03,
+            1.e-02,
+            1.e-01,
+            1,
+            1.e+02,
+            1.e+03,
+            1.e+04,
+            1.e+05,
+          ]
   - linear:
       - params: None
   - weisfeiler-lehman:
-      - n_iter: [3, 5, 10]
+      - n_iter: [1, 2, 3, 5, 10]
 
 organisms: ["humans", "ecoli"]
 
 data:
-  n_runs: 10
-  sample_size: 100
   systematic_dir: "data/systematic"
   data_split_dir: "data/systematic/run_idx/"
   time_estimates_dir: "data/systematic/time/"
-
-# compute:
-#   representations:
-#     graphs:
-#     point_cloud:
-#     sequence:
-#     persistence_diagram:
-#   perturbations:
-#     geometric:
-#     mutation:
-#     graphs:
-#   descriptors:
-#     esm:
-#     graph_descriptors:
-
-#   # graph_pipeline_gaussian:
-#   # graph_pipeline_linear:
-#   # graph_pipeline_wlk:
-#   # tda_pipeline:
-#   # esm_pipeline:
-#   # angles_pipeline:
