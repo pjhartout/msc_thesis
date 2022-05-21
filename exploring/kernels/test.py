@@ -26,8 +26,7 @@ def get_hash(G):
             flatten_lists(
                 list(
                     nx.weisfeiler_lehman_subgraph_hashes(
-                        G,
-                        iterations=1,
+                        G, iterations=1,
                     ).values()
                 )
             )

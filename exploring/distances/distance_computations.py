@@ -32,9 +32,7 @@ def main():
 
     # Linear kernel, degree dist
     degree_histograms = load_descriptor(
-        proteins,
-        descriptor="degree_histogram",
-        graph_type="knn_graph",
+        proteins, descriptor="degree_histogram", graph_type="knn_graph",
     )
     linear_kernel = LinearKernel(dense_output=False)
     mmd = MaximumMeanDiscrepancy(kernel=linear_kernel)

@@ -36,7 +36,7 @@ class Kernel(metaclass=ABCMeta):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
+    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
         """Apply transformation to apply kernel to X"""
         pass
 
@@ -49,7 +49,7 @@ class LinearKernel(Kernel):
         self.dense_output = dense_output
         self.normalize = normalize
 
-    def compute_gram_matrix(
+    def compute_matrix(
         self, X: np.ndarray, Y: Union[np.ndarray, None] = None
     ) -> Any:
         if Y is not None:
@@ -71,16 +71,28 @@ class LinearKernel(Kernel):
 
 
 class GaussianKernel(Kernel):
-    def __init__(self, sigma, precomputed_product, **kwargs):
+    def __init__(
+        self,
+        sigma: float,
+        pre_computed_difference: bool,
+        return_product: bool,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.sigma = sigma
-        self.precomputed_product = precomputed_product
+        self.pre_computed_difference = pre_computed_difference
+        self.return_product = return_product
 
-    def compute_gram_matrix(
-        self, X: np.ndarray, Y: np.ndarray = None
+    def compute_matrix(
+        self, X: np.ndarray, Y: np.ndarray
     ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
-        P = np.dot(X - Y, X - Y)
-        if self.precomputed_product:
+        if self.pre_computed_difference:
+            # This assumes that X = vec_1 - vec_2
+            P = np.dot(X, X)
+
+        else:
+            P = np.dot(X - Y, (X - Y).T)
+        if self.return_product:
             return np.exp(-self.sigma * P), P
         else:
             return np.exp(-self.sigma * P)
@@ -92,7 +104,7 @@ class WeisfeilerLehmanGrakel(Kernel):
         self.n_iter = n_iter
         self.node_label = node_label
 
-    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
+    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
         wl_kernel_grakel = WeisfeilerLehman(
             n_jobs=self.n_jobs, n_iter=self.n_iter
         )
@@ -146,7 +158,7 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
             / self.bandwidth_fisher
         )
 
-    def compute_gram_matrix(self, X: Any, Y: Any = None) -> Any:
+    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
         # Remove points where birth = death
         # Loop over homology dimensions
 
@@ -190,14 +202,14 @@ class KernelComposition:
         self.composition_rule = composition_rule
         self.kernel2reps = kernel2reps
 
-    def compute_gram_matrix(self, X_reps: List, Y_reps: List = None) -> Any:
-        """Because this kernel can operate on multiple representations of the data (graphs, embeddings, graph descriptors, sequence data, etc.), we provide an extra argument to the compute_gram_matrix method. This argument is a list that gives the index of the input vector to use with the kernel.
+    def compute_matrix(self, X_reps: List, Y_reps: List = None) -> Any:
+        """Because this kernel can operate on multiple representations of the data (graphs, embeddings, graph descriptors, sequence data, etc.), we provide an extra argument to the compute_matrix method. This argument is a list that gives the index of the input vector to use with the kernel.
 
         Example:
         >>> kernel2reps = [0, 1, 2]
         >>> X_reps = [X_graphs, X_embeddings, X_graph_descriptors]
         >>> kernel = KernelComposition([Kernel1, Kernel2, Kernel3], composition_rule="product")
-        >>> kernel.compute_gram_matrix(X_reps, Y_reps, kernel2reps)
+        >>> kernel.compute_matrix(X_reps, Y_reps, kernel2reps)
 
         Args:
             X_reps (List): representations of X
@@ -224,7 +236,7 @@ class KernelComposition:
         K_list = []
         for idx, kernel in enumerate(self.kernels):
             K_list.append(
-                kernel.compute_gram_matrix(
+                kernel.compute_matrix(
                     X_reps[self.kernel2reps[idx]],
                     Y_reps[self.kernel2reps[idx]],
                 )

@@ -153,7 +153,9 @@ def angles_filter(opts):
     return pd.concat([opts, angles_experiments])
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
+@hydra.main(
+    version_base=None, config_path=str(here()) + "/conf/", config_name="conf"
+)
 def main(cfg):
     options_to_consider = [k for k in cfg.meta.keys() if "_" not in k]
 
@@ -202,7 +204,7 @@ def main(cfg):
     all_opts = all_opts.drop(columns="params")
 
     # Create directory
-    make_dir(str(here() / "systematic"))
+    make_dir(str(here() / "data/systematic"))
     all_opts.to_csv(
         here() / "data" / "systematic" / "experimental_configurations.csv"
     )

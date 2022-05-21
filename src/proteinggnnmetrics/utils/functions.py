@@ -9,10 +9,10 @@ import contextlib
 import os
 import pickle
 from itertools import product
-from pathlib import PosixPath
+from pathlib import Path
 from random import choice
 from string import ascii_letters
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import joblib
 import networkx as nx
@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 from grakel import graph_from_networkx
 from joblib import Parallel, delayed
-from matplotlib.path import Path
 from networkx.readwrite.graph6 import n_to_data
 from pyprojroot import here
 from tqdm import tqdm
@@ -28,14 +27,14 @@ from tqdm import tqdm
 from .exception import UniquenessError
 
 
-def remove_fragments(files: List[PosixPath]) -> List[PosixPath]:
+def remove_fragments(files: List[Path]) -> List[Path]:
     """Some proteins are too long for AlphaFold to process, so it breaks it up into overlapping fragments. This can introduce bias in our data, so we only keep one fragment per protein.
 
     Args:
-        files (List[PosixPath]): list of files to filter
+        files (List[Path]): list of files to filter
 
     Returns:
-        List[PosixPath]: list of filtered files
+        List[Path]: list of filtered files
     """
     return [file for file in files if "F1" in str(file)]
 
@@ -71,7 +70,7 @@ def filter_monomers(lst_of_files: List[str]) -> List[str]:
     return monomers
 
 
-def make_dir(directory: str) -> None:
+def make_dir(directory: Union[str, Path]) -> None:
     """Idempotent function making directory and does not stop if it is already
     created.
 
@@ -80,7 +79,10 @@ def make_dir(directory: str) -> None:
     """
 
     try:
-        os.mkdir(directory)
+        if type(directory) == str:
+            directory = Path(directory)
+
+        directory.mkdir(parents=True)
     except OSError:
         print(
             f"Creation of the directory {directory} failed, probably already "
@@ -283,12 +285,12 @@ def distance2similarity(K):
     return K
 
 
-def save_obj(path: PosixPath, obj) -> None:
+def save_obj(path: Path, obj) -> None:
     with open(path, "wb") as f:
         pickle.dump(obj, f)
 
 
-def load_obj(path: PosixPath) -> Any:
+def load_obj(path: Path) -> Any:
     with open(path, "rb") as f:
         obj = pickle.load(f)
     return obj

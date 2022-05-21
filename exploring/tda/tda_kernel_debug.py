@@ -60,25 +60,12 @@ def main():
     sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
-        (
-            "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS),
-        ),
+        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
         ("sample", SamplePoints(n=2)),
-        (
-            "contact_map",
-            ContactMap(
-                n_jobs=N_JOBS,
-                verbose=True,
-            ),
-        ),
+        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True,),),
         (
             "epsilon_graph",
-            EpsilonGraph(
-                n_jobs=N_JOBS,
-                epsilon=8,
-                verbose=True,
-            ),
+            EpsilonGraph(n_jobs=N_JOBS, epsilon=8, verbose=True,),
         ),
         (
             "tda",
@@ -96,20 +83,11 @@ def main():
     ]
 
     base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=True)
-    proteins = base_feature_pipeline.fit_transform(
-        sampled_files[midpoint:],
-    )
+    proteins = base_feature_pipeline.fit_transform(sampled_files[midpoint:],)
 
     results = list()
     for twist in tqdm(
-        np.arange(
-            0,
-            0.1,
-            0.05,
-        ),
-        position=1,
-        leave=False,
-        desc="Twist range",
+        np.arange(0, 0.1, 0.05,), position=1, leave=False, desc="Twist range",
     ):
         perturb_feature_steps = flatten_lists(
             [
