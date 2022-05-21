@@ -153,6 +153,21 @@ def angles_filter(opts):
     return pd.concat([opts, angles_experiments])
 
 
+def distance_hist_filter(opts):
+    distance_experiments = opts[
+        (opts["descriptors"] == "distance_histogram")
+        & (
+            opts["representations"] == "point_cloud_CA"
+        )  # we filter out other reps because they are not supported
+        & (opts.perturbations.isin(point_cloud_perturbations))
+    ]
+    opts = opts[
+        (opts["descriptors"] != "distance_histogram")
+        & (opts["representations"] != "point_cloud_CA")
+    ]
+    return pd.concat([opts, distance_experiments])
+
+
 @hydra.main(
     version_base=None, config_path=str(here()) + "/conf/", config_name="conf"
 )
@@ -197,6 +212,7 @@ def main(cfg):
     all_opts = weisfeiler_lehman_filter(all_opts)
     all_opts = esm_filter(all_opts)
     all_opts = angles_filter(all_opts)
+    all_opts = distance_hist_filter(all_opts)
     all_opts = all_opts.reset_index(drop=True)
 
     # Remove params column since it's a dummy placeholder for a parameter-free

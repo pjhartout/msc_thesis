@@ -26,6 +26,7 @@ descriptors:
     "degree_histogram",
     "laplacian_spectrum",
     "clustering_histogram",
+    "distance_histogram",
     "esm",
   ]
 
