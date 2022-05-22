@@ -105,8 +105,8 @@ class ClusteringHistogram(Descriptor):
         self,
         graph_type: str,
         n_bins: int,
-        density: bool,
         n_jobs: int,
+        density: bool = True,
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
@@ -139,7 +139,7 @@ class ClusteringHistogram(Descriptor):
             calculate_degree_histogram,
             proteins,
             self.n_jobs,
-            "Compute degree histogram",
+            "Compute clustering histogram",
             show_tqdm=self.verbose,
         )
         return proteins
@@ -388,9 +388,9 @@ class RamachandranAngles(Descriptor):
         self,
         from_pdb: bool,
         n_bins: int,
-        bin_range: Tuple[float, float],
         n_jobs: int,
         verbose: bool,
+        bin_range: Tuple[float, float] = (-np.pi, np.pi),
         density: bool = True,
     ) -> None:
         super().__init__(n_jobs, verbose)
@@ -514,22 +514,29 @@ class RamachandranAngles(Descriptor):
 
 
 class DistanceHistogram(Descriptor):
-    def __init__(self, n_bins, n_jobs, verbose):
+    def __init__(
+        self,
+        n_bins,
+        n_jobs: int,
+        verbose,
+        bin_range: Tuple[int, int] = (0, 300),
+    ):
         super().__init__(n_jobs, verbose)
         self.n_bins = n_bins
+        self.bin_range = bin_range
 
     def get_histogram(self, protein: Protein) -> Protein:
         """Gets the interatomic clashes"""
         triu = np.triu(protein.contact_map)
         triu = triu[triu != 0]  # Why not reduce the amount of processing by 2?
         hist, _ = np.histogram(
-            triu, bins=self.n_bins, range=(0.0, 1.0), density=True,
+            triu, bins=self.n_bins, range=self.bin_range, density=True,
         )
         protein.distance_hist = hist
         return protein
 
     def fit(self):
-        pass
+        ...
 
     def transform(self):
         ...
@@ -593,7 +600,7 @@ class ESM(Embedding):
         longest_sequence: int,
         n_jobs: int,
         verbose: bool,
-        n_chunks: int,
+        n_chunks: int = 20,
     ) -> None:
         """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
 
@@ -681,7 +688,10 @@ class ESM(Embedding):
             return token_representations
 
         if self.verbose:
-            for ck in tqdm(cks, total=divmod(len(proteins), self.n_chunks)[0]):
+            total = divmod(len(proteins), self.n_chunks)[0]
+            if total == 0:
+                total = 1
+            for ck in tqdm(cks, total=total):
                 token_representations = execute_chunk(ck)
                 reps.append(token_representations)
         else:
