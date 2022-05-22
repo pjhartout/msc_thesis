@@ -453,7 +453,10 @@ def compute_reps(
     proteins_constant = compute_distance_histogram(cfg, proteins_constant)
     if perturbation is None or "mutation" in perturbation[0]:
         proteins_constant = compute_esm_descriptors(cfg, proteins_constant)
-    proteins_constant = compute_tda_descriptors(cfg, proteins_constant)
+    if perturbation is None or (
+        type(perturbation) == tuple and "mutation" not in perturbation[0]
+    ):
+        proteins_constant = compute_tda_descriptors(cfg, proteins_constant)
     log.info("Constant reps computed. Saving.")
     if organism == "human":
         if perturbation is None:
