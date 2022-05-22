@@ -1466,5 +1466,13 @@ Research questions:
   * Mutation
   * Other kernels like WL kernel
 
-* References
+  Directory structure
+
+  /data/systematic/representations/organism/perturbation/twist/amount/*.pkl (protein objects)
+
+  representations = constant/
+  representations = variable/
+
+
+** References
 #+LaTeX: \printbibliography[heading=none]
