@@ -49,7 +49,7 @@ class Descriptor(metaclass=ABCMeta):
 
     def fit(self, protein: List[Protein]) -> None:
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -70,7 +70,7 @@ class DegreeHistogram(Descriptor):
         self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -115,7 +115,7 @@ class ClusteringHistogram(Descriptor):
         self.density = density
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -162,7 +162,7 @@ class LaplacianSpectrum(Descriptor):
         self.bin_range = bin_range
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -223,7 +223,7 @@ class TopologicalDescriptor(Descriptor):
         self.use_caching = use_caching
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -231,7 +231,7 @@ class TopologicalDescriptor(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
 
         if self.tda_descriptor_type == "diagram":
-            pass
+            ...
 
         elif self.tda_descriptor_type == "landscape":
             tda_pipeline = [
@@ -485,10 +485,10 @@ class RamachandranAngles(Descriptor):
         return protein
 
     def fit(self):
-        pass
+        ...
 
     def transform(self):
-        pass
+        ...
 
     def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Gets the angles from the list of pdb files"""
@@ -559,7 +559,7 @@ class Embedding(metaclass=ABCMeta):
         Args:
             sequences (List[Protein]): list of sequences to embed.
         """
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         """Transform the given sequences to embeddings.
@@ -614,7 +614,7 @@ class ESM(Embedding):
         Args:
             sequences (List[Protein]): list of sequences to embed.
         """
-        pass
+        ...
 
     def transform(self, sequences: List[Protein], y=None) -> List[Protein]:
         """Transform the given sequences to embeddings.

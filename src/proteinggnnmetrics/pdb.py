@@ -126,11 +126,11 @@ class Coordinates:
 
     def fit(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def fit_transform(
         self, fname_list: List[PosixPath], y=None
@@ -186,11 +186,11 @@ class Sequence:
 
     def fit(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def fit_transform(
         self, fname_list: List[PosixPath], y=None
