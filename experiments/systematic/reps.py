@@ -40,10 +40,13 @@ from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import (
+    AddConnectedNodes,
     AddEdges,
     GaussianNoise,
     GraphPerturbation,
     Mutation,
+    RemoveEdges,
+    RewireEdges,
     Shear,
     Taper,
     Twist,
@@ -103,7 +106,7 @@ def load_unperturbed_proteins(cfg: DictConfig, perturbed: bool) -> List[Path]:
 def compute_basic_reps(
     cfg: DictConfig,
     protein_sets: List[Path],
-    perturbation: Union[Tuple[str, Any], None] = None,
+    perturbation: Union[Tuple[str, Any], None, List[Tuple[str, Any]]] = None,
 ) -> List[Protein]:
     """Compute basic representations of proteins.
 
@@ -284,9 +287,14 @@ def compute_eps_graphs(
         rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
             proteins
         )
-        save_graphs(
-            cfg, rep_specific, perturbation[0], "eps", eps_value, organism
-        )
+        if type(perturbation) == list:
+            save_graphs(
+                cfg, rep_specific, perturbation[0], "eps", eps_value, organism
+            )
+        else:
+            save_graphs(
+                cfg, rep_specific, perturbation, "eps", eps_value, organism
+            )
 
     log.info("Done computing epsilon graphs.")
 
@@ -322,7 +330,11 @@ def compute_knn_graphs(
         rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
             proteins
         )
-        save_graphs(cfg, rep_specific, perturbation[1], "knn", k, organism)
+        if type(perturbation) == list:
+            save_graphs(cfg, rep_specific, perturbation[1], "knn", k, organism)
+        else:
+            save_graphs(cfg, rep_specific, perturbation, "knn", k, organism)
+
     log.info("Done computing KNN graphs.")
 
 
@@ -439,8 +451,9 @@ def compute_reps(
 
     proteins_constant = compute_dihedral_angles(cfg, proteins_basic_reps)
     proteins_constant = compute_distance_histogram(cfg, proteins_constant)
-    # proteins_constant = compute_esm_descriptors(cfg, proteins_constant)
-    # proteins_constant = compute_tda_descriptors(cfg, proteins_constant)
+    if perturbation is None or "mutation" in perturbation[0]:
+        proteins_constant = compute_esm_descriptors(cfg, proteins_constant)
+    proteins_constant = compute_tda_descriptors(cfg, proteins_constant)
     log.info("Constant reps computed. Saving.")
     if organism == "human":
         if perturbation is None:
@@ -522,6 +535,38 @@ def gaussian_noise_perturbation(
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
+
+
+def mutation_perturbation(
+    cfg: DictConfig, protein_sets: List[Path], organism: str
+) -> None:
+    """Compute the perturbed protein sets.
+
+    Args:
+        cfg (DictConfig): Configuration.
+        protein_sets (List[Path]): List of protein sets.
+    """
+    log.info("Perturbing proteins with mutations.")
+    for p_mutate in np.linspace(
+        cfg.perturbations.mutation.min,
+        cfg.perturbations.mutation.max,
+        cfg.perturbations.n_perturbations,
+    ):
+        log.info(f"Mutation rate to {p_mutate}.")
+        perturbation = (
+            f"mutation_{p_mutate}",
+            Mutation(
+                p_mutate=p_mutate,
+                random_state=np.random.RandomState(
+                    divmod(hash(str(protein_sets)), 42)[1]
+                ),  # The seed is the same as long as the paths is the same.
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        )
+        proteins = compute_basic_reps(cfg, protein_sets, perturbation)
+        # proteins = compute_esm_descriptors(cfg, proteins)
+        compute_graphs(cfg, proteins, perturbation, organism)
 
 
 def twist_perturbation(cfg, protein_sets, organism):
@@ -623,7 +668,7 @@ def add_edges_perturbation(cfg, protein_sets, organism):
         cfg.perturbations.add_edges.max,
         cfg.perturbations.n_perturbations,
     ):
-        log.info(f"Add edge set to {add_edges} Å.")
+        log.info(f"Add edges with probability p={add_edges}.")
         perturbation = [
             (
                 f"addedge_{add_edges}",
@@ -654,6 +699,140 @@ def add_edges_perturbation(cfg, protein_sets, organism):
         compute_graphs(cfg, proteins, perturbation, organism)
 
 
+def remove_edge_perturbation(cfg, protein_sets, organism):
+    """Compute the perturbed protein sets.
+
+    Args:
+        cfg (DictConfig): Configuration.
+        protein_sets (List[Path]): List of protein sets.
+    """
+    log.info("Perturbing proteins with remove edge.")
+    for remove_edges in np.linspace(
+        cfg.perturbations.remove_edges.min,
+        cfg.perturbations.remove_edges.max,
+        cfg.perturbations.n_perturbations,
+    ):
+        log.info(f"Remove edges with probability p={remove_edges}.")
+        perturbation = [
+            (
+                f"removeedge_{remove_edges}",
+                RemoveEdges(
+                    graph_type="eps_graph",
+                    p_remove=remove_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+            (
+                f"removeedge_{remove_edges}",
+                RemoveEdges(
+                    graph_type="knn_graph",
+                    p_remove=remove_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+        ]
+        proteins = compute_basic_reps(cfg, protein_sets, perturbation)
+        compute_graphs(cfg, proteins, perturbation, organism)
+
+
+def rewire_edges_perturbation(cfg, protein_sets, organism):
+    """Compute the perturbed protein sets.
+
+    Args:
+        cfg (DictConfig): Configuration.
+        protein_sets (List[Path]): List of protein sets.
+    """
+    log.info("Perturbing proteins with rewire edge.")
+    for rewire_edges in np.linspace(
+        cfg.perturbations.rewire_edges.min,
+        cfg.perturbations.rewire_edges.max,
+        cfg.perturbations.n_perturbations,
+    ):
+        log.info(f"Rewire edges with probability p={rewire_edges}.")
+        perturbation = [
+            (
+                f"rewireedge_{rewire_edges}",
+                RewireEdges(
+                    graph_type="eps_graph",
+                    p_rewire=rewire_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+            (
+                f"rewireedge_{rewire_edges}",
+                RewireEdges(
+                    graph_type="knn_graph",
+                    p_rewire=rewire_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+        ]
+        proteins = compute_basic_reps(cfg, protein_sets, perturbation)
+        compute_graphs(cfg, proteins, perturbation, organism)
+
+
+def add_connected_nodes_perturbation(cfg, protein_sets, organism):
+    """Compute the perturbed protein sets.
+
+    Args:
+        cfg (DictConfig): Configuration.
+        protein_sets (List[Path]): List of protein sets.
+    """
+    log.info("Perturbing proteins with add connected nodes.")
+    for p_edge in np.linspace(
+        cfg.perturbations.add_nodes.min,
+        cfg.perturbations.add_nodes.max,
+        cfg.perturbations.n_perturbations,
+    ):
+        log.info(f"Add connected node with connection probability p={p_edge}.")
+        perturbation = [
+            (
+                f"addnodes_{p_edge}",
+                AddConnectedNodes(
+                    graph_type="eps_graph",
+                    n_nodes=1,
+                    p_edge=p_edge,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+            (
+                f"addconnectednodes_{p_edge}",
+                AddConnectedNodes(
+                    graph_type="knn_graph",
+                    n_nodes=1,
+                    p_edge=p_edge,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+        ]
+        proteins = compute_basic_reps(cfg, protein_sets, perturbation)
+        compute_graphs(cfg, proteins, perturbation, organism)
+
+
 def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     log.info("Computing perturbed protein sets.")
     protein_sets = load_unperturbed_proteins(cfg, perturbed=True)
@@ -663,17 +842,29 @@ def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
 
     log.info("Point cloud perturbations")
     # Gaussian Noise perturbation
-    # gaussian_noise_perturbation(cfg, protein_sets, organism)
+    gaussian_noise_perturbation(cfg, protein_sets, organism)
     # Twist perturbation
-    # twist_perturbation(cfg, protein_sets, organism)
+    twist_perturbation(cfg, protein_sets, organism)
     # Shear perturbation
-    # shear_perturbation(cfg, protein_sets, organism)
+    shear_perturbation(cfg, protein_sets, organism)
     # Taper perturbation
-    # taper_perturbation(cfg, protein_sets, organism)
+    taper_perturbation(cfg, protein_sets, organism)
 
     log.info("Graph perturbations")
     # Add edge perturbation
     add_edges_perturbation(cfg, protein_sets, organism)
+
+    # Remove edge perturbation
+    remove_edge_perturbation(cfg, protein_sets, organism)
+
+    # Rewire edge perturbation
+    rewire_edges_perturbation(cfg, protein_sets, organism)
+
+    # Add connected nodes perturbation
+    add_connected_nodes_perturbation(cfg, protein_sets, organism)
+
+    log.info("Mutation")
+    mutation_perturbation(cfg, protein_sets, organism)
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="systematic")
