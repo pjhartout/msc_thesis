@@ -40,7 +40,9 @@ from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
 from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import (
+    AddEdges,
     GaussianNoise,
+    GraphPerturbation,
     Mutation,
     Shear,
     Taper,
@@ -128,12 +130,15 @@ def compute_basic_reps(
             ContactMap(metric="euclidean", n_jobs=cfg.compute.n_jobs),
         ),
     ]
-    if perturbation is not None:
+    if perturbation is not None and type(perturbation) == tuple:
+        # if it's a list it's a graph perturbation and we don't want to do it
+        # here.
         basic_representations_steps = [
             basic_representations_steps[0],
             perturbation,
             basic_representations_steps[1],
         ]
+
     proteins = pipeline.Pipeline(basic_representations_steps).fit_transform(
         protein_sets
     )
@@ -253,6 +258,7 @@ def compute_eps_graphs(
     proteins: List[Protein],
     graph_descriptor_steps: List[Tuple[str, Any]],
     perturbation,
+    organism,
 ) -> None:
     log.info("Computing epsilon graphs.")
     for eps_value in cfg.meta.representations[0]["eps_graphs"]:
@@ -269,11 +275,18 @@ def compute_eps_graphs(
                 ),
             ),
         )
+        if type(perturbation) == list:
+            eps_graph_steps = eps_graph_steps.copy()
+            eps_graph_steps.insert(
+                1, perturbation[0],
+            )
 
         rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
             proteins
         )
-        save_graphs(cfg, rep_specific, perturbation, "eps", eps_value)
+        save_graphs(
+            cfg, rep_specific, perturbation[0], "eps", eps_value, organism
+        )
 
     log.info("Done computing epsilon graphs.")
 
@@ -283,6 +296,7 @@ def compute_knn_graphs(
     proteins: List[Protein],
     graph_descriptor_steps: List[Tuple[str, Any]],
     perturbation,
+    organism,
 ):
     log.info("Computing KNN graphs.")
     for k in cfg.meta.representations[1]["knn_graphs"]:
@@ -299,29 +313,43 @@ def compute_knn_graphs(
                 ),
             ),
         )
+        if type(perturbation) == list:
+            knn_graph_steps = knn_graph_steps.copy()
+            knn_graph_steps.insert(
+                1, perturbation[1],
+            )
 
         rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
             proteins
         )
-        save_graphs(cfg, rep_specific, perturbation, "knn", k)
+        save_graphs(cfg, rep_specific, perturbation[1], "knn", k, organism)
     log.info("Done computing KNN graphs.")
 
 
-def save_graphs(cfg, rep_specific, perturbation, graph_type, graph_param):
-    save_obj(
-        here()
-        / cfg.paths.representations
-        / cfg.paths.human
-        / cfg.paths.perturbed
-        / perturbation[0].split("_")[0]
-        / graph_type
-        / str(graph_param)
-        / f"reps_{round(float(perturbation[0].split('_')[1]), 2)}.pkl",
-        rep_specific,
-    )
+def save_graphs(
+    cfg, rep_specific, perturbation, graph_type, graph_param, organism
+):
+    if organism == "human":
+        save_obj(
+            here()
+            / cfg.paths.representations
+            / cfg.paths.human
+            / cfg.paths.perturbed
+            / perturbation[0].split("_")[0]
+            / graph_type
+            / str(graph_param)
+            / f"reps_{round(float(perturbation[0].split('_')[-1]), 2)}.pkl",
+            rep_specific,
+        )
+    else:
+        msg = "Oganism not supported."
+        log.error(msg)
+        raise NotImplementedError()
 
 
-def compute_graphs(cfg: DictConfig, proteins: List[Protein], perturbation):
+def compute_graphs(
+    cfg: DictConfig, proteins: List[Protein], perturbation, organism
+):
     """Compute graphs. Since this is parameter-dependent, we are going to create copies of protein datasets with the same basic attributes but different graph info that depends on the parameters.
 
     Args:
@@ -355,11 +383,16 @@ def compute_graphs(cfg: DictConfig, proteins: List[Protein], perturbation):
         (
             "laplacian_spectrum",
             LaplacianSpectrum(
-                graph_type="eps_graph", n_bins=100, n_jobs=cfg.compute.n_jobs,
+                graph_type="eps_graph",
+                n_bins=100,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
             ),
         ),
     ]
-    compute_eps_graphs(cfg, proteins, eps_graph_descriptor_steps, perturbation)
+    compute_eps_graphs(
+        cfg, proteins, eps_graph_descriptor_steps, perturbation, organism
+    )
 
     knn_graph_descriptor_steps = [
         (
@@ -383,11 +416,16 @@ def compute_graphs(cfg: DictConfig, proteins: List[Protein], perturbation):
         (
             "laplacian_spectrum",
             LaplacianSpectrum(
-                graph_type="knn_graph", n_bins=100, n_jobs=cfg.compute.n_jobs,
+                graph_type="knn_graph",
+                n_bins=100,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
             ),
         ),
     ]
-    compute_knn_graphs(cfg, proteins, knn_graph_descriptor_steps, perturbation)
+    compute_knn_graphs(
+        cfg, proteins, knn_graph_descriptor_steps, perturbation, organism
+    )
     log.info("Done computing graphs.")
 
 
@@ -430,8 +468,8 @@ def compute_reps(
     log.info(
         "Computing representations depending on hyperparameters (i.e. graphs)."
     )
-    compute_graphs(cfg, proteins_basic_reps, perturbation)
-    log.info("Done computing unperturbed representations.")
+    compute_graphs(cfg, proteins_basic_reps, perturbation, organism)
+    log.info("Done computing representations.")
 
 
 def compute_reps_on_unperturbed_proteins(
@@ -452,7 +490,7 @@ def compute_reps_on_unperturbed_proteins(
     if cfg.debug.reduce_data:
         log.warning("Reducing data for debugging purposes.")
         protein_sets = protein_sets[: cfg.debug.sample_data_size]
-    compute_reps(cfg, protein_sets, organism)
+    compute_reps(cfg, protein_sets, organism=organism)
 
 
 def gaussian_noise_perturbation(
@@ -572,6 +610,50 @@ def taper_perturbation(cfg, protein_sets, organism):
         compute_reps(cfg, protein_sets, organism, perturbation)
 
 
+def add_edges_perturbation(cfg, protein_sets, organism):
+    """Compute the perturbed protein sets.
+
+    Args:
+        cfg (DictConfig): Configuration.
+        protein_sets (List[Path]): List of protein sets.
+    """
+    log.info("Perturbing proteins with add edge.")
+    for add_edges in np.linspace(
+        cfg.perturbations.add_edges.min,
+        cfg.perturbations.add_edges.max,
+        cfg.perturbations.n_perturbations,
+    ):
+        log.info(f"Add edge set to {add_edges} Å.")
+        perturbation = [
+            (
+                f"addedge_{add_edges}",
+                AddEdges(
+                    graph_type="eps_graph",
+                    p_add=add_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+            (
+                f"addedge_{add_edges}",
+                AddEdges(
+                    graph_type="knn_graph",
+                    p_add=add_edges,
+                    random_state=np.random.RandomState(
+                        divmod(hash(str(protein_sets)), 42)[1]
+                    ),  # The seed is the same as long as the paths is the same.
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            ),
+        ]
+        proteins = compute_basic_reps(cfg, protein_sets, perturbation)
+        compute_graphs(cfg, proteins, perturbation, organism)
+
+
 def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     log.info("Computing perturbed protein sets.")
     protein_sets = load_unperturbed_proteins(cfg, perturbed=True)
@@ -579,14 +661,19 @@ def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     if cfg.debug.reduce_data:
         protein_sets = protein_sets[: cfg.debug.sample_data_size]
 
+    log.info("Point cloud perturbations")
     # Gaussian Noise perturbation
-    gaussian_noise_perturbation(cfg, protein_sets, organism)
+    # gaussian_noise_perturbation(cfg, protein_sets, organism)
     # Twist perturbation
-    twist_perturbation(cfg, protein_sets, organism)
+    # twist_perturbation(cfg, protein_sets, organism)
     # Shear perturbation
-    shear_perturbation(cfg, protein_sets, organism)
+    # shear_perturbation(cfg, protein_sets, organism)
     # Taper perturbation
-    taper_perturbation(cfg, protein_sets, organism)
+    # taper_perturbation(cfg, protein_sets, organism)
+
+    log.info("Graph perturbations")
+    # Add edge perturbation
+    add_edges_perturbation(cfg, protein_sets, organism)
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="systematic")
