@@ -25,25 +25,26 @@ from proteinggnnmetrics.utils.functions import make_dir
 )
 def main(cfg):
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
-    make_dir(here() / cfg.meta.data.data_split_dir)
-    for run in range(cfg.meta.data.n_runs):
+    make_dir(here() / cfg.meta.splits_dir)
+    for run in range(cfg.meta.n_runs):
         sampled_files = random.Random(run).sample(
-            pdb_files, cfg.meta.data.sample_size * 2
+            pdb_files, cfg.meta.sample_size * 2
         )
-        half = cfg.meta.data.sample_size
+        half = cfg.meta.sample_size
+        sampled_files = [file.name for file in sampled_files]
         df_unperturbed = pd.DataFrame(sampled_files[:half], columns=["pdb_id"])
         df_perturbed = pd.DataFrame(sampled_files[half:], columns=["pdb_id"])
 
         df_unperturbed.to_csv(
             os.path.join(
-                here() / cfg.meta.data.data_split_dir,
+                here() / cfg.meta.splits_dir,
                 f"data_split_{run}_unperturbed.csv",
             ),
             index=False,
         )
         df_perturbed.to_csv(
             os.path.join(
-                here() / cfg.meta.data.data_split_dir,
+                here() / cfg.meta.splits_dir,
                 f"data_split_{run}_perturbed.csv",
             ),
             index=False,
