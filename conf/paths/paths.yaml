@@ -1,0 +1,6 @@
+representations: "data/systematic/representations/"
+human: "human/"
+ecoli: "ecoli/"
+constant: "constant/"
+unperturbed: "unperturbed/"
+perturbed: "perturbed/"

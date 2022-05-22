@@ -1,0 +1,6 @@
+defaults:
+  - paths: paths
+  - compute: compute
+  - meta: meta
+  - perturbations: perturbations
+  - debug: debug
