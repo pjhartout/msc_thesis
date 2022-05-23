@@ -53,6 +53,7 @@ from proteinggnnmetrics.perturbations import (
 )
 from proteinggnnmetrics.protein import Protein
 from proteinggnnmetrics.utils.functions import (
+    distribute_function,
     flatten_lists,
     remove_fragments,
     save_obj,
@@ -71,7 +72,7 @@ def get_longest_protein_dummy_sequence(
     return longest_sequence
 
 
-def load_unperturbed_proteins(cfg: DictConfig, perturbed: bool) -> List[Path]:
+def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
     """Loads unique unperturbed protein file names
 
     Args:
@@ -147,52 +148,6 @@ def compute_basic_reps(
     )
     log.info("Done computing basic representations.")
     return proteins  # type: ignore
-
-
-def compute_esm_descriptors(
-    cfg: DictConfig, proteins: List[Protein]
-) -> List[Protein]:
-
-    log.info("Computing ESM descriptors.")
-    esm_steps = [
-        (
-            "compute_esm",
-            ESM(
-                size="M",
-                longest_sequence=get_longest_protein_dummy_sequence(
-                    proteins, cfg
-                ),
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-    ]
-    proteins = pipeline.Pipeline(esm_steps).fit_transform(proteins)
-    log.info("Done computing ESM descriptors.")
-    return proteins
-
-
-def compute_tda_descriptors(
-    cfg: DictConfig, proteins: List[Protein]
-) -> List[Protein]:
-    log.info("Computing TDA descriptors.")
-    tda_steps = [
-        (
-            "tda",
-            TopologicalDescriptor(
-                "diagram",
-                epsilon=0.01,
-                n_bins=100,
-                order=2,
-                n_jobs=cfg.compute.n_jobs,
-                landscape_layers=1,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-    ]
-    proteins = pipeline.Pipeline(tda_steps).fit_transform(proteins)
-    log.info("Done computing TDA descriptors.")
-    return proteins
 
 
 def compute_dihedral_angles(
@@ -451,12 +406,7 @@ def compute_reps(
 
     proteins_constant = compute_dihedral_angles(cfg, proteins_basic_reps)
     proteins_constant = compute_distance_histogram(cfg, proteins_constant)
-    if perturbation is None or "mutation" in perturbation[0]:
-        proteins_constant = compute_esm_descriptors(cfg, proteins_constant)
-    if perturbation is None or (
-        type(perturbation) == tuple and "mutation" not in perturbation[0]
-    ):
-        proteins_constant = compute_tda_descriptors(cfg, proteins_constant)
+
     log.info("Constant reps computed. Saving.")
     if organism == "human":
         if perturbation is None:
@@ -501,7 +451,7 @@ def compute_reps_on_unperturbed_proteins(
 
     """
     log.info("Computing unperturbed protein sets.")
-    protein_sets = load_unperturbed_proteins(cfg, perturbed=False)
+    protein_sets = load_proteins_from_config(cfg, perturbed=False)
 
     if cfg.debug.reduce_data:
         log.warning("Reducing data for debugging purposes.")
@@ -519,11 +469,8 @@ def gaussian_noise_perturbation(
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with Gaussian noise.")
-    for sigma in np.linspace(
-        cfg.perturbations.gaussian_noise.min,
-        cfg.perturbations.gaussian_noise.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def gaussian_noise_perturbation_worker(sigma):
         log.info(f"Gaussian level set to {sigma}.")
         perturbation = (
             f"gaussian_{sigma}",
@@ -538,6 +485,18 @@ def gaussian_noise_perturbation(
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
+        return _
+
+    _ = distribute_function(
+        func=gaussian_noise_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.gaussian_noise.min,
+            cfg.perturbations.gaussian_noise.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def mutation_perturbation(
@@ -550,11 +509,8 @@ def mutation_perturbation(
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with mutations.")
-    for p_mutate in np.linspace(
-        cfg.perturbations.mutation.min,
-        cfg.perturbations.mutation.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def mutation_perturbation_worker(p_mutate):
         log.info(f"Mutation rate to {p_mutate}.")
         perturbation = (
             f"mutation_{p_mutate}",
@@ -568,8 +524,19 @@ def mutation_perturbation(
             ),
         )
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
-        # proteins = compute_esm_descriptors(cfg, proteins)
         compute_graphs(cfg, proteins, perturbation, organism)
+        return _
+
+    _ = distribute_function(
+        func=mutation_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.mutation.min,
+            cfg.perturbations.mutation.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def twist_perturbation(cfg, protein_sets, organism):
@@ -580,11 +547,8 @@ def twist_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with twist.")
-    for alpha in np.linspace(
-        cfg.perturbations.twist.min,
-        cfg.perturbations.twist.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def twist_perturbation_worker(alpha):
         log.info(f"Twist rad/Å set to {alpha}.")
         perturbation = (
             f"twist_{alpha}",
@@ -598,6 +562,18 @@ def twist_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
+        return _
+
+    _ = distribute_function(
+        func=twist_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.twist.min,
+            cfg.perturbations.twist.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def shear_perturbation(cfg, protein_sets, organism):
@@ -607,12 +583,10 @@ def shear_perturbation(cfg, protein_sets, organism):
         cfg (DictConfig): Configuration.
         protein_sets (List[Path]): List of protein sets.
     """
+
     log.info("Perturbing proteins with shear.")
-    for shear in np.linspace(
-        cfg.perturbations.shear.min,
-        cfg.perturbations.shear.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def shear_perturbation_worker(shear):
         log.info(f"Shear set to {shear} Å.")
         perturbation = (
             f"shear_{shear}",
@@ -627,6 +601,18 @@ def shear_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
+        return _
+
+    _ = distribute_function(
+        func=shear_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.shear.min,
+            cfg.perturbations.shear.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def taper_perturbation(cfg, protein_sets, organism):
@@ -637,11 +623,8 @@ def taper_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with taper.")
-    for taper in np.linspace(
-        cfg.perturbations.taper.min,
-        cfg.perturbations.taper.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def taper_perturbation_worker(taper):
         log.info(f"Taper set to {taper} Å.")
         perturbation = (
             f"taper_{taper}",
@@ -656,6 +639,18 @@ def taper_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
+        return _
+
+    _ = distribute_function(
+        func=taper_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.taper.min,
+            cfg.perturbations.taper.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def add_edges_perturbation(cfg, protein_sets, organism):
@@ -666,11 +661,8 @@ def add_edges_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with add edge.")
-    for add_edges in np.linspace(
-        cfg.perturbations.add_edges.min,
-        cfg.perturbations.add_edges.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def add_edges_perturbation_worker(add_edges):
         log.info(f"Add edges with probability p={add_edges}.")
         perturbation = [
             (
@@ -700,6 +692,18 @@ def add_edges_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
+        return _
+
+    _ = distribute_function(
+        func=add_edges_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.add_edges.min,
+            cfg.perturbations.add_edges.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def remove_edge_perturbation(cfg, protein_sets, organism):
@@ -710,11 +714,8 @@ def remove_edge_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with remove edge.")
-    for remove_edges in np.linspace(
-        cfg.perturbations.remove_edges.min,
-        cfg.perturbations.remove_edges.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def remode_edge_perturbation_worker(remove_edges):
         log.info(f"Remove edges with probability p={remove_edges}.")
         perturbation = [
             (
@@ -744,6 +745,18 @@ def remove_edge_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
+        return _
+
+    _ = distribute_function(
+        func=remode_edge_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.remove_edges.min,
+            cfg.perturbations.remove_edges.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def rewire_edges_perturbation(cfg, protein_sets, organism):
@@ -754,11 +767,8 @@ def rewire_edges_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with rewire edge.")
-    for rewire_edges in np.linspace(
-        cfg.perturbations.rewire_edges.min,
-        cfg.perturbations.rewire_edges.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def rewire_edge_perturbation_worker(rewire_edges):
         log.info(f"Rewire edges with probability p={rewire_edges}.")
         perturbation = [
             (
@@ -788,6 +798,18 @@ def rewire_edges_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
+        return _
+
+    _ = distribute_function(
+        func=rewire_edge_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.rewire_edges.min,
+            cfg.perturbations.rewire_edges.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def add_connected_nodes_perturbation(cfg, protein_sets, organism):
@@ -798,11 +820,8 @@ def add_connected_nodes_perturbation(cfg, protein_sets, organism):
         protein_sets (List[Path]): List of protein sets.
     """
     log.info("Perturbing proteins with add connected nodes.")
-    for p_edge in np.linspace(
-        cfg.perturbations.add_nodes.min,
-        cfg.perturbations.add_nodes.max,
-        cfg.perturbations.n_perturbations,
-    ):
+
+    def add_connected_nodes_perturbation_worker(p_edge):
         log.info(f"Add connected node with connection probability p={p_edge}.")
         perturbation = [
             (
@@ -834,11 +853,23 @@ def add_connected_nodes_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
+        return _
+
+    _ = distribute_function(
+        func=add_connected_nodes_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.add_nodes.min,
+            cfg.perturbations.add_nodes.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_runs,
+        show_tqdm=cfg.debug.verbose,
+    )
 
 
 def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     log.info("Computing perturbed protein sets.")
-    protein_sets = load_unperturbed_proteins(cfg, perturbed=True)
+    protein_sets = load_proteins_from_config(cfg, perturbed=True)
 
     if cfg.debug.reduce_data:
         protein_sets = protein_sets[: cfg.debug.sample_data_size]
@@ -846,14 +877,18 @@ def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     log.info("Point cloud perturbations")
     # Gaussian Noise perturbation
     gaussian_noise_perturbation(cfg, protein_sets, organism)
+
     # Twist perturbation
     twist_perturbation(cfg, protein_sets, organism)
+
     # Shear perturbation
     shear_perturbation(cfg, protein_sets, organism)
+
     # Taper perturbation
     taper_perturbation(cfg, protein_sets, organism)
 
     log.info("Graph perturbations")
+
     # Add edge perturbation
     add_edges_perturbation(cfg, protein_sets, organism)
 
@@ -875,7 +910,7 @@ def main(cfg: DictConfig):
     log.info(OmegaConf.to_yaml(cfg))
     log.info("Starting reps.py")
     for organism in ["human"]:
-        # compute_reps_on_unperturbed_proteins(cfg, organism)
+        compute_reps_on_unperturbed_proteins(cfg, organism)
         compute_reps_on_perturbed_proteins(cfg, organism)
         log.info(f"Done with {organism}")
     log.info("Done computing representations")
