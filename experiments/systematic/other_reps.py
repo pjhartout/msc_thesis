@@ -37,7 +37,7 @@ from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.kernels import LinearKernel
 from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
+from proteinggnnmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import (
     AddConnectedNodes,
@@ -99,7 +99,7 @@ def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
         for fname in unique_protein_fnames.pdb_id.tolist()
     ]
     log.info(
-        f"Found {len(unique_protein_fnames)} unique proteins in each set.."
+        f"Found {len(unique_protein_fnames)} unique proteins in each set."
     )
     return unique_protein_fnames  # type: ignore
 
@@ -236,7 +236,8 @@ def compute_eps_graphs(
         if type(perturbation) == list:
             eps_graph_steps = eps_graph_steps.copy()
             eps_graph_steps.insert(
-                1, perturbation[0],
+                1,
+                perturbation[0],
             )
 
         rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
@@ -279,7 +280,8 @@ def compute_knn_graphs(
         if type(perturbation) == list:
             knn_graph_steps = knn_graph_steps.copy()
             knn_graph_steps.insert(
-                1, perturbation[1],
+                1,
+                perturbation[1],
             )
 
         rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
@@ -296,22 +298,39 @@ def compute_knn_graphs(
 def save_graphs(
     cfg, rep_specific, perturbation, graph_type, graph_param, organism
 ):
-    if organism == "human":
-        save_obj(
-            here()
-            / cfg.paths.representations
-            / cfg.paths.human
-            / cfg.paths.perturbed
-            / perturbation[0].split("_")[0]
-            / graph_type
-            / str(graph_param)
-            / f"reps_{round(float(perturbation[0].split('_')[-1]), 2)}.pkl",
-            rep_specific,
-        )
+    if perturbation is not None:
+        if organism == "human":
+            save_obj(
+                DATA_HOME
+                / cfg.paths.representations
+                / cfg.paths.human
+                / cfg.paths.perturbed
+                / perturbation[0].split("_")[0]
+                / graph_type
+                / str(graph_param)
+                / f"reps_{round(float(perturbation[0].split('_')[-1]), 2)}.pkl",
+                rep_specific,
+            )
+        else:
+            msg = "Oganism not supported."
+            log.error(msg)
+            raise NotImplementedError()
     else:
-        msg = "Oganism not supported."
-        log.error(msg)
-        raise NotImplementedError()
+        if organism == "human":
+            save_obj(
+                DATA_HOME
+                / cfg.paths.representations
+                / cfg.paths.human
+                / cfg.paths.unperturbed
+                / graph_type
+                / str(graph_param)
+                / f"reps_unperturbed.pkl",
+                rep_specific,
+            )
+        else:
+            msg = "Oganism not supported."
+            log.error(msg)
+            raise NotImplementedError()
 
 
 def compute_graphs(
@@ -411,7 +430,7 @@ def compute_reps(
     if organism == "human":
         if perturbation is None:
             save_obj(
-                here()
+                DATA_HOME
                 / cfg.paths.representations
                 / cfg.paths.human
                 / cfg.paths.unperturbed
@@ -420,7 +439,7 @@ def compute_reps(
             )
         else:
             save_obj(
-                here()
+                DATA_HOME
                 / cfg.paths.representations
                 / cfg.paths.human
                 / cfg.paths.perturbed
@@ -485,7 +504,7 @@ def gaussian_noise_perturbation(
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=gaussian_noise_perturbation_worker,
@@ -525,7 +544,7 @@ def mutation_perturbation(
         )
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=mutation_perturbation_worker,
@@ -562,7 +581,7 @@ def twist_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=twist_perturbation_worker,
@@ -601,7 +620,7 @@ def shear_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=shear_perturbation_worker,
@@ -639,7 +658,7 @@ def taper_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=taper_perturbation_worker,
@@ -692,7 +711,7 @@ def add_edges_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=add_edges_perturbation_worker,
@@ -745,7 +764,7 @@ def remove_edge_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=remode_edge_perturbation_worker,
@@ -798,7 +817,7 @@ def rewire_edges_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=rewire_edge_perturbation_worker,
@@ -853,7 +872,7 @@ def add_connected_nodes_perturbation(cfg, protein_sets, organism):
         ]
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
         compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=add_connected_nodes_perturbation_worker,
@@ -910,7 +929,7 @@ def main(cfg: DictConfig):
     log.info(OmegaConf.to_yaml(cfg))
     log.info("Starting reps.py")
     for organism in ["human"]:
-        compute_reps_on_unperturbed_proteins(cfg, organism)
+
         compute_reps_on_perturbed_proteins(cfg, organism)
         log.info(f"Done with {organism}")
     log.info("Done computing representations")
