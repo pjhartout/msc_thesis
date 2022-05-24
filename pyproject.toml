@@ -36,6 +36,7 @@ natsort = "^8.1.0"
 fair-esm = "^0.4.0"
 torch = "^1.11.0"
 scipy = "^1.8.0"
+umap-learn = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
