@@ -25,7 +25,12 @@ from .utils.functions import distribute_function, flatten_lists, tqdm_joblib
 
 
 class Coordinates:
-    """Coordinates handles coordinate extraction of atoms in pdb files."""
+    """Coordinates handles coordinate extraction of atoms in pdb files.
+
+    TODO: ideally we want to be able to compute each of the different configs
+    without only supplying a list of files but also List[Protein] in case we
+    want to add a rep post-hoc.
+    """
 
     def __init__(
         self, granularity: str, n_jobs: int, verbose: bool = False
@@ -102,6 +107,7 @@ class Coordinates:
                 N_coordinates=np.vstack(N_coordinates),
                 CA_coordinates=np.vstack(CA_coordinates),
                 C_coordinates=np.vstack(C_coordinates),
+                coordinates=np.vstack(CA_coordinates),
                 sequence=sequence,
             )
 
@@ -126,11 +132,11 @@ class Coordinates:
 
     def fit(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def fit_transform(
         self, fname_list: List[PosixPath], y=None
@@ -186,11 +192,11 @@ class Sequence:
 
     def fit(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self):
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def fit_transform(
         self, fname_list: List[PosixPath], y=None

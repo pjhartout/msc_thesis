@@ -28,7 +28,7 @@ class GraphConstruction(metaclass=ABCMeta):
     """Defines skeleton of graph construction classes"""
 
     def __init__(self):
-        pass
+        ...
 
     def fit(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""

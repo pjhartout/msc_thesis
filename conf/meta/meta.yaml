@@ -6,6 +6,16 @@ representations:
   - point_cloud: ["backbone", "CA"]
   - sequence: [""]
 
+descriptors:
+  [
+    "persistence_diagram",
+    "angles",
+    "degree_histogram",
+    "laplacian_spectrum",
+    "clustering_histogram",
+    "distance_histogram",
+    "esm",
+  ]
 perturbations:
   [
     "twist",
@@ -19,16 +29,7 @@ perturbations:
     "add_nodes",
   ]
 
-descriptors:
-  [
-    "persistence_diagram",
-    "angles",
-    "degree_histogram",
-    "laplacian_spectrum",
-    "clustering_histogram",
-    "distance_histogram",
-    "esm",
-  ]
+
 
 kernels:
   - persistence_fisher:
@@ -79,7 +80,8 @@ kernels:
 
 organisms: ["humans", "ecoli"]
 
-data:
-  systematic_dir: "data/systematic"
-  data_split_dir: "data/systematic/run_idx/"
-  time_estimates_dir: "data/systematic/time/"
+n_runs: 10
+sample_size: 100
+systematic_dir: "data/systematic"
+splits_dir: "data/systematic/run_idx/"
+time_estimates_dir: "data/systematic/time/"

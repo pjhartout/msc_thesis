@@ -36,7 +36,7 @@ class SamplePoints:
 
     def fit(self, X, y=None):
         """fit method"""
-        pass
+        ...
 
     def transform(self, X):
         """transform method"""

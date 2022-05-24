@@ -18,9 +18,12 @@ from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.descriptors import DegreeHistogram, RamachandranAngles
+from proteinggnnmetrics.descriptors import (
+    ESM,
+    DegreeHistogram,
+    RamachandranAngles,
+)
 from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.embeddings import ESM
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
 from proteinggnnmetrics.kernels import KernelComposition, LinearKernel
 from proteinggnnmetrics.loaders import (
