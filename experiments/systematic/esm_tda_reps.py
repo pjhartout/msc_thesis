@@ -6,6 +6,8 @@
 This script computes all possible representations of a protein available.
 
 Format of directory structure: /data/systematic/representations/organism/perturbation/twist/amount/*.pkl
+
+ABORTED - comsumes too much disk space!
 """
 
 import logging
