@@ -38,7 +38,7 @@ class Kernel(metaclass=ABCMeta):
 
     def compute_matrix(self, X: Any, Y: Any = None) -> Any:
         """Apply transformation to apply kernel to X"""
-        pass
+        ...
 
 
 class LinearKernel(Kernel):

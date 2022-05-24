@@ -51,7 +51,7 @@ class Perturbation(metaclass=ABCMeta):
 
     def fit(self, proteins: List[Protein]) -> None:
         """For pipeline compatibiltiy"""
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -79,7 +79,7 @@ class GaussianNoise(Perturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -131,7 +131,7 @@ class Twist(Perturbation):
             raise ValueError("Invalid protein")
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -176,7 +176,7 @@ class Shear(Perturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -214,7 +214,7 @@ class Taper(Perturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -301,7 +301,7 @@ class RemoveEdges(GraphPerturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -344,7 +344,7 @@ class AddEdges(GraphPerturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -399,7 +399,7 @@ class RewireEdges(GraphPerturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X
@@ -448,7 +448,7 @@ class AddConnectedNodes(GraphPerturbation):
         return protein
 
     def fit(self, X: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, X: List[Protein]) -> List[Protein]:
         return X

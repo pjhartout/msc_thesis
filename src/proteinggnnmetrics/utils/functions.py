@@ -286,6 +286,7 @@ def distance2similarity(K):
 
 
 def save_obj(path: Path, obj) -> None:
+    make_dir(path.parent)
     with open(path, "wb") as f:
         pickle.dump(obj, f)
 

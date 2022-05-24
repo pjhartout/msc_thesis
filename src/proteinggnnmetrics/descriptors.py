@@ -49,7 +49,7 @@ class Descriptor(metaclass=ABCMeta):
 
     def fit(self, protein: List[Protein]) -> None:
         """required for sklearn compatibility"""
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         """required for sklearn compatibility"""
@@ -70,7 +70,7 @@ class DegreeHistogram(Descriptor):
         self.verbose = verbose
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -105,8 +105,8 @@ class ClusteringHistogram(Descriptor):
         self,
         graph_type: str,
         n_bins: int,
-        density: bool,
         n_jobs: int,
+        density: bool = True,
         verbose: bool = False,
     ):
         super().__init__(n_jobs, verbose)
@@ -115,7 +115,7 @@ class ClusteringHistogram(Descriptor):
         self.density = density
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -139,7 +139,7 @@ class ClusteringHistogram(Descriptor):
             calculate_degree_histogram,
             proteins,
             self.n_jobs,
-            "Compute degree histogram",
+            "Compute clustering histogram",
             show_tqdm=self.verbose,
         )
         return proteins
@@ -162,7 +162,7 @@ class LaplacianSpectrum(Descriptor):
         self.bin_range = bin_range
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -208,6 +208,7 @@ class TopologicalDescriptor(Descriptor):
         n_jobs: int = 1,
         verbose: bool = False,
         use_caching: bool = True,
+        n_chunks: int = 20,
     ) -> None:
         super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
@@ -221,9 +222,10 @@ class TopologicalDescriptor(Descriptor):
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.use_caching = use_caching
+        self.n_chunks = n_chunks
 
     def fit(self, proteins: List[Protein]) -> None:
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         return proteins
@@ -231,7 +233,7 @@ class TopologicalDescriptor(Descriptor):
     def fit_transform(self, proteins: List[Protein], y=None) -> Any:
 
         if self.tda_descriptor_type == "diagram":
-            pass
+            ...
 
         elif self.tda_descriptor_type == "landscape":
             tda_pipeline = [
@@ -317,10 +319,12 @@ class TopologicalDescriptor(Descriptor):
                 / f"diagram_compute_cache_{uuid.uuid4().hex}/"
             )
             diagram_cache.mkdir(
-                parents=True, exist_ok=True,
+                parents=True,
+                exist_ok=True,
             )
             n_chunks = (
-                int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
+                int(len(coordinates) / self.n_chunks)
+                + 1  # 20 is a good size of chunks
             )
             cks = chunks(coordinates, n_chunks)
             for i, ck in enumerate(cks):
@@ -388,9 +392,9 @@ class RamachandranAngles(Descriptor):
         self,
         from_pdb: bool,
         n_bins: int,
-        bin_range: Tuple[float, float],
         n_jobs: int,
         verbose: bool,
+        bin_range: Tuple[float, float] = (-np.pi, np.pi),
         density: bool = True,
     ) -> None:
         super().__init__(n_jobs, verbose)
@@ -485,10 +489,10 @@ class RamachandranAngles(Descriptor):
         return protein
 
     def fit(self):
-        pass
+        ...
 
     def transform(self):
-        pass
+        ...
 
     def fit_transform(self, proteins: List[Protein], y=None) -> List[Protein]:
         """Gets the angles from the list of pdb files"""
@@ -514,22 +518,29 @@ class RamachandranAngles(Descriptor):
 
 
 class DistanceHistogram(Descriptor):
-    def __init__(self, n_bins, n_jobs, verbose):
+    def __init__(
+        self,
+        n_bins,
+        n_jobs: int,
+        verbose,
+        bin_range: Tuple[int, int] = (0, 300),
+    ):
         super().__init__(n_jobs, verbose)
         self.n_bins = n_bins
+        self.bin_range = bin_range
 
     def get_histogram(self, protein: Protein) -> Protein:
         """Gets the interatomic clashes"""
         triu = np.triu(protein.contact_map)
         triu = triu[triu != 0]  # Why not reduce the amount of processing by 2?
         hist, _ = np.histogram(
-            triu, bins=self.n_bins, range=(0.0, 1.0), density=True,
+            triu, bins=self.n_bins, range=self.bin_range, density=True,
         )
         protein.distance_hist = hist
         return protein
 
     def fit(self):
-        pass
+        ...
 
     def transform(self):
         ...
@@ -559,7 +570,7 @@ class Embedding(metaclass=ABCMeta):
         Args:
             sequences (List[Protein]): list of sequences to embed.
         """
-        pass
+        ...
 
     def transform(self, proteins: List[Protein]) -> List[Protein]:
         """Transform the given sequences to embeddings.
@@ -593,7 +604,7 @@ class ESM(Embedding):
         longest_sequence: int,
         n_jobs: int,
         verbose: bool,
-        n_chunks: int,
+        n_chunks: int = 20,
     ) -> None:
         """Used for dummy to ensure all embeddings have the same size even when run on different sets of data
 
@@ -614,7 +625,7 @@ class ESM(Embedding):
         Args:
             sequences (List[Protein]): list of sequences to embed.
         """
-        pass
+        ...
 
     def transform(self, sequences: List[Protein], y=None) -> List[Protein]:
         """Transform the given sequences to embeddings.
@@ -666,14 +677,14 @@ class ESM(Embedding):
         if self.verbose:
             print("Computing embeddings...")
 
-        cks = chunks(proteins, self.n_chunks)
+        cks = chunks(batch_tokens, self.n_chunks)
 
         reps = list()
 
         def execute_chunk(ck):
             with torch.no_grad():
                 results = model(
-                    batch_tokens,
+                    ck,
                     repr_layers=[repr_layer],
                     return_contacts=False,
                 )
@@ -681,7 +692,10 @@ class ESM(Embedding):
             return token_representations
 
         if self.verbose:
-            for ck in tqdm(cks, total=divmod(len(proteins), self.n_chunks)[0]):
+            total = divmod(len(proteins), self.n_chunks)[0]
+            if total == 0:
+                total = 1
+            for ck in tqdm(cks, total=total):
                 token_representations = execute_chunk(ck)
                 reps.append(token_representations)
         else:
