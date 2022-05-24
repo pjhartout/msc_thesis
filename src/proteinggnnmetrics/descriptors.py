@@ -208,6 +208,7 @@ class TopologicalDescriptor(Descriptor):
         n_jobs: int = 1,
         verbose: bool = False,
         use_caching: bool = True,
+        n_chunks: int = 20,
     ) -> None:
         super().__init__(n_jobs, verbose)
         self.tda_descriptor_type = tda_descriptor_type
@@ -221,6 +222,7 @@ class TopologicalDescriptor(Descriptor):
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.use_caching = use_caching
+        self.n_chunks = n_chunks
 
     def fit(self, proteins: List[Protein]) -> None:
         ...
@@ -317,10 +319,12 @@ class TopologicalDescriptor(Descriptor):
                 / f"diagram_compute_cache_{uuid.uuid4().hex}/"
             )
             diagram_cache.mkdir(
-                parents=True, exist_ok=True,
+                parents=True,
+                exist_ok=True,
             )
             n_chunks = (
-                int(len(coordinates) / 20) + 1  # 20 is a good size of chunks
+                int(len(coordinates) / self.n_chunks)
+                + 1  # 20 is a good size of chunks
             )
             cks = chunks(coordinates, n_chunks)
             for i, ck in enumerate(cks):
@@ -673,14 +677,14 @@ class ESM(Embedding):
         if self.verbose:
             print("Computing embeddings...")
 
-        cks = chunks(proteins, self.n_chunks)
+        cks = chunks(batch_tokens, self.n_chunks)
 
         reps = list()
 
         def execute_chunk(ck):
             with torch.no_grad():
                 results = model(
-                    batch_tokens,
+                    ck,
                     repr_layers=[repr_layer],
                     return_contacts=False,
                 )
