@@ -444,7 +444,7 @@ def compute_reps(
                 / cfg.paths.human
                 / cfg.paths.perturbed
                 / perturbation[0].split("_")[0]
-                / f"reps_{perturbation[0].split('_')[1]}.pkl",
+                / f"reps_{round(float(perturbation[0].split('_')[1]),2)}.pkl",
                 proteins_constant,
             )
     else:
@@ -929,7 +929,7 @@ def main(cfg: DictConfig):
     log.info(OmegaConf.to_yaml(cfg))
     log.info("Starting reps.py")
     for organism in ["human"]:
-
+        compute_reps_on_unperturbed_proteins(cfg, organism)
         compute_reps_on_perturbed_proteins(cfg, organism)
         log.info(f"Done with {organism}")
     log.info("Done computing representations")

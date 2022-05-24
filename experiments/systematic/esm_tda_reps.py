@@ -37,7 +37,7 @@ from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
 from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
 from proteinggnnmetrics.kernels import LinearKernel
 from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
+from proteinggnnmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinggnnmetrics.pdb import Coordinates, Sequence
 from proteinggnnmetrics.perturbations import (
     AddConnectedNodes,
@@ -52,6 +52,7 @@ from proteinggnnmetrics.perturbations import (
     Twist,
 )
 from proteinggnnmetrics.protein import Protein
+from proteinggnnmetrics.utils.debug import measure_memory
 from proteinggnnmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
@@ -165,6 +166,7 @@ def compute_esm_descriptors(
                 ),
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
+                n_chunks=10,
             ),
         ),
     ]
@@ -187,6 +189,8 @@ def compute_tda_descriptors(
                 order=2,
                 n_jobs=cfg.compute.n_jobs,
                 landscape_layers=1,
+                use_caching=True,
+                n_chunks=200,
                 verbose=cfg.debug.verbose,
             ),
         ),
@@ -257,189 +261,25 @@ def compute_distance_histogram(
     return proteins
 
 
-def compute_eps_graphs(
-    cfg: DictConfig,
-    proteins: List[Protein],
-    graph_descriptor_steps: List[Tuple[str, Any]],
-    perturbation,
-    organism,
-) -> None:
-    log.info("Computing epsilon graphs.")
-    for eps_value in cfg.meta.representations[0]["eps_graphs"]:
-        log.info(f"Computing epsilon graphs for epsilon={eps_value}")
-        eps_graph_steps = graph_descriptor_steps.copy()
-        eps_graph_steps.insert(
-            0,
-            (
-                "epsilon graph",
-                EpsilonGraph(
-                    epsilon=eps_value,
-                    n_jobs=cfg.compute.n_jobs,
-                    verbose=cfg.debug.verbose,
-                ),
-            ),
-        )
-        if type(perturbation) == list:
-            eps_graph_steps = eps_graph_steps.copy()
-            eps_graph_steps.insert(
-                1, perturbation[0],
-            )
-
-        rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
-            proteins
-        )
-        if type(perturbation) == list:
-            save_graphs(
-                cfg, rep_specific, perturbation[0], "eps", eps_value, organism
-            )
-        else:
-            save_graphs(
-                cfg, rep_specific, perturbation, "eps", eps_value, organism
-            )
-
-    log.info("Done computing epsilon graphs.")
-
-
-def compute_knn_graphs(
-    cfg: DictConfig,
-    proteins: List[Protein],
-    graph_descriptor_steps: List[Tuple[str, Any]],
-    perturbation,
-    organism,
-):
-    log.info("Computing KNN graphs.")
-    for k in cfg.meta.representations[1]["knn_graphs"]:
-        log.info(f"Computing KNN graphs for k={k}")
-        knn_graph_steps = graph_descriptor_steps.copy()
-        knn_graph_steps.insert(
-            0,
-            (
-                "knn graph",
-                KNNGraph(
-                    n_neighbors=k,
-                    n_jobs=cfg.compute.n_jobs,
-                    verbose=cfg.debug.verbose,
-                ),
-            ),
-        )
-        if type(perturbation) == list:
-            knn_graph_steps = knn_graph_steps.copy()
-            knn_graph_steps.insert(
-                1, perturbation[1],
-            )
-
-        rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
-            proteins
-        )
-        if type(perturbation) == list:
-            save_graphs(cfg, rep_specific, perturbation[1], "knn", k, organism)
-        else:
-            save_graphs(cfg, rep_specific, perturbation, "knn", k, organism)
-
-    log.info("Done computing KNN graphs.")
-
-
 def save_graphs(
     cfg, rep_specific, perturbation, graph_type, graph_param, organism
 ):
     if organism == "human":
         save_obj(
-            here()
+            DATA_HOME
             / cfg.paths.representations
             / cfg.paths.human
             / cfg.paths.perturbed
             / perturbation[0].split("_")[0]
             / graph_type
             / str(graph_param)
-            / f"reps_{round(float(perturbation[0].split('_')[-1]), 2)}.pkl",
+            / f"reps_esm_tda_{round(float(perturbation[0].split('_')[-1]), 2)}.pkl",
             rep_specific,
         )
     else:
         msg = "Oganism not supported."
         log.error(msg)
         raise NotImplementedError()
-
-
-def compute_graphs(
-    cfg: DictConfig, proteins: List[Protein], perturbation, organism
-):
-    """Compute graphs. Since this is parameter-dependent, we are going to create copies of protein datasets with the same basic attributes but different graph info that depends on the parameters.
-
-    Args:
-        cfg (DictConfig): Configuration.
-        proteins (List[Protein]): List of proteins.
-
-    Returns:
-        list: List of proteins.
-
-    """
-    log.info("Computing graphs.")
-    eps_graph_descriptor_steps = [
-        (
-            "degree_histogram",
-            DegreeHistogram(
-                graph_type="eps_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-        (
-            "clustering_coefficient",
-            ClusteringHistogram(
-                graph_type="eps_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-        (
-            "laplacian_spectrum",
-            LaplacianSpectrum(
-                graph_type="eps_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-    ]
-    compute_eps_graphs(
-        cfg, proteins, eps_graph_descriptor_steps, perturbation, organism
-    )
-
-    knn_graph_descriptor_steps = [
-        (
-            "degree_histogram",
-            DegreeHistogram(
-                graph_type="knn_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-        (
-            "clustering_coefficient",
-            ClusteringHistogram(
-                graph_type="knn_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-        (
-            "laplacian_spectrum",
-            LaplacianSpectrum(
-                graph_type="knn_graph",
-                n_bins=100,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),
-        ),
-    ]
-    compute_knn_graphs(
-        cfg, proteins, knn_graph_descriptor_steps, perturbation, organism
-    )
-    log.info("Done computing graphs.")
 
 
 def compute_reps(
@@ -460,30 +300,26 @@ def compute_reps(
     if organism == "human":
         if perturbation is None:
             save_obj(
-                here()
+                DATA_HOME
                 / cfg.paths.representations
                 / cfg.paths.human
                 / cfg.paths.unperturbed
-                / "constant_reps.pkl",
-                proteins_constant,
+                / "constant_reps_esm_tda.pkl",
+                proteins_constant,  # type: ignore
             )
         else:
             save_obj(
-                here()
+                DATA_HOME
                 / cfg.paths.representations
                 / cfg.paths.human
                 / cfg.paths.perturbed
                 / perturbation[0].split("_")[0]
-                / f"reps_{perturbation[0].split('_')[1]}.pkl",
-                proteins_constant,
+                / f"reps_esm_tda_{perturbation[0].split('_')[1]}.pkl",
+                proteins_constant,  # type: ignore
             )
     else:
         log.info("Patience.")
 
-    log.info(
-        "Computing representations depending on hyperparameters (i.e. graphs)."
-    )
-    compute_graphs(cfg, proteins_basic_reps, perturbation, organism)
     log.info("Done computing representations.")
 
 
@@ -534,7 +370,7 @@ def gaussian_noise_perturbation(
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=gaussian_noise_perturbation_worker,
@@ -573,8 +409,7 @@ def mutation_perturbation(
             ),
         )
         proteins = compute_basic_reps(cfg, protein_sets, perturbation)
-        compute_graphs(cfg, proteins, perturbation, organism)
-        return _
+        return ""
 
     _ = distribute_function(
         func=mutation_perturbation_worker,
@@ -611,7 +446,7 @@ def twist_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=twist_perturbation_worker,
@@ -650,7 +485,7 @@ def shear_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=shear_perturbation_worker,
@@ -688,7 +523,7 @@ def taper_perturbation(cfg, protein_sets, organism):
             ),
         )
         compute_reps(cfg, protein_sets, organism, perturbation)
-        return _
+        return ""
 
     _ = distribute_function(
         func=taper_perturbation_worker,
