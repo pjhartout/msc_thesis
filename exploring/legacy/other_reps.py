@@ -239,8 +239,7 @@ def compute_eps_graphs(
         if type(perturbation) == list:
             eps_graph_steps = eps_graph_steps.copy()
             eps_graph_steps.insert(
-                1,
-                perturbation[0],
+                1, perturbation[0],
             )
 
         rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
@@ -283,8 +282,7 @@ def compute_knn_graphs(
         if type(perturbation) == list:
             knn_graph_steps = knn_graph_steps.copy()
             knn_graph_steps.insert(
-                1,
-                perturbation[1],
+                1, perturbation[1],
             )
 
         rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
@@ -921,7 +919,7 @@ def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     rewire_edges_perturbation(cfg, protein_sets, organism)
 
     # Add connected nodes perturbation
-    add_connected_nodes_perturbation(cfg, protein_sets, organism)
+    # add_connected_nodes_perturbation(cfg, protein_sets, organism)
 
     log.info("Mutation")
     mutation_perturbation(cfg, protein_sets, organism)
