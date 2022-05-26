@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""graph_experiments.py
+"""weisfeiler_lehman_kernel_graph_experiments.py
 
 The idea is to deal with all graph experiments here.
 Steps:
@@ -188,9 +188,7 @@ def pc_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
+                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -389,10 +387,7 @@ def gaussian_perturbation_wl_pc(
 
 
 def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig,
-    graph_type: str,
-    graph_extraction_param: int,
-    n_iter: int,
+    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
 ):
     base_feature_steps = [
         (
