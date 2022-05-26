@@ -188,7 +188,9 @@ def pc_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=n_iter,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -387,7 +389,10 @@ def gaussian_perturbation_wl_pc(
 
 
 def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
+    cfg: DictConfig,
+    graph_type: str,
+    graph_extraction_param: int,
+    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -404,7 +409,7 @@ def weisfeiler_lehman_experiment_pc_perturbation(
         ),
     ]
 
-    if graph_type == "knn":
+    if graph_type == "knn_graph":
         base_feature_steps.append(
             (
                 "knn graph",
