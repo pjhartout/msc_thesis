@@ -1,8 +1,8 @@
 # This contains all the elements necessary to create the ensemble of experiments to run.
 
 representations:
-  - eps_graphs: [8, 16, 32]
-  - knn_graphs: [2, 6, 8]
+  - eps_graph: [8, 16, 32]
+  - knn_graph: [2, 6, 8]
   - point_cloud: ["backbone", "CA"]
   - sequence: [""]
 
