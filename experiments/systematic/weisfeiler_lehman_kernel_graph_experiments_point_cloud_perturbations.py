@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""weisfeiler_lehman_kernel_graph_experiments.py
+"""weisfeiler_lehman_kernel_graph_experiments_point_cloud_perturbations.py
 
 The idea is to deal with all graph experiments here.
 Steps:
@@ -375,8 +375,55 @@ def gaussian_perturbation_wl_pc(
     mmds = distribute_function(
         func=twist_perturbation_worker,
         X=np.linspace(
-            cfg.perturbations.gaussian.min,
-            cfg.perturbations.gaussian.max,
+            cfg.perturbations.gaussian_noise.min,
+            cfg.perturbations.gaussian_noise.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_perturb,
+        show_tqdm=cfg.debug.verbose,
+        tqdm_label="gaussian noise experiment",
+        perturbed=perturbed,
+        unperturbed=unperturbed,
+    )
+    return mmds
+
+
+def mutation_perturbation_wl_pc(
+    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+):
+    log.info("Perturbing proteins with mutations.")
+
+    def mutation_perturbation_worker(mutation, perturbed, unperturbed):
+        log.info(f"gaussian set to {mutation}.")
+        perturbation = (
+            f"gaussian_{mutation}",
+            Mutation(
+                p_mutate=mutation,
+                random_state=hash(
+                    str(perturbed)
+                ),  # The seed is the same as long as the paths is the same.
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        )
+        mmd_runs = pc_perturbation_worker(
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
+            graph_type,
+            n_iter,
+        )
+        mmd_pack = {"perturb": mutation, "mmd": mmd_runs}
+        log.info(f"Computed the MMD with gaussian noise {mutation}.")
+        return mmd_pack
+
+    mmds = distribute_function(
+        func=mutation_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.mutation.min,
+            cfg.perturbations.mutation.max,
             cfg.perturbations.n_perturbations,
         ),
         n_jobs=cfg.compute.n_parallel_perturb,
