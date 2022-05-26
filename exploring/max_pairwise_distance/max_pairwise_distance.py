@@ -5,6 +5,8 @@
 
 What is the highest pairwise distance observed between any two residues in a protein?
 
+Around 462.5783386230469
+
 """
 
 
@@ -24,7 +26,7 @@ from proteinmetrics.loaders import list_pdb_files
 from proteinmetrics.paths import HUMAN_PROTEOME
 from proteinmetrics.pdb import Coordinates
 
-N_JOBS = 6
+N_JOBS = 40
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +38,10 @@ def main():
             "coordinates",
             Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=True),
         ),
-        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True),),
+        (
+            "contact_map",
+            ContactMap(n_jobs=N_JOBS, verbose=True),
+        ),
     ]
     proteins = pipeline.Pipeline(base_feature_steps).fit_transform(pdb_files)
     max_distance = np.max(
