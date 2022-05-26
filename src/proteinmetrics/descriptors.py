@@ -23,7 +23,7 @@ from Bio.PDB import PDBParser, PPBuilder, vectors
 from gtda import curves, diagrams, homology, pipeline
 from tqdm import tqdm
 
-from proteinggnnmetrics.loaders import load_descriptor
+from proteinmetrics.loaders import load_descriptor
 
 from .paths import CACHE_DIR
 from .protein import Protein
@@ -319,8 +319,7 @@ class TopologicalDescriptor(Descriptor):
                 / f"diagram_compute_cache_{uuid.uuid4().hex}/"
             )
             diagram_cache.mkdir(
-                parents=True,
-                exist_ok=True,
+                parents=True, exist_ok=True,
             )
             n_chunks = (
                 int(len(coordinates) / self.n_chunks)
@@ -684,9 +683,7 @@ class ESM(Embedding):
         def execute_chunk(ck):
             with torch.no_grad():
                 results = model(
-                    ck,
-                    repr_layers=[repr_layer],
-                    return_contacts=False,
+                    ck, repr_layers=[repr_layer], return_contacts=False,
                 )
             token_representations = results["representations"][repr_layer]
             return token_representations

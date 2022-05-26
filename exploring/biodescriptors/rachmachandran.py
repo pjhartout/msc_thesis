@@ -7,11 +7,11 @@ Test out Rachmachandran angles extraction.
 
 """
 
-from proteinggnnmetrics.descriptors import RamachandranAngles
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.functions import configure
+from proteinmetrics.descriptors import RamachandranAngles
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.functions import configure
 
 config = configure()
 

@@ -9,16 +9,12 @@ Computes MMD, other distances from features extracted from protein
 
 import numpy as np
 
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
-from proteinggnnmetrics.loaders import (
-    load_descriptor,
-    load_graphs,
-    load_proteins,
-)
-from proteinggnnmetrics.paths import CACHE_DIR
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import distribute_function
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
+from proteinmetrics.loaders import load_descriptor, load_graphs, load_proteins
+from proteinmetrics.paths import CACHE_DIR
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import distribute_function
 
 
 def compute_wl_hashes(protein):

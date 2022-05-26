@@ -18,7 +18,7 @@ from typing import Callable, Dict, List
 import numpy as np
 import scipy
 
-from proteinggnnmetrics.kernels import Kernel
+from proteinmetrics.kernels import Kernel
 
 from .distance import MaximumMeanDiscrepancy
 

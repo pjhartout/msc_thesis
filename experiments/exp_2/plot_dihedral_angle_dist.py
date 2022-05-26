@@ -22,17 +22,17 @@ from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.descriptors import RamachandranAngles
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.functions import (
+from proteinmetrics.descriptors import RamachandranAngles
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
     remove_fragments,
     tqdm_joblib,
 )
-from proteinggnnmetrics.utils.plots import (
+from proteinmetrics.utils.plots import (
     setup_annotations,
     setup_plotting_parameters,
 )

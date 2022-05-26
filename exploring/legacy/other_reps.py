@@ -27,7 +27,7 @@ from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import (
+from proteinmetrics.descriptors import (
     ESM,
     ClusteringHistogram,
     DegreeHistogram,
@@ -36,13 +36,13 @@ from proteinggnnmetrics.descriptors import (
     RamachandranAngles,
     TopologicalDescriptor,
 )
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, Sequence
-from proteinggnnmetrics.perturbations import (
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_graphs
+from proteinmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates, Sequence
+from proteinmetrics.perturbations import (
     AddConnectedNodes,
     AddEdges,
     GaussianNoise,
@@ -54,8 +54,8 @@ from proteinggnnmetrics.perturbations import (
     Taper,
     Twist,
 )
-from proteinggnnmetrics.protein import Protein
-from proteinggnnmetrics.utils.functions import (
+from proteinmetrics.protein import Protein
+from proteinmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
     remove_fragments,
@@ -239,8 +239,7 @@ def compute_eps_graphs(
         if type(perturbation) == list:
             eps_graph_steps = eps_graph_steps.copy()
             eps_graph_steps.insert(
-                1,
-                perturbation[0],
+                1, perturbation[0],
             )
 
         rep_specific = pipeline.Pipeline(eps_graph_steps).fit_transform(
@@ -283,8 +282,7 @@ def compute_knn_graphs(
         if type(perturbation) == list:
             knn_graph_steps = knn_graph_steps.copy()
             knn_graph_steps.insert(
-                1,
-                perturbation[1],
+                1, perturbation[1],
             )
 
         rep_specific = pipeline.Pipeline(knn_graph_steps).fit_transform(
@@ -921,7 +919,7 @@ def compute_reps_on_perturbed_proteins(cfg, organism) -> None:
     rewire_edges_perturbation(cfg, protein_sets, organism)
 
     # Add connected nodes perturbation
-    add_connected_nodes_perturbation(cfg, protein_sets, organism)
+    # add_connected_nodes_perturbation(cfg, protein_sets, organism)
 
     log.info("Mutation")
     mutation_perturbation(cfg, protein_sets, organism)

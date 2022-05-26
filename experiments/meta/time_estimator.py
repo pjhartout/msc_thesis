@@ -16,28 +16,24 @@ from gtda import pipeline
 from omegaconf.dictconfig import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.descriptors import (
+from proteinmetrics.descriptors import (
     ESM,
     ClusteringHistogram,
     DegreeHistogram,
     LaplacianSpectrum,
     TopologicalDescriptor,
 )
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import (
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import (
     GaussianKernel,
     LinearKernel,
     PersistenceFisherKernel,
 )
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
-from proteinggnnmetrics.paths import DATA_HOME, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, Sequence
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import make_dir
+from proteinmetrics.loaders import list_pdb_files, load_descriptor, load_graphs
+from proteinmetrics.paths import DATA_HOME, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates, Sequence
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import make_dir
 
 N_JOBS = 10
 N_SAMPLES = 100

@@ -74,9 +74,9 @@ class MaximumMeanDiscrepancy:
             )
 
         if len(args) <= 2:
-            K_XX = self.kernel.compute_gram_matrix(Xt)
-            K_YY = self.kernel.compute_gram_matrix(Yt)
-            K_XY = self.kernel.compute_gram_matrix(Xt, Yt)
+            K_XX = self.kernel.compute_matrix(Xt)
+            K_YY = self.kernel.compute_matrix(Yt)
+            K_XY = self.kernel.compute_matrix(Xt, Yt)
 
         # Following the notation of the paper
         m = K_XX.shape[0]

@@ -17,7 +17,7 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.plots import (
+from proteinmetrics.utils.plots import (
     setup_annotations,
     setup_plotting_parameters,
 )

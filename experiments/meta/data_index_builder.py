@@ -15,9 +15,9 @@ import pandas as pd
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.utils.functions import make_dir
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.utils.functions import make_dir
 
 
 @hydra.main(

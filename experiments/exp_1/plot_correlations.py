@@ -19,7 +19,7 @@ import seaborn as sns
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.functions import flatten_lists
+from proteinmetrics.utils.functions import flatten_lists
 
 plt.rcParams["figure.figsize"] = (6.4, 4.8)
 plt.rcParams["savefig.dpi"] = 1200

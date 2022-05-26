@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "proteinmetrics"
+name = "msc_thesis"
 version = "0.1.0"
 description = "This is the virtual environment used for my MSc thesis"
 authors = ["Philip Hartout <philip.hartout@protonmail.com>"]
@@ -41,7 +41,7 @@ Brotli = "^1.0.9"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
-proteinggnnmetrics = { path = "./src/", develop = true }
+proteinmetrics = { path = "./src/", develop = true }
 snakeviz = "^2.1.1"
 
 [build-system]

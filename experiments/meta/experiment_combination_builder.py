@@ -17,7 +17,7 @@ import pandas as pd
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.utils.functions import make_dir
+from proteinmetrics.utils.functions import make_dir
 
 # Constants
 point_cloud_perturbations = ["shear", "taper", "twist", "gaussian"]

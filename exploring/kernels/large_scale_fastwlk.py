@@ -15,12 +15,12 @@ from fastwlk.kernel import WeisfeilerLehmanKernel
 from grakel.graph_kernels import WeisfeilerLehman
 from gtda import pipeline
 
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import networkx2grakel, positive_eig
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.loaders import list_pdb_files, load_graphs
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import networkx2grakel, positive_eig
 
 N_JOBS = 10
 

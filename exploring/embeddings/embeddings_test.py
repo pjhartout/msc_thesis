@@ -13,15 +13,15 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import ESM
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, Sequence
-from proteinggnnmetrics.perturbations import GaussianNoise, Shear, Taper, Twist
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.descriptors import ESM
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates, Sequence
+from proteinmetrics.perturbations import GaussianNoise, Shear, Taper, Twist
+from proteinmetrics.utils.debug import measure_memory, timeit
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf")
