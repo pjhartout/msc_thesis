@@ -399,8 +399,8 @@ def mutation_perturbation_wl_pc(
             f"gaussian_{mutation}",
             Mutation(
                 p_mutate=mutation,
-                random_state=hash(
-                    str(perturbed)
+                random_state=np.random.RandomState(
+                    divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
@@ -416,7 +416,7 @@ def mutation_perturbation_wl_pc(
             n_iter,
         )
         mmd_pack = {"perturb": mutation, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with gaussian noise {mutation}.")
+        log.info(f"Computed the MMD with mutation {mutation}.")
         return mmd_pack
 
     mmds = distribute_function(
@@ -428,7 +428,7 @@ def mutation_perturbation_wl_pc(
         ),
         n_jobs=cfg.compute.n_parallel_perturb,
         show_tqdm=cfg.debug.verbose,
-        tqdm_label="gaussian noise experiment",
+        tqdm_label="mutation experiment",
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
@@ -590,6 +590,32 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     )
     make_dir(target_dir)
     gauss_mmds.to_csv(target_dir / f"gauss_mmds_n_iters_{n_iter}.csv")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+    log.info("Compute mutation")
+    mutation_mmds = mutation_perturbation_wl_pc(
+        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    )
+    gauss_mmds = (
+        pd.DataFrame(mutation_mmds)
+        .explode(column="mmd")
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / "mutation"
+    )
+    make_dir(target_dir)
+    mutation_mmds.to_csv(target_dir / f"mutation_mmds_n_iters_{n_iter}.csv")
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     log.info(f"WROTE FILE in {target_dir}")
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

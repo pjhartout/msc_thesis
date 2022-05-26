@@ -188,7 +188,9 @@ def graph_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=n_iter,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -216,8 +218,8 @@ def remove_edge_perturbation_wl_graphs(
             RemoveEdges(
                 p_remove=p_perturb,
                 graph_type=graph_type,
-                random_state=hash(
-                    str(perturbed)
+                random_state=np.random.RandomState(
+                    divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
@@ -297,8 +299,8 @@ def add_edge_perturbation_wl_graphs(
             AddEdges(
                 p_add=p_perturb,
                 graph_type=graph_type,
-                random_state=hash(
-                    str(perturbed)
+                random_state=np.random.RandomState(
+                    divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
@@ -380,8 +382,8 @@ def rewire_edge_perturbation_wl_graphs(
             RewireEdges(
                 p_rewire=p_perturb,
                 graph_type=graph_type,
-                random_state=hash(
-                    str(perturbed)
+                random_state=np.random.RandomState(
+                    divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
@@ -442,8 +444,11 @@ def rewire_edge_perturbation_wl_graphs(
     return mmds
 
 
-def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
+def weisfeiler_lehman_experiment_graph_perturbation(
+    cfg: DictConfig,
+    graph_type: str,
+    graph_extraction_param: int,
+    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -537,14 +542,14 @@ def main(cfg: DictConfig):
     # outside for loops for n_iters and k.
     for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
         for k in cfg.meta.representations[1]["knn_graph"]:
-            weisfeiler_lehman_experiment_pc_perturbation(
+            weisfeiler_lehman_experiment_graph_perturbation(
                 cfg=cfg,
                 graph_type="knn_graph",
                 graph_extraction_param=k,
                 n_iter=n_iters,
             )
         for eps in cfg.meta.representations[1]["eps_graph"]:
-            weisfeiler_lehman_experiment_pc_perturbation(
+            weisfeiler_lehman_experiment_graph_perturbation(
                 cfg=cfg,
                 graph_type="eps_graph",
                 graph_extraction_param=eps,
