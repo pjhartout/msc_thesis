@@ -598,7 +598,7 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     mutation_mmds = mutation_perturbation_wl_pc(
         cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
     )
-    gauss_mmds = (
+    mutation_mmds = (
         pd.DataFrame(mutation_mmds)
         .explode(column="mmd")
         .reset_index()
