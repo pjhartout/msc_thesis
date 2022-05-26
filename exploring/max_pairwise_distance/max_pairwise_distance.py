@@ -31,7 +31,6 @@ log = logging.getLogger(__name__)
 
 def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
-    pdb_files = pdb_files[:10]
     base_feature_steps = [
         (
             "coordinates",
