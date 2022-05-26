@@ -21,6 +21,7 @@ import os
 import random
 from enum import unique
 from pathlib import Path
+from re import A
 from tkinter import E
 from typing import Any, Dict, List, Tuple, Union
 
@@ -187,7 +188,9 @@ def pc_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=n_iter,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -270,7 +273,7 @@ def shear_perturbation_wl_pc(
             n_iter,
         )
         mmd_pack = {"perturb": shear, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with twist {shear}.")
+        log.info(f"Computed the MMD with shearing {shear}.")
         return mmd_pack
 
     mmds = distribute_function(
@@ -289,8 +292,107 @@ def shear_perturbation_wl_pc(
     return mmds
 
 
+def taper_perturbation_wl_pc(
+    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+):
+    log.info("Perturbing proteins with taper.")
+
+    def twist_perturbation_worker(taper, perturbed, unperturbed):
+        log.info(f"taper set to {taper}.")
+        perturbation = (
+            f"taper_{taper}",
+            Taper(
+                a=taper,
+                b=taper,
+                random_state=hash(
+                    str(perturbed)
+                ),  # The seed is the same as long as the paths is the same.
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        )
+        mmd_runs = pc_perturbation_worker(
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
+            graph_type,
+            n_iter,
+        )
+        mmd_pack = {"perturb": taper, "mmd": mmd_runs}
+        log.info(f"Computed the MMD with tapering {taper}.")
+        return mmd_pack
+
+    mmds = distribute_function(
+        func=twist_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.taper.min,
+            cfg.perturbations.taper.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_perturb,
+        show_tqdm=cfg.debug.verbose,
+        tqdm_label="tapering experiment",
+        perturbed=perturbed,
+        unperturbed=unperturbed,
+    )
+    return mmds
+
+
+def gaussian_perturbation_wl_pc(
+    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+):
+    log.info("Perturbing proteins with gaussian.")
+
+    def twist_perturbation_worker(gaussian, perturbed, unperturbed):
+        log.info(f"gaussian set to {gaussian}.")
+        perturbation = (
+            f"gaussian_{gaussian}",
+            GaussianNoise(
+                noise_mean=0,
+                noise_variance=gaussian,
+                random_state=hash(
+                    str(perturbed)
+                ),  # The seed is the same as long as the paths is the same.
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        )
+        mmd_runs = pc_perturbation_worker(
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
+            graph_type,
+            n_iter,
+        )
+        mmd_pack = {"perturb": gaussian, "mmd": mmd_runs}
+        log.info(f"Computed the MMD with gaussian noise {gaussian}.")
+        return mmd_pack
+
+    mmds = distribute_function(
+        func=twist_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.gaussian.min,
+            cfg.perturbations.gaussian.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_perturb,
+        show_tqdm=cfg.debug.verbose,
+        tqdm_label="gaussian noise experiment",
+        perturbed=perturbed,
+        unperturbed=unperturbed,
+    )
+    return mmds
+
+
 def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
+    cfg: DictConfig,
+    graph_type: str,
+    graph_extraction_param: int,
+    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -363,10 +465,9 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     )
     make_dir(target_dir)
     twist_mmds.to_csv(target_dir / f"twist_mmds_n_iters_{n_iter}.csv")
-
-    log.info(
-        f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
-    )
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info("Compute shear")
     shear_mmds = shear_perturbation_wl_pc(
@@ -390,18 +491,81 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     )
     make_dir(target_dir)
     shear_mmds.to_csv(target_dir / f"shear_mmds_n_iters_{n_iter}.csv")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+    log.info("Compute taper")
+    taper_mmds = taper_perturbation_wl_pc(
+        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    )
+    taper_mmds = (
+        pd.DataFrame(taper_mmds)
+        .explode(column="mmd")
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / "taper"
+    )
+    make_dir(target_dir)
+    taper_mmds.to_csv(target_dir / f"taper_mmds_n_iters_{n_iter}.csv")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+    log.info("Compute gaussian noise")
+    gauss_mmds = gaussian_perturbation_wl_pc(
+        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    )
+    gauss_mmds = (
+        pd.DataFrame(gauss_mmds)
+        .explode(column="mmd")
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / "gauss"
+    )
+    make_dir(target_dir)
+    gauss_mmds.to_csv(target_dir / f"gauss_mmds_n_iters_{n_iter}.csv")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info(
         f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
     )
 
 
-@hydra.main(config_path=str(here()) + "/conf/", config_name="systematic")
+@hydra.main(
+    version_base=None,
+    config_path=str(here()) + "/conf/",
+    config_name="systematic",
+)
 def main(cfg: DictConfig):
     log.info("Starting graph_experiments.py")
     log.info("Running with config:")
     log.info(OmegaConf.to_yaml(cfg))
 
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info("DATA_DIR")
+    log.info(DATA_HOME)
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
     for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
