@@ -16,7 +16,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from proteinggnnmetrics.utils.functions import chunks, flatten_lists
+from proteinmetrics.utils.functions import chunks, flatten_lists
 
 
 def get_hash(G):

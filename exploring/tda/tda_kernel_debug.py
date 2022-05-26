@@ -24,27 +24,20 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import (
-    LaplacianSpectrum,
-    TopologicalDescriptor,
-)
-from proteinggnnmetrics.distance import (
+from proteinmetrics.descriptors import LaplacianSpectrum, TopologicalDescriptor
+from proteinmetrics.distance import (
     MaximumMeanDiscrepancy,
     PearsonCorrelation,
     SpearmanCorrelation,
 )
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import LinearKernel, PersistenceFisherKernel
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import GaussianNoise, Twist
-from proteinggnnmetrics.utils.debug import SamplePoints, measure_memory, timeit
-from proteinggnnmetrics.utils.functions import (
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinmetrics.loaders import list_pdb_files, load_descriptor, load_graphs
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.perturbations import GaussianNoise, Twist
+from proteinmetrics.utils.debug import SamplePoints, measure_memory, timeit
+from proteinmetrics.utils.functions import (
     flatten_lists,
     remove_fragments,
     tqdm_joblib,

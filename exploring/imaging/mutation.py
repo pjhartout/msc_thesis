@@ -14,18 +14,18 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.perturbations import (
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.perturbations import (
     GaussianNoise,
     Mutation,
     Shear,
     Taper,
     Twist,
 )
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.debug import measure_memory, timeit
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")

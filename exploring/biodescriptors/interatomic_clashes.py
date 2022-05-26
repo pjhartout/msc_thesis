@@ -7,12 +7,12 @@ Test out the calculations the number of interatomic clashes for each protein.
 
 """
 
-from proteinggnnmetrics.descriptors import InteratomicClash
-from proteinggnnmetrics.graphs import ContactMap
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.functions import configure
+from proteinmetrics.descriptors import InteratomicClash
+from proteinmetrics.graphs import ContactMap
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.functions import configure
 
 config = configure()
 

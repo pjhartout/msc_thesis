@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from proteinggnnmetrics.descriptors import DistanceHistogram
-from proteinggnnmetrics.graphs import ContactMap
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
+from proteinmetrics.descriptors import DistanceHistogram
+from proteinmetrics.graphs import ContactMap
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
 
 N_JOBS = 4
 REDUCE_DATA = True

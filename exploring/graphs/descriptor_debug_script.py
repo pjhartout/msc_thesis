@@ -18,22 +18,18 @@ from omegaconf import DictConfig
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import (
+from proteinmetrics.descriptors import (
     ClusteringHistogram,
     DegreeHistogram,
     LaplacianSpectrum,
 )
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
-from proteinggnnmetrics.paths import HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.functions import remove_fragments
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_descriptor, load_graphs
+from proteinmetrics.paths import HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.functions import remove_fragments
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="conf")

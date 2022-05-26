@@ -1,4 +1,4 @@
-name: proteinggnnmetrics
+name: proteinmetrics
 
 channels:
   - conda-forge

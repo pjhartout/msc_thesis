@@ -22,16 +22,12 @@ from sklearn.metrics.pairwise import linear_kernel
 from tqdm import tqdm
 from typing_extensions import runtime
 
-from proteinggnnmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
-from proteinggnnmetrics.loaders import (
-    load_descriptor,
-    load_graphs,
-    load_proteins,
-)
-from proteinggnnmetrics.paths import CACHE_DIR
-from proteinggnnmetrics.protein import Protein
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import (
+from proteinmetrics.kernels import LinearKernel, WeisfeilerLehmanKernel
+from proteinmetrics.loaders import load_descriptor, load_graphs, load_proteins
+from proteinmetrics.paths import CACHE_DIR
+from proteinmetrics.protein import Protein
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
     networkx2grakel,

@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     # mandatory
-    name="proteinggnnmetrics",
+    name="proteinmetrics",
     # mandatory
     version="0.1",
     # mandatory

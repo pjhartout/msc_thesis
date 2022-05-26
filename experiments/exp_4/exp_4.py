@@ -23,15 +23,15 @@ from pyprojroot import here
 from torch import embedding
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import ESM
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, Sequence
-from proteinggnnmetrics.perturbations import Mutation
-from proteinggnnmetrics.utils.functions import flatten_lists, remove_fragments
+from proteinmetrics.descriptors import ESM
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_graphs
+from proteinmetrics.paths import ECOLI_PROTEOME, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates, Sequence
+from proteinmetrics.perturbations import Mutation
+from proteinmetrics.utils.functions import flatten_lists, remove_fragments
 
 log = logging.getLogger(__name__)
 

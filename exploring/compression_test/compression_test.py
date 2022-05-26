@@ -16,8 +16,8 @@ import pickle
 
 import brotli
 
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import load_obj
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import load_obj
 
 
 @timeit

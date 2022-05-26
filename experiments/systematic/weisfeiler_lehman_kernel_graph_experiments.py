@@ -33,7 +33,7 @@ from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import (
+from proteinmetrics.descriptors import (
     ESM,
     ClusteringHistogram,
     DegreeHistogram,
@@ -42,13 +42,13 @@ from proteinggnnmetrics.descriptors import (
     RamachandranAngles,
     TopologicalDescriptor,
 )
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.kernels import LinearKernel
-from proteinggnnmetrics.loaders import list_pdb_files, load_graphs
-from proteinggnnmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates, Sequence
-from proteinggnnmetrics.perturbations import (
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
+from proteinmetrics.kernels import LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_graphs
+from proteinmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates, Sequence
+from proteinmetrics.perturbations import (
     AddConnectedNodes,
     AddEdges,
     GaussianNoise,
@@ -60,8 +60,8 @@ from proteinggnnmetrics.perturbations import (
     Taper,
     Twist,
 )
-from proteinggnnmetrics.protein import Protein
-from proteinggnnmetrics.utils.functions import (
+from proteinmetrics.protein import Protein
+from proteinmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
     make_dir,
@@ -139,6 +139,64 @@ def filter_protein_using_name(protein, protein_names):
     return [protein for protein in protein if protein.name in protein_names]
 
 
+def pc_perturbation_worker(
+    cfg,
+    experiment_steps,
+    perturbation,
+    unperturbed,
+    perturbed,
+    graph_type,
+    n_iter,
+):
+    experiment_steps_perturbed = experiment_steps[1:]
+    experiment_steps_perturbed.insert(0, perturbation)
+    perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
+        perturbed
+    )
+    log.info("Computed the representations.")
+
+    log.info("Extracting graphs")
+
+    perturbed_protein_names = idx2name2run(cfg, perturbed=True)
+    unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
+
+    mmd_runs = []
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
+
+        unperturbed_graphs = load_graphs(
+            unperturbed_run, graph_type=graph_type
+        )
+        perturbed_graphs = load_graphs(perturbed_run, graph_type=graph_type)
+
+        if cfg.debug.reduce_data:
+            unperturbed_graphs = unperturbed_graphs[
+                : cfg.debug.sample_data_size
+            ]
+            perturbed_graphs = perturbed_graphs[: cfg.debug.sample_data_size]
+
+        log.info("Computing the kernel.")
+
+        mmd = MaximumMeanDiscrepancy(
+            biased=True,
+            squared=True,
+            kernel=WeisfeilerLehmanKernel(
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=n_iter,
+                normalize=True,
+                biased=True,
+            ),  # type: ignore
+        ).compute(unperturbed_graphs, perturbed_graphs)
+        mmd_runs.append(mmd)
+    return mmd_runs
+
+
 def twist_perturbation_wl_pc(
     cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
 ):
@@ -157,57 +215,16 @@ def twist_perturbation_wl_pc(
                 verbose=cfg.debug.verbose,
             ),
         )
-        experiment_steps_perturbed = experiment_steps[1:]
-        experiment_steps_perturbed.insert(0, perturbation)
-        perturbed = pipeline.Pipeline(
-            experiment_steps_perturbed
-        ).fit_transform(perturbed)
-        log.info("Computed the representations.")
-
-        log.info("Extracting graphs")
-
-        perturbed_protein_names = idx2name2run(cfg, perturbed=True)
-        unperturbed_protein_names = idx2name2run(cfg, perturbed=True)
-
-        mmd_runs = []
-        for run in range(2):
-            log.info(f"Run {run}")
-            unperturbed_run = filter_protein_using_name(
-                unperturbed, unperturbed_protein_names[run].tolist()
-            )
-            perturbed_run = filter_protein_using_name(
-                perturbed, perturbed_protein_names[run].tolist()
-            )
-
-            unperturbed_graphs = load_graphs(
-                unperturbed_run, graph_type=graph_type
-            )
-            perturbed_graphs = load_graphs(
-                perturbed_run, graph_type=graph_type
-            )
-
-            if cfg.debug.reduce_data:
-                unperturbed_graphs = unperturbed_graphs[
-                    : cfg.debug.sample_data_size
-                ]
-                perturbed_graphs = perturbed_graphs[
-                    : cfg.debug.sample_data_size
-                ]
-
-            log.info("Computing the kernel.")
-
-            mmd = MaximumMeanDiscrepancy(
-                biased=True,
-                squared=True,
-                kernel=WeisfeilerLehmanKernel(
-                    n_jobs=cfg.compute.n_jobs,
-                    n_iter=n_iter,
-                    normalize=True,
-                    biased=True,
-                ),  # type: ignore
-            ).compute(unperturbed_graphs, perturbed_graphs)
-            mmd_runs.append(mmd)
-        mmd_pack = {"alpha": alpha, "mmd": mmd_runs}
+        mmd_runs = pc_perturbation_worker(
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
+            graph_type,
+            n_iter,
+        )
+        mmd_pack = {"perturb": alpha, "mmd": mmd_runs}
         log.info(f"Computed the MMD with twist {alpha}.")
         return mmd_pack
 
@@ -218,9 +235,57 @@ def twist_perturbation_wl_pc(
             cfg.perturbations.twist.max,
             cfg.perturbations.n_perturbations,
         ),
-        n_jobs=cfg.compute.n_parallel_runs,
+        n_jobs=cfg.compute.n_parallel_perturb,
         show_tqdm=cfg.debug.verbose,
         tqdm_label="Twisting experiment",
+        perturbed=perturbed,
+        unperturbed=unperturbed,
+    )
+    return mmds
+
+
+def shear_perturbation_wl_pc(
+    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+):
+    log.info("Perturbing proteins with shear.")
+
+    def twist_perturbation_worker(shear, perturbed, unperturbed):
+        log.info(f"Shear set to {shear}.")
+        perturbation = (
+            f"shear_{shear}",
+            Shear(
+                shear_x=shear,
+                shear_y=shear,
+                random_state=hash(
+                    str(perturbed)
+                ),  # The seed is the same as long as the paths is the same.
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),
+        )
+        mmd_runs = pc_perturbation_worker(
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
+            graph_type,
+            n_iter,
+        )
+        mmd_pack = {"perturb": shear, "mmd": mmd_runs}
+        log.info(f"Computed the MMD with twist {shear}.")
+        return mmd_pack
+
+    mmds = distribute_function(
+        func=twist_perturbation_worker,
+        X=np.linspace(
+            cfg.perturbations.shear.min,
+            cfg.perturbations.shear.max,
+            cfg.perturbations.n_perturbations,
+        ),
+        n_jobs=cfg.compute.n_parallel_perturb,
+        show_tqdm=cfg.debug.verbose,
+        tqdm_label="Shearing experiment",
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
@@ -287,10 +352,9 @@ def weisfeiler_lehman_experiment_pc_perturbation(
         pd.DataFrame(twist_mmds)
         .explode(column="mmd")
         .reset_index()
-        .set_index(["index", "alpha"])
+        .set_index(["index", "perturb"])
         .rename_axis(index={"index": "run"})
     )
-
     target_dir = (
         DATA_HOME
         / cfg.paths.systematic
@@ -302,6 +366,33 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     )
     make_dir(target_dir)
     twist_mmds.to_csv(target_dir / f"twist_mmds_n_iters_{n_iter}.csv")
+
+    log.info(
+        f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
+    )
+
+    log.info("Compute shear")
+    shear_mmds = shear_perturbation_wl_pc(
+        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    )
+    shear_mmds = (
+        pd.DataFrame(shear_mmds)
+        .explode(column="mmd")
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / "shear"
+    )
+    make_dir(target_dir)
+    shear_mmds.to_csv(target_dir / f"shear_mmds_n_iters_{n_iter}.csv")
 
     log.info(
         f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"

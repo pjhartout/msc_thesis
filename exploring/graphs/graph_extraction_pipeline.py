@@ -12,17 +12,17 @@ import random
 
 from tqdm import tqdm
 
-from proteinggnnmetrics.descriptors import (
+from proteinmetrics.descriptors import (
     ClusteringHistogram,
     DegreeHistogram,
     LaplacianSpectrum,
     TopologicalDescriptor,
 )
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinggnnmetrics.loaders import list_pdb_files
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
+from proteinmetrics.loaders import list_pdb_files
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.debug import measure_memory, timeit
 
 random.seed(42)
 

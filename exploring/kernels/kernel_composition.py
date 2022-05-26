@@ -18,23 +18,15 @@ from gtda import pipeline
 from omegaconf import DictConfig
 from pyprojroot import here
 
-from proteinggnnmetrics.descriptors import (
-    ESM,
-    DegreeHistogram,
-    RamachandranAngles,
-)
-from proteinggnnmetrics.distance import MaximumMeanDiscrepancy
-from proteinggnnmetrics.graphs import ContactMap, EpsilonGraph
-from proteinggnnmetrics.kernels import KernelComposition, LinearKernel
-from proteinggnnmetrics.loaders import (
-    list_pdb_files,
-    load_descriptor,
-    load_graphs,
-)
-from proteinggnnmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
-from proteinggnnmetrics.pdb import Coordinates
-from proteinggnnmetrics.utils.debug import measure_memory, timeit
-from proteinggnnmetrics.utils.functions import networkx2grakel, positive_eig
+from proteinmetrics.descriptors import ESM, DegreeHistogram, RamachandranAngles
+from proteinmetrics.distance import MaximumMeanDiscrepancy
+from proteinmetrics.graphs import ContactMap, EpsilonGraph
+from proteinmetrics.kernels import KernelComposition, LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_descriptor, load_graphs
+from proteinmetrics.paths import CACHE_DIR, HUMAN_PROTEOME
+from proteinmetrics.pdb import Coordinates
+from proteinmetrics.utils.debug import measure_memory, timeit
+from proteinmetrics.utils.functions import networkx2grakel, positive_eig
 
 
 @hydra.main(config_path=str(here()) + "/conf/", config_name="config.yaml")
