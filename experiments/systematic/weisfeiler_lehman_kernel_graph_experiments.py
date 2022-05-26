@@ -184,13 +184,10 @@ def pc_perturbation_worker(
         log.info("Computing the kernel.")
 
         mmd = MaximumMeanDiscrepancy(
-            biased=True,
+            biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
-                biased=True,
+                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
