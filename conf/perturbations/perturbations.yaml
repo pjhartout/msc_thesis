@@ -1,4 +1,4 @@
-n_perturbations: 20
+n_perturbations: 3
 
 twist:
   min: 0

@@ -1,3 +1,3 @@
 verbose: True
-reduce_data: False
+reduce_data: True
 sample_data_size: 5
