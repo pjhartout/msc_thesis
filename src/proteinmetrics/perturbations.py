@@ -64,16 +64,14 @@ class Perturbation(metaclass=ABCMeta):
 class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
-    def __init__(
-        self, noise_mean: float, noise_variance: float, **kwargs,
-    ) -> None:
+    def __init__(self, noise_mean: float, noise_std: float, **kwargs,) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean
-        self.noise_variance = noise_variance
+        self.noise_std = noise_std
 
     def add_noise_to_protein(self, protein: Protein) -> Protein:
         noise = np.random.normal(
-            loc=0, scale=self.noise_variance, size=len(protein.coordinates) * 3
+            loc=0, scale=self.noise_std, size=len(protein.coordinates) * 3
         ).reshape(len(protein.coordinates), 3)
         protein.coordinates = protein.coordinates + noise
         return protein

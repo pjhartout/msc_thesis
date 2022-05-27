@@ -188,9 +188,7 @@ def pc_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
+                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -351,7 +349,7 @@ def gaussian_perturbation_wl_pc(
             f"gaussian_{gaussian}",
             GaussianNoise(
                 noise_mean=0,
-                noise_variance=gaussian,
+                noise_std=gaussian,
                 random_state=hash(
                     str(perturbed)
                 ),  # The seed is the same as long as the paths is the same.
@@ -436,10 +434,7 @@ def mutation_perturbation_wl_pc(
 
 
 def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig,
-    graph_type: str,
-    graph_extraction_param: int,
-    n_iter: int,
+    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
 ):
     base_feature_steps = [
         (

@@ -101,7 +101,7 @@ def execute_run(cfg, run):
                             GaussianNoise(
                                 random_seed=run,
                                 noise_mean=0,
-                                noise_variance=std,
+                                noise_std=std,
                                 n_jobs=cfg.compute.n_jobs,
                                 verbose=False,
                             ),

@@ -21,6 +21,7 @@ import numpy as np
 import torch
 from Bio.PDB import PDBParser, PPBuilder, vectors
 from gtda import curves, diagrams, homology, pipeline
+from matplotlib.pyplot import hist
 from tqdm import tqdm
 
 from proteinmetrics.loaders import load_descriptor
@@ -62,10 +63,18 @@ class Descriptor(metaclass=ABCMeta):
 
 class DegreeHistogram(Descriptor):
     def __init__(
-        self, graph_type: str, n_bins: int, n_jobs: int, verbose: bool = False
+        self,
+        graph_type: str,
+        n_bins: int,
+        bin_range: Tuple[float, float],
+        n_jobs: int,
+        density: bool = True,
+        verbose: bool = False,
     ):
         self.n_bins = n_bins
+        self.bin_range = bin_range
         self.graph_type = graph_type
+        self.density = density
         self.n_jobs = n_jobs
         self.verbose = verbose
 
@@ -79,14 +88,17 @@ class DegreeHistogram(Descriptor):
         def calculate_degree_histogram(protein: Protein, normalize=True):
             G = protein.graphs[self.graph_type]
             degrees = np.array([val for (node, val) in G.degree()])  # type: ignore
-            histogram = np.bincount(degrees, minlength=self.n_bins + 1)
+            hist, _ = np.histogram(
+                degrees,
+                bins=self.n_bins,
+                range=self.bin_range,
+                density=self.density,
+            )
 
             if normalize:
-                histogram = histogram / np.sum(histogram)
+                hist = hist / np.sum(hist)
 
-            protein.descriptors[self.graph_type][
-                "degree_histogram"
-            ] = histogram
+            protein.descriptors[self.graph_type]["degree_histogram"] = hist
 
             return protein
 

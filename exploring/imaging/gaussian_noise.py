@@ -34,7 +34,7 @@ def main(cfg: DictConfig):
                 "gaussian noise",
                 GaussianNoise(
                     noise_mean=0,
-                    noise_variance=i,
+                    noise_std=i,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=False,
                     random_state=42,
