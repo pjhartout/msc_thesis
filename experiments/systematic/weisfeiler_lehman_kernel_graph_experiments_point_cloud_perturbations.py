@@ -188,7 +188,9 @@ def pc_perturbation_worker(
             biased=False,
             squared=True,
             kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs, n_iter=n_iter, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                n_iter=n_iter,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -434,7 +436,10 @@ def mutation_perturbation_wl_pc(
 
 
 def weisfeiler_lehman_experiment_pc_perturbation(
-    cfg: DictConfig, graph_type: str, graph_extraction_param: int, n_iter: int,
+    cfg: DictConfig,
+    graph_type: str,
+    graph_extraction_param: int,
+    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -637,18 +642,18 @@ def main(cfg: DictConfig):
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
     for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+        for eps in cfg.meta.representations[0]["eps_graph"]:
+            weisfeiler_lehman_experiment_pc_perturbation(
+                cfg=cfg,
+                graph_type="eps_graph",
+                graph_extraction_param=eps,
+                n_iter=n_iters,
+            )
         for k in cfg.meta.representations[1]["knn_graph"]:
             weisfeiler_lehman_experiment_pc_perturbation(
                 cfg=cfg,
                 graph_type="knn_graph",
                 graph_extraction_param=k,
-                n_iter=n_iters,
-            )
-        for eps in cfg.meta.representations[1]["eps_graph"]:
-            weisfeiler_lehman_experiment_pc_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
                 n_iter=n_iters,
             )
 

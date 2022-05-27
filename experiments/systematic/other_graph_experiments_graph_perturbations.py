@@ -113,7 +113,12 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def graph_perturbation_worker(
-    cfg, experiment_steps, perturbation, unperturbed, perturbed, graph_type,
+    cfg,
+    experiment_steps,
+    perturbation,
+    unperturbed,
+    perturbed,
+    graph_type,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.append(perturbation)
@@ -154,7 +159,8 @@ def graph_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_graphs, perturbed_graphs)
         mmd_runs.append(mmd)
@@ -255,7 +261,11 @@ def remove_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "removedge",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "removedge",
     )
 
 
@@ -314,7 +324,11 @@ def add_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "addedge",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "addedge",
     )
 
 
@@ -373,7 +387,11 @@ def rewire_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "rewireedge",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "rewireedge",
     )
 
 
@@ -520,18 +538,19 @@ def main(cfg: DictConfig):
         "laplacian_spectrum_histogram",
     ]
     for descriptor in descriptors:
+        for eps in cfg.meta.representations[0]["eps_graph"]:
+            linear_kernel_experiment_graph_perturbation(
+                cfg=cfg,
+                graph_type="eps_graph",
+                graph_extraction_param=eps,
+                descriptor=descriptor,
+            )
+
         for k in cfg.meta.representations[1]["knn_graph"]:
             linear_kernel_experiment_graph_perturbation(
                 cfg=cfg,
                 graph_type="knn_graph",
                 graph_extraction_param=k,
-                descriptor=descriptor,
-            )
-        for eps in cfg.meta.representations[1]["eps_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
                 descriptor=descriptor,
             )
 

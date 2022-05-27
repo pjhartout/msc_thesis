@@ -165,7 +165,8 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                normalize=True,
             ),  # type: ignore
         ).compute(unperturbed_descriptor, perturbed_descriptor)
         mmd_runs.append(mmd)
@@ -642,18 +643,18 @@ def main(cfg: DictConfig):
         "laplacian_spectrum_histogram",
     ]
     for descriptor in descriptors:
-        for k in cfg.meta.representations[1]["knn_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="knn_graph",
-                graph_extraction_param=k,
-                descriptor=descriptor,
-            )
-        for eps in cfg.meta.representations[1]["eps_graph"]:
+        for eps in cfg.meta.representations[0]["eps_graph"]:
             linear_kernel_experiment_graph_perturbation(
                 cfg=cfg,
                 graph_type="eps_graph",
                 graph_extraction_param=eps,
+                descriptor=descriptor,
+            )
+w        for k in cfg.meta.representations[1]["knn_graph"]:
+            linear_kernel_experiment_graph_perturbation(
+                cfg=cfg,
+                graph_type="knn_graph",
+                graph_extraction_param=k,
                 descriptor=descriptor,
             )
 

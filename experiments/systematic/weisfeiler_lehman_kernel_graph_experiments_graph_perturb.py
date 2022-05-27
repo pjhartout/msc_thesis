@@ -541,18 +541,18 @@ def main(cfg: DictConfig):
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
     for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+        for eps in cfg.meta.representations[0]["eps_graph"]:
+            weisfeiler_lehman_experiment_graph_perturbation(
+                cfg=cfg,
+                graph_type="eps_graph",
+                graph_extraction_param=eps,
+                n_iter=n_iters,
+            )
         for k in cfg.meta.representations[1]["knn_graph"]:
             weisfeiler_lehman_experiment_graph_perturbation(
                 cfg=cfg,
                 graph_type="knn_graph",
                 graph_extraction_param=k,
-                n_iter=n_iters,
-            )
-        for eps in cfg.meta.representations[1]["eps_graph"]:
-            weisfeiler_lehman_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
                 n_iter=n_iters,
             )
 
