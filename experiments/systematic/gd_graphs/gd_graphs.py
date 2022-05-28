@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""other_graph_experiments.py
+"""gd_graphs.py
 
 """
 
@@ -446,7 +446,7 @@ def linear_kernel_experiment_graph_perturbation(
                 "degree_histogram",
                 DegreeHistogram(
                     graph_type=graph_type,
-                    n_bins=cfg.descriptors.degree_histogram.n_bins,
+                    n_bins=100,
                     bin_range=(1, 100),
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
@@ -459,7 +459,7 @@ def linear_kernel_experiment_graph_perturbation(
                 "clustering_histogram",
                 ClusteringHistogram(
                     graph_type=graph_type,
-                    n_bins=cfg.descriptors.degree_histogram.n_bins,
+                    n_bins=100,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
                 ),
@@ -471,7 +471,7 @@ def linear_kernel_experiment_graph_perturbation(
                 "laplacian_spectrum_histogram",
                 LaplacianSpectrum(
                     graph_type=graph_type,
-                    n_bins=cfg.descriptors.degree_histogram.n_bins,
+                    n_bins=100,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
                     bin_range=(0, 100),
@@ -530,29 +530,13 @@ def main(cfg: DictConfig):
     log.info("DATA_DIR")
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    # Start with Weisfeiler-Lehman-based-experiments.
-    # outside for loops for n_iters and k.
-    descriptors = [
-        "degree_histogram",
-        "clustering_histogram",
-        "laplacian_spectrum_histogram",
-    ]
-    for descriptor in descriptors:
-        for eps in cfg.meta.representations[0]["eps_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
-                descriptor=descriptor,
-            )
 
-        for k in cfg.meta.representations[1]["knn_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="knn_graph",
-                graph_extraction_param=k,
-                descriptor=descriptor,
-            )
+    linear_kernel_experiment_graph_perturbation(
+        cfg=cfg,
+        graph_type=cfg.graph_type,
+        graph_extraction_param=cfg.graph_extraction_param,
+        descriptor=cfg.descriptor,
+    )
 
 
 if __name__ == "__main__":

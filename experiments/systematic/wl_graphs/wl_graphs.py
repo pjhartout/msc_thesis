@@ -1,18 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""weisfeiler_lehman_kernel_graph_experiments_graph_perturb.py
+"""wl_graphs.py
 
-The idea is to deal with all graph experiments here.
-Steps:
-    1. Compute unperturbed set
-        1. Point cloud
-    2. Generate graphs
-        1.
-    3. Compute MMD
 
-Structure of output:
-/data/systematic/wl_experiments/
+Weisfeiler-Lehman kernel experiments on graphs
 
 """
 
@@ -518,6 +510,15 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         n_iter,
         graph_extraction_param,
     )
+    rewire_edge_perturbation_wl_graphs(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        n_iter,
+        graph_extraction_param,
+    )
 
     log.info(
         f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
@@ -540,21 +541,12 @@ def main(cfg: DictConfig):
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
-    for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
-        for eps in cfg.meta.representations[0]["eps_graph"]:
-            weisfeiler_lehman_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
-                n_iter=n_iters,
-            )
-        for k in cfg.meta.representations[1]["knn_graph"]:
-            weisfeiler_lehman_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="knn_graph",
-                graph_extraction_param=k,
-                n_iter=n_iters,
-            )
+    weisfeiler_lehman_experiment_graph_perturbation(
+        cfg=cfg,
+        graph_type=cfg.graph_type,
+        graph_extraction_param=cfg.graph_extraction_parameter,
+        n_iter=cfg.n_iter,
+    )
 
     # Epsilon experiments
     # KNN experiments

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""batch_job_generator.py
+"""wl_graphs_batch_job_generator.py
 
 This script generates the series of jobs that need to be run on the cluster
 
@@ -27,14 +27,14 @@ fi\n
 )
 def main(cfg):
     wl_pc = open(
-        here() / "experiments/systematic" / "wl_pc_job_array.sh",
+        here() / "experiments/systematic/wl_graphs" / "wl_graphs_job_array.sh",
         "w",
     )  # write mode
     wl_pc.write(f"#!/bin/bash \n")
     wl_pc.write(f"\n\n")
     wl_pc.write(f"cd /home/phartout/Documents/Git/msc_thesis/ \n")
     wl_pc.write(f"export PATH=/home/phartout/.anaconda3/bin:$PATH\n\n")
-    slurm_string = "srun --cpus-per-task 140 --mem-per-cpu 7G --exclude=bs-hpsvr08 poetry run python experiments/systematic/wl_pc.py"
+    slurm_string = "srun --cpus-per-task 140 --mem-per-cpu 7G --exclude=bs-hpsvr08 poetry run python experiments/systematic/wl_graphs/wl_graphs.py"
 
     for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
         for eps in cfg.meta.representations[0]["eps_graph"]:

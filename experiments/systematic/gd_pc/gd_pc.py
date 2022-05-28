@@ -634,29 +634,13 @@ def main(cfg: DictConfig):
     log.info("DATA_DIR")
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    # Start with Weisfeiler-Lehman-based-experiments.
-    # outside for loops for n_iters and k.
 
-    descriptors = [
-        "degree_histogram",
-        "clustering_histogram",
-        "laplacian_spectrum_histogram",
-    ]
-    for descriptor in descriptors:
-        for eps in cfg.meta.representations[0]["eps_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
-                descriptor=descriptor,
-            )
-w        for k in cfg.meta.representations[1]["knn_graph"]:
-            linear_kernel_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="knn_graph",
-                graph_extraction_param=k,
-                descriptor=descriptor,
-            )
+    linear_kernel_experiment_graph_perturbation(
+        cfg=cfg,
+        graph_type=cfg.graph_type,
+        graph_extraction_param=cfg.graph_extraction_param,
+        descriptor=cfg.descriptor,
+    )
 
 
 if __name__ == "__main__":
