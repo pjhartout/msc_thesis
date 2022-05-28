@@ -14,7 +14,6 @@ import random
 from enum import unique
 from pathlib import Path
 from re import A
-from tkinter import E
 from typing import Any, Dict, List, Tuple, Union
 
 import hydra
@@ -63,8 +62,6 @@ from proteinmetrics.utils.functions import (
 )
 
 log = logging.getLogger(__name__)
-
-N_JOBS = 4
 
 
 def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
@@ -139,7 +136,6 @@ def graph_perturbation_worker(
     unperturbed,
     perturbed,
     graph_type,
-    n_iter,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.append(perturbation)
@@ -154,7 +150,7 @@ def graph_perturbation_worker(
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
     mmd_runs_n_iter = dict()
-    for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+    for n_iter in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
         mmd_runs = []
         for run in range(cfg.meta.n_runs):
             log.info(f"Run {run}")
@@ -192,8 +188,39 @@ def graph_perturbation_worker(
                 ),  # type: ignore
             ).compute(unperturbed_graphs, perturbed_graphs)
             mmd_runs.append(mmd)
-        mmd_runs_n_iter[n_iter] = mmd_runs
+        mmd_runs_n_iter[f"n_iter=   {n_iter}"] = mmd_runs
     return mmd_runs_n_iter
+
+
+def save_mmd_experiment(
+    cfg,
+    mmds,
+    graph_type,
+    graph_extraction_param,
+    perturbation_type,
+):
+    mmds = (
+        pd.concat(mmds)
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / perturbation_type
+    )
+    make_dir(target_dir)
+
+    mmds.to_csv(target_dir / f"{perturbation_type}_mmds.csv")
+
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 
 def remove_edge_perturbation_wl_graphs(
@@ -202,7 +229,6 @@ def remove_edge_perturbation_wl_graphs(
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
     **kwargs,
 ):
@@ -231,13 +257,12 @@ def remove_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(
             f"Computed the MMD of removing edges with probability {p_perturb}."
         )
-        return mmd_pack
+        return mmd_df
 
     mmds = distribute_function(
         func=remove_edges_perturbation_worker,
@@ -254,27 +279,13 @@ def remove_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "remove_edges",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "remove_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"remove_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 
 def add_edge_perturbation_wl_graphs(
@@ -283,7 +294,6 @@ def add_edge_perturbation_wl_graphs(
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
     **kwargs,
 ):
@@ -312,13 +322,12 @@ def add_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(
             f"Computed the MMD of adding edges with probability {p_perturb}."
         )
-        return mmd_pack
+        return mmd_df
 
     mmds = distribute_function(
         func=add_edges_perturbation_worker,
@@ -335,29 +344,13 @@ def add_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "add_edges",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "add_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"add_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-    return mmds
 
 
 def rewire_edge_perturbation_wl_graphs(
@@ -366,7 +359,6 @@ def rewire_edge_perturbation_wl_graphs(
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
     **kwargs,
 ):
@@ -395,13 +387,12 @@ def rewire_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(
             f"Computed the MMD of adding edges with probability {p_perturb}."
         )
-        return mmd_pack
+        return mmd_df
 
     mmds = distribute_function(
         func=rewire_edges_perturbation_worker,
@@ -418,36 +409,19 @@ def rewire_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "rewire_edges",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "rewire_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"rewire_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-    return mmds
 
 
 def weisfeiler_lehman_experiment_graph_perturbation(
     cfg: DictConfig,
     graph_type: str,
     graph_extraction_param: int,
-    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -505,7 +479,6 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         unperturbed,
         base_feature_steps,
         graph_type,
-        n_iter,
         graph_extraction_param,
     )
     add_edge_perturbation_wl_graphs(
@@ -514,7 +487,6 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         unperturbed,
         base_feature_steps,
         graph_type,
-        n_iter,
         graph_extraction_param,
     )
     rewire_edge_perturbation_wl_graphs(
@@ -523,13 +495,10 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         unperturbed,
         base_feature_steps,
         graph_type,
-        n_iter,
         graph_extraction_param,
     )
 
-    log.info(
-        f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
-    )
+    log.info(f"Done with {graph_type} {graph_extraction_param}")
 
 
 @hydra.main(
@@ -551,12 +520,8 @@ def main(cfg: DictConfig):
     weisfeiler_lehman_experiment_graph_perturbation(
         cfg=cfg,
         graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_parameter,
-        n_iter=cfg.n_iter,
+        graph_extraction_param=cfg.graph_extraction_param,
     )
-
-    # Epsilon experiments
-    # KNN experiments
 
 
 if __name__ == "__main__":
