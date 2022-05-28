@@ -65,8 +65,6 @@ from proteinmetrics.utils.functions import (
 
 log = logging.getLogger(__name__)
 
-N_JOBS = 4
-
 
 def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
     """Loads unique unperturbed protein file names
