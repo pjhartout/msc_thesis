@@ -1,0 +1,11 @@
+degree_histogram:
+  n_bins: 1000
+  bin_range:
+    min: 0
+    max: 1000
+
+laplacian_spectrum:
+  n_bins: 100
+  bin_range:
+    min: 0
+    max: 2

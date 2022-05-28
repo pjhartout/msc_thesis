@@ -4,3 +4,4 @@ defaults:
   - seeding: seeding
   - debug: debug
   - meta: meta
+  - descriptors: descriptors
