@@ -188,7 +188,7 @@ def graph_perturbation_worker(
                 ),  # type: ignore
             ).compute(unperturbed_graphs, perturbed_graphs)
             mmd_runs.append(mmd)
-        mmd_runs_n_iter[f"n_iter=   {n_iter}"] = mmd_runs
+        mmd_runs_n_iter[f"n_iter={n_iter}"] = mmd_runs
     return mmd_runs_n_iter
 
 

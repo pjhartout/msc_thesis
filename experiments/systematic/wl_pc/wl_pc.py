@@ -153,8 +153,9 @@ def pc_perturbation_worker(
     perturbed_protein_names = idx2name2run(cfg, perturbed=True)
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
-    mmd_runs = []
+    mmd_runs_n_iter = dict()
     for n_iter in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+        mmd_runs = list()
         for run in range(cfg.meta.n_runs):
             log.info(f"Run {run}")
             unperturbed_run = filter_protein_using_name(
@@ -191,7 +192,9 @@ def pc_perturbation_worker(
                 ),  # type: ignore
             ).compute(unperturbed_graphs, perturbed_graphs)
             mmd_runs.append(mmd)
-    return mmd_runs
+        mmd_runs_n_iter[f"n_iter={n_iter}"] = mmd_runs
+
+    return mmd_runs_n_iter
 
 
 def save_mmd_experiment(
