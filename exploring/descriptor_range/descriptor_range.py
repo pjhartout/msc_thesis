@@ -14,7 +14,6 @@ import logging
 import os
 import pickle
 import sys
-from cgi import print_arguments
 
 import matplotlib.pyplot as plt
 import networkx as nx
