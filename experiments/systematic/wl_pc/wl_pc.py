@@ -141,6 +141,7 @@ def pc_perturbation_worker(
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
+    perturbed = perturbed.copy()
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
@@ -187,7 +188,9 @@ def pc_perturbation_worker(
                     n_jobs=cfg.compute.n_jobs,
                     n_iter=n_iter,
                     normalize=True,
+                    verbose=cfg.debug.verbose,
                 ),  # type: ignore
+                verbose=cfg.debug.verbose,
             ).compute(unperturbed_graphs, perturbed_graphs)
             mmd_runs.append(mmd)
         mmd_runs_n_iter[f"n_iter={n_iter}"] = mmd_runs
