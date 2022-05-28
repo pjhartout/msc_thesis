@@ -1,3 +1,2 @@
-n_jobs: 10
-n_parallel_perturb: 4
-n_parallel_runs: 2
+n_jobs: 14
+n_parallel_perturb: 10
