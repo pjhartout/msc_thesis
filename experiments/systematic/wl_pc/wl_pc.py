@@ -140,7 +140,6 @@ def pc_perturbation_worker(
     unperturbed,
     perturbed,
     graph_type,
-    n_iter,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
@@ -155,52 +154,94 @@ def pc_perturbation_worker(
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
     mmd_runs = []
-    for run in range(cfg.meta.n_runs):
-        log.info(f"Run {run}")
-        unperturbed_run = filter_protein_using_name(
-            unperturbed, unperturbed_protein_names[run].tolist()
-        )
-        perturbed_run = filter_protein_using_name(
-            perturbed, perturbed_protein_names[run].tolist()
-        )
+    for n_iter in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+        for run in range(cfg.meta.n_runs):
+            log.info(f"Run {run}")
+            unperturbed_run = filter_protein_using_name(
+                unperturbed, unperturbed_protein_names[run].tolist()
+            )
+            perturbed_run = filter_protein_using_name(
+                perturbed, perturbed_protein_names[run].tolist()
+            )
 
-        unperturbed_graphs = load_graphs(
-            unperturbed_run, graph_type=graph_type
-        )
-        perturbed_graphs = load_graphs(perturbed_run, graph_type=graph_type)
+            unperturbed_graphs = load_graphs(
+                unperturbed_run, graph_type=graph_type
+            )
+            perturbed_graphs = load_graphs(
+                perturbed_run, graph_type=graph_type
+            )
 
-        if cfg.debug.reduce_data:
-            unperturbed_graphs = unperturbed_graphs[
-                : cfg.debug.sample_data_size
-            ]
-            perturbed_graphs = perturbed_graphs[: cfg.debug.sample_data_size]
+            if cfg.debug.reduce_data:
+                unperturbed_graphs = unperturbed_graphs[
+                    : cfg.debug.sample_data_size
+                ]
+                perturbed_graphs = perturbed_graphs[
+                    : cfg.debug.sample_data_size
+                ]
 
-        log.info("Computing the kernel.")
+            log.info("Computing the kernel.")
 
-        mmd = MaximumMeanDiscrepancy(
-            biased=False,
-            squared=True,
-            kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
-            ),  # type: ignore
-        ).compute(unperturbed_graphs, perturbed_graphs)
-        mmd_runs.append(mmd)
+            mmd = MaximumMeanDiscrepancy(
+                biased=False,
+                squared=True,
+                kernel=WeisfeilerLehmanKernel(
+                    n_jobs=cfg.compute.n_jobs,
+                    n_iter=n_iter,
+                    normalize=True,
+                ),  # type: ignore
+            ).compute(unperturbed_graphs, perturbed_graphs)
+            mmd_runs.append(mmd)
     return mmd_runs
 
 
+def save_mmd_experiment(
+    cfg,
+    mmds,
+    graph_type,
+    graph_extraction_param,
+    perturbation_type,
+):
+    mmds = (
+        pd.concat(mmds)
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        DATA_HOME
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / perturbation_type
+    )
+    make_dir(target_dir)
+
+    mmds.to_csv(target_dir / f"{perturbation_type}_mmds.csv")
+
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+
 def twist_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    graph_type,
+    graph_extraction_param,
+    **kwargs,
 ):
     log.info("Perturbing proteins with twist.")
 
-    def twist_perturbation_worker(alpha, perturbed, unperturbed):
-        log.info(f"Twist rad/Å set to {alpha}.")
+    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+        log.info(f"Twist rad/Å set to {p_perturb}.")
         perturbation = (
-            f"twist_{alpha}",
+            f"twist_{p_perturb}",
             Twist(
-                alpha=alpha,
+                alpha=p_perturb,
                 random_state=hash(
                     str(perturbed)
                 ),  # The seed is the same as long as the paths is the same.
@@ -215,11 +256,10 @@ def twist_perturbation_wl_pc(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": alpha, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with twist {alpha}.")
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        log.info(f"Computed the MMD with twist {p_perturb}.")
+        return mmd_df
 
     mmds = distribute_function(
         func=twist_perturbation_worker,
@@ -234,21 +274,33 @@ def twist_perturbation_wl_pc(
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
-    return mmds
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        perturbation_type="twist",
+    )
 
 
 def shear_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    graph_type,
+    graph_extraction_param,
+    **kwargs,
 ):
     log.info("Perturbing proteins with shear.")
 
-    def twist_perturbation_worker(shear, perturbed, unperturbed):
-        log.info(f"Shear set to {shear}.")
+    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+        log.info(f"Shear set to {p_perturb}.")
         perturbation = (
-            f"shear_{shear}",
+            f"shear_{p_perturb}",
             Shear(
-                shear_x=shear,
-                shear_y=shear,
+                shear_x=p_perturb,
+                shear_y=p_perturb,
                 random_state=hash(
                     str(perturbed)
                 ),  # The seed is the same as long as the paths is the same.
@@ -263,11 +315,10 @@ def shear_perturbation_wl_pc(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": shear, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with shearing {shear}.")
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        log.info(f"Computed the MMD with shearing {p_perturb}.")
+        return mmd_df
 
     mmds = distribute_function(
         func=twist_perturbation_worker,
@@ -282,21 +333,33 @@ def shear_perturbation_wl_pc(
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
-    return mmds
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        perturbation_type="shear",
+    )
 
 
 def taper_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    graph_type,
+    graph_extraction_param,
+    **kwargs,
 ):
     log.info("Perturbing proteins with taper.")
 
-    def twist_perturbation_worker(taper, perturbed, unperturbed):
-        log.info(f"taper set to {taper}.")
+    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+        log.info(f"taper set to {p_perturb}.")
         perturbation = (
-            f"taper_{taper}",
+            f"taper_{p_perturb}",
             Taper(
-                a=taper,
-                b=taper,
+                a=p_perturb,
+                b=p_perturb,
                 random_state=hash(
                     str(perturbed)
                 ),  # The seed is the same as long as the paths is the same.
@@ -311,11 +374,10 @@ def taper_perturbation_wl_pc(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": taper, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with tapering {taper}.")
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        log.info(f"Computed the MMD with tapering {p_perturb}.")
+        return mmd_df
 
     mmds = distribute_function(
         func=twist_perturbation_worker,
@@ -330,21 +392,33 @@ def taper_perturbation_wl_pc(
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
-    return mmds
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        perturbation_type="taper",
+    )
 
 
 def gaussian_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    graph_type,
+    graph_extraction_param,
+    **kwargs,
 ):
     log.info("Perturbing proteins with gaussian.")
 
-    def twist_perturbation_worker(gaussian, perturbed, unperturbed):
-        log.info(f"gaussian set to {gaussian}.")
+    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+        log.info(f"gaussian set to {p_perturb}.")
         perturbation = (
-            f"gaussian_{gaussian}",
+            f"gaussian_{p_perturb}",
             GaussianNoise(
                 noise_mean=0,
-                noise_std=gaussian,
+                noise_std=p_perturb,
                 random_state=hash(
                     str(perturbed)
                 ),  # The seed is the same as long as the paths is the same.
@@ -359,11 +433,10 @@ def gaussian_perturbation_wl_pc(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": gaussian, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with gaussian noise {gaussian}.")
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        log.info(f"Computed the MMD with gaussian noise {p_perturb}.")
+        return mmd_df
 
     mmds = distribute_function(
         func=twist_perturbation_worker,
@@ -378,20 +451,32 @@ def gaussian_perturbation_wl_pc(
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
-    return mmds
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        perturbation_type="gaussian_noise",
+    )
 
 
 def mutation_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, graph_type, n_iter, **kwargs
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    graph_type,
+    graph_extraction_param,
+    **kwargs,
 ):
     log.info("Perturbing proteins with mutations.")
 
-    def mutation_perturbation_worker(mutation, perturbed, unperturbed):
-        log.info(f"gaussian set to {mutation}.")
+    def mutation_perturbation_worker(p_perturb, perturbed, unperturbed):
+        log.info(f"gaussian set to {p_perturb}.")
         perturbation = (
-            f"gaussian_{mutation}",
+            f"gaussian_{p_perturb}",
             Mutation(
-                p_mutate=mutation,
+                p_mutate=p_perturb,
                 random_state=np.random.RandomState(
                     divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
@@ -406,11 +491,10 @@ def mutation_perturbation_wl_pc(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
         )
-        mmd_pack = {"perturb": mutation, "mmd": mmd_runs}
-        log.info(f"Computed the MMD with mutation {mutation}.")
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        log.info(f"Computed the MMD with mutation {p_perturb}.")
+        return mmd_df
 
     mmds = distribute_function(
         func=mutation_perturbation_worker,
@@ -425,14 +509,19 @@ def mutation_perturbation_wl_pc(
         perturbed=perturbed,
         unperturbed=unperturbed,
     )
-    return mmds
+    save_mmd_experiment(
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        perturbation_type="mutation",
+    )
 
 
 def weisfeiler_lehman_experiment_pc_perturbation(
     cfg: DictConfig,
     graph_type: str,
     graph_extraction_param: int,
-    n_iter: int,
 ):
     base_feature_steps = [
         (
@@ -484,142 +573,53 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     )
 
     log.info("Compute twist")
-    twist_mmds = twist_perturbation_wl_pc(
-        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    twist_perturbation_wl_pc(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        graph_extraction_param,
     )
-    twist_mmds = (
-        pd.DataFrame(twist_mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
-    )
-    target_dir = (
-        here()
-        / cfg.paths.data
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "twist"
-    )
-    make_dir(target_dir)
-    twist_mmds.to_csv(target_dir / f"twist_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info("Compute shear")
-    shear_mmds = shear_perturbation_wl_pc(
-        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    shear_perturbation_wl_pc(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        graph_extraction_param,
     )
-    shear_mmds = (
-        pd.DataFrame(shear_mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
-    )
-    target_dir = (
-        here()
-        / cfg.paths.data
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "shear"
-    )
-    make_dir(target_dir)
-    shear_mmds.to_csv(target_dir / f"shear_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info("Compute taper")
-    taper_mmds = taper_perturbation_wl_pc(
-        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    taper_perturbation_wl_pc(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        graph_extraction_param,
     )
-    taper_mmds = (
-        pd.DataFrame(taper_mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
-    )
-    target_dir = (
-        here()
-        / cfg.paths.data
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "taper"
-    )
-    make_dir(target_dir)
-    taper_mmds.to_csv(target_dir / f"taper_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info("Compute gaussian noise")
-    gauss_mmds = gaussian_perturbation_wl_pc(
-        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
+    gaussian_perturbation_wl_pc(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        graph_extraction_param,
     )
-    gauss_mmds = (
-        pd.DataFrame(gauss_mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
-    )
-    target_dir = (
-        here()
-        / cfg.paths.data
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "gauss"
-    )
-    make_dir(target_dir)
-    gauss_mmds.to_csv(target_dir / f"gauss_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     log.info("Compute mutation")
-    mutation_mmds = mutation_perturbation_wl_pc(
-        cfg, perturbed, unperturbed, base_feature_steps, graph_type, n_iter
-    )
-    mutation_mmds = (
-        pd.DataFrame(mutation_mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
-    )
-    target_dir = (
-        here()
-        / cfg.paths.data
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "mutation"
-    )
-    make_dir(target_dir)
-    mutation_mmds.to_csv(target_dir / f"mutation_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-    log.info(
-        f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
+    mutation_perturbation_wl_pc(
+        cfg,
+        perturbed,
+        unperturbed,
+        base_feature_steps,
+        graph_type,
+        graph_extraction_param,
     )
 
 
@@ -644,7 +644,6 @@ def main(cfg: DictConfig):
         cfg=cfg,
         graph_type=cfg.graph_type,
         graph_extraction_param=cfg.graph_extraction_parameter,
-        n_iter=cfg.n_iter,
     )
 
 
