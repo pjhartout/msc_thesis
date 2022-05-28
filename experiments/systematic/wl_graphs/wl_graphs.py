@@ -153,40 +153,47 @@ def graph_perturbation_worker(
     perturbed_protein_names = idx2name2run(cfg, perturbed=True)
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
-    mmd_runs = []
-    for run in range(cfg.meta.n_runs):
-        log.info(f"Run {run}")
-        unperturbed_run = filter_protein_using_name(
-            unperturbed, unperturbed_protein_names[run].tolist()
-        )
-        perturbed_run = filter_protein_using_name(
-            perturbed, perturbed_protein_names[run].tolist()
-        )
+    mmd_runs_n_iter = dict()
+    for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
+        mmd_runs = []
+        for run in range(cfg.meta.n_runs):
+            log.info(f"Run {run}")
+            unperturbed_run = filter_protein_using_name(
+                unperturbed, unperturbed_protein_names[run].tolist()
+            )
+            perturbed_run = filter_protein_using_name(
+                perturbed, perturbed_protein_names[run].tolist()
+            )
 
-        unperturbed_graphs = load_graphs(
-            unperturbed_run, graph_type=graph_type
-        )
-        perturbed_graphs = load_graphs(perturbed_run, graph_type=graph_type)
+            unperturbed_graphs = load_graphs(
+                unperturbed_run, graph_type=graph_type
+            )
+            perturbed_graphs = load_graphs(
+                perturbed_run, graph_type=graph_type
+            )
 
-        if cfg.debug.reduce_data:
-            unperturbed_graphs = unperturbed_graphs[
-                : cfg.debug.sample_data_size
-            ]
-            perturbed_graphs = perturbed_graphs[: cfg.debug.sample_data_size]
+            if cfg.debug.reduce_data:
+                unperturbed_graphs = unperturbed_graphs[
+                    : cfg.debug.sample_data_size
+                ]
+                perturbed_graphs = perturbed_graphs[
+                    : cfg.debug.sample_data_size
+                ]
 
-        log.info("Computing the kernel.")
+            log.info("Computing the kernel.")
 
-        mmd = MaximumMeanDiscrepancy(
-            biased=False,
-            squared=True,
-            kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
-            ),  # type: ignore
-        ).compute(unperturbed_graphs, perturbed_graphs)
-        mmd_runs.append(mmd)
-    return mmd_runs
+            mmd = MaximumMeanDiscrepancy(
+                biased=False,
+                squared=True,
+                kernel=WeisfeilerLehmanKernel(
+                    n_jobs=cfg.compute.n_jobs,
+                    n_iter=n_iter,
+                    normalize=True,
+                ),  # type: ignore
+            ).compute(unperturbed_graphs, perturbed_graphs)
+            mmd_runs.append(mmd)
+        mmd_runs_n_iter[n_iter] = mmd_runs
+    return mmd_runs_n_iter
 
 
 def remove_edge_perturbation_wl_graphs(
