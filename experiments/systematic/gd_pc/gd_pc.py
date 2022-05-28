@@ -536,8 +536,11 @@ def linear_kernel_experiment_graph_perturbation(
                 "degree_histogram",
                 DegreeHistogram(
                     graph_type=graph_type,
-                    n_bins=100,
-                    bin_range=(1, 100),
+                    n_bins=cfg.descriptors.degree_histogram.n_bins,
+                    bin_range=(
+                        cfg.descriptors.degree_histogram.bin_range.min,
+                        cfg.descriptors.degree_histogram.bin_range.max,
+                    ),
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
                 ),
@@ -561,10 +564,13 @@ def linear_kernel_experiment_graph_perturbation(
                 "laplacian_spectrum_histogram",
                 LaplacianSpectrum(
                     graph_type=graph_type,
-                    n_bins=100,
+                    n_bins=cfg.descriptors.laplacian_spectrum.n_bins,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
-                    bin_range=(0, 100),
+                    bin_range=(
+                        cfg.descriptors.laplacian_spectrum.bin_range.min,
+                        cfg.descriptors.laplacian_spectrum.bin_range.max,
+                    ),
                 ),
             )
         )
