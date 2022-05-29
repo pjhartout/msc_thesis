@@ -13,6 +13,7 @@ import os
 import random
 import sys
 from enum import unique
+from multiprocessing.sharedctypes import Value
 from pathlib import Path
 from re import A
 from tkinter import E
@@ -212,7 +213,8 @@ def save_mmd_experiment(
         .rename_axis(index={"index": "run"})
     )
     target_dir = (
-        DATA_HOME
+        here()
+        / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
         / cfg.paths.weisfeiler_lehman
@@ -526,6 +528,7 @@ def weisfeiler_lehman_experiment_pc_perturbation(
     cfg: DictConfig,
     graph_type: str,
     graph_extraction_param: int,
+    perturbation: str,
 ):
     base_feature_steps = [
         (
@@ -576,55 +579,59 @@ def weisfeiler_lehman_experiment_pc_perturbation(
         perturbed
     )
 
-    log.info("Compute twist")
-    twist_perturbation_wl_pc(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
+    if perturbation == "twist":
+        log.info("Compute twist")
+        twist_perturbation_wl_pc(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    elif perturbation == "shear":
+        log.info("Compute shear")
+        shear_perturbation_wl_pc(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    elif perturbation == "taper":
+        log.info("Compute taper")
+        taper_perturbation_wl_pc(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    elif perturbation == "gaussian_noise":
+        log.info("Compute gaussian noise")
+        gaussian_perturbation_wl_pc(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
 
-    log.info("Compute shear")
-    shear_perturbation_wl_pc(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
-
-    log.info("Compute taper")
-    taper_perturbation_wl_pc(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
-
-    log.info("Compute gaussian noise")
-    gaussian_perturbation_wl_pc(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
-
-    log.info("Compute mutation")
-    mutation_perturbation_wl_pc(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
+    elif perturbation == "mutation":
+        log.info("Compute mutation")
+        mutation_perturbation_wl_pc(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    else:
+        raise ValueError("Invalid perturbation")
 
 
 @hydra.main(
@@ -648,6 +655,7 @@ def main(cfg: DictConfig):
         cfg=cfg,
         graph_type=cfg.graph_type,
         graph_extraction_param=cfg.graph_extraction_parameter,
+        perturbation=cfg.perturbation,
     )
 
 
