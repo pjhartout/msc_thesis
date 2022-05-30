@@ -190,7 +190,8 @@ def save_mmd_experiment(
         .rename_axis(index={"index": "run"})
     )
     target_dir = (
-        DATA_HOME
+        here()
+        / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
         / cfg.paths.weisfeiler_lehman
