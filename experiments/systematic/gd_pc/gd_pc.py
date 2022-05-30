@@ -807,10 +807,10 @@ def main(cfg: DictConfig):
 
     fixed_length_kernel_experiment_graph_perturbation(
         cfg=cfg,
-        graph_type="eps_graph",
-        graph_extraction_param=16,
-        descriptor="distance_histogram",
-        perturbation="twist",
+        graph_type=cfg.graph_type,
+        graph_extraction_param=cfg.graph_extraction_parameter,
+        descriptor=cfg.descriptor,
+        perturbation=cfg.perturbation,
     )
 
 
