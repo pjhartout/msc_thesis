@@ -27,7 +27,8 @@ fi\n
 )
 def main(cfg):
     wl_pc = open(
-        here() / "experiments/systematic/gd_pc" / "gd_pc_job_array.sh", "w",
+        here() / "experiments/systematic/gd_pc" / "gd_pc_job_array.sh",
+        "w",
     )  # write mode
     wl_pc.write(f"#!/bin/bash \n")
     wl_pc.write(f"\n\n")
@@ -39,6 +40,8 @@ def main(cfg):
         "degree_histogram",
         "clustering_histogram",
         "laplacian_spectrum_histogram",
+        "distance_histogram",
+        "dihedral_angles_histogram",
     ]
     perturbations = [
         "twist",

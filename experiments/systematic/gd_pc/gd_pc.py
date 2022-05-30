@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""other_graph_experiments.py
+"""gd_pc.py
 
 """
 
@@ -156,13 +156,13 @@ def point_cloud_perturbation_worker(
         products = {
             # The np.ones is used here because
             # exp(sigma*(x-x)**2) = 1(n x n)
-            "K_XX": np.ones(
+            "K_XX": np.zeros(
                 (
                     unperturbed_descriptor_run.shape[0],
                     unperturbed_descriptor_run.shape[0],
                 )
             ),
-            "K_YY": np.ones(
+            "K_YY": np.zeros(
                 (
                     perturbed_descriptor_run.shape[0],
                     perturbed_descriptor_run.shape[0],
@@ -200,13 +200,13 @@ def point_cloud_perturbation_worker(
             kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
             mmd = MaximumMeanDiscrepancy(
-                biased=False, squared=True, verbose=cfg.debug.verbose,
+                biased=False,
+                squared=True,
+                verbose=cfg.debug.verbose,
             ).compute(
-                pre_computed_products[run]["K_XX"],
-                pre_computed_products[run]["K_YY"],
-                kernel.compute_matrix(
-                    unperturbed_descriptor_run, perturbed_descriptor_run
-                ),
+                kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
             )
             mmd_runs.append(mmd)
         mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
@@ -243,7 +243,8 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                normalize=True,
             ),  # type: ignore
             verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -273,7 +274,7 @@ def save_mmd_experiment(
         / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
+        / cfg.paths.fixed_length_kernels
         / graph_type
         / str(graph_extraction_param)
         / perturbation_type
@@ -344,7 +345,12 @@ def twist_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "twist", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "twist",
+        descriptor,
     )
 
 
@@ -405,7 +411,12 @@ def shear_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "shear", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "shear",
+        descriptor,
     )
 
 
@@ -466,7 +477,12 @@ def taper_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "taper", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "taper",
+        descriptor,
     )
 
 
@@ -592,7 +608,12 @@ def mutation_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "mutation", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "mutation",
+        descriptor,
     )
 
 
@@ -687,6 +708,45 @@ def fixed_length_kernel_experiment_graph_perturbation(
                 ),
             )
         )
+    elif descriptor == "distance_histogram":
+        base_feature_steps.append(
+            (
+                "laplacian_spectrum_histogram",
+                DistanceHistogram(
+                    n_bins=cfg.descriptors.distance_histogram.n_bins,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                    bin_range=(
+                        cfg.descriptors.distance_histogram.bin_range.min,
+                        cfg.descriptors.distance_histogram.bin_range.max,
+                    ),
+                ),
+            )
+        )
+    elif descriptor == "dihedral_angles_histogram":
+        base_feature_steps[0] = (
+            (
+                "coordinates",
+                Coordinates(
+                    granularity="backbone",
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=True,
+                ),
+            ),
+        )
+        base_feature_steps.append(
+            (
+                "dihedral_angles",
+                RamachandranAngles(
+                    from_pdb=False,
+                    n_bins=cfg.descriptors.dihedral_angles.n_bins,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            )
+        )
+    else:
+        raise ValueError("Unknown descriptor")
 
     unperturbed = load_proteins_from_config(cfg, perturbed=False)
     unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
