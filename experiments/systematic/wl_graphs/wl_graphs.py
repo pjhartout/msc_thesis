@@ -199,7 +199,8 @@ def save_mmd_experiment(
         .rename_axis(index={"index": "run"})
     )
     target_dir = (
-        DATA_HOME
+        here()
+        / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
         / cfg.paths.weisfeiler_lehman
@@ -509,7 +510,7 @@ def main(cfg: DictConfig):
     weisfeiler_lehman_experiment_graph_perturbation(
         cfg=cfg,
         graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_param,
+        graph_extraction_param=cfg.graph_extraction_parameter,
         perturbation=cfg.perturbation,
     )
 
