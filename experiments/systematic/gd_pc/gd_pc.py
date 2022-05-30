@@ -200,9 +200,7 @@ def point_cloud_perturbation_worker(
             kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
             mmd = MaximumMeanDiscrepancy(
-                biased=False,
-                squared=True,
-                verbose=cfg.debug.verbose,
+                biased=False, squared=True, verbose=cfg.debug.verbose,
             ).compute(
                 kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
                 kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
@@ -243,8 +241,7 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs,
-                normalize=True,
+                n_jobs=cfg.compute.n_jobs, normalize=True,
             ),  # type: ignore
             verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -345,12 +342,7 @@ def twist_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "twist",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "twist", descriptor,
     )
 
 
@@ -411,12 +403,7 @@ def shear_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "shear",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "shear", descriptor,
     )
 
 
@@ -477,12 +464,7 @@ def taper_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "taper",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "taper", descriptor,
     )
 
 
@@ -608,12 +590,7 @@ def mutation_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "mutation",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "mutation", descriptor,
     )
 
 
@@ -711,7 +688,7 @@ def fixed_length_kernel_experiment_graph_perturbation(
     elif descriptor == "distance_histogram":
         base_feature_steps.append(
             (
-                "laplacian_spectrum_histogram",
+                "distance_histogram",
                 DistanceHistogram(
                     n_bins=cfg.descriptors.distance_histogram.n_bins,
                     n_jobs=cfg.compute.n_jobs,
@@ -733,18 +710,20 @@ def fixed_length_kernel_experiment_graph_perturbation(
                     verbose=True,
                 ),
             ),
-        )
+        )[0]
+
         base_feature_steps.append(
             (
                 "dihedral_angles",
                 RamachandranAngles(
                     from_pdb=False,
-                    n_bins=cfg.descriptors.dihedral_angles.n_bins,
+                    n_bins=cfg.descriptors.dihedral_anlges.n_bins,
                     n_jobs=cfg.compute.n_jobs,
                     verbose=cfg.debug.verbose,
                 ),
             )
         )
+        pass
     else:
         raise ValueError("Unknown descriptor")
 
@@ -828,10 +807,10 @@ def main(cfg: DictConfig):
 
     fixed_length_kernel_experiment_graph_perturbation(
         cfg=cfg,
-        graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_param,
-        descriptor=cfg.descriptor,
-        perturbation=cfg.perturbation,
+        graph_type="eps_graph",
+        graph_extraction_param=16,
+        descriptor="distance_histogram",
+        perturbation="twist",
     )
 
 
