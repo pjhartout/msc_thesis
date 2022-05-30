@@ -40,18 +40,27 @@ def main(cfg):
         "degree_histogram",
         "clustering_histogram",
         "laplacian_spectrum_histogram",
+        "distance_histogram",
+        "dihedral_angles_histogram",
+    ]
+    perturbations = [
+        "remove_edges",
+        "add_edges",
+        "rewire_edges",
     ]
 
     for descriptor in descriptors:
         for eps in cfg.meta.representations[0]["eps_graph"]:
-            job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} \n"
-            wl_pc.write(job_param)
-            wl_pc.write(build_fail_string(job_param))
+            for perturbation in perturbations:
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
+                wl_pc.write(job_param)
+                wl_pc.write(build_fail_string(job_param))
 
         for k in cfg.meta.representations[1]["knn_graph"]:
-            job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=knn_graph +graph_extraction_parameter={k} \n"
-            wl_pc.write(job_param)
-            wl_pc.write(build_fail_string(job_param))
+            for perturbation in perturbations:
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=knn_graph +graph_extraction_parameter={k} +perturbation={perturbation} \n"
+                wl_pc.write(job_param)
+                wl_pc.write(build_fail_string(job_param))
 
     wl_pc.write(f'echo "Done"\n')
     wl_pc.close()
