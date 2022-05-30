@@ -32,7 +32,7 @@ default_eigvalue_precision = float("-1e-5")
 class Kernel(metaclass=ABCMeta):
     """Defines skeleton of descriptor classes"""
 
-    def __init__(self, n_jobs: int, verbose: bool = False):
+    def __init__(self, n_jobs: int = None, verbose: bool = False):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
