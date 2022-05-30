@@ -1473,6 +1473,9 @@ Research questions:
   representations = constant/
   representations = variable/
 
+** Notes for thesis
+*** Discuss mode collapse and mode dropping
+*** Discuss descriptors with bin_ranges not able to capture extreme cases
 
 ** References
 #+LaTeX: \printbibliography[heading=none]
