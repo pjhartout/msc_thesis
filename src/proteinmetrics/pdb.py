@@ -39,7 +39,7 @@ class Coordinates:
 
         Args:
             granularity (str, optional): granularity of the desired set of
-            coordinates. Can be N, CA, C, O, or all. Defaults to "CA".
+            coordinates. Can be N, CA, C, O, backbone, or all. Defaults to "CA".
             n_jobs (int, optional): [description].
         """
         self.granularity = granularity

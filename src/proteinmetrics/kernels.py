@@ -32,7 +32,7 @@ default_eigvalue_precision = float("-1e-5")
 class Kernel(metaclass=ABCMeta):
     """Defines skeleton of descriptor classes"""
 
-    def __init__(self, n_jobs: int, verbose: bool = False):
+    def __init__(self, n_jobs: int = None, verbose: bool = False):
         self.n_jobs = n_jobs
         self.verbose = verbose
 
@@ -72,30 +72,23 @@ class LinearKernel(Kernel):
 
 class GaussianKernel(Kernel):
     def __init__(
-        self,
-        sigma: float,
-        pre_computed_difference: bool,
-        return_product: bool,
-        **kwargs,
+        self, sigma: float, pre_computed_product: bool, **kwargs,
     ):
         super().__init__(**kwargs)
         self.sigma = sigma
-        self.pre_computed_difference = pre_computed_difference
-        self.return_product = return_product
+        self.pre_computed_product = pre_computed_product
 
     def compute_matrix(
-        self, X: np.ndarray, Y: np.ndarray
+        self, X: np.ndarray, Y: Union[np.ndarray, None] = None
     ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
-        if self.pre_computed_difference:
-            # This assumes that X = vec_1 - vec_2
-            P = np.dot(X, X)
+        if Y is None:
+            Y = X
 
-        else:
+        if not self.pre_computed_product:
             P = np.dot(X - Y, (X - Y).T)
-        if self.return_product:
-            return np.exp(-self.sigma * P), P
         else:
-            return np.exp(-self.sigma * P)
+            P = X
+        return np.exp(-self.sigma * P)
 
 
 class WeisfeilerLehmanGrakel(Kernel):

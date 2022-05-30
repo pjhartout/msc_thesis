@@ -1,28 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""weisfeiler_lehman_kernel_graph_experiments_graph_perturb.py
-
-The idea is to deal with all graph experiments here.
-Steps:
-    1. Compute unperturbed set
-        1. Point cloud
-    2. Generate graphs
-        1.
-    3. Compute MMD
-
-Structure of output:
-/data/systematic/wl_experiments/
+"""gd_graphs.py
 
 """
 
 import logging
 import os
 import random
-from enum import unique
 from pathlib import Path
-from re import A
-from tkinter import E
 from typing import Any, Dict, List, Tuple, Union
 
 import hydra
@@ -45,30 +31,13 @@ from proteinmetrics.descriptors import (
 )
 from proteinmetrics.distance import MaximumMeanDiscrepancy
 from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinmetrics.kernels import LinearKernel
-from proteinmetrics.loaders import list_pdb_files, load_graphs
+from proteinmetrics.kernels import GaussianKernel, LinearKernel
+from proteinmetrics.loaders import list_pdb_files, load_descriptor
 from proteinmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinmetrics.pdb import Coordinates, Sequence
-from proteinmetrics.perturbations import (
-    AddConnectedNodes,
-    AddEdges,
-    GaussianNoise,
-    GraphPerturbation,
-    Mutation,
-    RemoveEdges,
-    RewireEdges,
-    Shear,
-    Taper,
-    Twist,
-)
+from proteinmetrics.perturbations import AddEdges, RemoveEdges, RewireEdges
 from proteinmetrics.protein import Protein
-from proteinmetrics.utils.functions import (
-    distribute_function,
-    flatten_lists,
-    make_dir,
-    remove_fragments,
-    save_obj,
-)
+from proteinmetrics.utils.functions import distribute_function, make_dir
 
 log = logging.getLogger(__name__)
 
@@ -147,21 +116,18 @@ def graph_perturbation_worker(
     unperturbed,
     perturbed,
     graph_type,
-    n_iter,
+    descriptor,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.append(perturbation)
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
-    log.info("Computed the representations.")
-
-    log.info("Extracting graphs")
 
     perturbed_protein_names = idx2name2run(cfg, perturbed=True)
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
-
-    mmd_runs = []
+    # For every run - compute x-y
+    pre_computed_products = list()
     for run in range(cfg.meta.n_runs):
         log.info(f"Run {run}")
         unperturbed_run = filter_protein_using_name(
@@ -171,40 +137,159 @@ def graph_perturbation_worker(
             perturbed, perturbed_protein_names[run].tolist()
         )
 
-        unperturbed_graphs = load_graphs(
-            unperturbed_run, graph_type=graph_type
+        unperturbed_descriptor_run = load_descriptor(
+            unperturbed_run, graph_type=graph_type, descriptor=descriptor
         )
-        perturbed_graphs = load_graphs(perturbed_run, graph_type=graph_type)
+        perturbed_descriptor_run = load_descriptor(
+            perturbed_run, graph_type=graph_type, descriptor=descriptor
+        )
+
+        products = {
+            # The np.ones is used here because
+            # exp(sigma*(x-x)**2) = 1(n x n)
+            "K_XX": np.zeros(
+                (
+                    unperturbed_descriptor_run.shape[0],
+                    unperturbed_descriptor_run.shape[0],
+                )
+            ),
+            "K_YY": np.zeros(
+                (
+                    perturbed_descriptor_run.shape[0],
+                    perturbed_descriptor_run.shape[0],
+                )
+            ),
+            "K_XY": np.dot(
+                unperturbed_descriptor_run - perturbed_descriptor_run,  # type: ignore
+                (unperturbed_descriptor_run - perturbed_descriptor_run).T,  # type: ignore
+            ),
+        }
+        pre_computed_products.append(products)
+        # pre_computed_products[f"sigma={sigma}"] = pre_computed_products_sigma
+
+    # For every run and for every sigma - compute gaussian kernel
+    mmd_runs_sigma = dict()
+    for sigma in cfg.meta.kernels[1]["gaussian"][0]["bandwidth"]:
+        mmd_runs = list()
+        for run in range(cfg.meta.n_runs):
+            log.info(f"Run {run}")
+            unperturbed_run = filter_protein_using_name(
+                unperturbed, unperturbed_protein_names[run].tolist()
+            )
+            perturbed_run = filter_protein_using_name(
+                perturbed, perturbed_protein_names[run].tolist()
+            )
+
+            unperturbed_descriptor_run = load_descriptor(
+                unperturbed_run, graph_type=graph_type, descriptor=descriptor
+            )
+            perturbed_descriptor_run = load_descriptor(
+                perturbed_run, graph_type=graph_type, descriptor=descriptor
+            )
+            log.info("Computing the kernel.")
+
+            kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
+
+            mmd = MaximumMeanDiscrepancy(
+                biased=False, squared=True, verbose=cfg.debug.verbose,
+            ).compute(
+                kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+            )
+            mmd_runs.append(mmd)
+        mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
+
+    # For every run - compute linear kernel
+    mmd_linear_kernel_runs = []
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
+
+        unperturbed_descriptor_run = load_descriptor(
+            unperturbed_run, graph_type=graph_type, descriptor=descriptor
+        )
+        perturbed_descriptor_run = load_descriptor(
+            perturbed_run, graph_type=graph_type, descriptor=descriptor
+        )
 
         if cfg.debug.reduce_data:
-            unperturbed_graphs = unperturbed_graphs[
+            unperturbed_descriptor_run = unperturbed_descriptor_run[
                 : cfg.debug.sample_data_size
             ]
-            perturbed_graphs = perturbed_graphs[: cfg.debug.sample_data_size]
+            perturbed_descriptor_run = perturbed_descriptor_run[
+                : cfg.debug.sample_data_size
+            ]
 
         log.info("Computing the kernel.")
 
         mmd = MaximumMeanDiscrepancy(
             biased=False,
             squared=True,
-            kernel=WeisfeilerLehmanKernel(
-                n_jobs=cfg.compute.n_jobs,
-                n_iter=n_iter,
-                normalize=True,
+            kernel=LinearKernel(
+                n_jobs=cfg.compute.n_jobs, normalize=True,
             ),  # type: ignore
-        ).compute(unperturbed_graphs, perturbed_graphs)
-        mmd_runs.append(mmd)
-    return mmd_runs
+            verbose=cfg.debug.verbose,
+        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+        mmd_linear_kernel_runs.append(mmd)
+
+    # We make linear kernel part of the same dict to simplify things
+    mmd_runs_sigma["linear_kernel"] = mmd_linear_kernel_runs
+    return mmd_runs_sigma
 
 
-def remove_edge_perturbation_wl_graphs(
+def save_mmd_experiment(
+    cfg,
+    mmds,
+    graph_type,
+    graph_extraction_param,
+    perturbation_type,
+    kernel_params: Union[None, Dict] = None,
+):
+    mmds = (
+        pd.concat(mmds)
+        .reset_index()
+        .set_index(["index", "perturb"])
+        .rename_axis(index={"index": "run"})
+    )
+    target_dir = (
+        here()
+        / cfg.paths.data
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / graph_type
+        / str(graph_extraction_param)
+        / perturbation_type
+    )
+    make_dir(target_dir)
+    if kernel_params is None:
+        mmds.to_csv(target_dir / f"{perturbation_type}_mmds.csv")
+    else:
+        kernel_spec_string = ""
+        for k, v in kernel_params.items():
+            kernel_spec_string += f"{k}={v}_"
+        mmds.to_csv(
+            target_dir / f"{perturbation_type}_{kernel_spec_string}mmds.csv"
+        )
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    log.info(f"WROTE FILE in {target_dir}")
+    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+
+def remove_edge_perturbation_linear_kernel(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
+    descriptor,
     **kwargs,
 ):
     log.info("Perturbing proteins with RemoveEdges.")
@@ -232,13 +317,10 @@ def remove_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
+            descriptor,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
-        log.info(
-            f"Computed the MMD of removing edges with probability {p_perturb}."
-        )
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        return mmd_df
 
     mmds = distribute_function(
         func=remove_edges_perturbation_worker,
@@ -255,37 +337,19 @@ def remove_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg, mmds, graph_type, graph_extraction_param, "removedge",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "remove_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"remove_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 
-def add_edge_perturbation_wl_graphs(
+def add_edge_perturbation_linear_kernel(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
+    descriptor,
     **kwargs,
 ):
     log.info("Perturbing proteins with AddEdges.")
@@ -295,7 +359,7 @@ def add_edge_perturbation_wl_graphs(
     ):
         log.info(f"Pertubation set to {p_perturb}.")
         perturbation = (
-            f"addeges_{p_perturb}",
+            f"addedge_{p_perturb}",
             AddEdges(
                 p_add=p_perturb,
                 graph_type=graph_type,
@@ -313,13 +377,10 @@ def add_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
+            descriptor,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
-        log.info(
-            f"Computed the MMD of adding edges with probability {p_perturb}."
-        )
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        return mmd_df
 
     mmds = distribute_function(
         func=add_edges_perturbation_worker,
@@ -336,39 +397,19 @@ def add_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg, mmds, graph_type, graph_extraction_param, "addedge",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "add_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"add_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-    return mmds
 
 
-def rewire_edge_perturbation_wl_graphs(
+def rewire_edge_perturbation_linear_kernel(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
     graph_type,
-    n_iter,
     graph_extraction_param,
+    descriptor,
     **kwargs,
 ):
     log.info("Perturbing proteins with RewireEdges.")
@@ -378,7 +419,7 @@ def rewire_edge_perturbation_wl_graphs(
     ):
         log.info(f"Pertubation set to {p_perturb}.")
         perturbation = (
-            f"rewireeges_{p_perturb}",
+            f"rewireedge_{p_perturb}",
             RewireEdges(
                 p_rewire=p_perturb,
                 graph_type=graph_type,
@@ -396,13 +437,10 @@ def rewire_edge_perturbation_wl_graphs(
             unperturbed,
             perturbed,
             graph_type,
-            n_iter,
+            descriptor,
         )
-        mmd_pack = {"perturb": p_perturb, "mmd": mmd_runs}
-        log.info(
-            f"Computed the MMD of adding edges with probability {p_perturb}."
-        )
-        return mmd_pack
+        mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
+        return mmd_df
 
     mmds = distribute_function(
         func=rewire_edges_perturbation_worker,
@@ -419,36 +457,17 @@ def rewire_edge_perturbation_wl_graphs(
         graph_type=graph_type,
     )
 
-    mmds = (
-        pd.DataFrame(mmds)
-        .explode(column="mmd")
-        .reset_index()
-        .set_index(["index", "perturb"])
-        .rename_axis(index={"index": "run"})
+    save_mmd_experiment(
+        cfg, mmds, graph_type, graph_extraction_param, "rewireedge",
     )
-    target_dir = (
-        DATA_HOME
-        / cfg.paths.systematic
-        / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
-        / graph_type
-        / str(graph_extraction_param)
-        / "rewire_edge"
-    )
-    make_dir(target_dir)
-    mmds.to_csv(target_dir / f"rewire_edges_mmds_n_iters_{n_iter}.csv")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    log.info(f"WROTE FILE in {target_dir}")
-    log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-    return mmds
 
 
-def weisfeiler_lehman_experiment_graph_perturbation(
+def fixed_length_kernel_experiment_graph_perturbation(
     cfg: DictConfig,
     graph_type: str,
     graph_extraction_param: int,
-    n_iter: int,
+    descriptor: str,
+    perturbation: str,
 ):
     base_feature_steps = [
         (
@@ -489,6 +508,91 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         )
     else:
         raise ValueError(f"Unknown graph type {graph_type}")
+    if descriptor == "degree_histogram":
+        base_feature_steps.append(
+            (
+                "degree_histogram",
+                DegreeHistogram(
+                    graph_type=graph_type,
+                    n_bins=cfg.descriptors.degree_histogram.n_bins,
+                    bin_range=(
+                        cfg.descriptors.degree_histogram.bin_range.min,
+                        cfg.descriptors.degree_histogram.bin_range.max,
+                    ),
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            )
+        )
+    elif descriptor == "clustering_histogram":
+        base_feature_steps.append(
+            (
+                "clustering_histogram",
+                ClusteringHistogram(
+                    graph_type=graph_type,
+                    n_bins=100,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            )
+        )
+    elif descriptor == "laplacian_spectrum_histogram":
+        base_feature_steps.append(
+            (
+                "laplacian_spectrum_histogram",
+                LaplacianSpectrum(
+                    graph_type=graph_type,
+                    n_bins=cfg.descriptors.laplacian_spectrum.n_bins,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                    bin_range=(
+                        cfg.descriptors.laplacian_spectrum.bin_range.min,
+                        cfg.descriptors.laplacian_spectrum.bin_range.max,
+                    ),
+                ),
+            )
+        )
+    elif descriptor == "distance_histogram":
+        base_feature_steps.append(
+            (
+                "distance_histogram",
+                DistanceHistogram(
+                    n_bins=cfg.descriptors.distance_histogram.n_bins,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                    bin_range=(
+                        cfg.descriptors.distance_histogram.bin_range.min,
+                        cfg.descriptors.distance_histogram.bin_range.max,
+                    ),
+                ),
+            )
+        )
+    elif descriptor == "dihedral_angles_histogram":
+        base_feature_steps[0] = (
+            (
+                "coordinates",
+                Coordinates(
+                    granularity="backbone",
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=True,
+                ),
+            ),
+        )[0]
+
+        base_feature_steps.append(
+            (
+                "dihedral_angles",
+                RamachandranAngles(
+                    from_pdb=False,
+                    n_bins=cfg.descriptors.dihedral_anlges.n_bins,
+                    n_jobs=cfg.compute.n_jobs,
+                    verbose=cfg.debug.verbose,
+                ),
+            )
+        )
+        pass
+    else:
+        raise ValueError("Unknown descriptor")
 
     unperturbed = load_proteins_from_config(cfg, perturbed=False)
     unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
@@ -499,29 +603,40 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         perturbed
     )
 
-    log.info("Compute remove_edges")
-    remove_edge_perturbation_wl_graphs(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        n_iter,
-        graph_extraction_param,
-    )
-    add_edge_perturbation_wl_graphs(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        n_iter,
-        graph_extraction_param,
-    )
+    if perturbation == "remove_edges":
+        remove_edge_perturbation_linear_kernel(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+            descriptor,
+        )
 
-    log.info(
-        f"Done with {graph_type} {graph_extraction_param} with W-L config {n_iter}"
-    )
+    elif perturbation == "add_edges":
+        add_edge_perturbation_linear_kernel(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+            descriptor,
+        )
+
+    elif perturbation == "rewire_edges":
+        rewire_edge_perturbation_linear_kernel(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+            descriptor,
+        )
+    else:
+        raise ValueError(f"Unknown perturbation {perturbation}")
 
 
 @hydra.main(
@@ -538,26 +653,14 @@ def main(cfg: DictConfig):
     log.info("DATA_DIR")
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    # Start with Weisfeiler-Lehman-based-experiments.
-    # outside for loops for n_iters and k.
-    for n_iters in cfg.meta.kernels[3]["weisfeiler-lehman"][0]["n_iter"]:
-        for k in cfg.meta.representations[1]["knn_graph"]:
-            weisfeiler_lehman_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="knn_graph",
-                graph_extraction_param=k,
-                n_iter=n_iters,
-            )
-        for eps in cfg.meta.representations[1]["eps_graph"]:
-            weisfeiler_lehman_experiment_graph_perturbation(
-                cfg=cfg,
-                graph_type="eps_graph",
-                graph_extraction_param=eps,
-                n_iter=n_iters,
-            )
 
-    # Epsilon experiments
-    # KNN experiments
+    fixed_length_kernel_experiment_graph_perturbation(
+        cfg=cfg,
+        graph_type=cfg.graph_type,
+        graph_extraction_param=cfg.graph_extraction_param,
+        descriptor=cfg.descriptor,
+        perturbation=cfg.perturbation,
+    )
 
 
 if __name__ == "__main__":

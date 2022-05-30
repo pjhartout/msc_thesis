@@ -80,8 +80,8 @@ kernels:
 
 organisms: ["humans", "ecoli"]
 
-n_runs: 3
-sample_size: 20
+n_runs: 10
+sample_size: 100
 systematic_dir: "data/systematic"
 splits_dir: "data/systematic/run_idx/"
 time_estimates_dir: "data/systematic/time/"

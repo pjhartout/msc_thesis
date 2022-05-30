@@ -48,15 +48,24 @@ def load_descriptor(
     path_or_protein: Union[PosixPath, List[Protein]],
     descriptor: str,
     graph_type: str,
-):
+) -> np.ndarray:
     if type(path_or_protein) == PosixPath:
         proteins = load_proteins(path_or_protein)
     else:
         proteins = path_or_protein
 
     descriptor_list = list()
-    for protein in proteins:
-        descriptor_list.append(protein.descriptors[graph_type][descriptor])
+    if any([string not in descriptor for string in ["dihedral", "distance"]]):
+        for protein in proteins:
+            descriptor_list.append(protein.descriptors[graph_type][descriptor])
+    else:
+        if "dihedral" in descriptor or "ramachandran" in descriptor:
+            for protein in proteins:
+                descriptor_list.append(protein.phi_psi_angles)
+        elif "distance" in descriptor:
+            for protein in proteins:
+                descriptor_list.append(protein.distance_hist)
+
     return np.array(descriptor_list)
 
 

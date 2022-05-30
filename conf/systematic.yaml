@@ -4,3 +4,4 @@ defaults:
   - meta: meta
   - perturbations: perturbations
   - debug: debug
+  - descriptors: descriptors
