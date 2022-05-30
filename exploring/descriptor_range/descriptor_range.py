@@ -23,11 +23,6 @@ import pandas as pd
 import seaborn as sns
 from gtda import pipeline
 
-from proteinmetrics.descriptors import (
-    DegreeHistogram,
-    DistanceHistogram,
-    LaplacianSpectrum,
-)
 from proteinmetrics.graphs import ContactMap, EpsilonGraph
 from proteinmetrics.loaders import list_pdb_files
 from proteinmetrics.paths import HUMAN_PROTEOME
