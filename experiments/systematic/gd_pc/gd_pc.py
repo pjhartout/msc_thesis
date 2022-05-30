@@ -11,7 +11,6 @@ import random
 from enum import unique
 from pathlib import Path
 from re import A
-from tkinter import E
 from typing import Any, Dict, List, Tuple, Union
 
 import hydra
@@ -168,6 +167,7 @@ def point_cloud_perturbation_worker(
                 n_jobs=cfg.compute.n_jobs,
                 normalize=True,
             ),  # type: ignore
+            verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor, perturbed_descriptor)
         mmd_runs.append(mmd)
     return mmd_runs
