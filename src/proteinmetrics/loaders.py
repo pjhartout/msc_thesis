@@ -48,7 +48,7 @@ def load_descriptor(
     path_or_protein: Union[PosixPath, List[Protein]],
     descriptor: str,
     graph_type: str,
-):
+) -> np.ndarray:
     if type(path_or_protein) == PosixPath:
         proteins = load_proteins(path_or_protein)
     else:
