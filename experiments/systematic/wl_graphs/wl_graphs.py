@@ -130,12 +130,7 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def graph_perturbation_worker(
-    cfg,
-    experiment_steps,
-    perturbation,
-    unperturbed,
-    perturbed,
-    graph_type,
+    cfg, experiment_steps, perturbation, unperturbed, perturbed, graph_type,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.append(perturbation)
@@ -195,11 +190,7 @@ def graph_perturbation_worker(
 
 
 def save_mmd_experiment(
-    cfg,
-    mmds,
-    graph_type,
-    graph_extraction_param,
-    perturbation_type,
+    cfg, mmds, graph_type, graph_extraction_param, perturbation_type,
 ):
     mmds = (
         pd.concat(mmds)
@@ -282,11 +273,7 @@ def remove_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "remove_edges",
+        cfg, mmds, graph_type, graph_extraction_param, "remove_edges",
     )
 
 
@@ -347,11 +334,7 @@ def add_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "add_edges",
+        cfg, mmds, graph_type, graph_extraction_param, "add_edges",
     )
 
 
@@ -412,11 +395,7 @@ def rewire_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "rewire_edges",
+        cfg, mmds, graph_type, graph_extraction_param, "rewire_edges",
     )
 
 
@@ -424,6 +403,7 @@ def weisfeiler_lehman_experiment_graph_perturbation(
     cfg: DictConfig,
     graph_type: str,
     graph_extraction_param: int,
+    perturbation: str,
 ):
     base_feature_steps = [
         (
@@ -474,31 +454,38 @@ def weisfeiler_lehman_experiment_graph_perturbation(
         perturbed
     )
 
-    log.info("Compute remove_edges")
-    remove_edge_perturbation_wl_graphs(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
-    add_edge_perturbation_wl_graphs(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
-    rewire_edge_perturbation_wl_graphs(
-        cfg,
-        perturbed,
-        unperturbed,
-        base_feature_steps,
-        graph_type,
-        graph_extraction_param,
-    )
+    if perturbation == "remove_edges":
+        log.info("Compute remove_edges")
+        remove_edge_perturbation_wl_graphs(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+
+    elif perturbation == "add_edges":
+        log.info("Compute add_edges")
+        add_edge_perturbation_wl_graphs(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    elif perturbation == "rewire_edges":
+        rewire_edge_perturbation_wl_graphs(
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
+            graph_type,
+            graph_extraction_param,
+        )
+    else:
+        raise ValueError(f"Unknown perturbation {perturbation}")
 
     log.info(f"Done with {graph_type} {graph_extraction_param}")
 
@@ -523,6 +510,7 @@ def main(cfg: DictConfig):
         cfg=cfg,
         graph_type=cfg.graph_type,
         graph_extraction_param=cfg.graph_extraction_param,
+        perturbation=cfg.perturbation,
     )
 
 
