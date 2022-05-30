@@ -169,8 +169,8 @@ def point_cloud_perturbation_worker(
                 )
             ),
             "K_XY": np.dot(
-                unperturbed_descriptor_run - perturbed_descriptor_run,
-                (unperturbed_descriptor_run - perturbed_descriptor_run).T,
+                unperturbed_descriptor_run - perturbed_descriptor_run,  # type: ignore
+                (unperturbed_descriptor_run - perturbed_descriptor_run).T,  # type: ignore
             ),
         }
         pre_computed_products.append(products)
