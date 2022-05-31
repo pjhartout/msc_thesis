@@ -20,6 +20,7 @@ from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
+from sklearn.metrics import pairwise_distances
 from tqdm import tqdm
 
 from proteinmetrics.descriptors import (
@@ -184,9 +185,10 @@ def point_cloud_perturbation_worker(
                     perturbed_descriptor_run.shape[0],
                 )
             ),
-            "K_XY": np.dot(
-                unperturbed_descriptor_run - perturbed_descriptor_run,  # type: ignore
-                (unperturbed_descriptor_run - perturbed_descriptor_run).T,  # type: ignore
+            "K_XY": pairwise_distances(
+                unperturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
             ),
         }
         pre_computed_products.append(products)
@@ -198,27 +200,12 @@ def point_cloud_perturbation_worker(
         mmd_runs = list()
         for run in range(cfg.meta.n_runs):
             log.info(f"Run {run}")
-            unperturbed_run = filter_protein_using_name(
-                unperturbed, unperturbed_protein_names[run].tolist()
-            )
-            perturbed_run = filter_protein_using_name(
-                perturbed, perturbed_protein_names[run].tolist()
-            )
-
-            unperturbed_descriptor_run = load_descriptor(
-                unperturbed_run, graph_type=graph_type, descriptor=descriptor
-            )
-            perturbed_descriptor_run = load_descriptor(
-                perturbed_run, graph_type=graph_type, descriptor=descriptor
-            )
             log.info("Computing the kernel.")
 
             kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
             mmd = MaximumMeanDiscrepancy(
-                biased=False,
-                squared=True,
-                verbose=cfg.debug.verbose,
+                biased=False, squared=True, verbose=cfg.debug.verbose,
             ).compute(
                 kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
                 kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
@@ -238,20 +225,28 @@ def point_cloud_perturbation_worker(
             perturbed, perturbed_protein_names[run].tolist()
         )
 
-        unperturbed_descriptor_run = load_descriptor(
-            unperturbed_run, graph_type=graph_type, descriptor=descriptor
-        )
-        perturbed_descriptor_run = load_descriptor(
-            perturbed_run, graph_type=graph_type, descriptor=descriptor
-        )
+        if descriptor == "distance_histogram":
+            unperturbed_descriptor_run = np.asarray(
+                [protein.distance_hist for protein in unperturbed]
+            )
+            perturbed_descriptor_run = np.asarray(
+                [protein.distance_hist for protein in perturbed]
+            )
 
-        if cfg.debug.reduce_data:
-            unperturbed_descriptor_run = unperturbed_descriptor_run[
-                : cfg.debug.sample_data_size
-            ]
-            perturbed_descriptor_run = perturbed_descriptor_run[
-                : cfg.debug.sample_data_size
-            ]
+        elif descriptor == "dihedral_angles_histogram":
+            unperturbed_descriptor_run = np.asarray(
+                [protein.phi_psi_angles for protein in unperturbed]
+            )
+            perturbed_descriptor_run = np.asarray(
+                [protein.phi_psi_angles for protein in perturbed]
+            )
+        else:
+            unperturbed_descriptor_run = load_descriptor(
+                unperturbed_run, graph_type=graph_type, descriptor=descriptor,
+            )
+            perturbed_descriptor_run = load_descriptor(
+                perturbed_run, graph_type=graph_type, descriptor=descriptor
+            )
 
         log.info("Computing the kernel.")
 
@@ -259,8 +254,7 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs,
-                normalize=True,
+                n_jobs=cfg.compute.n_jobs, normalize=False,
             ),  # type: ignore
             verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -361,12 +355,7 @@ def twist_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "twist",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "twist", descriptor,
     )
 
 
@@ -427,12 +416,7 @@ def shear_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "shear",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "shear", descriptor,
     )
 
 
@@ -493,12 +477,7 @@ def taper_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "taper",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "taper", descriptor,
     )
 
 
@@ -624,12 +603,7 @@ def mutation_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "mutation",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "mutation", descriptor,
     )
 
 
@@ -854,6 +828,14 @@ def main(cfg: DictConfig):
         descriptor=cfg.descriptor,
         perturbation=cfg.perturbation,
     )
+
+    # fixed_length_kernel_experiment_graph_perturbation(
+    #     cfg=cfg,
+    #     graph_type="pc_descriptor",
+    #     graph_extraction_param=1,
+    #     descriptor="distance_histogram",
+    #     perturbation="twist",
+    # )
 
 
 if __name__ == "__main__":
