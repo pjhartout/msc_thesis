@@ -4,489 +4,489 @@
 cd /home/phartout/Documents/Git/msc_thesis/ 
 export PATH=/home/phartout/.anaconda3/bin:$PATH
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=degree_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=clustering_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=16 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=16 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_parameter=32 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=eps_graph +graph_extraction_param=32 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=2 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=2 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=6 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=6 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=remove_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=remove_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=add_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=add_edges 
 " >> failed_jobs.txt
 fi
 
-srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 
 if [ $? -eq 0 ]; then
    echo OK
 else
-   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_parameter=8 +perturbation=rewire_edges 
+   echo "FAILED srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py +descriptor=laplacian_spectrum_histogram +graph_type=knn_graph +graph_extraction_param=8 +perturbation=rewire_edges 
 " >> failed_jobs.txt
 fi
 
