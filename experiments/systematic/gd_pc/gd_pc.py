@@ -205,11 +205,14 @@ def point_cloud_perturbation_worker(
             kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
             mmd = MaximumMeanDiscrepancy(
-                biased=False, squared=True, verbose=cfg.debug.verbose,
+                biased=False,
+                squared=True,
+                verbose=cfg.debug.verbose,
+                kernel=kernel,
             ).compute(
                 kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
                 kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
-                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_XY"]),
             )
             mmd_runs.append(mmd)
         mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
@@ -242,7 +245,9 @@ def point_cloud_perturbation_worker(
             )
         else:
             unperturbed_descriptor_run = load_descriptor(
-                unperturbed_run, graph_type=graph_type, descriptor=descriptor,
+                unperturbed_run,
+                graph_type=graph_type,
+                descriptor=descriptor,
             )
             perturbed_descriptor_run = load_descriptor(
                 perturbed_run, graph_type=graph_type, descriptor=descriptor
@@ -254,7 +259,8 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs, normalize=False,
+                n_jobs=cfg.compute.n_jobs,
+                normalize=False,
             ),  # type: ignore
             verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -355,7 +361,12 @@ def twist_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "twist", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "twist",
+        descriptor,
     )
 
 
@@ -416,7 +427,12 @@ def shear_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "shear", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "shear",
+        descriptor,
     )
 
 
@@ -477,7 +493,12 @@ def taper_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "taper", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "taper",
+        descriptor,
     )
 
 
@@ -603,7 +624,12 @@ def mutation_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "mutation", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "mutation",
+        descriptor,
     )
 
 
