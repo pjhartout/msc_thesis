@@ -18,6 +18,7 @@ from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
+from sklearn.metrics import pairwise_distances
 from tqdm import tqdm
 
 from proteinmetrics.descriptors import (
@@ -119,13 +120,14 @@ def graph_perturbation_worker(
     descriptor,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
-    experiment_steps_perturbed.append(perturbation)
+    experiment_steps_perturbed.insert(2, perturbation)
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
 
     perturbed_protein_names = idx2name2run(cfg, perturbed=True)
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
+
     # For every run - compute x-y
     pre_computed_products = list()
     for run in range(cfg.meta.n_runs):
@@ -147,21 +149,18 @@ def graph_perturbation_worker(
         products = {
             # The np.ones is used here because
             # exp(sigma*(x-x)**2) = 1(n x n)
-            "K_XX": np.zeros(
-                (
-                    unperturbed_descriptor_run.shape[0],
-                    unperturbed_descriptor_run.shape[0],
-                )
+            "K_XX": pairwise_distances(
+                unperturbed_descriptor_run, unperturbed_descriptor_run,
             ),
-            "K_YY": np.zeros(
-                (
-                    perturbed_descriptor_run.shape[0],
-                    perturbed_descriptor_run.shape[0],
-                )
+            "K_YY": pairwise_distances(
+                perturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
             ),
-            "K_XY": np.dot(
-                unperturbed_descriptor_run - perturbed_descriptor_run,  # type: ignore
-                (unperturbed_descriptor_run - perturbed_descriptor_run).T,  # type: ignore
+            "K_XY": pairwise_distances(
+                unperturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
             ),
         }
         pre_computed_products.append(products)
@@ -173,29 +172,19 @@ def graph_perturbation_worker(
         mmd_runs = list()
         for run in range(cfg.meta.n_runs):
             log.info(f"Run {run}")
-            unperturbed_run = filter_protein_using_name(
-                unperturbed, unperturbed_protein_names[run].tolist()
-            )
-            perturbed_run = filter_protein_using_name(
-                perturbed, perturbed_protein_names[run].tolist()
-            )
-
-            unperturbed_descriptor_run = load_descriptor(
-                unperturbed_run, graph_type=graph_type, descriptor=descriptor
-            )
-            perturbed_descriptor_run = load_descriptor(
-                perturbed_run, graph_type=graph_type, descriptor=descriptor
-            )
             log.info("Computing the kernel.")
 
             kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
             mmd = MaximumMeanDiscrepancy(
-                biased=False, squared=True, verbose=cfg.debug.verbose,
+                biased=False,
+                squared=True,
+                verbose=cfg.debug.verbose,
+                kernel=kernel,
             ).compute(
                 kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
                 kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
-                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_XY"]),
             )
             mmd_runs.append(mmd)
         mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
@@ -217,14 +206,6 @@ def graph_perturbation_worker(
         perturbed_descriptor_run = load_descriptor(
             perturbed_run, graph_type=graph_type, descriptor=descriptor
         )
-
-        if cfg.debug.reduce_data:
-            unperturbed_descriptor_run = unperturbed_descriptor_run[
-                : cfg.debug.sample_data_size
-            ]
-            perturbed_descriptor_run = perturbed_descriptor_run[
-                : cfg.debug.sample_data_size
-            ]
 
         log.info("Computing the kernel.")
 
@@ -249,7 +230,7 @@ def save_mmd_experiment(
     graph_type,
     graph_extraction_param,
     perturbation_type,
-    kernel_params: Union[None, Dict] = None,
+    descriptor: str,
 ):
     mmds = (
         pd.concat(mmds)
@@ -262,21 +243,15 @@ def save_mmd_experiment(
         / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
-        / cfg.paths.weisfeiler_lehman
+        / cfg.paths.fixed_length_kernels
         / graph_type
         / str(graph_extraction_param)
         / perturbation_type
+        / descriptor
     )
     make_dir(target_dir)
-    if kernel_params is None:
-        mmds.to_csv(target_dir / f"{perturbation_type}_mmds.csv")
-    else:
-        kernel_spec_string = ""
-        for k, v in kernel_params.items():
-            kernel_spec_string += f"{k}={v}_"
-        mmds.to_csv(
-            target_dir / f"{perturbation_type}_{kernel_spec_string}mmds.csv"
-        )
+    mmds.to_csv(target_dir / f"{perturbation_type}_mmds.csv")
+
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     log.info(f"WROTE FILE in {target_dir}")
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -338,7 +313,7 @@ def remove_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "removedge",
+        cfg, mmds, graph_type, graph_extraction_param, "removedge", descriptor,
     )
 
 
@@ -398,7 +373,7 @@ def add_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "addedge",
+        cfg, mmds, graph_type, graph_extraction_param, "addedge", descriptor
     )
 
 
@@ -458,7 +433,7 @@ def rewire_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "rewireedge",
+        cfg, mmds, graph_type, graph_extraction_param, "rewireedge", descriptor
     )
 
 
@@ -495,6 +470,7 @@ def fixed_length_kernel_experiment_graph_perturbation(
                 ),
             )
         )
+
     elif graph_type == "eps_graph":
         base_feature_steps.append(
             (
@@ -506,6 +482,7 @@ def fixed_length_kernel_experiment_graph_perturbation(
                 ),
             )
         )
+
     else:
         raise ValueError(f"Unknown graph type {graph_type}")
     if descriptor == "degree_histogram":
@@ -552,45 +529,7 @@ def fixed_length_kernel_experiment_graph_perturbation(
                 ),
             )
         )
-    elif descriptor == "distance_histogram":
-        base_feature_steps.append(
-            (
-                "distance_histogram",
-                DistanceHistogram(
-                    n_bins=cfg.descriptors.distance_histogram.n_bins,
-                    n_jobs=cfg.compute.n_jobs,
-                    verbose=cfg.debug.verbose,
-                    bin_range=(
-                        cfg.descriptors.distance_histogram.bin_range.min,
-                        cfg.descriptors.distance_histogram.bin_range.max,
-                    ),
-                ),
-            )
-        )
-    elif descriptor == "dihedral_angles_histogram":
-        base_feature_steps[0] = (
-            (
-                "coordinates",
-                Coordinates(
-                    granularity="backbone",
-                    n_jobs=cfg.compute.n_jobs,
-                    verbose=True,
-                ),
-            ),
-        )[0]
 
-        base_feature_steps.append(
-            (
-                "dihedral_angles",
-                RamachandranAngles(
-                    from_pdb=False,
-                    n_bins=cfg.descriptors.dihedral_anlges.n_bins,
-                    n_jobs=cfg.compute.n_jobs,
-                    verbose=cfg.debug.verbose,
-                ),
-            )
-        )
-        pass
     else:
         raise ValueError("Unknown descriptor")
 
@@ -661,6 +600,13 @@ def main(cfg: DictConfig):
         descriptor=cfg.descriptor,
         perturbation=cfg.perturbation,
     )
+    # fixed_length_kernel_experiment_graph_perturbation(
+    #     cfg=cfg,
+    #     graph_type="eps_graph",
+    #     graph_extraction_param=8,
+    #     descriptor="clustering_histogram",
+    #     perturbation="remove_edges",
+    # )
 
 
 if __name__ == "__main__":

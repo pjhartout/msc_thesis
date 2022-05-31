@@ -40,8 +40,6 @@ def main(cfg):
         "degree_histogram",
         "clustering_histogram",
         "laplacian_spectrum_histogram",
-        "distance_histogram",
-        "dihedral_angles_histogram",
     ]
     perturbations = [
         "remove_edges",
