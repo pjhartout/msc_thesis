@@ -146,12 +146,28 @@ def point_cloud_perturbation_worker(
             perturbed, perturbed_protein_names[run].tolist()
         )
 
-        unperturbed_descriptor_run = load_descriptor(
-            unperturbed_run, graph_type=graph_type, descriptor=descriptor
-        )
-        perturbed_descriptor_run = load_descriptor(
-            perturbed_run, graph_type=graph_type, descriptor=descriptor
-        )
+        if descriptor == "distance_histogram":
+            unperturbed_descriptor_run = np.asarray(
+                [protein.distance_hist for protein in unperturbed]
+            )
+            perturbed_descriptor_run = np.asarray(
+                [protein.distance_hist for protein in perturbed]
+            )
+
+        elif descriptor == "dihedral_angles_histogram":
+            unperturbed_descriptor_run = np.asarray(
+                [protein.phi_psi_angles for protein in unperturbed]
+            )
+            perturbed_descriptor_run = np.asarray(
+                [protein.phi_psi_angles for protein in perturbed]
+            )
+        else:
+            unperturbed_descriptor_run = load_descriptor(
+                unperturbed_run, graph_type=graph_type, descriptor=descriptor
+            )
+            perturbed_descriptor_run = load_descriptor(
+                perturbed_run, graph_type=graph_type, descriptor=descriptor
+            )
 
         products = {
             # The np.ones is used here because
