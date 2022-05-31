@@ -55,16 +55,8 @@ def load_descriptor(
         proteins = path_or_protein
 
     descriptor_list = list()
-    if any([string not in descriptor for string in ["dihedral", "distance"]]):
-        for protein in proteins:
-            descriptor_list.append(protein.descriptors[graph_type][descriptor])
-    else:
-        if "dihedral" in descriptor or "ramachandran" in descriptor:
-            for protein in proteins:
-                descriptor_list.append(protein.phi_psi_angles)
-        elif "distance" in descriptor:
-            for protein in proteins:
-                descriptor_list.append(protein.distance_hist)
+    for protein in proteins:
+        descriptor_list.append(protein.descriptors[graph_type][descriptor])
 
     return np.array(descriptor_list)
 
