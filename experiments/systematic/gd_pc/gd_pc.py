@@ -174,7 +174,8 @@ def point_cloud_perturbation_worker(
             # The np.ones is used here because
             # exp(sigma*(x-x)**2) = 1(n x n)
             "K_XX": pairwise_distances(
-                unperturbed_descriptor_run, unperturbed_descriptor_run,
+                unperturbed_descriptor_run,
+                unperturbed_descriptor_run,
             ),
             "K_YY": pairwise_distances(
                 perturbed_descriptor_run,
@@ -584,8 +585,8 @@ def mutation_perturbation_linear_kernel(
             f"mutation_{perturb}",
             Mutation(
                 p_mutate=perturb,
-                random_state=hash(
-                    str(perturbed)
+                random_state=np.random.RandomState(
+                    divmod(hash(str(perturbed)), 42)[1]
                 ),  # The seed is the same as long as the paths is the same.
                 n_jobs=cfg.compute.n_jobs,
                 verbose=cfg.debug.verbose,
