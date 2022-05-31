@@ -173,17 +173,13 @@ def point_cloud_perturbation_worker(
         products = {
             # The np.ones is used here because
             # exp(sigma*(x-x)**2) = 1(n x n)
-            "K_XX": np.zeros(
-                (
-                    unperturbed_descriptor_run.shape[0],
-                    unperturbed_descriptor_run.shape[0],
-                )
+            "K_XX": pairwise_distances(
+                unperturbed_descriptor_run, unperturbed_descriptor_run,
             ),
-            "K_YY": np.zeros(
-                (
-                    perturbed_descriptor_run.shape[0],
-                    perturbed_descriptor_run.shape[0],
-                )
+            "K_YY": pairwise_distances(
+                perturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
             ),
             "K_XY": pairwise_distances(
                 unperturbed_descriptor_run,
