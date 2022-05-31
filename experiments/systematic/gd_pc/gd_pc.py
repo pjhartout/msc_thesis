@@ -149,18 +149,18 @@ def point_cloud_perturbation_worker(
 
         if descriptor == "distance_histogram":
             unperturbed_descriptor_run = np.asarray(
-                [protein.distance_hist for protein in unperturbed]
+                [protein.distance_hist for protein in unperturbed_run]
             )
             perturbed_descriptor_run = np.asarray(
-                [protein.distance_hist for protein in perturbed]
+                [protein.distance_hist for protein in perturbed_run]
             )
 
         elif descriptor == "dihedral_angles_histogram":
             unperturbed_descriptor_run = np.asarray(
-                [protein.phi_psi_angles for protein in unperturbed]
+                [protein.phi_psi_angles for protein in unperturbed_run]
             )
             perturbed_descriptor_run = np.asarray(
-                [protein.phi_psi_angles for protein in perturbed]
+                [protein.phi_psi_angles for protein in perturbed_run]
             )
         else:
             unperturbed_descriptor_run = load_descriptor(
@@ -230,24 +230,22 @@ def point_cloud_perturbation_worker(
 
         if descriptor == "distance_histogram":
             unperturbed_descriptor_run = np.asarray(
-                [protein.distance_hist for protein in unperturbed]
+                [protein.distance_hist for protein in unperturbed_run]
             )
             perturbed_descriptor_run = np.asarray(
-                [protein.distance_hist for protein in perturbed]
+                [protein.distance_hist for protein in perturbed_run]
             )
 
         elif descriptor == "dihedral_angles_histogram":
             unperturbed_descriptor_run = np.asarray(
-                [protein.phi_psi_angles for protein in unperturbed]
+                [protein.phi_psi_angles for protein in unperturbed_run]
             )
             perturbed_descriptor_run = np.asarray(
-                [protein.phi_psi_angles for protein in perturbed]
+                [protein.phi_psi_angles for protein in perturbed_run]
             )
         else:
             unperturbed_descriptor_run = load_descriptor(
-                unperturbed_run,
-                graph_type=graph_type,
-                descriptor=descriptor,
+                unperturbed_run, graph_type=graph_type, descriptor=descriptor,
             )
             perturbed_descriptor_run = load_descriptor(
                 perturbed_run, graph_type=graph_type, descriptor=descriptor
@@ -259,8 +257,7 @@ def point_cloud_perturbation_worker(
             biased=False,
             squared=True,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs,
-                normalize=False,
+                n_jobs=cfg.compute.n_jobs, normalize=False,
             ),  # type: ignore
             verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -361,12 +358,7 @@ def twist_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "twist",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "twist", descriptor,
     )
 
 
@@ -427,12 +419,7 @@ def shear_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "shear",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "shear", descriptor,
     )
 
 
@@ -493,12 +480,7 @@ def taper_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "taper",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "taper", descriptor,
     )
 
 
@@ -624,12 +606,7 @@ def mutation_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg,
-        mmds,
-        graph_type,
-        graph_extraction_param,
-        "mutation",
-        descriptor,
+        cfg, mmds, graph_type, graph_extraction_param, "mutation", descriptor,
     )
 
 
@@ -847,21 +824,21 @@ def main(cfg: DictConfig):
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-    fixed_length_kernel_experiment_graph_perturbation(
-        cfg=cfg,
-        graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_parameter,
-        descriptor=cfg.descriptor,
-        perturbation=cfg.perturbation,
-    )
-
     # fixed_length_kernel_experiment_graph_perturbation(
     #     cfg=cfg,
-    #     graph_type="pc_descriptor",
-    #     graph_extraction_param=1,
-    #     descriptor="distance_histogram",
-    #     perturbation="twist",
+    #     graph_type=cfg.graph_type,
+    #     graph_extraction_param=cfg.graph_extraction_parameter,
+    #     descriptor=cfg.descriptor,
+    #     perturbation=cfg.perturbation,
     # )
+
+    fixed_length_kernel_experiment_graph_perturbation(
+        cfg=cfg,
+        graph_type="pc_descriptor",
+        graph_extraction_param=1,
+        descriptor="distance_histogram",
+        perturbation="twist",
+    )
 
 
 if __name__ == "__main__":
