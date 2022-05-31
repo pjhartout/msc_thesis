@@ -54,17 +54,13 @@ class LinearKernel(Kernel):
     ) -> Any:
         if Y is not None:
             if self.normalize:
-                if X.shape == Y.shape:
-                    return np.dot(X, Y.T) / np.sqrt(
-                        np.dot(X, X.T) * np.dot(Y, Y.T)
-                    )
-                else:
-                    raise ValueError(
-                        "X and Y must have the same shape to normalize"
-                    )
-            return np.dot(X, Y.T)
+                return linear_kernel(X, Y) / np.sqrt(
+                    linear_kernel(X, X) * linear_kernel(Y, Y)
+                )
+
+            return linear_kernel(X, Y)
         else:
-            K_XX = np.dot(X, X.T)
+            K_XX = linear_kernel(X, X)
             if self.normalize:
                 return K_XX / np.sqrt(K_XX * K_XX)
             return K_XX
@@ -80,12 +76,12 @@ class GaussianKernel(Kernel):
 
     def compute_matrix(
         self, X: np.ndarray, Y: Union[np.ndarray, None] = None
-    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+    ) -> np.ndarray:
         if Y is None:
             Y = X
 
         if not self.pre_computed_product:
-            P = np.dot(X - Y, (X - Y).T)
+            P = pairwise_distances(X, Y, metric="euclidean")
         else:
             P = X
         return np.exp(-self.sigma * P)
