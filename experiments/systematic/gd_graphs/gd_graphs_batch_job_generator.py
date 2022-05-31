@@ -34,7 +34,7 @@ def main(cfg):
     wl_pc.write(f"\n\n")
     wl_pc.write(f"cd /home/phartout/Documents/Git/msc_thesis/ \n")
     wl_pc.write(f"export PATH=/home/phartout/.anaconda3/bin:$PATH\n\n")
-    slurm_string = "srun --cpus-per-task 140 --mem-per-cpu 7G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py"
+    slurm_string = "srun --cpus-per-task 50 --mem-per-cpu 9.9G --exclude=bs-hpsvr08 poetry run python experiments/systematic/gd_graphs/gd_graphs.py"
 
     descriptors = [
         "degree_histogram",
