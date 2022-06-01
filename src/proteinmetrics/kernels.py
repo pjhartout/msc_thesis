@@ -171,7 +171,7 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         Ks = distribute_function(
             compute_kernel_in_homology_dimension,
             np.unique(X[0][:, 2]),
-            n_jobs=self.n_jobs,
+            n_jobs=np.unique(X[0][:, 2]).shape[0],
             tqdm_label="Computing Persistence Fisher Kernel",
             show_tqdm=self.verbose,
         )
