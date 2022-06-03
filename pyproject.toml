@@ -38,6 +38,7 @@ torch = "^1.11.0"
 scipy = "^1.8.0"
 umap-learn = "^0.5.3"
 Brotli = "^1.0.9"
+torch-topological = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.1.0", allow-prereleases = true}
