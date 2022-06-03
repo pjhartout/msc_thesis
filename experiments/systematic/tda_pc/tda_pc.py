@@ -382,12 +382,7 @@ def gaussian_perturbation_wl_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg,
-            experiment_steps,
-            perturbation,
-            unperturbed,
-            perturbed,
-            graph_type,
+            cfg, experiment_steps, perturbation, unperturbed, perturbed,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with gaussian noise {p_perturb}.")
