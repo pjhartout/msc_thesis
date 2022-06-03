@@ -15,9 +15,11 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from grakel import WeisfeilerLehman, graph_from_networkx
+from scipy.spatial.distance import cdist
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
+from torch import cdist
 
 from .utils.functions import distribute_function, networkx2grakel
 from .utils.metrics import (
@@ -171,13 +173,67 @@ class PersistenceFisherKernel(BaseEstimator, TransformerMixin, Kernel):
         Ks = distribute_function(
             compute_kernel_in_homology_dimension,
             np.unique(X[0][:, 2]),
-            n_jobs=np.unique(X[0][:, 2]).shape[0],
+            n_jobs=self.n_jobs,
             tqdm_label="Computing Persistence Fisher Kernel",
             show_tqdm=self.verbose,
         )
 
         # We take the average of the kernel matrices in each homology dimension
         return np.product(np.array(Ks), axis=0)
+
+
+class MultiScaleKernel(Kernel):
+    """Multiscale kernel
+    References:
+        A Stable Multi-scale Kernel for Topological Machine Learning by Reininghaus et al.
+        Statistical Topological Data Analysis - A Kernel Perspective by Kwitt et al.
+    TODO: format
+
+    This is a numpy-friendly version of this implementation: https://github.com/aidos-lab/pytorch-topological/blob/main/torch_topological/nn/multi_scale_kernel.py
+    """
+
+    def __init__(self, sigma, p=2.0, **kwargs):
+        super().__init__(**kwargs)
+        self.sigma = sigma
+        self.p = p
+
+    @staticmethod
+    def _mirror(x):
+        # Mirror one or multiple points of a persistence
+        # diagram at the diagonal
+        if len(x.shape) > 1:
+            return x[:, [1, 0]]
+
+    def _dist(self, x, y):
+        # Compute the point-wise lp-distance between two
+        # persistence diagrams
+        dist = cdist(x, y, p=self.p)
+        return np.power(dist, 2)
+
+    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
+
+        if Y is None:
+            Y = X
+
+        k_sigma = 0.0
+        for dim in np.unique(X[0][:, 2]):
+            D1 = filter_dimension(X, dim)
+            D2 = filter_dimension(Y, dim)
+
+            # compute the pairwise distances between the
+            # two diagrams
+            nom = self._dist(D1, D2)
+            # distance between diagram 1 and mirrored
+            # diagram 2
+            denom = self._dist(D1, self._mirror(D2), self.p)
+
+            M = np.exp(-nom) / (8 * self.sigma)
+            M -= np.exp(-denom) / (8 * self.sigma)
+
+            # sum over all points
+            k_sigma += M.sum() / (8.0 * self.sigma * np.pi)
+
+        return
 
 
 class KernelComposition:
