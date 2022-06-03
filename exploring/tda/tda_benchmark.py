@@ -5,6 +5,8 @@
 
 Is using ripser directly using Bastian's data structure faster than giotto's?
 
+giotto is faster
+
 """
 import os
 import pickle
@@ -49,7 +51,7 @@ from proteinmetrics.utils.functions import (
     tqdm_joblib,
 )
 
-N_JOBS = 4
+N_JOBS = 6
 
 
 @timeit
@@ -80,6 +82,7 @@ def torch_topological(proteins):
     # get coordinates
     coordinates = [protein.coordinates for protein in proteins]
     vr = VietorisRipsComplex(dim=3)
+
     vr_complexes = distribute_function(
         compute_vr,
         coordinates,
@@ -96,14 +99,25 @@ def main():
     sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
-        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True,),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        (
+            "contact_map",
+            ContactMap(
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
+        ),
     ]
 
     base_feature_pipeline = pipeline.Pipeline(base_feature_steps, verbose=True)
-    proteins = base_feature_pipeline.fit_transform(sampled_files[:10],)
+    proteins = base_feature_pipeline.fit_transform(
+        sampled_files[:10],
+    )
 
-    giotto(proteins)
+    # giotto(proteins)
 
     torch_topological(proteins)
 
