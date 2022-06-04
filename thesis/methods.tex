@@ -10,25 +10,60 @@ steps:
 
 \begin{enumerate}
 \item Take two i.i.d. samples a database of proteins.
-\item Apply some perturbation to one of the samples.
+\item Progressively add some perturbation to one of the samples.
 \item Measure the MMD between the unperturbed and perturbed sample.
 \end{enumerate}
 
-We start by motivating the datasets that will be used to simulate a
-generative protein model. We then enumerate and justify the configurations of maximum mean
-discrepancy that will be tested, including all the combinations of protein
-representations, descriptor functions, and kernels. Finally, we describe and
-motivate the experimental setups -- i.e. perturbations -- that we will employ to
-test the various metric configurations.
+We start by motivating the datasets that will be used to simulate a generative
+protein model. We then describe and motivate the experimental setups -- i.e.
+perturbations -- that we will employ to test the various configurations MMD.
+Finally, we enumerate and justify which configurations of MMD are tested,
+including all the combinations of protein representations, descriptor functions,
+and kernels. Finally, we describe and motivate the experimental setups -- i.e.
+perturbations -- that we will employ to test the various metric configurations.
 
 
 \section{Datasets}
 
-Because generative models have not been applied to proteins yet, which is partly due to
-the lack of suitable evaluation metrics, no generative model can be used here.
-In this thesis, we will use the EBI AlphaFold2Recently, however, the emergence of AlphaFold2
+Because generative models have not been applied to proteins yet, which is partly
+due to the lack of suitable evaluation metrics, no generative model can be used
+here. In this thesis, except otherwise stated, all results will be dervied from
+10 random samples from the \textit{homo sapiens} monomeric proteome downloaded
+from the EBI AlphaFold2 database
+\citep{varadi2022alphafold,tunyasuvunakool2021highly}, a repository comprising
+predicted 3D structures of protein sequences obtained from AlphaFold2, the
+current state-of-the-art method to predict protein structure from sequences
+\citep{jumper2021highly}. This dataset was chosen because it contains
+consistently formatted pdb files consistently only containing information from
+heavy atom directly contributing to the 3D structure of a single monomer, which
+simplifies downstream processing.
 
 \section{Perturbations}
+
+While \cite{o2021evaluation} focused on \emph{graph perturbations} specifically,
+we wanted to augment and refine the set of perturbation applied to the perturbed
+sample of proteins to be more pertinent to this particular data type. Three categories of
+perturbations can be distinguished:
+\begin{itemize}
+\item \emph{Graph Perturbations}. These perturbations mostly overlap with those defined by
+  \cite{o2021evaluation}, as they include (i) adding edges to a graph (ii)
+  removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
+  graph.
+\item \emph{Point cloud perturbations}. These perturbations aim to add changes
+  to the underlying coordinates of each of the atom in the protein. Such
+  perturbations include (i) injecting Gaussian noise (ii) twisting (iii)
+  shearing (iv) tapering.
+\item \emph{Mutation}. These simply consist in swapping node labels, i.e.
+  changing an existing node label, with another. While graph perturbation
+  probabilities (i.e. of adding an edge) ranges from 0 to 1, here we mostly
+  concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
+  sensitive the MMD to a few point mutations, which covers most relevant
+  real-world protein engineering use cases \cite{poluri2016protein}.
+\end{itemize}
+
+For each perturbation, a range of degree of perturbation is defined and 20
+different degrees of perturbation is examined and repeated 10 times with i.i.d. set of
+proteins to estimate the sensitivity of the particular MMD configuration to the.
 
 \section{MMD Configurations}
 
