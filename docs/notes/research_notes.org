@@ -378,6 +378,17 @@ There are multiple objectives here:
 + Extract graph from real datasets
 
 * Annotations :noexport:
+
+Protein engineering techniques.
+#+begin_src bibtex
+@book{poluri2016protein,
+  title={Protein engineering techniques: Gateways to synthetic protein universe},
+  author={Poluri, Krishna Mohan and Gulati, Khushboo},
+  year={2016},
+  publisher={Springer}
+}
+#+end_src
+
   Blog explaining weisfeiler-lehmann procedure (with illustrations)
   #+begin_src bibtex
 @misc{mengin2019,
@@ -459,6 +470,20 @@ AlphaFold EBI Database
   pages={D439--D444},
   year={2022},
   publisher={Oxford University Press}
+}
+#+end_src
+
+AlphaFold Human proteome
+#+begin_src bibtex
+@article{tunyasuvunakool2021highly,
+  title={Highly accurate protein structure prediction for the human proteome},
+  author={Tunyasuvunakool, Kathryn and Adler, Jonas and Wu, Zachary and Green, Tim and Zielinski, Michal and {\v{Z}}{\'\i}dek, Augustin and Bridgland, Alex and Cowie, Andrew and Meyer, Clemens and Laydon, Agata and others},
+  journal={Nature},
+  volume={596},
+  number={7873},
+  pages={590--596},
+  year={2021},
+  publisher={Nature Publishing Group}
 }
 #+end_src
 
@@ -1624,6 +1649,7 @@ Research questions:
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
+*** We did not consider more advance mutation types (transpositions, deletions, additions, or reverse)
 
 ** References
 #+LaTeX: \printbibliography[heading=none]
