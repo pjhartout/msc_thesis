@@ -23,23 +23,24 @@ introduce kernels can be used within the maximum mean discrepancy.
 \section{Proteins}\label{background:proteins}
 
 Proteins are large biomolecules that are formed from a sequence of amino acids,
-performing their functions as determined by their three-dimensional structure, and amino
-acid sequence. Proteins support a vast array of functions in living organisms,
-such as catalysing metabolic reactions, DNA replication, providing structural
-support to cells, transporting molecules and sensing stimuli.
+performing their functions as determined by their three-dimensional structure,
+and amino acid sequence. Proteins support a vast array of functions in living
+organisms, such as catalysing metabolic reactions, DNA replication, providing
+structural support to cells, transporting molecules and sensing stimuli.
 
-Each protein is made up of one or more chains of amino acids, each of which
-contain a backbone and different side chains. The atoms in the backbone include
-a \textalpha{}-carbon, another carbon and a nitrogen atom. An overview of the
+Each protein is made up of one or more chains of amino acids, and contain a
+backbone and different side chains. The atoms in the backbone include a
+\textalpha{}-carbon, another carbon and a nitrogen atom. An overview of the
 peptide backbone is shown in Figure \ref{fig:backbone}. Interestingly, a plane
-is forned by two alpha carbons, the carboxyl group, and the hydrogen atom attached
-to the nitrogen atom (see Figure \ref{fig:backbone}), making the peptide bond
-between the nitrogen and carbon atom resistant to twisting. That means that the
-rotations enabling the 3D folding of a protein is governed by the angle of the bonds linking
-the nitrogen atom to the \textalpha{}-carbon and the other carbon atom to the
-\textalpha{}-carbon, named \textphi{} and \textpsi{}. These angles' values are
-frequently used to validate proteins, characterise the secondary structure of proteins
-(i.e. structural features observed in certain segments of proteins), etc.
+is forned by two alpha carbons, the carboxyl group, and the hydrogen atom
+attached to the nitrogen atom (see Figure \ref{fig:backbone}), making the
+peptide bond between the nitrogen and carbon atom resistant to twisting. That
+means that the rotations enabling the 3D folding of a protein is governed by the
+angle of the bonds linking the nitrogen atom to the \textalpha{}-carbon and the
+other carbon atom to the \textalpha{}-carbon, named \textphi{} and \textpsi{}.
+These angles' values are frequently used to validate proteins, characterise the
+secondary structure of proteins (i.e. structural features observed in certain
+segments of proteins), etc.
 
 
 \begin{figure}[h]
@@ -393,7 +394,8 @@ properties:
 \end{itemize}
 
 Given $n$ samples from $\bx=\{x_1,\dots, x_n\}\subseteq\mathcal{X}$ and $m$
-samples from $\by=\{y_1,\dots, y_m\}\subseteq\mathcal{X}$, the biased estimate of $\MMD^2$ is given by:
+samples from $\by=\{y_1,\dots, y_m\}\subseteq\mathcal{X}$, the biased estimate
+of $\MMD^2$ is given by:
 
 \begin{equation}
   \label{eq:mmd}

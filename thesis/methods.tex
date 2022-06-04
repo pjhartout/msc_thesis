@@ -42,28 +42,29 @@ simplifies downstream processing.
 
 While \cite{o2021evaluation} focused on \emph{graph perturbations} specifically,
 we wanted to augment and refine the set of perturbation applied to the perturbed
-sample of proteins to be more pertinent to this particular data type. Three categories of
-perturbations can be distinguished:
+sample of proteins to be more pertinent to this particular data type. Three
+categories of perturbations can be distinguished:
 \begin{itemize}
-\item \emph{Graph Perturbations}. These perturbations mostly overlap with those defined by
-  \cite{o2021evaluation}, as they include (i) adding edges to a graph (ii)
-  removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
-  graph.
+\item \emph{Graph Perturbations}. These perturbations mostly overlap with those
+defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
+(ii) removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
+graph.
 \item \emph{Point cloud perturbations}. These perturbations aim to add changes
-  to the underlying coordinates of each of the atom in the protein. Such
-  perturbations include (i) injecting Gaussian noise (ii) twisting (iii)
-  shearing (iv) tapering.
+to the underlying coordinates of each of the atom in the protein. Such
+perturbations include (i) injecting Gaussian noise (ii) twisting (iii) shearing
+(iv) tapering.
 \item \emph{Mutation}. These simply consist in swapping node labels, i.e.
-  changing an existing node label, with another. While graph perturbation
-  probabilities (i.e. of adding an edge) ranges from 0 to 1, here we mostly
-  concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
-  sensitive the MMD to a few point mutations, which covers most relevant
-  real-world protein engineering use cases \cite{poluri2016protein}.
+changing an existing node label, with another. While graph perturbation
+probabilities (i.e. of adding an edge) ranges from 0 to 1, here we mostly
+concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
+sensitive the MMD to a few point mutations, which covers most relevant
+real-world protein engineering use cases \cite{poluri2016protein}.
 \end{itemize}
 
 For each perturbation, a range of degree of perturbation is defined and 20
-different degrees of perturbation is examined and repeated 10 times with i.i.d. set of
-proteins to estimate the sensitivity of the particular MMD configuration to the.
+different degrees of perturbation is examined and repeated 10 times with i.i.d.
+set of proteins to estimate the sensitivity of the particular MMD configuration
+to the.
 
 \section{MMD Configurations}
 
