@@ -17,6 +17,9 @@ experiments/systematic/wl_graphs/wl_graphs_job_array.sh
 # Hide hydra output directories
 outputs
 
+# We don't want the compiled pdf bloating the repo yet
+thesis/main.pdf
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
