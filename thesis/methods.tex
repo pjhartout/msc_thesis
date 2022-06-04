@@ -1,24 +1,37 @@
 \chapter{Methods}
 
-Dummy text.% Don't forget about precomputign difference between x and y in
-           % Gaussian kernel
+% Dummy text.% Don't forget about precomputign difference between x and y in
+% % Gaussian kernels
 
-\section{Example Section}
+The primary methodology employed in this thesis to assess the quality of metrics
+used to evaluate generative protein models follows a fundamentally similar
+approach used by \cite{o2021evaluation}, which we adapt to include the following
+steps:
 
-Dummy text.
+\begin{enumerate}
+\item Take two i.i.d. samples a database of proteins.
+\item Apply some perturbation to one of the samples.
+\item Measure the MMD between the unperturbed and perturbed sample.
+\end{enumerate}
 
-\subsection{Example Subsection}
+We start by motivating the datasets that will be used to simulate a
+generative protein model. We then enumerate and justify the configurations of maximum mean
+discrepancy that will be tested, including all the combinations of protein
+representations, descriptor functions, and kernels. Finally, we describe and
+motivate the experimental setups -- i.e. perturbations -- that we will employ to
+test the various metric configurations.
 
-Dummy text.
 
-\subsubsection{Example Subsubsection}
+\section{Datasets}
 
-Dummy text.
+Because generative models have not been applied to proteins yet, which is partly due to
+the lack of suitable evaluation metrics, no generative model can be used here.
+In this thesis, we will use the EBI AlphaFold2Recently, however, the emergence of AlphaFold2
 
-\paragraph{Example Paragraph}
+\section{Perturbations}
 
-Dummy text.
+\section{MMD Configurations}
 
-\subparagraph{Example Subparagraph}
+\section{Experimental Setup}
 
-Dummy text.
+\section{Summary}
