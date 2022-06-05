@@ -457,3 +457,20 @@ ping google.com
 *** sample for error bar
 *** on 100 CPU cores, should be doable
 ** account for intra sample variance, so two different family (kernel needs to pick up perturbation on other unseen proteins)
+
+* Notion meeting notes
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-06-04 Sat 19:59
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:END:
+Set of meetings in Notion: https://rectangular-answer-964.notion.site/6b95962afd784fb887ceeff1e0b79dc9?v=f187d8658edb4ff0a0f68dba8f0d42d8
+
+* DONE Notion meeting notes
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-06-04 Sat 19:59
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:ARCHIVE_TODO: DONE
+:END:
+Set of meetings in Notion: https://rectangular-answer-964.notion.site/6b95962afd784fb887ceeff1e0b79dc9?v=f187d8658edb4ff0a0f68dba8f0d42d8
