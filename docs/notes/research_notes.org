@@ -1477,5 +1477,9 @@ Research questions:
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
 
+* Cluster essentials
+scontrol show jobid -dd [id]
+squeue --start -p cpu
+
 ** References
 #+LaTeX: \printbibliography[heading=none]
