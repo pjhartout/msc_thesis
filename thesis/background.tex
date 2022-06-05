@@ -20,7 +20,7 @@ we discuss the current landscape of methods used to evaluate
 graph generative models, such as the maximum mean discrepancy. Finally, we
 introduce kernels can be used within the maximum mean discrepancy.
 
-\section{Proteins}\label{background:proteins}
+\section{Proteins}\label{sec:proteins}
 
 Proteins are large biomolecules that are formed from a sequence of amino acids,
 performing their functions as determined by their three-dimensional structure,
@@ -70,7 +70,7 @@ the middle upper right part of the plot. This figure is adapted from
   \label{fig:ramachandran}
 \end{figure}
 
-\section{Graphs}\label{background:graphs}
+\section{Graphs}\label{sec:graphs}
 
 Proteins are often abstracted using graphs. A graph $G$ is a pair of vertices
 $V$ and edges $E$ such that $G=(V, E)$, $|V|=n$ and $|E|=m$. Two vertices $i$
@@ -98,14 +98,14 @@ extract a \emph{contact map} of a protein by computing the (euclidean) distance
 between any two points belonging to each amino acid. The \textalpha-carbon is
 often used for this purpose. This is a fully connected graph with continuously
 labeled edges representing the distance between each node. From there, it is
-possible to either extract a $k$-nearest neighbour graph, where
+possible to either extract a $k$-nearest neighbour ($k$-NN) graph, where
 $k\in\mathbb{N}>0$ defines the amount of nodes directly connected to any given
 nodes; or an $\varepsilon$-graph, where each node within a given distance
 $\varepsilon\in\mathbb{R^+}\setminus \{0\}$ of another node is connected. Both
 are graphs where each node is labeled with the residue name to which the
 \textalpha{}-carbon belongs and the edges are unlabeled.
 
-\section{Topological Data Analysis}\label{background:tda}
+\section{Topological Data Analysis}\label{sec:tda}
 
 Although graphs are powerful representation of proteins, the latter can also be
 represented as \emph{point clouds}. One powerful field of study of topological
@@ -167,7 +167,7 @@ x(j))\leq\varepsilon\},\ \forall x(i),x(j)\in\sigma$, i.e.
 $\mathcal{V}_{\varepsilon}$ contains all subsets of the input space whose
 pairwise distances are less than or equal to $\varepsilon$.
 $\mathcal{V}_{\varepsilon}$ is conceptually very similar to the
-$\varepsilon$-graphs discussed in section \ref{background:graphs}, except that
+$\varepsilon$-graphs discussed in section \ref{sec:graphs}, except that
 $\varepsilon$ here ranges over the entire space of possible distance values, and
 $\mathcal{V}_{\epsilon}$ also tracks topological features over all three
 dimensions, instead of only connected nodes.
@@ -243,7 +243,7 @@ presence of one edge is not independent from another, i.e. real-world graphs
 often exhibit patterns of local connectedness which need to be accounted for in
 the model.
 
-\section{The Evaluation Problem}
+\section{The Evaluation Problem}\label{sec:evalproblem}
 
 But perhaps the most significant problem plaguing all generative models is the
 evaluation problem. Concretely, this problem can be framed using the following
@@ -350,7 +350,7 @@ is assigned the following value:
 f^{(l)}\left(\left\{ \mathbf{h}_{v}^{(l-1)}: u\in N(v)\right\}\right)\right),
 \end{equation}
 
-$\forall v\in V$ where $V$ is as defined in section \ref{background:graphs},
+$\forall v\in V$ where $V$ is as defined in section \ref{sec:graphs},
 $\forall\ l>0, \mathbf{h}_{v}^{(l)}\in\mathbb{R}^d$, $\text{MLP}^{(l)}$ is a
 multilayer perceptron, and $f^{(l)}$ is some aggregating function, such as mean,
 max or sum. The second part, i.e. the graph readout layer with skip connections,
@@ -368,7 +368,7 @@ GNNs such as \cite{liao2019efficient, niu2020permutation}, and
 \cite{you2018graphrnn} have generally gravitated towards the maximum mean
 discrepancy (MMD) measure to evaluate the quality of the graph.
 
-\section{Maximum Mean Discrepancy}\label{background:kernels}
+\section{Maximum Mean Discrepancy}\label{sec:mmd}
 
 A significant part of this thesis is centered around investigating the MMD
 statistic, so we define and examine existing around MMD research here. Introduced by
@@ -417,7 +417,7 @@ A common practice in the literature is to first extract some fixed-length graph
 representation using a range of commonly used descriptors such as:
 \begin{itemize}
 \item \textbf{The degree histogram.} Given a graph $G=(E,V)$ as defined in Section
-  \ref{background:graphs}, we can calculate $\deg(v)\forall v\in V$, where
+  \ref{sec:graphs}, we can calculate $\deg(v)\forall v\in V$, where
   position $i$ of the resulting histogram is the number of vertices with degree
   $i$. With a given maximum $d$, we obtain a mapping $f:G\mapsto\R^d$. We will
   normalize the entries of the histogram to obtain a size-invariant descriptor.
@@ -434,7 +434,7 @@ representation using a range of commonly used descriptors such as:
 
 \item \textbf{The Laplacian spectrum histogram.} The normalized graph Laplacian
   is given by $\laplace :=I-D^{-{1\over 2}}AD^{-{1\over 2}}$ where $A$ is the
-  adjacency matrix (see Section \ref{background:graphs}), $I$ the identity
+  adjacency matrix (see Section \ref{sec:graphs}), $I$ the identity
   matrix and $D$ the degree matrix, where $D_{ii}=\deg(v_i)$ and $D_{ij}=0,
   i\neq j$. Since $A$ is symmetric (all graphs in this thesis are undirected),
   and that $\laplace$ is real-valued, it is also diagnonalizable, with
@@ -494,7 +494,7 @@ kernels (reviewed by \cite{borgwardt2020graph}). In particular we will examine
 an efficient and expressive kernel used for biological
 data: the Weisfeiler-Lehmann kernel. The second class of kernels leveraged here
 operate directly on the persistence diagrams obtained using the filtration
-procedures described in section \ref{background:tda}, in particular the
+procedures described in section \ref{sec:tda}, in particular the
 persistence Fisher kernel introduced by \cite{le2018persistence}. We define both
 in the next paragraphs.
 

@@ -22,6 +22,7 @@ including all the combinations of protein representations, descriptor functions,
 and kernels. Finally, we describe and motivate the experimental setups -- i.e.
 perturbations -- that we will employ to test the various metric configurations.
 
+% TODO: refs to tables and emphasize on doing things \emph{in detail}
 
 \section{Datasets}
 
@@ -34,7 +35,7 @@ from the EBI AlphaFold2 database
 predicted 3D structures of protein sequences obtained from AlphaFold2, the
 current state-of-the-art method to predict protein structure from sequences
 \citep{jumper2021highly}. This dataset was chosen because it contains
-consistently formatted pdb files consistently only containing information from
+consistently formatted \texttt{pdb} files only containing information from
 heavy atom directly contributing to the 3D structure of a single monomer, which
 simplifies downstream processing.
 
@@ -42,32 +43,122 @@ simplifies downstream processing.
 
 While \cite{o2021evaluation} focused on \emph{graph perturbations} specifically,
 we wanted to augment and refine the set of perturbation applied to the perturbed
-sample of proteins to be more pertinent to this particular data type. Three
+sample of proteins to be more pertinent to proteins. Three
 categories of perturbations can be distinguished:
-\begin{itemize}
-\item \emph{Graph Perturbations}. These perturbations mostly overlap with those
+
+% TODO add illustrations + range of perturbations
+\paragraph{Graph Perturbations} These perturbations mostly overlap with those
 defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
 (ii) removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
 graph.
-\item \emph{Point cloud perturbations}. These perturbations aim to add changes
+\paragraph{Point cloud perturbations} These perturbations aim to add changes
 to the underlying coordinates of each of the atom in the protein. Such
 perturbations include (i) injecting Gaussian noise (ii) twisting (iii) shearing
 (iv) tapering.
-\item \emph{Mutation}. These simply consist in swapping node labels, i.e.
+\paragraph{Mutation} These simply consist in swapping node labels, i.e.
 changing an existing node label, with another. While graph perturbation
-probabilities (i.e. of adding an edge) ranges from 0 to 1, here we mostly
+probabilities (e.g. of adding an edge) ranges from 0 to 1, here we mostly
 concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
-sensitive the MMD to a few point mutations, which covers most relevant
-real-world protein engineering use cases \cite{poluri2016protein}.
-\end{itemize}
+sensitive the MMD to a few point mutations, which covers some of the
+real-world protein engineering use cases \citep{poluri2016protein}.
 
 For each perturbation, a range of degree of perturbation is defined and 20
-different degrees of perturbation is examined and repeated 10 times with i.i.d.
-set of proteins to estimate the sensitivity of the particular MMD configuration
-to the.
+different degrees of perturbation is examined and repeated 10 times with 10
+pairs of i.i.d. proteins to estimate the sensitivity of the particular MMD
+configuration to the perturbation.
 
 \section{MMD Configurations}
 
+
+
+We introduced MMD in Section \ref{sec:mmd}, Equation \ref{eq:mmd}, and
+noted that an important part of MMD consists in choosing the right set of
+descriptor function and kernel. Here, we list and motivate all graph extraction techniques,
+descriptor functions employed, and kernels adopted in this experiment.
+
+% TODO do we normalize?
+First, throughout our experiments we will use the unbiased squared MMD estimate, which
+removes self-comparison terms in the kernel matrices (\cite{gretton2012kernel},
+Lemma 6), which can result in negative values. We might normalize it as
+well to compare behaviours of different MMD configurations not operating on the
+same scale.
+
+\subsection{Representations}
+We will use several different representations in this thesis, which can be
+grouped into three categories. The first is \emph{coordinates}. These are parsed
+from each \texttt{.pdb} file. The second is \emph{graphs}. They include $k$-NN
+and $\varepsilon$-graphs, introduced in Section \ref{sec:graphs}. The third is
+the simple protein \emph{sequence}. Each protein's sequence parsed from each
+\texttt{.pdb} file as is. Since we are only dealing with monomers, no additional
+processing is required.
+
+\subsection{Descriptor functions}\label{sec:descriptors}
+
+As discussed Section \ref{sec:mmd}, some kernels require some alternative vectorized
+representation to work. We will use the following protein descriptor functions
+here.
+
+
+\paragraph{Graph descriptors} They are defined in Section \ref{sec:mmd} and include
+  the degree distribution histogram, the clustering coefficient histogram and
+  the laplacian spectrum histogram. These are all fixed-length vectors.
+\paragraph{Coordinates descriptors} In order to capture the information of the
+3D structure of the protein beyond local neighbourhood information, a
+topological descriptor of each protein in the form of a persistence diagram is
+extracted using a Vietoris-Rips filtration introduced in detail in Section \ref{sec:tda}.
+\paragraph{Protein-specific descriptors} In this thesis we introduce
+two novel protein-specific descriptor functions resulting in fixed-length vector
+representations. The first consists in a histogram of the pairwise distance of
+each atom considered; the second consists in concatenating the two histograms of
+the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in Section
+\ref{sec:proteins}.
+
+% TODO: add pgfplots figure of this workflow.
+
+\subsection{Kernels}
+Once a suitable representation and descriptor function is selected, one requires
+a kernel to evaluate the MMD in the corresponding RKHS. We detail which kernels
+we are going to evaluate and why in this section. Kernels used in this thesis can be grouped into
+three separate categories.
+
+The first category has been discussed in the literature extensively since it was
+used to evaluate generative graph neural network models, i.e. the
+\emph{fixed-length vector kernels} like the Gaussian (RBF) kernel and the linear
+kernel, both of which are defined in Section \ref{sec:kernels}. Since the only
+condition for each vector to be valid inputs for those kernels is that they are
+in $\R^d$, the protein-specific vector representations outlined in Section
+\ref{sec:descriptors} are valid inputs.
+% Special implementation of wl-k
+
+As aluded to in Section \ref{sec:kernels}, we introduce two new classes of
+kernels for use in MMD which so far have not been used to evaluate generative
+models due to the unique aspects of proteins that need to be captured. This
+brings us to the second category of kernels used in this thesis: \emph{graph kernels}.
+Specifically, we are going to use the Weisfeiler-Lehman kernel discussed in
+Section \ref{sec:kernels} because it captures \emph{local} patterns in the
+neighbourhood of each node.
+
+To estimate \emph{global} changes in the shape of the protein, we will also use
+kernels using persistence diagrams as input, specifically using the Persistence
+Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
+
 \section{Experimental Setup}
+
+To objectively evaluate the various representation, descriptor, and kernel
+combinations used in MMD, we will use two correlation coefficients, namely the
+Spearman's correlation coefficient and Pearson's correlation coefficient, each
+given by:
+\begin{equation}
+  \label{eq:spearman} \rho_p(X,Y) = {\cov(\rank(X), \rank(Y)) \over
+\sigma_{\rank(X)}\sigma_{\rank(Y)}},
+\end{equation} and
+\begin{equation}
+  \label{eq:spearman} \rho_s(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
+\end{equation}
+respectively. Here, $X$ will be the amount of perturbation applied to one of the
+protein sets and $Y$ the MMD between the unperturbed and perturbed set. A high Spearman correlation coefficient is crucial to satisfy the first criterium of a performance metric: expressivity (see Section \ref{sec:evalproblem}).
+
+% Ranked and pearson correlation used to rank metrics.
+% Compute, library setup, modularity.
 
 \section{Summary}
