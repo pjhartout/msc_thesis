@@ -34,7 +34,7 @@ def main(cfg):
     wl_pc.write(f"\n\n")
     wl_pc.write(f"cd /home/phartout/Documents/Git/msc_thesis/ \n")
     wl_pc.write(f"export PATH=/home/phartout/.anaconda3/bin:$PATH\n\n")
-    slurm_string = "srun --cpus-per-task 50 --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py"
+    slurm_string = f"srun --cpus-per-task {cfg.compute.n_jobs*cfg.compute.n_parallel_perturb} --mem-per-cpu 10G poetry run python experiments/systematic/gd_graphs/gd_graphs.py"
 
     descriptors = [
         "degree_histogram",
@@ -50,13 +50,13 @@ def main(cfg):
     for descriptor in descriptors:
         for eps in cfg.meta.representations[0]["eps_graph"]:
             for perturbation in perturbations:
-                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_param={eps} +perturbation={perturbation} \n"
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
                 wl_pc.write(job_param)
                 wl_pc.write(build_fail_string(job_param))
 
         for k in cfg.meta.representations[1]["knn_graph"]:
             for perturbation in perturbations:
-                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=knn_graph +graph_extraction_param={k} +perturbation={perturbation} \n"
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=knn_graph +graph_extraction_parameter={k} +perturbation={perturbation} \n"
                 wl_pc.write(job_param)
                 wl_pc.write(build_fail_string(job_param))
 

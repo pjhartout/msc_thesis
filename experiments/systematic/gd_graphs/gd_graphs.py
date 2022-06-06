@@ -150,7 +150,8 @@ def graph_perturbation_worker(
             # The np.ones is used here because
             # exp(sigma*(x-x)**2) = 1(n x n)
             "K_XX": pairwise_distances(
-                unperturbed_descriptor_run, unperturbed_descriptor_run,
+                unperturbed_descriptor_run,
+                unperturbed_descriptor_run,
             ),
             "K_YY": pairwise_distances(
                 perturbed_descriptor_run,
@@ -179,7 +180,7 @@ def graph_perturbation_worker(
             mmd = MaximumMeanDiscrepancy(
                 biased=False,
                 squared=True,
-                verbose=cfg.debug.verbose,
+                verbose=False,
                 kernel=kernel,
             ).compute(
                 kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
@@ -212,10 +213,11 @@ def graph_perturbation_worker(
         mmd = MaximumMeanDiscrepancy(
             biased=False,
             squared=True,
+            verbose=False,
             kernel=LinearKernel(
-                n_jobs=cfg.compute.n_jobs, normalize=True,
+                n_jobs=cfg.compute.n_jobs,
+                normalize=True,
             ),  # type: ignore
-            verbose=cfg.debug.verbose,
         ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
         mmd_linear_kernel_runs.append(mmd)
 
@@ -313,7 +315,12 @@ def remove_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "removedge", descriptor,
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "remove_edges",
+        descriptor,
     )
 
 
@@ -373,7 +380,7 @@ def add_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "addedge", descriptor
+        cfg, mmds, graph_type, graph_extraction_param, "add_edges", descriptor
     )
 
 
@@ -433,7 +440,12 @@ def rewire_edge_perturbation_linear_kernel(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "rewireedge", descriptor
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "rewire_edges",
+        descriptor,
     )
 
 
@@ -578,6 +590,20 @@ def fixed_length_kernel_experiment_graph_perturbation(
         raise ValueError(f"Unknown perturbation {perturbation}")
 
 
+def check_already_run(cfg):
+    return not Path(
+        here()
+        / cfg.paths.data
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.fixed_length_kernels
+        / cfg.graph_type
+        / str(cfg.graph_extraction_parameter)
+        / cfg.perturbation
+        / cfg.descriptor
+    ).exists()
+
+
 @hydra.main(
     version_base=None,
     config_path=str(here()) + "/conf/",
@@ -593,13 +619,16 @@ def main(cfg: DictConfig):
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-    fixed_length_kernel_experiment_graph_perturbation(
-        cfg=cfg,
-        graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_param,
-        descriptor=cfg.descriptor,
-        perturbation=cfg.perturbation,
-    )
+    if check_already_run(cfg):
+        fixed_length_kernel_experiment_graph_perturbation(
+            cfg=cfg,
+            graph_type=cfg.graph_type,
+            graph_extraction_param=cfg.graph_extraction_parameter,
+            descriptor=cfg.descriptor,
+            perturbation=cfg.perturbation,
+        )
+    else:
+        log.info("Experiment already run")
     # fixed_length_kernel_experiment_graph_perturbation(
     #     cfg=cfg,
     #     graph_type="eps_graph",

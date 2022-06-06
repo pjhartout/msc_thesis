@@ -130,7 +130,12 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def graph_perturbation_worker(
-    cfg, experiment_steps, perturbation, unperturbed, perturbed, graph_type,
+    cfg,
+    experiment_steps,
+    perturbation,
+    unperturbed,
+    perturbed,
+    graph_type,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.append(perturbation)
@@ -190,7 +195,11 @@ def graph_perturbation_worker(
 
 
 def save_mmd_experiment(
-    cfg, mmds, graph_type, graph_extraction_param, perturbation_type,
+    cfg,
+    mmds,
+    graph_type,
+    graph_extraction_param,
+    perturbation_type,
 ):
     mmds = (
         pd.concat(mmds)
@@ -274,7 +283,11 @@ def remove_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "remove_edges",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "remove_edges",
     )
 
 
@@ -335,7 +348,11 @@ def add_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "add_edges",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "add_edges",
     )
 
 
@@ -396,7 +413,11 @@ def rewire_edge_perturbation_wl_graphs(
     )
 
     save_mmd_experiment(
-        cfg, mmds, graph_type, graph_extraction_param, "rewire_edges",
+        cfg,
+        mmds,
+        graph_type,
+        graph_extraction_param,
+        "rewire_edges",
     )
 
 
@@ -491,6 +512,20 @@ def weisfeiler_lehman_experiment_graph_perturbation(
     log.info(f"Done with {graph_type} {graph_extraction_param}")
 
 
+def check_already_run(cfg):
+    """Simply checks if the path has already been run."""
+    return not Path(
+        here()
+        / cfg.paths.data
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.weisfeiler_lehman
+        / cfg.graph_type
+        / str(cfg.graph_extraction_parameter)
+        / cfg.perturbation
+    ).exists()
+
+
 @hydra.main(
     version_base=None,
     config_path=str(here()) + "/conf/",
@@ -507,12 +542,15 @@ def main(cfg: DictConfig):
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
-    weisfeiler_lehman_experiment_graph_perturbation(
-        cfg=cfg,
-        graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_parameter,
-        perturbation=cfg.perturbation,
-    )
+    if check_already_run(cfg):
+        weisfeiler_lehman_experiment_graph_perturbation(
+            cfg=cfg,
+            graph_type=cfg.graph_type,
+            graph_extraction_param=cfg.graph_extraction_parameter,
+            perturbation=cfg.perturbation,
+        )
+    else:
+        log.info("Experiment already run")
 
 
 if __name__ == "__main__":
