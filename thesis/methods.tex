@@ -156,7 +156,12 @@ given by:
   \label{eq:spearman} \rho_s(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
 \end{equation}
 respectively. Here, $X$ will be the amount of perturbation applied to one of the
-protein sets and $Y$ the MMD between the unperturbed and perturbed set. A high Spearman correlation coefficient is crucial to satisfy the first criterium of a performance metric: expressivity (see Section \ref{sec:evalproblem}).
+protein sets and $Y$ the MMD between the unperturbed and perturbed set. A high
+Spearman correlation coefficient is crucial to satisfy the first criterium of a
+performance metric: expressivity (see Section \ref{sec:evalproblem}). As
+\cite{o2021evaluation} have showed, some configurations of MMD on synthetic
+datasets showed that an increasing MMD value with increasing perturbation is not
+guaranteed.
 
 % Ranked and pearson correlation used to rank metrics.
 % Compute, library setup, modularity.
