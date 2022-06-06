@@ -829,6 +829,20 @@ def fixed_length_kernel_experiment_graph_perturbation(
         )
 
 
+def check_already_run(cfg):
+    return not Path(
+        here()
+        / cfg.paths.data
+        / cfg.paths.systematic
+        / cfg.paths.human
+        / cfg.paths.fixed_length_kernels
+        / cfg.graph_type
+        / str(cfg.graph_extraction_parameter)
+        / cfg.perturbation
+        / cfg.descriptor
+    ).exists()
+
+
 @hydra.main(
     version_base=None,
     config_path=str(here()) + "/conf/",
@@ -844,13 +858,16 @@ def main(cfg: DictConfig):
     log.info(DATA_HOME)
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-    fixed_length_kernel_experiment_graph_perturbation(
-        cfg=cfg,
-        graph_type=cfg.graph_type,
-        graph_extraction_param=cfg.graph_extraction_parameter,
-        descriptor=cfg.descriptor,
-        perturbation=cfg.perturbation,
-    )
+    if check_already_run(cfg):
+        fixed_length_kernel_experiment_graph_perturbation(
+            cfg=cfg,
+            graph_type=cfg.graph_type,
+            graph_extraction_param=cfg.graph_extraction_parameter,
+            descriptor=cfg.descriptor,
+            perturbation=cfg.perturbation,
+        )
+    else:
+        log.info("Experiment already run")
 
 
 if __name__ == "__main__":
