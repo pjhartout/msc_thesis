@@ -144,6 +144,8 @@ Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
 
 \section{Experimental Setup}
 
+\subsection{Measuring the quality of MMD configurations}
+
 To objectively evaluate the various representation, descriptor, and kernel
 combinations used in MMD, we will use two correlation coefficients, namely the
 Spearman's correlation coefficient and Pearson's correlation coefficient, each
@@ -169,6 +171,17 @@ not a requirement, the Pearson correlation coefficient (Equation
 \ref{eq:pearson}) will allow us to further refine the selection of the metrics
 behaving most predictably, and distill the most relevant configurations for a
 given perturbation range.
+
+\subsection{Software Library Design}
+
+Due to the complexity and modularity of the methodology outlined above, it is
+required to have a scalable library to execute all the evaluation experiments at
+scale and efficiently. To accomplish this task, we developed a custom Python
+library leveraging parallel processing of data to the greatest extent possible.
+We were inspired by the standards of \texttt{scikit-learn} and implemented
+multiple modules following the same design patterns to ensure that we could
+build \texttt{Pipeline} objects with the necessary steps required to compute an
+MMD.
 
 % Ranked and pearson correlation used to rank metrics.
 % Compute, library setup, modularity.
