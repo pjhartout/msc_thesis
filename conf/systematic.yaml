@@ -5,3 +5,4 @@ defaults:
   - perturbations: perturbations
   - debug: debug
   - descriptors: descriptors
+  - imaging: imaging

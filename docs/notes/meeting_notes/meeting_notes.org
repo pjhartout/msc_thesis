@@ -21,3 +21,5 @@
 
 * TODO <2022-06-10 Fri> Meeting with Tim
 ** AlphaFold2 - caries potential inductive biases?
+** Meta-metrics - take standard deviation into account?
+** Add-edges - necessary to do for all?
