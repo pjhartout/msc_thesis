@@ -366,10 +366,12 @@ def add_edge_perturbation_linear_kernel(
 
     mmds = distribute_function(
         func=add_edges_perturbation_worker,
-        X=np.linspace(
-            cfg.perturbations.add_edges.min,
-            cfg.perturbations.add_edges.max,
-            cfg.perturbations.n_perturbations,
+        X=np.flip(
+            np.linspace(
+                cfg.perturbations.add_edges.min,
+                cfg.perturbations.add_edges.max,
+                cfg.perturbations.n_perturbations,
+            )
         ),
         n_jobs=cfg.compute.n_parallel_perturb,
         show_tqdm=cfg.debug.verbose,
