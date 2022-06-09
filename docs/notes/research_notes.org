@@ -1650,9 +1650,9 @@ Research questions:
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
 *** We did not consider more advance mutation types (transpositions, deletions, additions, or reverse)
-** meta-metrics: take into account standard deviations
+*** meta-metrics: take into account standard deviations
 
-* Cluster essentials
+** Cluster essentials
 scontrol show jobid -dd [id]
 squeue --start -p cpu
 
