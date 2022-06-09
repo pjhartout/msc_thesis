@@ -192,6 +192,9 @@ def main(cfg: DictConfig):
     corr_coef_df = compute_corr_coef_for_mmd_config(df_normalized)
     std_df = compute_avg_std_for_mmd_config(df_normalized)
     df_quality = compute_mmd_config_quality(corr_coef_df, std_df)
+    df_quality.sort_values(by=["combined_score", "corr_coef", "std"]).to_csv(
+        here() / cfg.paths.data / "metric_scores.csv"
+    )
 
 
 if __name__ == "__main__":
