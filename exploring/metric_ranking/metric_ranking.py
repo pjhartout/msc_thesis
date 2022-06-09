@@ -175,6 +175,7 @@ def compute_mmd_config_quality(
     """
     one_minus_corr_coef_df = 1 - corr_coef_df
     quality_df = one_minus_corr_coef_df.join(std_df)
+    # TODO: do maybe a weighted sum to give more important to one vs. the other?
     quality_df["combined_score"] = one_minus_corr_coef_df["corr_coef"] + std_df
     return quality_df
 
