@@ -20,6 +20,8 @@
 #+LATEX_COMPILER: pdflatexorg-mode restarted
 
 * TODO <2022-06-10 Fri> Meeting with Tim
-** AlphaFold2 - caries potential inductive biases?
 ** Meta-metrics - take standard deviation into account?
+*** Make list of statements based on data analysis and make plots/tables accordingly
+*** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
 ** Add-edges - necessary to do for all?
+** AlphaFold2 - caries potential inductive biases?
