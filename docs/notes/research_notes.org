@@ -1651,6 +1651,24 @@ Research questions:
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
 *** We did not consider more advance mutation types (transpositions, deletions, additions, or reverse)
 *** meta-metrics: take into account standard deviations
+*** epsilon value relationship to sensitivity of metric
+*** de-novo design, promote structural heterogeneity, different than point mutation because this can be done in a lab
+*** Discuss mode collapse and mode dropping
+*** Discuss descriptors with bin_ranges not able to capture extreme cases
+*** We did not consider more advance mutation types (transpositions, deletions, additions, or reverse)
+*** meta-metrics: take into account standard deviations
+*** are graphs good reps? what's the best graph rep?
+*** epsilon value relationship to sensitivity of metric
+*** de-novo design, promote structural heterogeneity, different than point mutation because this can be done in a lab
+*** model space of possible proteins/feasible proteins, evolution has only explored a subset, because of incremenets
+*** find "jumps" in design landscape
+*** find new variants of proteins
+*** key is conditional generative models
+*** generative models are only way to get better proteins, because discriminative models are constrained to range of values it is trained on.
+*** out-of-distribution design of samples.
+*** are graphs good reps for proteins? what are the best params to use?
+*** AlphaFold reps have error rates that are approx. to the actual experimental data (different errors).
+*** artificial monomeric proteins in real data
 
 ** Cluster essentials
 scontrol show jobid -dd [id]
