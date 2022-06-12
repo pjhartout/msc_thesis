@@ -31,7 +31,11 @@ from proteinmetrics.distance import (
     SpearmanCorrelation,
 )
 from proteinmetrics.graphs import ContactMap, EpsilonGraph
-from proteinmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinmetrics.kernels import (
+    LinearKernel,
+    MultiScaleKernel,
+    PersistenceFisherKernel,
+)
 from proteinmetrics.loaders import list_pdb_files, load_descriptor, load_graphs
 from proteinmetrics.paths import HUMAN_PROTEOME
 from proteinmetrics.pdb import Coordinates
@@ -50,7 +54,7 @@ N_JOBS = 4
 def main():
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
     pdb_files = remove_fragments(pdb_files)
-    sampled_files = random.Random(42).sample(pdb_files, 5 * 2)
+    sampled_files = random.Random(42).sample(pdb_files, 5)
     midpoint = int(len(sampled_files) / 2)
     base_feature_steps = [
         ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
@@ -113,10 +117,14 @@ def main():
             for protein in proteins_perturbed
         ]
 
+        # Computer kernel of single combo:
+        kernel = MultiScaleKernel(sigma=1.0, n_jobs=1)
+        res = kernel.compute_matrix(diagrams, diagrams_perturbed)
+
         mmd_tda = MaximumMeanDiscrepancy(
             biased=True,
             squared=True,
-            kernel=PersistenceFisherKernel(n_jobs=N_JOBS),  # type: ignore
+            kernel=MultiScaleKernel(sigma=1.0, n_jobs=N_JOBS),  # type: ignore
         ).compute(diagrams, diagrams_perturbed)
 
         results.append({"mmd_tda": mmd_tda, "twist": twist})
