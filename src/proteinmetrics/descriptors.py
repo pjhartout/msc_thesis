@@ -98,7 +98,9 @@ class DegreeHistogram(Descriptor):
             if normalize:
                 hist = hist / np.sum(hist)
 
-            protein.descriptors[self.graph_type]["degree_histogram"] = hist
+            protein.descriptors[self.graph_type][
+                "degree_histogram"
+            ] = np.nan_to_num(hist, nan=0)
 
             return protein
 
