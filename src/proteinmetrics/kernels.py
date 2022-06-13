@@ -75,7 +75,10 @@ class LinearKernel(Kernel):
 
 class GaussianKernel(Kernel):
     def __init__(
-        self, sigma: float, pre_computed_product: bool, **kwargs,
+        self,
+        sigma: float,
+        pre_computed_product: bool,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.sigma = sigma
@@ -255,10 +258,10 @@ class MultiScaleKernel(Kernel):
         if Y is None:
             Y = X
 
-        if not self.biased and X == Y:
+        if not self.biased and np.array_equal(X, Y):
             iters_data = list(list(combinations(X, 2)))
             iters_idx = list(combinations(range(len(X)), 2))
-        elif self.biased and X == Y:
+        elif self.biased and np.array_equal(X, Y):
             iters_data = list(list(combinations_with_replacement(X, 2)))
             iters_idx = list(combinations_with_replacement(range(len(X)), 2))
         else:
@@ -271,7 +274,12 @@ class MultiScaleKernel(Kernel):
             for key, idx, data in zip(keys, iters_idx, iters_data)
         ]
         if self.n_jobs > 1:
-            iters = list(chunks(iters, self.n_jobs,))
+            iters = list(
+                chunks(
+                    iters,
+                    self.n_jobs,
+                )
+            )
             matrix_elems = flatten_lists(
                 distribute_function(
                     self._process_diagram_combo,
@@ -289,7 +297,7 @@ class MultiScaleKernel(Kernel):
             coords = list(elem.values())[0][0]
             val = list(elem.values())[0][1]
             K[coords[0], coords[1]] = val
-        if X == Y:
+        if np.array_equal(X, Y):
             # mirror the matrix along diagonal
             K = np.triu(K) + np.triu(K, 1).T
 
