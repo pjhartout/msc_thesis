@@ -40,7 +40,11 @@ from proteinmetrics.descriptors import (
 )
 from proteinmetrics.distance import MaximumMeanDiscrepancy
 from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinmetrics.kernels import (
+    LinearKernel,
+    MultiScaleKernel,
+    PersistenceFisherKernel,
+)
 from proteinmetrics.loaders import list_pdb_files, load_descriptor
 from proteinmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinmetrics.pdb import Coordinates, Sequence
@@ -134,7 +138,11 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def pc_perturbation_worker(
-    cfg, experiment_steps, perturbation, unperturbed, perturbed,
+    cfg,
+    experiment_steps,
+    perturbation,
+    unperturbed,
+    perturbed,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
@@ -150,49 +158,88 @@ def pc_perturbation_worker(
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
     mmd_runs_n_iter = dict()
-    for bandwidth in cfg.meta.kernels[0]["persistence_fisher"][0]["bandwidth"]:
-        for bandwidth_fisher in cfg.meta.kernels[0]["persistence_fisher"][1][
-            "bandwidth_fisher"
-        ]:
-            mmd_runs = list()
-            for run in range(cfg.meta.n_runs):
-                log.info(f"Run {run}")
-                unperturbed_run = filter_protein_using_name(
-                    unperturbed, unperturbed_protein_names[run].tolist()
-                )
-                perturbed_run = filter_protein_using_name(
-                    perturbed, perturbed_protein_names[run].tolist()
-                )
+    # for bandwidth in cfg.meta.kernels[0]["persistence_fisher"][0]["bandwidth"]:
+    #     for bandwidth_fisher in cfg.meta.kernels[0]["persistence_fisher"][1][
+    #         "bandwidth_fisher"
+    #     ]:
+    mmd_runs = list()
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
 
-                unperturbed_descriptor_run = load_descriptor(
-                    unperturbed_run,
-                    graph_type="contact_graph",
-                    descriptor="diagram",
-                )
-                perturbed_descriptor_run = load_descriptor(
-                    perturbed_run,
-                    graph_type="contact_graph",
-                    descriptor="diagram",
-                )
+        unperturbed_descriptor_run = load_descriptor(
+            unperturbed_run,
+            graph_type="contact_graph",
+            descriptor="diagram",
+        )
+        perturbed_descriptor_run = load_descriptor(
+            perturbed_run,
+            graph_type="contact_graph",
+            descriptor="diagram",
+        )
 
-                log.info("Computing the kernel.")
+        log.info("Computing the kernel.")
 
-                mmd = MaximumMeanDiscrepancy(
-                    biased=False,
-                    squared=True,
-                    kernel=PersistenceFisherKernel(
-                        bandwidth=bandwidth,
-                        bandwidth_fisher=bandwidth_fisher,
-                        n_jobs=cfg.compute.n_jobs,
-                        verbose=cfg.debug.verbose,
-                    ),  # type: ignore
-                    verbose=cfg.debug.verbose,
-                ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
-                mmd_runs.append(mmd)
+        mmd = MaximumMeanDiscrepancy(
+            biased=False,
+            squared=True,
+            kernel=PersistenceFisherKernel(
+                bandwidth=1,
+                bandwidth_fisher=1,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),  # type: ignore
+            verbose=cfg.debug.verbose,
+        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+        mmd_runs.append(mmd)
 
-            mmd_runs_n_iter[
-                f"bandwidth={bandwidth};bandwidth_fisher={bandwidth_fisher}"
-            ] = mmd_runs
+    mmd_runs_n_iter[
+        f"persistence_fisher_bandwidth={1};bandwidth_fisher={1}"
+    ] = mmd_runs
+
+    mmd_runs = list()
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
+
+        unperturbed_descriptor_run = load_descriptor(
+            unperturbed_run,
+            graph_type="contact_graph",
+            descriptor="diagram",
+        )
+        perturbed_descriptor_run = load_descriptor(
+            perturbed_run,
+            graph_type="contact_graph",
+            descriptor="diagram",
+        )
+
+        log.info("Computing the kernel.")
+
+        mmd = MaximumMeanDiscrepancy(
+            biased=False,
+            squared=True,
+            kernel=MultiScaleKernel(
+                sigma=1,
+                n_jobs=cfg.compute.n_jobs,
+                verbose=cfg.debug.verbose,
+            ),  # type: ignore
+            verbose=cfg.debug.verbose,
+        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+        mmd_runs.append(mmd)
+
+    mmd_runs_n_iter[
+        f"mutli_scale_kernel_bandwidth={1};bandwidth_fisher={1}"
+    ] = mmd_runs
 
     return mmd_runs_n_iter
 
@@ -222,7 +269,11 @@ def save_mmd_experiment(cfg, mmds, perturbation_type):
 
 
 def twist_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, **kwargs,
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    **kwargs,
 ):
     log.info("Perturbing proteins with twist.")
 
@@ -240,7 +291,11 @@ def twist_perturbation_wl_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg, experiment_steps, perturbation, unperturbed, perturbed,
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with twist {p_perturb}.")
@@ -260,12 +315,18 @@ def twist_perturbation_wl_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg, mmds, perturbation_type="twist",
+        cfg,
+        mmds,
+        perturbation_type="twist",
     )
 
 
 def shear_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, **kwargs,
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    **kwargs,
 ):
     log.info("Perturbing proteins with shear.")
 
@@ -309,12 +370,18 @@ def shear_perturbation_wl_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg, mmds, perturbation_type="shear",
+        cfg,
+        mmds,
+        perturbation_type="shear",
     )
 
 
 def taper_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, **kwargs,
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    **kwargs,
 ):
     log.info("Perturbing proteins with taper.")
 
@@ -358,12 +425,18 @@ def taper_perturbation_wl_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg, mmds, perturbation_type="taper",
+        cfg,
+        mmds,
+        perturbation_type="taper",
     )
 
 
 def gaussian_perturbation_wl_pc(
-    cfg, perturbed, unperturbed, experiment_steps, **kwargs,
+    cfg,
+    perturbed,
+    unperturbed,
+    experiment_steps,
+    **kwargs,
 ):
     log.info("Perturbing proteins with gaussian.")
 
@@ -382,7 +455,11 @@ def gaussian_perturbation_wl_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg, experiment_steps, perturbation, unperturbed, perturbed,
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with gaussian noise {p_perturb}.")
@@ -402,12 +479,15 @@ def gaussian_perturbation_wl_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg, mmds, perturbation_type="gaussian_noise",
+        cfg,
+        mmds,
+        perturbation_type="gaussian_noise",
     )
 
 
 def tda_experiment_pc_perturbation(
-    cfg: DictConfig, perturbation: str,
+    cfg: DictConfig,
+    perturbation: str,
 ):
     base_feature_steps = [
         (
@@ -447,22 +527,34 @@ def tda_experiment_pc_perturbation(
     if perturbation == "twist":
         log.info("Compute twist")
         twist_perturbation_wl_pc(
-            cfg, perturbed, unperturbed, base_feature_steps,
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
         )
     elif perturbation == "shear":
         log.info("Compute shear")
         shear_perturbation_wl_pc(
-            cfg, perturbed, unperturbed, base_feature_steps,
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
         )
     elif perturbation == "taper":
         log.info("Compute taper")
         taper_perturbation_wl_pc(
-            cfg, perturbed, unperturbed, base_feature_steps,
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
         )
     elif perturbation == "gaussian_noise":
         log.info("Compute gaussian noise")
         gaussian_perturbation_wl_pc(
-            cfg, perturbed, unperturbed, base_feature_steps,
+            cfg,
+            perturbed,
+            unperturbed,
+            base_feature_steps,
         )
 
     else:
@@ -487,7 +579,8 @@ def main(cfg: DictConfig):
     # outside for loops for n_iters and k.
 
     tda_experiment_pc_perturbation(
-        cfg=cfg, perturbation="twist",
+        cfg=cfg,
+        perturbation="twist",
     )
 
 
