@@ -19,9 +19,14 @@ from scipy.spatial.distance import cdist
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances, pairwise_kernels
 from sklearn.metrics.pairwise import linear_kernel
-from torch import cdist
 
-from .utils.functions import distribute_function, networkx2grakel
+from .utils.functions import (
+    chunks,
+    distribute_function,
+    flatten_lists,
+    generate_random_strings,
+    networkx2grakel,
+)
 from .utils.metrics import (
     _persistence_fisher_distance,
     pairwise_persistence_diagram_kernels,
@@ -192,10 +197,11 @@ class MultiScaleKernel(Kernel):
     This is a numpy-friendly version of this implementation: https://github.com/aidos-lab/pytorch-topological/blob/main/torch_topological/nn/multi_scale_kernel.py
     """
 
-    def __init__(self, sigma, p=2.0, **kwargs):
+    def __init__(self, sigma, p=2.0, biased=True, **kwargs):
         super().__init__(**kwargs)
         self.sigma = sigma
         self.p = p
+        self.biased = biased
 
     @staticmethod
     def _mirror(x):
@@ -207,33 +213,87 @@ class MultiScaleKernel(Kernel):
     def _dist(self, x, y):
         # Compute the point-wise lp-distance between two
         # persistence diagrams
-        dist = cdist(x, y, p=self.p)
+        dist = cdist(x, y)
         return np.power(dist, 2)
 
-    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
+    def _process_diagram_combo(self, iters):
+        res = list()
+        for elem in iters:
+            X = list(elem.values())[0][1][0]
+            Y = list(elem.values())[0][1][1]
 
+            if Y is None:
+                Y = X
+
+            k_sigma = 0.0
+            for dim in np.unique(X[:, 2]):
+                # Filter the relevant homology dimension
+                D1 = X[X[:, 2] == dim][:, :2]
+                D2 = Y[Y[:, 2] == dim][:, :2]
+
+                # compute the pairwise distances between the
+                # two diagrams
+
+                nom = self._dist(D1, D2)
+                # distance between diagram 1 and mirrored
+                # diagram 2
+                denom = self._dist(D1, self._mirror(D2))
+
+                M = np.exp(-nom) / (8 * self.sigma)
+                M -= np.exp(-denom) / (8 * self.sigma)
+
+                # sum over all points
+                k_sigma += M.sum() / (8.0 * self.sigma * np.pi)
+
+            res.append(
+                {list(elem.keys())[0]: [list(elem.values())[0][0], k_sigma]}
+            )
+        return res
+
+    def compute_matrix(self, X: Any, Y: Any = None) -> Any:
+        # Process all combinations of diagrams
         if Y is None:
             Y = X
 
-        k_sigma = 0.0
-        for dim in np.unique(X[0][:, 2]):
-            D1 = filter_dimension(X, dim)
-            D2 = filter_dimension(Y, dim)
+        if not self.biased and X == Y:
+            iters_data = list(list(combinations(X, 2)))
+            iters_idx = list(combinations(range(len(X)), 2))
+        elif self.biased and X == Y:
+            iters_data = list(list(combinations_with_replacement(X, 2)))
+            iters_idx = list(combinations_with_replacement(range(len(X)), 2))
+        else:
+            iters_data = list(list(product(X, Y)))
+            iters_idx = list(product(range(len(X)), range(len(Y))))
 
-            # compute the pairwise distances between the
-            # two diagrams
-            nom = self._dist(D1, D2)
-            # distance between diagram 1 and mirrored
-            # diagram 2
-            denom = self._dist(D1, self._mirror(D2), self.p)
+        keys = generate_random_strings(10, len(flatten_lists(iters_data)))
+        iters = [
+            {key: [idx, data]}
+            for key, idx, data in zip(keys, iters_idx, iters_data)
+        ]
+        if self.n_jobs > 1:
+            iters = list(chunks(iters, self.n_jobs,))
+            matrix_elems = flatten_lists(
+                distribute_function(
+                    self._process_diagram_combo,
+                    iters,
+                    self.n_jobs,
+                    show_tqdm=self.verbose,
+                    tqdm_label="Compute dot products",
+                )
+            )
+        else:
+            matrix_elems = self._process_diagram_combo(iters)
 
-            M = np.exp(-nom) / (8 * self.sigma)
-            M -= np.exp(-denom) / (8 * self.sigma)
+        K = np.zeros((len(X), len(Y)), dtype=int)
+        for elem in matrix_elems:
+            coords = list(elem.values())[0][0]
+            val = list(elem.values())[0][1]
+            K[coords[0], coords[1]] = val
+        if X == Y:
+            # mirror the matrix along diagonal
+            K = np.triu(K) + np.triu(K, 1).T
 
-            # sum over all points
-            k_sigma += M.sum() / (8.0 * self.sigma * np.pi)
-
-        return
+        return K
 
 
 class KernelComposition:
