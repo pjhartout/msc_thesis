@@ -21,13 +21,22 @@ relevant_cols = ["perturb", "run", "sigma=0.01"]
 
 def normalize(df):
     cols = [col for col in df.columns if "run" not in col]
-    for col in df.columns:
+    for col in cols:
         df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
     return df
 
 
+def normalize_by_run(df):
+    cols = [col for col in df.columns if "run" not in col]
+    for run in df.run.unique():
+        df.loc[df.run == run, cols] = (
+            df.loc[df.run == run, cols] - df.loc[df.run == run, cols].mean()
+        ) / df.loc[df.run == run, cols].std()
+    return df
+
+
 def load_dihedral_angles():
-    df_gaussian = normalize(
+    df_gaussian = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/gaussian_noise/dihedral_angles_histogram/gaussian_noise_mmds.csv"
@@ -35,7 +44,7 @@ def load_dihedral_angles():
     )[relevant_cols]
     df_gaussian = df_gaussian.assign(perturb_type="gaussian_noise")
 
-    df_taper = normalize(
+    df_taper = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/taper/dihedral_angles_histogram/taper_mmds.csv"
@@ -43,7 +52,7 @@ def load_dihedral_angles():
     )[relevant_cols]
     df_taper = df_taper.assign(perturb_type="taper")
 
-    df_twist = normalize(
+    df_twist = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/twist/dihedral_angles_histogram/twist_mmds.csv"
@@ -51,7 +60,7 @@ def load_dihedral_angles():
     )[relevant_cols]
     df_twist = df_twist.assign(perturb_type="twist")
 
-    df_shear = normalize(
+    df_shear = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/shear/dihedral_angles_histogram/shear_mmds.csv"
@@ -66,7 +75,7 @@ def load_dihedral_angles():
 
 
 def load_distance_histogram():
-    df_gaussian = normalize(
+    df_gaussian = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/gaussian_noise/distance_histogram/gaussian_noise_mmds.csv"
@@ -74,7 +83,7 @@ def load_distance_histogram():
     )[relevant_cols]
     df_gaussian = df_gaussian.assign(perturb_type="gaussian_noise")
 
-    df_taper = normalize(
+    df_taper = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/taper/distance_histogram/taper_mmds.csv"
@@ -82,7 +91,7 @@ def load_distance_histogram():
     )[relevant_cols]
     df_taper = df_taper.assign(perturb_type="taper")
 
-    df_twist = normalize(
+    df_twist = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/twist/distance_histogram/twist_mmds.csv"
@@ -90,7 +99,7 @@ def load_distance_histogram():
     )[relevant_cols]
     df_twist = df_twist.assign(perturb_type="twist")
 
-    df_shear = normalize(
+    df_shear = normalize_by_run(
         pd.read_csv(
             here()
             / "data/systematic/human/fixed_length_kernels/pc_descriptor/1/shear/distance_histogram/shear_mmds.csv"
@@ -107,13 +116,10 @@ def load_distance_histogram():
 def main():
     df_dihedral = load_dihedral_angles()
     df_dihedral = df_dihedral.assign(descriptor="dihedral_angles",)
-    df_distance = load_dihedral_angles()
+    df_distance = load_distance_histogram()
     df_distance = df_distance.assign(descriptor="distance_histogram",)
 
-    df = pd.concat([df_dihedral], ignore_index=True)
-    # df_addedges = load_addedges()
-    # df_removeedges = load_removeedges()
-    # df_rewireedges = load_rewireedges()
+    df = pd.concat([df_distance, df_dihedral], ignore_index=True)
 
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["descriptor"].nunique())
