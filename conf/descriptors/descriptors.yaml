@@ -1,8 +1,8 @@
 degree_histogram:
-  n_bins: 1000
+  n_bins: 2699
   bin_range:
     min: 0
-    max: 1000
+    max: 2699
 
 laplacian_spectrum:
   n_bins: 100
