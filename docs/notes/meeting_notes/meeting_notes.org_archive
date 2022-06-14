@@ -474,3 +474,29 @@ Set of meetings in Notion: https://rectangular-answer-964.notion.site/6b95962afd
 :ARCHIVE_TODO: DONE
 :END:
 Set of meetings in Notion: https://rectangular-answer-964.notion.site/6b95962afd784fb887ceeff1e0b79dc9?v=f187d8658edb4ff0a0f68dba8f0d42d8
+
+* DONE <2022-06-10 Fri> Meeting with Tim
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-06-13 Mon 13:15
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:ARCHIVE_TODO: DONE
+:END:
+** Meta-metrics - take standard deviation into account?
+*** Make list of statements based on data analysis and make plots/tables accordingly
+*** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
+** Add-edges - necessary to do for all?
+** AlphaFold2 - caries potential inductive biases?
+
+* DONE <2022-06-10 Fri> Meeting with Tim
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-06-13 Mon 13:16
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:ARCHIVE_TODO: DONE
+:END:
+** Meta-metrics - take standard deviation into account?
+*** Make list of statements based on data analysis and make plots/tables accordingly
+*** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
+** Add-edges - necessary to do for all?
+** AlphaFold2 - caries potential inductive biases?
