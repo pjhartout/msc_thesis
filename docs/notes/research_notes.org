@@ -1669,6 +1669,11 @@ Research questions:
 *** are graphs good reps for proteins? what are the best params to use?
 *** AlphaFold reps have error rates that are approx. to the actual experimental data (different errors).
 *** artificial monomeric proteins in real data
+*** Make list of statements based on data analysis and make plots/tables accordingly
+*** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
+
+o
+
 
 ** Cluster essentials
 scontrol show jobid -dd [id]
