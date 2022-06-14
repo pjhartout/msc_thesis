@@ -23,7 +23,7 @@ def setup_plotting_parameters(
     cmfont = font_manager.FontProperties(
         fname=mpl.get_data_path() + "/fonts/ttf/cmr10.ttf"
     )
-    mpl.rcParams["font.serif"] = cmfont.get_name()
+    mpl.rcParams["font.serif"] = ["Palatino"]
     mpl.rcParams["mathtext.fontset"] = "cm"
     mpl.rcParams["axes.unicode_minus"] = False
 
