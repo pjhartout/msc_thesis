@@ -580,7 +580,7 @@ def main(cfg: DictConfig):
 
     tda_experiment_pc_perturbation(
         cfg=cfg,
-        perturbation="twist",
+        perturbation=cfg.perturbation,
     )
 
 
