@@ -71,7 +71,7 @@ class GaussianNoise(Perturbation):
 
     def add_noise_to_matrix(self, points):
         noise = np.random.normal(
-            loc=0, scale=self.noise_std, size=len([points]) * 3
+            loc=0, scale=self.noise_std, size=len(points) * 3
         ).reshape(len(points), 3)
         points = points + noise
         return points
