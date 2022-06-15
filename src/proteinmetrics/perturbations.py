@@ -64,7 +64,12 @@ class Perturbation(metaclass=ABCMeta):
 class GaussianNoise(Perturbation):
     """Adds Gaussian noise to coordinates"""
 
-    def __init__(self, noise_mean: float, noise_std: float, **kwargs,) -> None:
+    def __init__(
+        self,
+        noise_mean: float,
+        noise_std: float,
+        **kwargs,
+    ) -> None:
         super().__init__(**kwargs)
         self.noise_mean = noise_mean
         self.noise_std = noise_std
@@ -79,7 +84,6 @@ class GaussianNoise(Perturbation):
     def add_noise_to_protein(self, protein: Protein) -> Protein:
         if protein.coordinates.size > 0:
             protein.coordinates = self.add_noise_to_matrix(protein.coordinates)
-            return protein
 
         if protein.N_coordinates.size > 0:
             protein.N_coordinates = self.add_noise_to_matrix(
@@ -91,7 +95,8 @@ class GaussianNoise(Perturbation):
             protein.C_coordinates = self.add_noise_to_matrix(
                 protein.C_coordinates
             )
-            return protein
+
+        return protein
 
     def fit(self, X: List[Protein]) -> None:
         ...
@@ -135,16 +140,16 @@ class Twist(Perturbation):
     def twist_protein(self, protein: Protein) -> Protein:
         if protein.coordinates.size > 0:
             protein.coordinates = self.twist_matrix(protein.coordinates)
-            return protein
 
         if protein.N_coordinates.size > 0:
             protein.N_coordinates = self.twist_matrix(protein.N_coordinates)
             protein.CA_coordinates = self.twist_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.twist_matrix(protein.C_coordinates)
-            return protein
 
         else:  # pragma: no cover
             raise ValueError("Invalid protein")
+
+        return protein
 
     def fit(self, X: List[Protein]) -> None:
         ...
@@ -192,16 +197,15 @@ class Shear(Perturbation):
     def shear_protein(self, protein: Protein) -> Protein:
         if protein.coordinates.size > 0:
             protein.coordinates = self.shear_matrix(protein.coordinates)
-            return protein
 
         if protein.N_coordinates.size > 0:
             protein.N_coordinates = self.shear_matrix(protein.N_coordinates)
             protein.CA_coordinates = self.shear_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.shear_matrix(protein.C_coordinates)
-            return protein
 
         else:  # pragma: no cover
             raise ValueError("Invalid protein")
+        return protein
 
     def fit(self, X: List[Protein]) -> None:
         ...
@@ -242,16 +246,15 @@ class Taper(Perturbation):
     def taper_protein(self, protein: Protein) -> Protein:
         if protein.coordinates.size > 0:
             protein.coordinates = self.taper_matrix(protein.coordinates)
-            return protein
 
         if protein.N_coordinates.size > 0:
             protein.N_coordinates = self.taper_matrix(protein.N_coordinates)
             protein.CA_coordinates = self.taper_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.taper_matrix(protein.C_coordinates)
-            return protein
 
         else:  # pragma: no cover
             raise ValueError("Invalid protein")
+        return protein
 
     def fit(self, X: List[Protein]) -> None:
         ...
