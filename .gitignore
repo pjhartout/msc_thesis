@@ -12,6 +12,7 @@ docs/midterm_presentation/midterm_presentation.pdf
 experiments/systematic/tda_pc/tda_pc_job_array.sh
 experiments/systematic/gd_pc/gd_pc_job_array.sh
 experiments/systematic/gd_graphs/gd_graphs_job_array.sh
+
 experiments/systematic/wl_pc/wl_pc_job_array.sh
 experiments/systematic/wl_graphs/wl_graphs_job_array.sh
 experiments/systematic/wl_graphs/wl_graphs_job_array.sh
