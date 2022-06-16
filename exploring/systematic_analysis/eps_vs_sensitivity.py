@@ -631,7 +631,7 @@ def main():
     # plt.legend([], [], frameon=False)
     g._legend.set_title(r"$\varepsilon$-value" + "\n" + "(in $\AA$)")
     g.tight_layout(rect=[0, 0, 0.93, 1.0])
-    plt.savefig(here() / "exploring/systematic_analysis/res_2.svg")
+    plt.savefig(here() / "exploring/systematic_analysis/res_2.pdf")
 
 
 if __name__ == "__main__":
