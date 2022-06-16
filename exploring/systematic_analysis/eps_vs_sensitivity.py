@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from pyparsing import col
 from pyprojroot import here
 from yaml import load
 
@@ -583,10 +584,24 @@ def main():
         kind="line",
         data=df,
         height=3,
-        aspect=0.9,
-        col_wrap=4,
+        aspect=1,
+        col_wrap=3,
         ci=100,
         palette=palette,
+        col_order=[
+            "Gaussian Noise_Clustering Histogram",
+            "Gaussian Noise_Degree Histogram",
+            "Gaussian Noise_Laplacian Spectrum Histogram",
+            "Taper_Clustering Histogram",
+            "Taper_Degree Histogram",
+            "Taper_Laplacian Spectrum Histogram",
+            "Shear_Clustering Histogram",
+            "Shear_Degree Histogram",
+            "Shear_Laplacian Spectrum Histogram",
+            "Twist_Clustering Histogram",
+            "Twist_Degree Histogram",
+            "Twist_Laplacian Spectrum Histogram",
+        ]
         # facet_kws={"legend_out": True}
         # facet_kws={"sharex": False},
     )
@@ -595,17 +610,17 @@ def main():
     )
     title = [
         "Gaussian Noise\n Clustering Histogram",
-        "Taper\n Clustering Histogram",
-        "Twist\n Clustering Histogram",
-        "Shear\n Clustering Histogram",
         "Gaussian Noise\n Degree Histogram",
-        "Taper\n Degree Histogram",
-        "Twist\n Degree Histogram",
-        "Shear\n Degree Histogram",
         "Gaussian Noise\n  Laplacian Spectrum Histogram",
+        "Taper\n Clustering Histogram",
+        "Taper\n Degree Histogram",
         "Taper\n Laplacian Spectrum Histogram",
-        "Twist\n Laplacian Spectrum Histogram",
+        "Shear\n Clustering Histogram",
+        "Shear\n Degree Histogram",
         "Shear\n Laplacian Spectrum Histogram",
+        "Twist\n Clustering Histogram",
+        "Twist\n Degree Histogram",
+        "Twist\n Laplacian Spectrum Histogram",
     ]
     for i, ax in enumerate(g.axes.flatten()):
         ax.set_title(f"{title[i]}")
@@ -615,7 +630,7 @@ def main():
     # leg.set_bbox_to_anchor([1, 0.5])
     # plt.legend([], [], frameon=False)
     g._legend.set_title(r"$\varepsilon$-value" + "\n" + "(in $\AA$)")
-    g.tight_layout(rect=[0, 0, 0.95, 1.0])
+    g.tight_layout(rect=[0, 0, 0.93, 1.0])
     plt.savefig(here() / "exploring/systematic_analysis/res_2.svg")
 
 
