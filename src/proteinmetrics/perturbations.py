@@ -146,9 +146,6 @@ class Twist(Perturbation):
             protein.CA_coordinates = self.twist_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.twist_matrix(protein.C_coordinates)
 
-        else:  # pragma: no cover
-            raise ValueError("Invalid protein")
-
         return protein
 
     def fit(self, X: List[Protein]) -> None:
@@ -203,8 +200,6 @@ class Shear(Perturbation):
             protein.CA_coordinates = self.shear_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.shear_matrix(protein.C_coordinates)
 
-        else:  # pragma: no cover
-            raise ValueError("Invalid protein")
         return protein
 
     def fit(self, X: List[Protein]) -> None:
@@ -252,8 +247,6 @@ class Taper(Perturbation):
             protein.CA_coordinates = self.taper_matrix(protein.CA_coordinates)
             protein.C_coordinates = self.taper_matrix(protein.C_coordinates)
 
-        else:  # pragma: no cover
-            raise ValueError("Invalid protein")
         return protein
 
     def fit(self, X: List[Protein]) -> None:
