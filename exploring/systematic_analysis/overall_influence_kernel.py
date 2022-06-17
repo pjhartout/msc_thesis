@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""overall_mmd_behaviour_eps.py
+"""overall_influence_kernel.py
 
-Surprisingly, structured graphs show a better correlation with the MMD than unstructured graphs.
+The overall influence of the kernel needs to be assessed here.
 
 """
 
@@ -18,7 +18,21 @@ from pyprojroot import here
 
 from proteinmetrics.utils.plots import setup_plotting_parameters
 
-relevant_cols = ["perturb", "run", "sigma=0.01"]
+relevant_cols = [
+    "perturb",
+    "run",
+    "sigma=1e-05",
+    "sigma=0.0001",
+    "sigma=0.0001",
+    "sigma=0.001",
+    "sigma=0.01",
+    "sigma=0.1",
+    "sigma=1",
+    "sigma=100.0",
+    "sigma=1000.0",
+    "sigma=10000.0",
+    "linear_kernel",
+]
 
 
 def normalize(df):
@@ -100,7 +114,6 @@ def load_clustering() -> pd.DataFrame:
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -180,7 +193,6 @@ def load_degree():
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -262,7 +274,6 @@ def load_laplacian():
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -286,8 +297,10 @@ def annotate(data, palette, **kws):
             )
             r_ss.append(r_s)
 
-        avg_rp = np.mean(r_ps)
-        avg_rs = np.mean(r_ss)
+        avg_rp = np.nanmean(r_ps)
+        avg_rs = np.nanmean(r_ss)
+        if np.isnan(avg_rp):
+            avg_rp = 0
         ax = plt.gca()
         ax.text(
             0.8 - 0.23 * i,
@@ -309,11 +322,27 @@ def main():
     df_degree = load_degree()
     df_laplacian = load_laplacian()
     df = pd.concat([df_clustering, df_degree, df_laplacian])
+    df = df.melt(
+        value_vars=[
+            "sigma=0.0001",
+            "sigma=0.001",
+            "sigma=0.01",
+            "sigma=0.1",
+            "sigma=1",
+            "sigma=100.0",
+            "sigma=1000.0",
+            "sigma=10000.0",
+            "linear_kernel",
+        ],
+        id_vars=["Perturbation", "run", "Perturbation Type", "descriptor"],
+    )
+
     df.rename(
         columns={
             "descriptor": "Descriptor",
             "Perturbation": "Perturbation (%)",
-            "MMD": "Normalized MMD",
+            "variable": "Kernel",
+            "value": "Normalized MMD",
         },
         inplace=True,
     )
@@ -322,34 +351,46 @@ def main():
     palette = sns.color_palette("mako_r", df["Descriptor"].nunique())
 
     df.reset_index(drop=True, inplace=True)
+    df = df.loc[df["Perturbation Type"] == "Gaussian Noise"]
     g = sns.relplot(
         x="Perturbation (%)",
         y="Normalized MMD",
         hue="Descriptor",
-        col="Perturbation Type",
+        col="Kernel",
         kind="line",
         data=df,
         height=3,
-        aspect=0.75,
+        aspect=1,
         col_wrap=3,
         palette=palette,
         ci=100,
         # facet_kws={"sharex": False},
     )
-    g.map_dataframe(annotate, palette=palette)
 
-    leg = g._legend
-    leg.set_bbox_to_anchor([0.67, 0.2])
-
+    # leg = g._legend
+    # leg.set_bbox_to_anchor([0.67, 0.2])
+    # g.map_dataframe(annotate, palette=palette)
+    titles = [
+        r"RBF Kernel $\sigma$ = 0.0001",
+        r"RBF Kernel $\sigma$ = 0.001",
+        r"RBF Kernel $\sigma$ = 0.01",
+        r"RBF Kernel $\sigma$ = 0.1",
+        r"RBF Kernel $\sigma$ = 1",
+        r"RBF Kernel $\sigma$ = 100",
+        r"RBF Kernel $\sigma$ = 1000",
+        r"RBF Kernel $\sigma$ = 10000",
+        "Linear Kernel",
+    ]
     for i, ax in enumerate(g.axes.flatten()):
-        ax.set_title(f"{df['Perturbation Type'].unique()[i]}")
+        ax.set_title(titles[i])
+
     # g.fig.suptitle(
     #     r"MMD vs. Perturbation (%) For Various Graph Descriptors of the 8$\AA$-Graphs Under Different Perturbations Regimes."
     # )
 
     plt.legend([], [], frameon=False)
-    plt.tight_layout()
-    plt.savefig(here() / "exploring/systematic_analysis/res_1_1.pdf")
+    g.tight_layout(rect=[0, 0, 0.8, 1.0])
+    plt.savefig(here() / "exploring/systematic_analysis/res_1_2.pdf")
 
     # sns.lineplot(data=add_edges, x="perturb", y="sigma=0.01")
     # sns.lineplot(data=remove_edges, x="perturb", y="sigma=0.01")

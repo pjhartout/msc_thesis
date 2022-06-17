@@ -29,13 +29,13 @@ def normalize(df):
 
 def load_clustering() -> pd.DataFrame:
 
-    add_edges = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/clustering_histogram/add_edges_mmds.csv"
-        )
-    )[relevant_cols]
-    add_edges = add_edges.assign(perturb_type="Add Edges")
+    # add_edges = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/clustering_histogram/add_edges_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -109,14 +109,14 @@ def load_clustering() -> pd.DataFrame:
 
 def load_degree():
 
-    add_edges = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/degree_histogram/add_edges_mmds.csv"
-        )
-    )[relevant_cols]
-    add_edges.sort_values(by=["perturb", "run"], inplace=True)
-    add_edges = add_edges.assign(perturb_type="Add Edges")
+    # add_edges = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/degree_histogram/add_edges_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # add_edges.sort_values(by=["perturb", "run"], inplace=True)
+    # add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -189,14 +189,14 @@ def load_degree():
 
 def load_laplacian():
 
-    add_edges = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/laplacian_spectrum_histogram/add_edges_mmds.csv"
-        )
-    )[relevant_cols]
-    add_edges.sort_values(by=["perturb", "run"], inplace=True)
-    add_edges = add_edges.assign(perturb_type="Add Edges")
+    # add_edges = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/laplacian_spectrum_histogram/add_edges_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # add_edges.sort_values(by=["perturb", "run"], inplace=True)
+    # add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -309,7 +309,7 @@ def main():
 
     plt.legend([], [], frameon=False)
     plt.tight_layout()
-    plt.savefig(here() / "exploring/systematic_analysis/res_1_1.svg")
+    plt.savefig(here() / "exploring/systematic_analysis/res_1_2.pdf")
 
     # sns.lineplot(data=add_edges, x="perturb", y="sigma=0.01")
     # sns.lineplot(data=remove_edges, x="perturb", y="sigma=0.01")

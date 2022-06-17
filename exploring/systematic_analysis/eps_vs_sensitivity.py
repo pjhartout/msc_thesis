@@ -12,8 +12,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy as sp
 import seaborn as sns
-from pyparsing import col
 from pyprojroot import here
 from yaml import load
 
@@ -557,6 +557,42 @@ def load_laplacian():
     return df.assign(descriptor="Laplacian Spectrum Histogram")
 
 
+def annotate(data, palette, **kws):
+    for i, eps_value in enumerate(data.eps_value.unique()):
+        eps_df = data[data["eps_value"] == eps_value]
+        r_ps = list()
+        r_ss = list()
+        for run in eps_df.run.unique():
+            run_df = eps_df[eps_df["run"] == run]
+            r_p, p_p = sp.stats.pearsonr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ps.append(r_p)
+            r_s, p_s = sp.stats.spearmanr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ss.append(r_s)
+
+        avg_rp = np.mean(r_ps)
+        avg_rs = np.mean(r_ss)
+        ax = plt.gca()
+        ax.text(
+            0.8 - 0.23 * i,
+            0.05,
+            f"{eps_value}-"
+            + r"$\AA$"
+            + f"\n"
+            + r"$\rho_P=$"
+            + f"{round(avg_rp, 2)}"
+            + "\n"
+            + r"$\rho_S=$"
+            + f"{round(avg_rs, 2)}",
+            # color=palette[i],
+            transform=ax.transAxes,
+            fontsize=8,
+        )
+
+
 def main():
     df_clustering = load_clustering()
     df_degree = load_degree()
@@ -570,14 +606,14 @@ def main():
     df["combo"] = df["perturb_type"] + "_" + df["descriptor"]
 
     df = df.rename(
-        columns={"perturb": "Perturbation", "sigma=0.01": "Normalized MMD"}
+        columns={"perturb": "Perturbation (%)", "sigma=0.01": "Normalized MMD"}
     )
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["eps_value"].nunique())
 
     df.reset_index(drop=True, inplace=True)
     g = sns.relplot(
-        x="Perturbation",
+        x="Perturbation (%)",
         y="Normalized MMD",
         hue="eps_value",
         col="combo",
@@ -605,9 +641,8 @@ def main():
         # facet_kws={"legend_out": True}
         # facet_kws={"sharex": False},
     )
-    g.fig.suptitle(
-        r"Sensitivity of MMD to perturbations with varying thresholds $\varepsilon$.",
-    )
+    g.map_dataframe(annotate, palette=palette)
+
     title = [
         "Gaussian Noise\n Clustering Histogram",
         "Gaussian Noise\n Degree Histogram",
