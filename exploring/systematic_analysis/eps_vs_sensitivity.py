@@ -12,6 +12,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy as sp
 import seaborn as sns
 from pyprojroot import here
 from yaml import load
@@ -556,6 +557,42 @@ def load_laplacian():
     return df.assign(descriptor="Laplacian Spectrum Histogram")
 
 
+def annotate(data, palette, **kws):
+    for i, eps_value in enumerate(data.eps_value.unique()):
+        eps_df = data[data["eps_value"] == eps_value]
+        r_ps = list()
+        r_ss = list()
+        for run in eps_df.run.unique():
+            run_df = eps_df[eps_df["run"] == run]
+            r_p, p_p = sp.stats.pearsonr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ps.append(r_p)
+            r_s, p_s = sp.stats.spearmanr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ss.append(r_s)
+
+        avg_rp = np.mean(r_ps)
+        avg_rs = np.mean(r_ss)
+        ax = plt.gca()
+        ax.text(
+            0.8 - 0.23 * i,
+            0.05,
+            f"{eps_value}-"
+            + r"$\AA$"
+            + f"\n"
+            + r"$\rho_P=$"
+            + f"{round(avg_rp, 2)}"
+            + "\n"
+            + r"$\rho_S=$"
+            + f"{round(avg_rs, 2)}",
+            # color=palette[i],
+            transform=ax.transAxes,
+            fontsize=8,
+        )
+
+
 def main():
     df_clustering = load_clustering()
     df_degree = load_degree()
@@ -569,43 +606,56 @@ def main():
     df["combo"] = df["perturb_type"] + "_" + df["descriptor"]
 
     df = df.rename(
-        columns={"perturb": "Perturbation", "sigma=0.01": "Normalized MMD"}
+        columns={"perturb": "Perturbation (%)", "sigma=0.01": "Normalized MMD"}
     )
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["eps_value"].nunique())
 
     df.reset_index(drop=True, inplace=True)
     g = sns.relplot(
-        x="Perturbation",
+        x="Perturbation (%)",
         y="Normalized MMD",
         hue="eps_value",
         col="combo",
         kind="line",
         data=df,
         height=3,
-        aspect=0.9,
-        col_wrap=4,
+        aspect=1,
+        col_wrap=3,
         ci=100,
         palette=palette,
+        col_order=[
+            "Gaussian Noise_Clustering Histogram",
+            "Gaussian Noise_Degree Histogram",
+            "Gaussian Noise_Laplacian Spectrum Histogram",
+            "Taper_Clustering Histogram",
+            "Taper_Degree Histogram",
+            "Taper_Laplacian Spectrum Histogram",
+            "Shear_Clustering Histogram",
+            "Shear_Degree Histogram",
+            "Shear_Laplacian Spectrum Histogram",
+            "Twist_Clustering Histogram",
+            "Twist_Degree Histogram",
+            "Twist_Laplacian Spectrum Histogram",
+        ]
         # facet_kws={"legend_out": True}
         # facet_kws={"sharex": False},
     )
-    g.fig.suptitle(
-        r"Sensitivity of MMD to perturbations with varying thresholds $\varepsilon$.",
-    )
+    g.map_dataframe(annotate, palette=palette)
+
     title = [
         "Gaussian Noise\n Clustering Histogram",
-        "Taper\n Clustering Histogram",
-        "Twist\n Clustering Histogram",
-        "Shear\n Clustering Histogram",
         "Gaussian Noise\n Degree Histogram",
-        "Taper\n Degree Histogram",
-        "Twist\n Degree Histogram",
-        "Shear\n Degree Histogram",
         "Gaussian Noise\n  Laplacian Spectrum Histogram",
+        "Taper\n Clustering Histogram",
+        "Taper\n Degree Histogram",
         "Taper\n Laplacian Spectrum Histogram",
-        "Twist\n Laplacian Spectrum Histogram",
+        "Shear\n Clustering Histogram",
+        "Shear\n Degree Histogram",
         "Shear\n Laplacian Spectrum Histogram",
+        "Twist\n Clustering Histogram",
+        "Twist\n Degree Histogram",
+        "Twist\n Laplacian Spectrum Histogram",
     ]
     for i, ax in enumerate(g.axes.flatten()):
         ax.set_title(f"{title[i]}")
@@ -615,8 +665,8 @@ def main():
     # leg.set_bbox_to_anchor([1, 0.5])
     # plt.legend([], [], frameon=False)
     g._legend.set_title(r"$\varepsilon$-value" + "\n" + "(in $\AA$)")
-    g.tight_layout(rect=[0, 0, 0.95, 1.0])
-    plt.savefig(here() / "exploring/systematic_analysis/res_2.svg")
+    g.tight_layout(rect=[0, 0, 0.93, 1.0])
+    plt.savefig(here() / "exploring/systematic_analysis/res_2.pdf")
 
 
 if __name__ == "__main__":

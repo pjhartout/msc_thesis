@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""overall_mmd_behaviour.py
+"""overall_mmd_behaviour_eps.py
 
 Surprisingly, structured graphs show a better correlation with the MMD than unstructured graphs.
 
@@ -12,6 +12,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy as sp
 import seaborn as sns
 from pyprojroot import here
 
@@ -269,6 +270,40 @@ def load_laplacian():
     return all_data
 
 
+def annotate(data, palette, **kws):
+    for i, descriptor in enumerate(data.Descriptor.unique()):
+        descriptor_df = data[data["Descriptor"] == descriptor]
+        r_ps = list()
+        r_ss = list()
+        for run in descriptor_df.run.unique():
+            run_df = descriptor_df[descriptor_df["run"] == run]
+            r_p, p_p = sp.stats.pearsonr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ps.append(r_p)
+            r_s, p_s = sp.stats.spearmanr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ss.append(r_s)
+
+        avg_rp = np.mean(r_ps)
+        avg_rs = np.mean(r_ss)
+        ax = plt.gca()
+        ax.text(
+            0.8 - 0.23 * i,
+            0.05,
+            f"{descriptor.split(' ')[:-1][0]}" + "\n"
+            r"$\rho_P=$"
+            + f"{round(avg_rp, 2)}"
+            + "\n"
+            + r"$\rho_S=$"
+            + f"{round(avg_rs, 2)}",
+            # color=palette[i],
+            transform=ax.transAxes,
+            fontsize=8,
+        )
+
+
 def main():
     df_clustering = load_clustering()
     df_degree = load_degree()
@@ -296,20 +331,25 @@ def main():
         data=df,
         height=3,
         aspect=0.75,
-        col_wrap=4,
+        col_wrap=3,
         palette=palette,
         ci=100,
         # facet_kws={"sharex": False},
     )
+    g.map_dataframe(annotate, palette=palette)
+
     leg = g._legend
-    leg.set_bbox_to_anchor([0.99, 0.30])
-    g.fig.suptitle(
-        r"MMD vs. Perturbation (%) For Various Graph Descriptors of the 8$\AA$-Graphs Under Different Perturbations Regimes."
-    )
+    leg.set_bbox_to_anchor([0.67, 0.2])
+
+    for i, ax in enumerate(g.axes.flatten()):
+        ax.set_title(f"{df['Perturbation Type'].unique()[i]}")
+    # g.fig.suptitle(
+    #     r"MMD vs. Perturbation (%) For Various Graph Descriptors of the 8$\AA$-Graphs Under Different Perturbations Regimes."
+    # )
 
     plt.legend([], [], frameon=False)
     plt.tight_layout()
-    plt.savefig(here() / "exploring/systematic_analysis/res_1.svg")
+    plt.savefig(here() / "exploring/systematic_analysis/res_1_1.pdf")
 
     # sns.lineplot(data=add_edges, x="perturb", y="sigma=0.01")
     # sns.lineplot(data=remove_edges, x="perturb", y="sigma=0.01")
