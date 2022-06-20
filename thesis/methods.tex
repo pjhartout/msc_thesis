@@ -55,8 +55,82 @@ defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
 graph.
 \paragraph{Point cloud perturbations} These perturbations aim to add changes
 to the underlying coordinates of each of the atom in the protein. Such
-perturbations include (i) injecting Gaussian noise (ii) twisting (iii) shearing
-(iv) tapering.
+perturbations include injecting Gaussian noise (Equation
+\ref{eq:gaussian_noise}), (ii) twisting, , (iii) shearing, and
+(iv) tapering. We proceed to detailing each of the equations governing the
+perturbations below.
+
+In the notations that follow, $x$, $y$ $z$ represent the unperturbed coordinates, and
+$x'$, $y'$, and $z'$ represent the perturbed coordinates. The Gaussian noise added to a coordinate system is given by:
+\begin{equation}
+  \label{eq:gaussian_noise}
+  \begin{bmatrix}
+    x' \\
+    y' \\
+    z'
+  \end{bmatrix} =
+  \begin{bmatrix}
+    x + \sigma \\
+    y+ \sigma \\
+    z+ \sigma
+  \end{bmatrix}
+\end{equation}
+where $\sigma\sim\caln(0,\sigma)$ is set by the user. Twisting is achieved by
+adding the following transformation to the coordinate system:
+
+\begin{equation}
+  \label{eq:twisting}
+  \begin{bmatrix}
+    x' \\
+    y' \\
+    z'
+  \end{bmatrix} =
+  \begin{bmatrix}
+    x\cdot\cos(\alpha\cdot z) - y\cdot\sin(\alpha\cdot z) \\
+    x\cdot\sin(\alpha\cdot z) + y\cdot\sin(\alpha\cdot z) \\
+    z
+  \end{bmatrix}
+\end{equation}
+
+where $\alpha\in\R$ is in $\rad\cdot\si{
+\angstrom}^{-1}$ is set by the user. Shearing the coordinate system is achieved
+by applying
+
+\begin{equation}
+  \label{eq:shearing}
+  \begin{bmatrix}
+    x' \\
+    y' \\
+    z'
+  \end{bmatrix} =
+  \begin{bmatrix}
+    a \cdot z + x\\
+    b \cdot z + y\\
+    z
+  \end{bmatrix}
+\end{equation}
+
+to the coordinate system, where $a, b\in\R$ are in \si{\angstrom} and set by the user. In this thesis, we set $a=b$. Similarly,
+tapering is achieved by applying
+
+
+\begin{equation}
+  \label{eq:tapering}
+  \begin{bmatrix}
+    x' \\
+    y' \\
+    z'
+  \end{bmatrix} =
+  \begin{bmatrix}
+    (0.5\cdot a^2\cdot z + b\cdot z + 1) \cdot x\\
+    (0.5\cdot a^2\cdot z + b\cdot z + 1) \cdot y\\
+    z
+  \end{bmatrix}
+\end{equation}
+
+where $a, b\in\R$ are in \si{\angstrom} and set by the user. Similarly to
+Equation \ref{eq:shearing}, we set $a=b$ in this thesis.
+
 \paragraph{Mutation} These simply consist in swapping node labels, i.e.
 changing an existing node label, with another. While graph perturbation
 probabilities (e.g. of adding an edge) ranges from 0 to 1, here we mostly
@@ -65,25 +139,32 @@ sensitive the MMD to a few point mutations, which covers some of the
 real-world protein engineering use cases \citep{poluri2016protein}.
 
 For each perturbation, a range of degree of perturbation is defined and 20
-different degrees of perturbation is examined and repeated 10 times with 10
-pairs of i.i.d. proteins to estimate the sensitivity of the particular MMD
-configuration to the perturbation.
+different evenly-spaced degrees of perturbation is examined and repeated 10
+times with 10 pairs of i.i.d. proteins to estimate the sensitivity of the
+particular MMD configuration to the perturbation.
 
 \section{MMD Configurations}
-
-
 
 We introduced MMD in Section \ref{sec:mmd}, Equation \ref{eq:mmd}, and
 noted that an important part of MMD consists in choosing the right set of
 descriptor function and kernel. Here, we list and motivate all graph extraction techniques,
 descriptor functions employed, and kernels adopted in this experiment.
 
-% TODO do we normalize?
-First, throughout our experiments we will use the unbiased squared MMD estimate, which
-removes self-comparison terms in the kernel matrices (\cite{gretton2012kernel},
-Lemma 6), which can result in negative values. We might normalize it as
-well to compare behaviours of different MMD configurations not operating on the
-same scale.
+First, throughout our experiments we will use the unbiased squared MMD estimate,
+which removes self-comparison terms in the kernel matrices
+(\cite{gretton2012kernel}, Lemma 6), which can result in negative values. We
+will normalize the resulting MMD over the whole range of perturbation for each
+curve as well to compare behaviours of different MMD configurations not
+operating on the same scale.
+
+\begin{equation}
+  \label{eq:normalization}
+  \MMD_{\textnormal{Normalized}} = {\MMD - \min(\MMD_{\textnormal{Experiment}}) \over \max(\MMD_{\textnormal{Experiment}}) - \min(\MMD_{\textnormal{Experiment}})}
+\end{equation}
+
+Where $\MMD_{\textnormal{Experiment}}$ is the collection of MMD values for a particular
+experiment, i.e. a particular MMD configuration tracked through the whole range
+of a particular perturbation.
 
 \subsection{Representations}
 We will use several different representations in this thesis, which can be
@@ -144,7 +225,70 @@ To estimate \emph{global} changes in the shape of the protein, we will also use
 kernels using persistence diagrams as input, specifically using the Persistence
 Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
 
+
 \section{Experimental Setup}
+
+\section{Settings}
+
+Table \ref{tab:graph_extraction} summarizes the various types of graphs
+extracted for the graph pipelines of this thesis. Table \ref{tab:descriptor_function_setup} details the setup used for the
+various descriptor functions used in this thesis.
+
+\begin{table}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Graph type} & \textbf{Values} \\
+    \midrule
+    $k$-NN graphs & 2, 6, 8 \\
+    $\varepsilon$-graphs & 8, 16, 32 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Ranges of graphs extracted in this thesis.}
+  \label{tab:graph_extraction}
+\end{table}
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Descriptor Name} & \textbf{Number of Bins} & \textbf{Range of Bins} \\
+    \midrule
+    Degree Histogram & 2699 & [0, 2699] \\
+    Laplacian Spectrum Histogram & 100 & [0, 2] \\
+    Distance Histogram & 1000 & [0, 1000] (\si{\angstrom}) \\
+    Dihedral Angles Histogram & 100 & [$-\pi$, $+\pi$] (rad) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Descriptor function bin numbers and ranges of descriptor functions
+    used in this thesis. The ranges are given by
+    [minimum value, maximum value] and (unit) when applicable.}
+  \label{tab:descriptor_function_setup}
+\end{table}
+
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{>{\raggedright\arraybackslash}p{4.8cm}l}
+    \toprule
+    \textbf{Perturbation} & \textbf{Range} \\
+    \midrule
+    Twist & [0, 0.1] (rad/\si{\angstrom})\\
+    Shear & [0, 5] (\si{\angstrom}) \\
+    Taper & [0, 0.1] (\si{\angstrom}, \si{\angstrom}) \\ % TODO Refer to equation definition
+    Gaussian Noise & [0, 30] (\si{\angstrom}) \\
+    Mutation & [0, 0.1]\\
+    Graph Perturbations (remove, add, rewire edges) & [0, 1]\\
+    \bottomrule
+  \end{tabular}
+  \caption{Perturbation ranges used in this thesis. Each interval was split into
+20 evenly-spaced degrees of perturbation.}
+  \label{tab:perturbation_ranges}
+\end{table}
+
+
 
 \subsection{Measuring the quality of MMD configurations}
 

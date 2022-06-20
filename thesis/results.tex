@@ -3,14 +3,17 @@
 \section{Overall MMD behaviour}
 
 Surprisingly, we found that the behaviour of MMD was not as inconsistent for the
-types of graphs extracted from proteins as was found on synthetic graphs
-by \cite{o2021evaluation}. Figure \ref{fig:mmd_consistent_eps} exhiqbits a
-typical trajectories of MMD values as different perturbation types are
-progressively added. We can see that both the (average) Spearman and Pearson correlation
-coefficients are high, indicating a high correlation between the amount of
+types of graphs extracted from proteins as was found on synthetic graphs by
+\cite{o2021evaluation}. Figure \ref{fig:mmd_consistent_eps} exhibits a typical
+trajectories of MMD values as different perturbation types are progressively
+added to $\varepsilon$-graphs with $\varepsilon$ set to $8$\si{\angstrom}. We
+can see that both the Spearman and Pearson correlation coefficients averaged
+across runs are high, indicating a high correlation between the amount of
 perturbation and the normalized MMD values. There is, however, an exception: the
-MMD obtained from the degree histogram does not behave as expected, and is very sensitive to the
-addition of edges and decreases in value as more and more edges are added.
+MMD obtained from the degree histogram does not behave as expected, and is very
+sensitive to the addition of edges and decreases in value as more and more edges
+are added. We expect that this pathology is not very common in real models and
+that this can be easily detected manually.
 
 The overall influence of the kernel on MMD's behaviour subject to
 perturbations such as Gaussian Noise, can be seen in Figure \ref{fig:mmd_effect_kernel}. We can
@@ -21,6 +24,15 @@ kernel matrices can ``saturate'' quite easily. This can have quite unpredictable
 behaviours: in the case of the degree histogram or the clustering histogram,
 this results in an overly sensitive kernel, while the clustering histogram
 remains oblivious to large amounts of perturbation.
+
+$k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
+able to detect perturbations - see Figure \ref{}. However, they are extremely
+sensitive to Gaussian noise (see upper left pane of Figure \ref{}). Presumably, this is
+because very small amounts of noise ($<4$\si{\angstrom}) affect the direct local
+neighbourhood of each node very significantly in such a way that the resulting
+$k$-NN graph is rapidly disrupted, which is not necessarily the case with other
+perturbations.
+
 
 \begin{figure}
   \centering
