@@ -50,11 +50,24 @@ def get_longest_protein_dummy_sequence(sampled_files, n_jobs) -> int:
 @timeit
 def tda_benchmark(pdb_files):
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
-        ("contact_map", ContactMap(n_jobs=N_JOBS, verbose=True,),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        (
+            "contact_map",
+            ContactMap(
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
+        ),
         (
             "epsilon_graph",
-            EpsilonGraph(n_jobs=N_JOBS, epsilon=8, verbose=True,),
+            EpsilonGraph(
+                n_jobs=N_JOBS,
+                epsilon=8,
+                verbose=True,
+            ),
         ),
         (
             "tda",
@@ -66,6 +79,7 @@ def tda_benchmark(pdb_files):
                 n_jobs=N_JOBS,
                 landscape_layers=1,
                 verbose=True,
+                use_caching=False,
             ),
         ),
     ]
@@ -82,7 +96,11 @@ def esm_benchmark(pdb_files):
     base_feature_steps = [
         (
             "coordinates",
-            Coordinates(granularity="CA", n_jobs=N_JOBS, verbose=True,),
+            Coordinates(
+                granularity="CA",
+                n_jobs=N_JOBS,
+                verbose=True,
+            ),
         ),
         (
             "esm",
@@ -108,9 +126,21 @@ def esm_benchmark(pdb_files):
 @timeit
 def graphs_benchmark(pdb_files):
     base_feature_steps = [
-        ("coordinates", Coordinates(granularity="CA", n_jobs=N_JOBS),),
-        ("contact map", ContactMap(metric="euclidean", n_jobs=N_JOBS,),),
-        ("epsilon graph", EpsilonGraph(epsilon=8, n_jobs=N_JOBS),),
+        (
+            "coordinates",
+            Coordinates(granularity="CA", n_jobs=N_JOBS),
+        ),
+        (
+            "contact map",
+            ContactMap(
+                metric="euclidean",
+                n_jobs=N_JOBS,
+            ),
+        ),
+        (
+            "epsilon graph",
+            EpsilonGraph(epsilon=8, n_jobs=N_JOBS),
+        ),
     ]
     start = time.perf_counter()
     proteins = pipeline.Pipeline(
@@ -170,7 +200,10 @@ def clustering_histogram_benchmark(proteins):
 def laplacian_spectrum_histogram_benchmark(proteins):
     start = time.perf_counter()
     proteins = LaplacianSpectrum(
-        graph_type="eps_graph", n_bins=100, n_jobs=N_JOBS, verbose=True,
+        graph_type="eps_graph",
+        n_bins=100,
+        n_jobs=N_JOBS,
+        verbose=True,
     ).fit_transform(proteins)
     time_elapsed = time.perf_counter() - start
     return proteins, time_elapsed
@@ -307,7 +340,7 @@ def main(cfg: DictConfig):
     # - not a fully representative scaling/sample size
     print(f"Looking for data in {HUMAN_PROTEOME}")
     print(f"Test existence of {len(list_pdb_files(HUMAN_PROTEOME))} files")
-    make_dir(here() / cfg.meta.data.time_estimates_dir)
+    make_dir(here() / cfg.meta.time_estimates_dir)
 
     # Reprensentations benchmarks
     (
@@ -322,14 +355,9 @@ def main(cfg: DictConfig):
         index=["tda", "esm", "graph"],
         columns=["representation"],
     )
-    representation_benchmarks = representation_benchmarks / (
-        N_JOBS * N_SAMPLES
-    )
 
     representation_benchmarks.to_csv(
-        here()
-        / cfg.meta.data.time_estimates_dir
-        / "representation_benchmarks.csv"
+        here() / cfg.meta.time_estimates_dir / "representation_benchmarks.csv"
     )
 
     # Descriptor benchmarks
@@ -350,9 +378,8 @@ def main(cfg: DictConfig):
         index=["degree", "clustering", "laplacian"],
         columns=["descriptor"],
     )
-    descriptor_benchmarks = descriptor_benchmarks / (N_JOBS * N_SAMPLES)
     descriptor_benchmarks.to_csv(
-        here() / cfg.meta.data.time_estimates_dir / "descriptor_benchmarks.csv"
+        here() / cfg.meta.time_estimates_dir / "descriptor_benchmarks.csv"
     )
 
     # kernel benchmarks
@@ -373,9 +400,8 @@ def main(cfg: DictConfig):
         index=["linear", "gaussian", "wl", "pf"],
         columns=["kernel"],
     )
-    kernel_benchmarks = kernel_benchmarks / (N_JOBS * N_SAMPLES)
     kernel_benchmarks.to_csv(
-        here() / cfg.meta.data.time_estimates_dir / "kernel_benchmarks.csv"
+        here() / cfg.meta.time_estimates_dir / "kernel_benchmarks.csv"
     )
 
 
