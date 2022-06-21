@@ -27,6 +27,7 @@ from fastwlk.kernel import WeisfeilerLehmanKernel
 from gtda import pipeline
 from omegaconf import DictConfig, OmegaConf
 from pyprojroot import here
+from sklearn.metrics import pairwise_distances
 from tqdm import tqdm
 
 from proteinmetrics.descriptors import (
@@ -40,7 +41,11 @@ from proteinmetrics.descriptors import (
 )
 from proteinmetrics.distance import MaximumMeanDiscrepancy
 from proteinmetrics.graphs import ContactMap, EpsilonGraph, KNNGraph
-from proteinmetrics.kernels import LinearKernel, PersistenceFisherKernel
+from proteinmetrics.kernels import (
+    GaussianKernel,
+    LinearKernel,
+    PersistenceFisherKernel,
+)
 from proteinmetrics.loaders import list_pdb_files, load_descriptor
 from proteinmetrics.paths import DATA_HOME, ECOLI_PROTEOME, HUMAN_PROTEOME
 from proteinmetrics.pdb import Coordinates, Sequence
@@ -134,67 +139,116 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def pc_perturbation_worker(
-    cfg, experiment_steps, perturbation, unperturbed, perturbed,
+    cfg,
+    experiment_steps,
+    perturbation,
+    unperturbed,
+    perturbed,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
-    perturbed = perturbed.copy()
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
-    log.info("Computed the representations.")
-
-    log.info("Extracting graphs")
 
     perturbed_protein_names = idx2name2run(cfg, perturbed=True)
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
 
-    mmd_runs_n_iter = dict()
-    for bandwidth in cfg.meta.kernels[0]["persistence_fisher"][0]["bandwidth"]:
-        for bandwidth_fisher in cfg.meta.kernels[0]["persistence_fisher"][1][
-            "bandwidth_fisher"
-        ]:
-            mmd_runs = list()
-            for run in range(cfg.meta.n_runs):
-                log.info(f"Run {run}")
-                unperturbed_run = filter_protein_using_name(
-                    unperturbed, unperturbed_protein_names[run].tolist()
-                )
-                perturbed_run = filter_protein_using_name(
-                    perturbed, perturbed_protein_names[run].tolist()
-                )
+    # For every run - compute x-y
+    pre_computed_products = list()
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
 
-                unperturbed_descriptor_run = load_descriptor(
-                    unperturbed_run,
-                    graph_type="contact_graph",
-                    descriptor="diagram",
-                )
-                perturbed_descriptor_run = load_descriptor(
-                    perturbed_run,
-                    graph_type="contact_graph",
-                    descriptor="diagram",
-                )
+        unperturbed_descriptor_run = np.asarray(
+            [protein.embeddings["esm"] for protein in unperturbed_run]
+        )
+        perturbed_descriptor_run = np.asarray(
+            [protein.embeddings["esm"] for protein in perturbed_run]
+        )
 
-                log.info("Computing the kernel.")
+        products = {
+            # The np.ones is used here because
+            # exp(sigma*(x-x)**2) = 1(n x n)
+            "K_XX": pairwise_distances(
+                unperturbed_descriptor_run,
+                unperturbed_descriptor_run,
+            ),
+            "K_YY": pairwise_distances(
+                perturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
+            ),
+            "K_XY": pairwise_distances(
+                unperturbed_descriptor_run,
+                perturbed_descriptor_run,
+                metric="euclidean",
+            ),
+        }
+        pre_computed_products.append(products)
+        # pre_computed_products[f"sigma={sigma}"] = pre_computed_products_sigma
 
-                mmd = MaximumMeanDiscrepancy(
-                    biased=False,
-                    squared=True,
-                    kernel=PersistenceFisherKernel(
-                        bandwidth=bandwidth,
-                        bandwidth_fisher=bandwidth_fisher,
-                        n_jobs=cfg.compute.n_jobs,
-                        verbose=cfg.debug.verbose,
-                    ),  # type: ignore
-                    verbose=cfg.debug.verbose,
-                ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
-                mmd_runs.append(mmd)
+    # For every run and for every sigma - compute gaussian kernel
+    mmd_runs_sigma = dict()
+    for sigma in cfg.meta.kernels[1]["gaussian"][0]["bandwidth"]:
+        mmd_runs = list()
+        for run in range(cfg.meta.n_runs):
+            log.info(f"Run {run}")
+            log.info("Computing the kernel.")
 
-            mmd_runs_n_iter[
-                f"bandwidth={bandwidth};bandwidth_fisher={bandwidth_fisher}"
-            ] = mmd_runs
+            kernel = GaussianKernel(sigma=sigma, pre_computed_product=True)
 
-    return mmd_runs_n_iter
+            mmd = MaximumMeanDiscrepancy(
+                biased=False,
+                squared=True,
+                verbose=cfg.debug.verbose,
+                kernel=kernel,
+            ).compute(
+                kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
+                kernel.compute_matrix(pre_computed_products[run]["K_XY"]),
+            )
+            mmd_runs.append(mmd)
+        mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
+
+    # For every run - compute linear kernel
+    mmd_linear_kernel_runs = []
+    for run in range(cfg.meta.n_runs):
+        log.info(f"Run {run}")
+        unperturbed_run = filter_protein_using_name(
+            unperturbed, unperturbed_protein_names[run].tolist()
+        )
+        perturbed_run = filter_protein_using_name(
+            perturbed, perturbed_protein_names[run].tolist()
+        )
+        unperturbed_descriptor_run = np.asarray(
+            [protein.embeddings["esm"] for protein in unperturbed_run]
+        )
+        perturbed_descriptor_run = np.asarray(
+            [protein.embeddings["esm"] for protein in perturbed_run]
+        )
+
+        log.info("Computing the kernel.")
+
+        mmd = MaximumMeanDiscrepancy(
+            biased=False,
+            squared=True,
+            kernel=LinearKernel(
+                n_jobs=cfg.compute.n_jobs,
+                normalize=False,
+            ),  # type: ignore
+            verbose=cfg.debug.verbose,
+        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+        mmd_linear_kernel_runs.append(mmd)
+
+    # We make linear kernel part of the same dict to simplify things
+    mmd_runs_sigma["linear_kernel"] = mmd_linear_kernel_runs
+    return mmd_runs_sigma
 
 
 def save_mmd_experiment(cfg, mmds, perturbation_type):
@@ -222,7 +276,7 @@ def save_mmd_experiment(cfg, mmds, perturbation_type):
 
 
 def get_longest_protein_dummy_sequence(sampled_files, cfg: DictConfig) -> int:
-    seq = Sequence(n_jobs=cfg.experiments.compute.n_jobs)
+    seq = Sequence(n_jobs=cfg.compute.n_jobs)
     sequences = seq.fit_transform(sampled_files)
     longest_sequence = max([len(protein.sequence) for protein in sequences])
     return longest_sequence
@@ -233,8 +287,6 @@ def mutation_perturbation_esm(
     perturbed,
     unperturbed,
     experiment_steps,
-    graph_type,
-    graph_extraction_param,
     **kwargs,
 ):
     log.info("Perturbing proteins with mutations.")
@@ -253,7 +305,11 @@ def mutation_perturbation_esm(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg, experiment_steps, perturbation, unperturbed, perturbed,
+            cfg,
+            experiment_steps,
+            perturbation,
+            unperturbed,
+            perturbed,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with mutation {p_perturb}.")
@@ -273,12 +329,15 @@ def mutation_perturbation_esm(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg, mmds, perturbation_type="mutation",
+        cfg,
+        mmds,
+        perturbation_type="mutation",
     )
 
 
 def tda_experiment_pc_perturbation(
-    cfg: DictConfig, perturbation: str,
+    cfg: DictConfig,
+    perturbation: str,
 ):
 
     unperturbed = load_proteins_from_config(cfg, perturbed=False)
@@ -345,7 +404,8 @@ def main(cfg: DictConfig):
     # outside for loops for n_iters and k.
 
     tda_experiment_pc_perturbation(
-        cfg=cfg, perturbation="twist",
+        cfg=cfg,
+        perturbation="mutation",
     )
 
 
