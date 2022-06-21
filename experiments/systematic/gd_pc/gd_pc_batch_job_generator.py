@@ -73,18 +73,18 @@ def main(cfg):
         "mutation",
     ]
 
-    # for descriptor in pc_descriptors:
-    #     for perturbation in perturbations:
-    #         job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=pc_descriptor +graph_extraction_parameter=1 +perturbation={perturbation} \n"
-    #         wl_pc.write(job_param)
-    #         wl_pc.write(build_fail_string(job_param))
+    for descriptor in pc_descriptors:
+        for perturbation in perturbations:
+            job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=pc_descriptor +graph_extraction_parameter=1 +perturbation={perturbation} \n"
+            wl_pc.write(job_param)
+            wl_pc.write(build_fail_string(job_param))
 
-    # for eps in cfg.meta.representations[0]["eps_graph"]:
-    #     for descriptor in descriptors:
-    #         for perturbation in perturbations:
-    #             job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
-    #             wl_pc.write(job_param)
-    #             wl_pc.write(build_fail_string(job_param))
+    for eps in cfg.meta.representations[0]["eps_graph"]:
+        for descriptor in descriptors:
+            for perturbation in perturbations:
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
+                wl_pc.write(job_param)
+                wl_pc.write(build_fail_string(job_param))
 
     for k in cfg.meta.representations[1]["knn_graph"]:
         for descriptor in descriptors:

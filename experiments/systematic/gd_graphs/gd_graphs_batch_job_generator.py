@@ -41,7 +41,9 @@ def check_already_run(
 
 
 @hydra.main(
-    version_base=None, config_path=str(here()) + "/conf/", config_name="systematic"
+    version_base=None,
+    config_path=str(here()) + "/conf/",
+    config_name="systematic",
 )
 def main(cfg):
     wl_pc = open(
@@ -66,11 +68,11 @@ def main(cfg):
     ]
 
     for descriptor in descriptors:
-        # for eps in cfg.meta.representations[0]["eps_graph"]:
-        #     for perturbation in perturbations:
-        #         job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
-        #         wl_pc.write(job_param)
-        #         wl_pc.write(build_fail_string(job_param))
+        for eps in cfg.meta.representations[0]["eps_graph"]:
+            for perturbation in perturbations:
+                job_param = f"{slurm_string} +descriptor={descriptor} +graph_type=eps_graph +graph_extraction_parameter={eps} +perturbation={perturbation} \n"
+                wl_pc.write(job_param)
+                wl_pc.write(build_fail_string(job_param))
 
         for k in cfg.meta.representations[1]["knn_graph"]:
             for perturbation in perturbations:
