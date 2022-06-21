@@ -17,7 +17,8 @@ from pyprojroot import here
 
 from proteinmetrics.utils.plots import setup_plotting_parameters
 
-relevant_cols = ["perturb", "run", "sigma=0.01"]
+kernel = "sigma=0.01"
+relevant_cols = ["perturb", "run", kernel]
 
 
 def normalize(df):
@@ -29,13 +30,13 @@ def normalize(df):
 
 def load_clustering() -> pd.DataFrame:
 
-    # add_edges = normalize(
-    #     pd.read_csv(
-    #         here()
-    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/clustering_histogram/add_edges_mmds.csv"
-    #     )
-    # )[relevant_cols]
-    # add_edges = add_edges.assign(perturb_type="Add Edges")
+    add_edges = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/clustering_histogram/add_edges_mmds.csv"
+        )
+    )[relevant_cols]
+    add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -87,7 +88,7 @@ def load_clustering() -> pd.DataFrame:
 
     all_data = pd.concat(
         [
-            # add_edges,
+            add_edges,
             gaussian_noise,
             remove_edges,
             rewire_edges,
@@ -99,7 +100,7 @@ def load_clustering() -> pd.DataFrame:
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
+            kernel: "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -109,14 +110,14 @@ def load_clustering() -> pd.DataFrame:
 
 def load_degree():
 
-    # add_edges = normalize(
-    #     pd.read_csv(
-    #         here()
-    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/degree_histogram/add_edges_mmds.csv"
-    #     )
-    # )[relevant_cols]
-    # add_edges.sort_values(by=["perturb", "run"], inplace=True)
-    # add_edges = add_edges.assign(perturb_type="Add Edges")
+    add_edges = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/degree_histogram/add_edges_mmds.csv"
+        )
+    )[relevant_cols]
+    add_edges.sort_values(by=["perturb", "run"], inplace=True)
+    add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -167,7 +168,7 @@ def load_degree():
     twist = twist.assign(perturb_type="Twist")
     all_data = pd.concat(
         [
-            # add_edges,
+            add_edges,
             gaussian_noise,
             remove_edges,
             rewire_edges,
@@ -179,7 +180,7 @@ def load_degree():
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
+            kernel: "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -189,14 +190,14 @@ def load_degree():
 
 def load_laplacian():
 
-    # add_edges = normalize(
-    #     pd.read_csv(
-    #         here()
-    #         / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/laplacian_spectrum_histogram/add_edges_mmds.csv"
-    #     )
-    # )[relevant_cols]
-    # add_edges.sort_values(by=["perturb", "run"], inplace=True)
-    # add_edges = add_edges.assign(perturb_type="Add Edges")
+    add_edges = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/fixed_length_kernels/knn_graph/2/add_edges/laplacian_spectrum_histogram/add_edges_mmds.csv"
+        )
+    )[relevant_cols]
+    add_edges.sort_values(by=["perturb", "run"], inplace=True)
+    add_edges = add_edges.assign(perturb_type="Add Edges")
 
     gaussian_noise = normalize(
         pd.read_csv(
@@ -248,7 +249,7 @@ def load_laplacian():
 
     all_data = pd.concat(
         [
-            # add_edges,
+            add_edges,
             gaussian_noise,
             remove_edges,
             rewire_edges,
@@ -261,7 +262,7 @@ def load_laplacian():
     all_data = all_data.rename(
         columns={
             "perturb": "Perturbation",
-            "sigma=0.01": "MMD",
+            kernel: "MMD",
             "perturb_type": "Perturbation Type",
         }
     )
@@ -309,7 +310,7 @@ def main():
 
     plt.legend([], [], frameon=False)
     plt.tight_layout()
-    plt.savefig(here() / "exploring/systematic_analysis/res_1_2.pdf")
+    plt.savefig(here() / "exploring/systematic_analysis/res_1_3.pdf")
 
     # sns.lineplot(data=add_edges, x="perturb", y="sigma=0.01")
     # sns.lineplot(data=remove_edges, x="perturb", y="sigma=0.01")
