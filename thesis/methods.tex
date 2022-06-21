@@ -141,7 +141,28 @@ real-world protein engineering use cases \citep{poluri2016protein}.
 For each perturbation, a range of degree of perturbation is defined and 20
 different evenly-spaced degrees of perturbation is examined and repeated 10
 times with 10 pairs of i.i.d. proteins to estimate the sensitivity of the
-particular MMD configuration to the perturbation.
+particular MMD configuration to the perturbation. The ranges used for each
+parameter used in this thesis is shown in Table \ref{tab:perturbation_ranges}
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{>{\raggedright\arraybackslash}p{4.8cm}l}
+    \toprule
+    \textbf{Perturbation} & \textbf{Range} \\
+    \midrule
+    Twist & [0, 0.1] (rad/\si{\angstrom})\\
+    Shear & [0, 5] (\si{\angstrom}) \\
+    Taper & [0, 0.1] (\si{\angstrom}, \si{\angstrom}) \\
+    Gaussian Noise & [0, 30] (\si{\angstrom}) \\
+    Mutation & [0, 0.1]\\
+    Graph Perturbations (remove, add, rewire edges) & [0, 1]\\
+    \bottomrule
+  \end{tabular}
+  \caption{Perturbation ranges used in this thesis. Each interval was split into
+    20 evenly-spaced degrees of perturbation.}
+  \label{tab:perturbation_ranges}
+\end{table}
 
 \section{MMD Configurations}
 
@@ -170,10 +191,27 @@ of a particular perturbation.
 We will use several different representations in this thesis, which can be
 grouped into three categories. The first is \emph{coordinates}. These are parsed
 from each \texttt{.pdb} file. The second is \emph{graphs}. They include $k$-NN
-and $\varepsilon$-graphs, introduced in Section \ref{sec:graphs}. The third is
-the simple protein \emph{sequence}. Each protein's sequence parsed from each
-\texttt{.pdb} file as is. Since we are only dealing with monomers, no additional
-processing is required.
+and $\varepsilon$-graphs, introduced in Section \ref{sec:graphs}. A summary
+table of the different types of graphs extracted from proteins in this thesis
+can be found in Table \ref{tab:graph_extraction}. The third is the simple
+protein \emph{sequence}. Each protein's sequence parsed from each \texttt{.pdb}
+file as is. Since we are only dealing with monomers, no additional processing is
+required.
+
+\begin{table}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Graph type} & \textbf{Values} \\
+    \midrule
+    $k$-NN graphs & 2, 6, 8 \\
+    $\varepsilon$-graphs & 8, 16, 32 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Ranges of graphs extracted in this thesis.}
+  \label{tab:graph_extraction}
+\end{table}
+
 
 \subsection{Descriptor functions}\label{sec:descriptors}
 
@@ -195,6 +233,27 @@ representations. The first consists in a histogram of the pairwise distance of
 each atom considered; the second consists in concatenating the two histograms of
 the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in Section
 \ref{sec:proteins}.
+
+Table \ref{tab:descriptor_function_setup} summarizes the parameters used to set
+up the descriptor functions in this thesis.
+
+\begin{table}
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Descriptor Name} & \textbf{Number of Bins} & \textbf{Range of Bins} \\
+    \midrule
+    Degree Histogram & 2699 & [0, 2699] \\
+    Laplacian Spectrum Histogram & 100 & [0, 2] \\
+    Distance Histogram & 1000 & [0, 1000] (\si{\angstrom}) \\
+    Dihedral Angles Histogram & 100 & [$-\pi$, $+\pi$] (rad) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Descriptor function bin numbers and ranges of descriptor functions
+    used in this thesis. The ranges are given by
+    [minimum value, maximum value] and (unit) when applicable.}
+  \label{tab:descriptor_function_setup}
+\end{table}
 
 % TODO: add pgfplots figure of this workflow.
 
@@ -227,68 +286,6 @@ Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
 
 
 \section{Experimental Setup}
-
-\section{Settings}
-
-Table \ref{tab:graph_extraction} summarizes the various types of graphs
-extracted for the graph pipelines of this thesis. Table \ref{tab:descriptor_function_setup} details the setup used for the
-various descriptor functions used in this thesis.
-
-\begin{table}
-  \centering
-  \begin{tabular}{ll}
-    \toprule
-    \textbf{Graph type} & \textbf{Values} \\
-    \midrule
-    $k$-NN graphs & 2, 6, 8 \\
-    $\varepsilon$-graphs & 8, 16, 32 \\
-    \bottomrule
-  \end{tabular}
-  \caption{Ranges of graphs extracted in this thesis.}
-  \label{tab:graph_extraction}
-\end{table}
-
-
-\begin{table}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Descriptor Name} & \textbf{Number of Bins} & \textbf{Range of Bins} \\
-    \midrule
-    Degree Histogram & 2699 & [0, 2699] \\
-    Laplacian Spectrum Histogram & 100 & [0, 2] \\
-    Distance Histogram & 1000 & [0, 1000] (\si{\angstrom}) \\
-    Dihedral Angles Histogram & 100 & [$-\pi$, $+\pi$] (rad) \\
-    \bottomrule
-  \end{tabular}
-  \caption{Descriptor function bin numbers and ranges of descriptor functions
-    used in this thesis. The ranges are given by
-    [minimum value, maximum value] and (unit) when applicable.}
-  \label{tab:descriptor_function_setup}
-\end{table}
-
-
-
-\begin{table}
-  \centering
-  \begin{tabular}{>{\raggedright\arraybackslash}p{4.8cm}l}
-    \toprule
-    \textbf{Perturbation} & \textbf{Range} \\
-    \midrule
-    Twist & [0, 0.1] (rad/\si{\angstrom})\\
-    Shear & [0, 5] (\si{\angstrom}) \\
-    Taper & [0, 0.1] (\si{\angstrom}, \si{\angstrom}) \\ % TODO Refer to equation definition
-    Gaussian Noise & [0, 30] (\si{\angstrom}) \\
-    Mutation & [0, 0.1]\\
-    Graph Perturbations (remove, add, rewire edges) & [0, 1]\\
-    \bottomrule
-  \end{tabular}
-  \caption{Perturbation ranges used in this thesis. Each interval was split into
-20 evenly-spaced degrees of perturbation.}
-  \label{tab:perturbation_ranges}
-\end{table}
-
-
 
 \subsection{Measuring the quality of MMD configurations}
 
