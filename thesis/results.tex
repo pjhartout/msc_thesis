@@ -175,7 +175,15 @@ sequences. As highlighted in Section
 One of the desiderata of MMD is a low computational complexity (see Section
 \ref{sec:evalproblem}). As such, we report the various computation times for
 each of the important elements of the pipelines outlined in this thesis. The
-summary of all execution times can be found in Table \ref{tab:runtimes}.
+summary of all execution times can be found in Table \ref{tab:runtimes}. First,
+we see that one computation stands out: computing the Vietoris-Rips filtration
+of a point cloud. Together with a large memory footprint, the Vietoris-Rips
+filtration is quite lengthy to compute, due to a runtime of
+$\mathcal{O}(n^{3(k+2)})$, where $k$ is the number of dimensions (here, $k=3$) and
+$n$ the number of points. Although some optimizations have been carried out by
+\texttt{Ripser}, the software used to compute the Vietoris-Rips filtration, it
+remains very expensive to compute and does not enjoy the benefits of hardware
+acceleration through e.g. a GPU due to the difficulty of parallelizing such a filtration \cite{Bauer2021Ripser}.
 
 
 \begin{table}
@@ -184,14 +192,26 @@ summary of all execution times can be found in Table \ref{tab:runtimes}.
     \toprule
     \textbf{Operation} &  \textbf{Execution Time} \\
     \midrule
-    Vietoris-Rips Filtration & \\
-    ESM Embedding & \\
-    Degree Distribution Histogram & \\
-    Clustering Coefficient Histogram & \\
-    Laplacian Spectrum Histogram & \\
+    \textbf{Descriptor Functions} & \\
+    \midrule
+    Vietoris-Rips Filtration & 3332 s \\
+    ESM Embedding & 163 s\\
+    Degree Distribution Histogram & 35 s\\
+    Clustering Coefficient Histogram & 175 s\\
+    Laplacian Spectrum Histogram & 35 s\\
+    Distance Histogram & 28 s\\
+    Dihedral Angles Histogram & 4 s\\
+    \midrule
+    \textbf{Kernels} & \\
+    \midrule
+    Weisfeiler-Lehman Kernel (4 iterations) & 32 s \\
+    RBF Kernel  & 1.7 ms \\
+    Linear Kernel  & 7.7 ms \\
     \bottomrule
   \end{tabular}
-  \caption{Runtime and computational complexity of the various elements of the pipeline.}
+  \caption{Runtime and computational complexity of the various elements of the
+pipeline. These timings are obtained by executing the operation on 100 samples
+spread across 10 CPU cores from an Intel Xeon Gold 6254 CPU clocked at 3.10GHz.}
   \label{tab:runtimes}
 \end{table}
 
