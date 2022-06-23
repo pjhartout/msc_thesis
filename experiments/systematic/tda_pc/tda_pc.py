@@ -8,6 +8,7 @@ Topological Data Analysis (TDA) on point clouds (PC) perturbations.
 """
 
 import argparse
+import json
 import logging
 import os
 import random
@@ -72,7 +73,9 @@ from proteinmetrics.utils.functions import (
 log = logging.getLogger(__name__)
 
 
-def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
+def load_proteins_from_config(
+    cfg: DictConfig, perturbed: bool, run
+) -> List[Path]:
     """Loads unique unperturbed protein file names
 
     Args:
@@ -82,18 +85,18 @@ def load_proteins_from_config(cfg: DictConfig, perturbed: bool) -> List[Path]:
         List[Path]: unique proteins seen across runs
     """
     protein_sets = []
-    for file in os.listdir(here() / cfg.meta.splits_dir):
-        if perturbed:
-            if "_perturbed" in file:
-                protein_sets.append(
-                    pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
-                )
-        else:
-            if "_unperturbed" in file:
-                protein_sets.append(
-                    pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
-                )
-    unique_protein_fnames = pd.concat(protein_sets).drop_duplicates()
+    if perturbed:
+        protein_sets = pd.read_csv(
+            here() / cfg.meta.splits_dir / f"data_split_{run}_perturbed.csv",
+            sep="\t",
+        )
+
+    else:
+        protein_sets = pd.read_csv(
+            here() / cfg.meta.splits_dir / f"data_split_{run}_unperturbed.csv",
+            sep="\t",
+        )
+    unique_protein_fnames = pd.concat([protein_sets]).drop_duplicates()
     unique_protein_fnames = [
         HUMAN_PROTEOME / fname
         for fname in unique_protein_fnames.pdb_id.tolist()
@@ -147,6 +150,24 @@ def pc_perturbation_worker(
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
     perturbed = perturbed.copy()
+
+    # target_dir = (
+    #     here()
+    #     / cfg.paths.data
+    #     / cfg.paths.systematic
+    #     / cfg.paths.human
+    #     / cfg.paths.tda
+    #     / perturbation[0].split("_")[0]
+    # )
+
+    # target_file = target_dir / f"perturb_{perturbation[0].split('_')[1]}.json"
+
+    # if target_file.isfile():
+    #     with target_file as fp:
+    #         mmd_runs_n_iter = json.load(fp)
+    #         log.info("Skipped - already computed")
+    #         return mmd_runs_n_iter
+
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
@@ -241,10 +262,14 @@ def pc_perturbation_worker(
         f"mutli_scale_kernel_bandwidth={1};bandwidth_fisher={1}"
     ] = mmd_runs
 
+    # make_dir(target_dir)
+    # with open(target_file, "w") as fp:
+    #     json.dump(mmd_runs_n_iter, fp)
+
     return mmd_runs_n_iter
 
 
-def save_mmd_experiment(cfg, mmds, perturbation_type):
+def save_mmd_experiment(cfg, mmds, run, perturbation_type):
     mmds = (
         pd.concat(mmds)
         .reset_index()
@@ -258,6 +283,7 @@ def save_mmd_experiment(cfg, mmds, perturbation_type):
         / cfg.paths.human
         / cfg.paths.tda
         / perturbation_type
+        / run
     )
     make_dir(target_dir)
 
@@ -268,11 +294,12 @@ def save_mmd_experiment(cfg, mmds, perturbation_type):
     log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 
-def twist_perturbation_wl_pc(
+def twist_perturbation_pc(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
+    run,
     **kwargs,
 ):
     log.info("Perturbing proteins with twist.")
@@ -317,20 +344,22 @@ def twist_perturbation_wl_pc(
     save_mmd_experiment(
         cfg,
         mmds,
+        run,
         perturbation_type="twist",
     )
 
 
-def shear_perturbation_wl_pc(
+def shear_perturbation_pc(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
+    run,
     **kwargs,
 ):
     log.info("Perturbing proteins with shear.")
 
-    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+    def shear_perturbation_worker(p_perturb, perturbed, unperturbed):
         log.info(f"Shear set to {p_perturb}.")
         perturbation = (
             f"shear_{p_perturb}",
@@ -350,14 +379,13 @@ def shear_perturbation_wl_pc(
             perturbation,
             unperturbed,
             perturbed,
-            graph_type,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with shearing {p_perturb}.")
         return mmd_df
 
     mmds = distribute_function(
-        func=twist_perturbation_worker,
+        func=shear_perturbation_worker,
         X=np.linspace(
             cfg.perturbations.shear.min,
             cfg.perturbations.shear.max,
@@ -372,20 +400,22 @@ def shear_perturbation_wl_pc(
     save_mmd_experiment(
         cfg,
         mmds,
+        run,
         perturbation_type="shear",
     )
 
 
-def taper_perturbation_wl_pc(
+def taper_perturbation_pc(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
+    run,
     **kwargs,
 ):
     log.info("Perturbing proteins with taper.")
 
-    def twist_perturbation_worker(p_perturb, perturbed, unperturbed):
+    def taper_perturbation_worker(p_perturb, perturbed, unperturbed):
         log.info(f"taper set to {p_perturb}.")
         perturbation = (
             f"taper_{p_perturb}",
@@ -405,14 +435,13 @@ def taper_perturbation_wl_pc(
             perturbation,
             unperturbed,
             perturbed,
-            graph_type,
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with tapering {p_perturb}.")
         return mmd_df
 
     mmds = distribute_function(
-        func=twist_perturbation_worker,
+        func=taper_perturbation_worker,
         X=np.linspace(
             cfg.perturbations.taper.min,
             cfg.perturbations.taper.max,
@@ -427,15 +456,17 @@ def taper_perturbation_wl_pc(
     save_mmd_experiment(
         cfg,
         mmds,
+        run,
         perturbation_type="taper",
     )
 
 
-def gaussian_perturbation_wl_pc(
+def gaussian_perturbation_pc(
     cfg,
     perturbed,
     unperturbed,
     experiment_steps,
+    run,
     **kwargs,
 ):
     log.info("Perturbing proteins with gaussian.")
@@ -481,6 +512,7 @@ def gaussian_perturbation_wl_pc(
     save_mmd_experiment(
         cfg,
         mmds,
+        run,
         perturbation_type="gaussian_noise",
     )
 
@@ -515,50 +547,39 @@ def tda_experiment_pc_perturbation(
         ),
     ]
 
-    unperturbed = load_proteins_from_config(cfg, perturbed=False)
-    unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
-        unperturbed
-    )
-    perturbed = load_proteins_from_config(cfg, perturbed=True)
-    perturbed = pipeline.Pipeline([base_feature_steps[0]]).fit_transform(
-        perturbed
-    )
-
-    if perturbation == "twist":
-        log.info("Compute twist")
-        twist_perturbation_wl_pc(
-            cfg,
-            perturbed,
-            unperturbed,
-            base_feature_steps,
+    for run in range(cfg.meta.n_runs):
+        unperturbed = load_proteins_from_config(cfg, perturbed=False, run=run)
+        unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
+            unperturbed
         )
-    elif perturbation == "shear":
-        log.info("Compute shear")
-        shear_perturbation_wl_pc(
-            cfg,
-            perturbed,
-            unperturbed,
-            base_feature_steps,
-        )
-    elif perturbation == "taper":
-        log.info("Compute taper")
-        taper_perturbation_wl_pc(
-            cfg,
-            perturbed,
-            unperturbed,
-            base_feature_steps,
-        )
-    elif perturbation == "gaussian_noise":
-        log.info("Compute gaussian noise")
-        gaussian_perturbation_wl_pc(
-            cfg,
-            perturbed,
-            unperturbed,
-            base_feature_steps,
+        perturbed = load_proteins_from_config(cfg, perturbed=True, run=run)
+        perturbed = pipeline.Pipeline([base_feature_steps[0]]).fit_transform(
+            perturbed
         )
 
-    else:
-        raise ValueError("Invalid perturbation")
+        if perturbation == "twist":
+            log.info("Compute twist")
+            twist_perturbation_pc(
+                cfg, perturbed, unperturbed, base_feature_steps, run
+            )
+        elif perturbation == "shear":
+            log.info("Compute shear")
+            shear_perturbation_pc(
+                cfg, perturbed, unperturbed, base_feature_steps, run
+            )
+        elif perturbation == "taper":
+            log.info("Compute taper")
+            taper_perturbation_pc(
+                cfg, perturbed, unperturbed, base_feature_steps, run
+            )
+        elif perturbation == "gaussian_noise":
+            log.info("Compute gaussian noise")
+            gaussian_perturbation_pc(
+                cfg, perturbed, unperturbed, base_feature_steps, run
+            )
+
+        else:
+            raise ValueError("Invalid perturbation")
 
 
 @hydra.main(
