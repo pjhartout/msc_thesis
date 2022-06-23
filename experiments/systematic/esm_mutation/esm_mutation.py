@@ -15,9 +15,6 @@ import sys
 from enum import unique
 from multiprocessing.sharedctypes import Value
 from pathlib import Path
-from re import A
-from tabnanny import verbose
-from tkinter import E
 from typing import Any, Dict, List, Tuple, Union
 
 import hydra
@@ -170,15 +167,7 @@ def idx2name2run(cfg: DictConfig, perturbed: bool, run) -> pd.DataFrame:
                 sep="\t",
             )
         )
-    return (
-        pd.concat(protein_sets, axis=1)
-        .set_axis(list(range(cfg.meta.n_runs)), axis=1, inplace=False)
-        .applymap(lambda x: x.split(".")[0])
-    )
-
-
-def filter_protein_using_name(protein, protein_names):
-    return [protein for protein in protein if protein.name in protein_names]
+    return pd.concat(protein_sets, axis=1).applymap(lambda x: x.split(".")[0])
 
 
 def pc_perturbation_worker(
@@ -196,18 +185,12 @@ def pc_perturbation_worker(
     # For every run - compute x-y
     pre_computed_products = list()
     log.info(f"Run {run}")
-    unperturbed_run = filter_protein_using_name(
-        unperturbed, unperturbed_protein_names[run].tolist()
-    )
-    perturbed_run = filter_protein_using_name(
-        perturbed, perturbed_protein_names[run].tolist()
-    )
 
     unperturbed_descriptor_run = np.asarray(
-        [protein.embeddings["esm"] for protein in unperturbed_run]
+        [protein.embeddings["esm"] for protein in unperturbed]
     )
     perturbed_descriptor_run = np.asarray(
-        [protein.embeddings["esm"] for protein in perturbed_run]
+        [protein.embeddings["esm"] for protein in perturbed]
     )
 
     products = {
@@ -246,9 +229,9 @@ def pc_perturbation_worker(
             verbose=cfg.debug.verbose,
             kernel=kernel,
         ).compute(
-            kernel.compute_matrix(pre_computed_products[run]["K_XX"]),
-            kernel.compute_matrix(pre_computed_products[run]["K_YY"]),
-            kernel.compute_matrix(pre_computed_products[run]["K_XY"]),
+            kernel.compute_matrix(pre_computed_products[0]["K_XX"]),
+            kernel.compute_matrix(pre_computed_products[0]["K_YY"]),
+            kernel.compute_matrix(pre_computed_products[0]["K_XY"]),
         )
         mmd_runs.append(mmd)
         mmd_runs_sigma[f"sigma={sigma}"] = mmd_runs
@@ -256,17 +239,12 @@ def pc_perturbation_worker(
     # For every run - compute linear kernel
     mmd_linear_kernel_runs = []
     log.info(f"Run {run}")
-    unperturbed_run = filter_protein_using_name(
-        unperturbed, unperturbed_protein_names[run].tolist()
-    )
-    perturbed_run = filter_protein_using_name(
-        perturbed, perturbed_protein_names[run].tolist()
-    )
+
     unperturbed_descriptor_run = np.asarray(
-        [protein.embeddings["esm"] for protein in unperturbed_run]
+        [protein.embeddings["esm"] for protein in unperturbed]
     )
     perturbed_descriptor_run = np.asarray(
-        [protein.embeddings["esm"] for protein in perturbed_run]
+        [protein.embeddings["esm"] for protein in perturbed]
     )
 
     log.info("Computing the kernel.")
@@ -301,7 +279,7 @@ def save_mmd_experiment(cfg, mmds, perturbation_type, run):
         / cfg.paths.human
         / cfg.paths.esm
         / perturbation_type
-        / run
+        / str(run)
     )
     make_dir(target_dir)
 
@@ -330,9 +308,9 @@ def mutation_perturbation_esm(
     log.info("Perturbing proteins with mutations.")
 
     def mutation_perturbation_worker(p_perturb, perturbed, unperturbed):
-        log.info(f"gaussian set to {p_perturb}.")
+        log.info(f"mutation set to {p_perturb}.")
         perturbation = (
-            f"gaussian_{p_perturb}",
+            f"mutation_{p_perturb}",
             Mutation(
                 p_mutate=p_perturb,
                 random_state=np.random.RandomState(
@@ -365,7 +343,7 @@ def mutation_perturbation_esm(
     save_mmd_experiment(cfg, mmds, perturbation_type="mutation", run=run)
 
 
-def tda_experiment_pc_perturbation(
+def esm_experiment_pc_perturbation(
     cfg: DictConfig,
     perturbation: str,
 ):
@@ -397,6 +375,7 @@ def tda_experiment_pc_perturbation(
                 longest_sequence=longest_sequence,
                 n_jobs=cfg.compute.n_jobs,
                 verbose=True,
+                n_chunks=cfg.compute.n_jobs,
             ),
         ),
     ]
@@ -438,7 +417,7 @@ def main(cfg: DictConfig):
     # Start with Weisfeiler-Lehman-based-experiments.
     # outside for loops for n_iters and k.
 
-    tda_experiment_pc_perturbation(
+    esm_experiment_pc_perturbation(
         cfg=cfg,
         perturbation="mutation",
     )
