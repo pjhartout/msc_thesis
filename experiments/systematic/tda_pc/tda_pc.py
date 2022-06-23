@@ -108,7 +108,7 @@ def load_proteins_from_config(
     return unique_protein_fnames  # type: ignore
 
 
-def idx2name2run(cfg: DictConfig, perturbed: bool) -> pd.DataFrame:
+def idx2name2run(cfg: DictConfig, perturbed: bool, run) -> pd.DataFrame:
     """Loads unique unperturbed protein file names
 
     Args:
@@ -120,19 +120,35 @@ def idx2name2run(cfg: DictConfig, perturbed: bool) -> pd.DataFrame:
     protein_sets = []
     for file in os.listdir(here() / cfg.meta.splits_dir):
         if perturbed:
-            if "_perturbed" in file:
-                protein_sets.append(
-                    pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
+            protein_sets = [
+                pd.read_csv(
+                    here()
+                    / cfg.meta.splits_dir
+                    / f"data_split_{run}_perturbed.csv",
+                    sep="\t",
                 )
+            ]
+            # if "_perturbed" in file:
+            #     protein_sets.append(
+            #         pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
+            #     )
         else:
-            if "_unperturbed" in file:
-                protein_sets.append(
-                    pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
+            protein_sets = [
+                pd.read_csv(
+                    here()
+                    / cfg.meta.splits_dir
+                    / f"data_split_{run}_unperturbed.csv",
+                    sep="\t",
                 )
+            ]
+            # if "_unperturbed" in file:
+            #     protein_sets.append(
+            #         pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
+            #     )
     return (
         pd.concat(protein_sets, axis=1)
-        .set_axis(list(range(cfg.meta.n_runs)), axis=1, inplace=False)
-        .applymap(lambda x: x.split(".")[0])
+        # .set_axis(list(range(cfg.meta.n_runs)), axis=1, inplace=False)
+        # .applymap(lambda x: x.split(".")[0])
     )
 
 
@@ -146,6 +162,7 @@ def pc_perturbation_worker(
     perturbation,
     unperturbed,
     perturbed,
+    run,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
@@ -175,8 +192,8 @@ def pc_perturbation_worker(
 
     log.info("Extracting graphs")
 
-    perturbed_protein_names = idx2name2run(cfg, perturbed=True)
-    unperturbed_protein_names = idx2name2run(cfg, perturbed=False)
+    perturbed_protein_names = idx2name2run(cfg, perturbed=True, run=run)
+    unperturbed_protein_names = idx2name2run(cfg, perturbed=False, run=run)
 
     mmd_runs_n_iter = dict()
     # for bandwidth in cfg.meta.kernels[0]["persistence_fisher"][0]["bandwidth"]:
@@ -318,11 +335,7 @@ def twist_perturbation_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg,
-            experiment_steps,
-            perturbation,
-            unperturbed,
-            perturbed,
+            cfg, experiment_steps, perturbation, unperturbed, perturbed, run
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with twist {p_perturb}.")
@@ -374,11 +387,7 @@ def shear_perturbation_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg,
-            experiment_steps,
-            perturbation,
-            unperturbed,
-            perturbed,
+            cfg, experiment_steps, perturbation, unperturbed, perturbed, run
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with shearing {p_perturb}.")
@@ -430,11 +439,7 @@ def taper_perturbation_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg,
-            experiment_steps,
-            perturbation,
-            unperturbed,
-            perturbed,
+            cfg, experiment_steps, perturbation, unperturbed, perturbed, run
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with tapering {p_perturb}.")
@@ -486,11 +491,7 @@ def gaussian_perturbation_pc(
             ),
         )
         mmd_runs = pc_perturbation_worker(
-            cfg,
-            experiment_steps,
-            perturbation,
-            unperturbed,
-            perturbed,
+            cfg, experiment_steps, perturbation, unperturbed, perturbed, run
         )
         mmd_df = pd.DataFrame(mmd_runs).assign(perturb=p_perturb)
         log.info(f"Computed the MMD with gaussian noise {p_perturb}.")
