@@ -195,29 +195,29 @@ def load_clustering():
 
 
 def load_gaussian_degree():
-    clustering_eps_8 = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
-        )
-    )[relevant_cols]
-    clustering_eps_8 = clustering_eps_8.assign(
-        descriptor="Degree Histogram",
-        perturb_type="Gaussian Noise",
-        eps_value=8,
-    )
+    # clustering_eps_8 = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # clustering_eps_8 = clustering_eps_8.assign(
+    #     descriptor="Degree Histogram",
+    #     perturb_type="Gaussian Noise",
+    #     eps_value=8,
+    # )
 
-    clustering_eps_16 = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/16/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
-        )
-    )[relevant_cols]
-    clustering_eps_16 = clustering_eps_16.assign(
-        descriptor="Degree Histogram",
-        perturb_type="Gaussian Noise",
-        eps_value=16,
-    )
+    # clustering_eps_16 = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/16/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # clustering_eps_16 = clustering_eps_16.assign(
+    #     descriptor="Degree Histogram",
+    #     perturb_type="Gaussian Noise",
+    #     eps_value=16,
+    # )
 
     clustering_eps_32 = normalize(
         pd.read_csv(
@@ -231,7 +231,11 @@ def load_gaussian_degree():
         eps_value=32,
     )
     df = pd.concat(
-        [clustering_eps_8, clustering_eps_16, clustering_eps_32,],
+        [
+            # clustering_eps_8,
+            clustering_eps_16,
+            clustering_eps_32,
+        ],
         ignore_index=True,
     )
     return df
@@ -666,7 +670,7 @@ def main():
     # plt.legend([], [], frameon=False)
     g._legend.set_title(r"$\varepsilon$-value" + "\n" + "(in $\AA$)")
     g.tight_layout(rect=[0, 0, 0.93, 1.0])
-    plt.savefig(here() / "exploring/systematic_analysis/res_2.pdf")
+    plt.savefig(here() / "exploring/systematic_analysis/res_2_1.pdf")
 
 
 if __name__ == "__main__":

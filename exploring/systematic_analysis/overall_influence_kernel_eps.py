@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""overall_influence_kernel.py
+"""overall_influence_kernel_eps.py
 
 The overall influence of the kernel needs to be assessed here.
 

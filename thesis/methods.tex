@@ -232,7 +232,13 @@ two novel protein-specific descriptor functions resulting in fixed-length vector
 representations. The first consists in a histogram of the pairwise distance of
 each atom considered; the second consists in concatenating the two histograms of
 the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in Section
-\ref{sec:proteins}.
+\ref{sec:proteins}. The inspiration behind those two descriptors comes from
+elements of the validation pipeline of novel Protein Data Bank structures \citep{read2011new,
+  gore2012implementing, gore2017validation}, where atoms too close together are
+flagged and unusual dihedral angles are reported. Those unusual dihedral angles
+are also called ``Ramachandran outliers'', after the scientist who discovered
+those angles \citep{ramachandran1063Stereochemistry}.
+\paragraph{Sequence descriptors}
 
 Table \ref{tab:descriptor_function_setup} summarizes the parameters used to set
 up the descriptor functions in this thesis.
@@ -257,7 +263,7 @@ up the descriptor functions in this thesis.
 
 % TODO: add pgfplots figure of this workflow.
 
-\subsection{Kernels}\label{sec:kernels}
+\subsection{Kernels}\label{sec:methods_kernels}
 Once a suitable representation and descriptor function is selected, one requires
 a kernel to evaluate the MMD in the corresponding RKHS. We detail which kernels
 we are going to evaluate and why in this section. Kernels used in this thesis can be grouped into

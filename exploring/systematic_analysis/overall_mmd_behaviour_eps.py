@@ -119,18 +119,18 @@ def load_degree():
     add_edges.sort_values(by=["perturb", "run"], inplace=True)
     add_edges = add_edges.assign(perturb_type="Add Edges")
 
-    gaussian_noise = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
-        )
-    )[relevant_cols]
-    gaussian_noise = gaussian_noise.assign(perturb_type="Gaussian Noise")
+    # gaussian_noise = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # gaussian_noise = gaussian_noise.assign(perturb_type="Gaussian Noise")
 
     remove_edges = normalize(
         pd.read_csv(
             here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/remove_edges/degree_histogram/removedge_mmds.csv"
+            / "data/systematic/human/fixed_length_kernels/eps_graph/8/remove_edges/degree_histogram/remove_edges_mmds.csv"
         )
     )[relevant_cols]
     remove_edges = remove_edges.assign(perturb_type="Remove Edges")
@@ -138,43 +138,44 @@ def load_degree():
     rewire_edges = normalize(
         pd.read_csv(
             here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/rewire_edges/degree_histogram/rewireedge_mmds.csv"
+            / "data/systematic/human/fixed_length_kernels/eps_graph/8/rewire_edges/degree_histogram/rewire_edges_mmds.csv"
         )
     )[relevant_cols]
     rewire_edges = rewire_edges.assign(perturb_type="Rewire Edges")
 
-    shear = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/shear/degree_histogram/shear_mmds.csv"
-        )
-    )[relevant_cols]
-    shear = shear.assign(perturb_type="Shear")
+    # shear = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/shear/degree_histogram/shear_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # shear = shear.assign(perturb_type="Shear")
 
-    taper = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/taper/degree_histogram/taper_mmds.csv"
-        )
-    )[relevant_cols]
-    taper = taper.assign(perturb_type="Taper")
+    # taper = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/taper/degree_histogram/taper_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # taper = taper.assign(perturb_type="Taper")
 
-    twist = normalize(
-        pd.read_csv(
-            here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/twist/degree_histogram/twist_mmds.csv"
-        )
-    )[relevant_cols]
-    twist = twist.assign(perturb_type="Twist")
+    # twist = normalize(
+    #     pd.read_csv(
+    #         here()
+    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/twist/degree_histogram/twist_mmds.csv"
+    #     )
+    # )[relevant_cols]
+    # twist = twist.assign(perturb_type="Twist")
+
     all_data = pd.concat(
         [
             add_edges,
-            gaussian_noise,
+            # gaussian_noise,
             remove_edges,
             rewire_edges,
-            shear,
-            taper,
-            twist,
+            # shear,
+            # taper,
+            # twist,
         ]
     )
     all_data = all_data.rename(
