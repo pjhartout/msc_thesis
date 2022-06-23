@@ -263,7 +263,7 @@ def save_mmd_experiment(cfg, mmds, perturbation_type):
         / cfg.paths.data
         / cfg.paths.systematic
         / cfg.paths.human
-        / cfg.paths.tda
+        / cfg.paths.esm
         / perturbation_type
     )
     make_dir(target_dir)
