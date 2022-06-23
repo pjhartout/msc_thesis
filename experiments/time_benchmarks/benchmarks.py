@@ -65,7 +65,7 @@ def tda_benchmark(pdb_files):
             "epsilon_graph",
             EpsilonGraph(
                 n_jobs=N_JOBS,
-                epsilon=8,
+                epsilon=32,
                 verbose=True,
             ),
         ),
@@ -139,7 +139,7 @@ def graphs_benchmark(pdb_files):
         ),
         (
             "epsilon graph",
-            EpsilonGraph(epsilon=8, n_jobs=N_JOBS),
+            EpsilonGraph(epsilon=32, n_jobs=N_JOBS),
         ),
     ]
     start = time.perf_counter()
@@ -261,8 +261,6 @@ def gaussian_k_benchmark(left, right):
         n_jobs=N_JOBS,
         verbose=True,
         sigma=1,
-        pre_computed_difference=False,
-        return_product=False,
     ).compute_matrix(left, right)
     time_elapsed = time.perf_counter() - start
     return kernel, time_elapsed
