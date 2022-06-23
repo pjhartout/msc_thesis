@@ -62,6 +62,7 @@ from proteinmetrics.perturbations import (
     Twist,
 )
 from proteinmetrics.protein import Protein
+from proteinmetrics.utils.debug import SamplePoints
 from proteinmetrics.utils.functions import (
     distribute_function,
     flatten_lists,
@@ -73,30 +74,30 @@ from proteinmetrics.utils.functions import (
 log = logging.getLogger(__name__)
 
 
-def load_proteins_from_config(
-    cfg: DictConfig, perturbed: bool, run
+def load_proteins_from_config_run(
+    cfg: DictConfig, perturbed: bool, run: int
 ) -> List[Path]:
-    """Loads unique unperturbed protein file names
-
-    Args:
-        cfg (DictConfig): Configuration.
-
-    Returns:
-        List[Path]: unique proteins seen across runs
-    """
-    protein_sets = []
+    """Loads unique unperturbed protein file names"""
+    protein_sets = list()
     if perturbed:
-        protein_sets = pd.read_csv(
-            here() / cfg.meta.splits_dir / f"data_split_{run}_perturbed.csv",
-            sep="\t",
+        protein_sets.append(
+            pd.read_csv(
+                here()
+                / cfg.meta.splits_dir
+                / f"data_split_{run}_perturbed.csv",
+                sep="\t",
+            )
         )
-
     else:
-        protein_sets = pd.read_csv(
-            here() / cfg.meta.splits_dir / f"data_split_{run}_unperturbed.csv",
-            sep="\t",
+        protein_sets.append(
+            pd.read_csv(
+                here()
+                / cfg.meta.splits_dir
+                / f"data_split_{run}_unperturbed.csv",
+                sep="\t",
+            )
         )
-    unique_protein_fnames = pd.concat([protein_sets]).drop_duplicates()
+    unique_protein_fnames = pd.concat(protein_sets).drop_duplicates()
     unique_protein_fnames = [
         HUMAN_PROTEOME / fname
         for fname in unique_protein_fnames.pdb_id.tolist()
@@ -118,38 +119,26 @@ def idx2name2run(cfg: DictConfig, perturbed: bool, run) -> pd.DataFrame:
         pd.DataFrame: dataframe where each column contains the names of proteins to use in one run.
     """
     protein_sets = []
-    for file in os.listdir(here() / cfg.meta.splits_dir):
-        if perturbed:
-            protein_sets = [
-                pd.read_csv(
-                    here()
-                    / cfg.meta.splits_dir
-                    / f"data_split_{run}_perturbed.csv",
-                    sep="\t",
-                )
-            ]
-            # if "_perturbed" in file:
-            #     protein_sets.append(
-            #         pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
-            #     )
-        else:
-            protein_sets = [
-                pd.read_csv(
-                    here()
-                    / cfg.meta.splits_dir
-                    / f"data_split_{run}_unperturbed.csv",
-                    sep="\t",
-                )
-            ]
-            # if "_unperturbed" in file:
-            #     protein_sets.append(
-            #         pd.read_csv(here() / cfg.meta.splits_dir / file, sep="\t")
-            #     )
-    return (
-        pd.concat(protein_sets, axis=1)
-        # .set_axis(list(range(cfg.meta.n_runs)), axis=1, inplace=False)
-        # .applymap(lambda x: x.split(".")[0])
-    )
+    # for file in os.listdir(here() / cfg.meta.splits_dir):
+    if perturbed:
+        protein_sets.append(
+            pd.read_csv(
+                here()
+                / cfg.meta.splits_dir
+                / f"data_split_{run}_perturbed.csv",
+                sep="\t",
+            )
+        )
+    else:
+        protein_sets.append(
+            pd.read_csv(
+                here()
+                / cfg.meta.splits_dir
+                / f"data_split_{run}_perturbed.csv",
+                sep="\t",
+            )
+        )
+    return pd.concat(protein_sets, axis=1).applymap(lambda x: x.split(".")[0])
 
 
 def filter_protein_using_name(protein, protein_names):
@@ -168,23 +157,6 @@ def pc_perturbation_worker(
     experiment_steps_perturbed.insert(0, perturbation)
     perturbed = perturbed.copy()
 
-    # target_dir = (
-    #     here()
-    #     / cfg.paths.data
-    #     / cfg.paths.systematic
-    #     / cfg.paths.human
-    #     / cfg.paths.tda
-    #     / perturbation[0].split("_")[0]
-    # )
-
-    # target_file = target_dir / f"perturb_{perturbation[0].split('_')[1]}.json"
-
-    # if target_file.isfile():
-    #     with target_file as fp:
-    #         mmd_runs_n_iter = json.load(fp)
-    #         log.info("Skipped - already computed")
-    #         return mmd_runs_n_iter
-
     perturbed = pipeline.Pipeline(experiment_steps_perturbed).fit_transform(
         perturbed
     )
@@ -196,92 +168,60 @@ def pc_perturbation_worker(
     unperturbed_protein_names = idx2name2run(cfg, perturbed=False, run=run)
 
     mmd_runs_n_iter = dict()
-    # for bandwidth in cfg.meta.kernels[0]["persistence_fisher"][0]["bandwidth"]:
-    #     for bandwidth_fisher in cfg.meta.kernels[0]["persistence_fisher"][1][
-    #         "bandwidth_fisher"
-    #     ]:
+
     mmd_runs = list()
-    for run in range(cfg.meta.n_runs):
-        log.info(f"Run {run}")
-        unperturbed_run = filter_protein_using_name(
-            unperturbed, unperturbed_protein_names[run].tolist()
-        )
-        perturbed_run = filter_protein_using_name(
-            perturbed, perturbed_protein_names[run].tolist()
-        )
+    log.info(f"Run {run}")
 
-        unperturbed_descriptor_run = load_descriptor(
-            unperturbed_run,
-            graph_type="contact_graph",
-            descriptor="diagram",
-        )
-        perturbed_descriptor_run = load_descriptor(
-            perturbed_run,
-            graph_type="contact_graph",
-            descriptor="diagram",
-        )
+    unperturbed_descriptor_run = load_descriptor(
+        unperturbed,
+        graph_type="contact_graph",
+        descriptor="diagram",
+    )
+    perturbed_descriptor_run = load_descriptor(
+        unperturbed,
+        graph_type="contact_graph",
+        descriptor="diagram",
+    )
 
-        log.info("Computing the kernel.")
+    log.info("Computing the kernel.")
 
-        mmd = MaximumMeanDiscrepancy(
-            biased=False,
-            squared=True,
-            kernel=PersistenceFisherKernel(
-                bandwidth=1,
-                bandwidth_fisher=1,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),  # type: ignore
+    mmd = MaximumMeanDiscrepancy(
+        biased=False,
+        squared=True,
+        kernel=PersistenceFisherKernel(
+            bandwidth=1,
+            bandwidth_fisher=1,
+            n_jobs=cfg.compute.n_jobs,
             verbose=cfg.debug.verbose,
-        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
-        mmd_runs.append(mmd)
+        ),  # type: ignore
+        verbose=cfg.debug.verbose,
+    ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+    mmd_runs.append(mmd)
 
     mmd_runs_n_iter[
         f"persistence_fisher_bandwidth={1};bandwidth_fisher={1}"
     ] = mmd_runs
 
     mmd_runs = list()
-    for run in range(cfg.meta.n_runs):
-        log.info(f"Run {run}")
-        unperturbed_run = filter_protein_using_name(
-            unperturbed, unperturbed_protein_names[run].tolist()
-        )
-        perturbed_run = filter_protein_using_name(
-            perturbed, perturbed_protein_names[run].tolist()
-        )
+    log.info(f"Run {run}")
 
-        unperturbed_descriptor_run = load_descriptor(
-            unperturbed_run,
-            graph_type="contact_graph",
-            descriptor="diagram",
-        )
-        perturbed_descriptor_run = load_descriptor(
-            perturbed_run,
-            graph_type="contact_graph",
-            descriptor="diagram",
-        )
+    log.info("Computing the kernel.")
 
-        log.info("Computing the kernel.")
-
-        mmd = MaximumMeanDiscrepancy(
-            biased=False,
-            squared=True,
-            kernel=MultiScaleKernel(
-                sigma=1,
-                n_jobs=cfg.compute.n_jobs,
-                verbose=cfg.debug.verbose,
-            ),  # type: ignore
+    mmd = MaximumMeanDiscrepancy(
+        biased=False,
+        squared=True,
+        kernel=MultiScaleKernel(
+            sigma=1,
+            n_jobs=cfg.compute.n_jobs,
             verbose=cfg.debug.verbose,
-        ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
-        mmd_runs.append(mmd)
+        ),  # type: ignore
+        verbose=cfg.debug.verbose,
+    ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
+    mmd_runs.append(mmd)
 
     mmd_runs_n_iter[
         f"mutli_scale_kernel_bandwidth={1};bandwidth_fisher={1}"
     ] = mmd_runs
-
-    # make_dir(target_dir)
-    # with open(target_file, "w") as fp:
-    #     json.dump(mmd_runs_n_iter, fp)
 
     return mmd_runs_n_iter
 
@@ -300,7 +240,7 @@ def save_mmd_experiment(cfg, mmds, run, perturbation_type):
         / cfg.paths.human
         / cfg.paths.tda
         / perturbation_type
-        / run
+        / str(run)
     )
     make_dir(target_dir)
 
@@ -535,6 +475,7 @@ def tda_experiment_pc_perturbation(
                 metric="euclidean", n_jobs=cfg.compute.n_jobs, verbose=True
             ),
         ),
+        ("sample", SamplePoints(n=2)),
         (
             "tda",
             TopologicalDescriptor(
@@ -549,11 +490,13 @@ def tda_experiment_pc_perturbation(
     ]
 
     for run in range(cfg.meta.n_runs):
-        unperturbed = load_proteins_from_config(cfg, perturbed=False, run=run)
+        unperturbed = load_proteins_from_config_run(
+            cfg, perturbed=False, run=run
+        )
         unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
             unperturbed
         )
-        perturbed = load_proteins_from_config(cfg, perturbed=True, run=run)
+        perturbed = load_proteins_from_config_run(cfg, perturbed=True, run=run)
         perturbed = pipeline.Pipeline([base_feature_steps[0]]).fit_transform(
             perturbed
         )
