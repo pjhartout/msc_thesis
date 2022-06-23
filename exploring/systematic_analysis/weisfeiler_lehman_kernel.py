@@ -87,6 +87,14 @@ def load_data():
     )
     twist = twist.assign(perturb_type="Twist")
 
+    mutation = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/weisfeiler_lehman/eps_graph/8/mutation/mutation_mmds.csv"
+        )
+    )
+    mutation = twist.assign(perturb_type="Mutation")
+
     return pd.concat(
         [
             add_edges,
@@ -103,22 +111,67 @@ def load_data():
 
 def main():
     df = load_data()
+    df = df.melt(id_vars=["run", "perturb", "perturb_type"])
+    # Rename columns
+    df = df.rename(
+        columns={
+            "variable": "Kernel Settings",
+            "value": "Normalized MMDs",
+            "perturb": "Perturbation (%)",
+        }
+    )
+    # Filter n_iter=1, n_iter=5, n_iter=10
+    df = df[df["Kernel Settings"].isin(["n_iter=1", "n_iter=5", "n_iter=10"])]
+    # rename n_iter=1, n_iter=5, n_iter=10 to Iterations: 1, Iterations: 5, Iterations: 10
+    df["Kernel Settings"] = df["Kernel Settings"].str.replace(
+        "n_iter=", "Iterations: "
+    )
     print("Loaded data")
     setup_plotting_parameters(resolution=100)
+    palette = sns.color_palette("mako_r", df["Kernel Settings"].nunique())
+
     g = sns.relplot(
-        x="perturb",
-        y="n_iter=5",
+        x="Perturbation (%)",
+        y="Normalized MMDs",
         col="perturb_type",
+        hue="Kernel Settings",
         kind="line",
         data=df,
         height=3,
         aspect=1,
-        col_wrap=4,
+        col_wrap=3,
         ci=100,
+        palette=palette,
+        col_order=[
+            "Add Edges",
+            "Remove Edges",
+            "Rewire Edges",
+            "Gaussian Noise",
+            "Mutation",
+            "Shear",
+            "Taper",
+            "Twist",
+        ]
         # facet_kws={"sharex": False},
     )
+
+    title = [
+        "Add Edges",
+        "Remove Edges",
+        "Rewire Edges",
+        "Gaussian Noise",
+        "Mutation",
+        "Shear",
+        "Taper",
+        "Twist",
+    ]
+    for i, ax in enumerate(g.axes.flatten()):
+        ax.set_title(f"{title[i]}")
+
+    leg = g._legend
+    leg.set_bbox_to_anchor([0.9, 0.2])
     plt.tight_layout()
-    plt.savefig(here() / "exploring/systematic_analysis/res_4.svg")
+    plt.savefig(here() / "exploring/systematic_analysis/res_3.pdf")
 
 
 if __name__ == "__main__":
