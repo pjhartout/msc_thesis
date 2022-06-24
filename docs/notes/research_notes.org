@@ -1712,7 +1712,7 @@ Research questions:
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
 *** We did not consider more advance mutation types (transpositions, deletions, additions, or reverse)
 *** meta-metrics: take into account standard deviations
-*** epsilon value relationship to sensitivity of metric
+*** DONE epsilon value relationship to sensitivity of metric
 *** de-novo design, promote structural heterogeneity, different than point mutation because this can be done in a lab
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
