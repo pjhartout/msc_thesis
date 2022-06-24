@@ -178,7 +178,7 @@ def pc_perturbation_worker(
         descriptor="diagram",
     )
     perturbed_descriptor_run = load_descriptor(
-        unperturbed,
+        perturbed,
         graph_type="contact_graph",
         descriptor="diagram",
     )
