@@ -52,3 +52,6 @@
 ** Discuss need for baseline violin plots
 ** Discuss outline discussion
 ** Key findings necessary? repeat?
+** Fraction instead of percent. Refer to methods every time.
+** take set of natural proteins,
+** unperturbed -> compute embedding -> pairwise distance

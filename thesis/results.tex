@@ -125,6 +125,8 @@ instances, we see that increasing the $\varepsilon$ value increases the MMD vari
 \end{figure}
 
 \section{Graph Kernels}\label{sec:results_graph_kernels}
+% TODO compare WL with ESM (no modelling bias for WL on paper, might be a
+% weakness since some mutations might not have a functional effect.)
 
 The results of the behaviour of the Weisfeiler-Lehman kernel (see Sections
 \ref{sec:kernels} and \ref{sec:methods_kernels}) can be seen in Figure
@@ -147,7 +149,7 @@ of Weisfeiler-Lehman hashes, but this is beyond the scope of the thesis.
   \label{fig:wlk}
 \end{figure}
 
-\section{Protein-specific descriptors}
+\section{Protein-specific descriptors}\label{sec:results_protein_descriptors}
 
 The behaviour of MMD values derived from the protein-specific descriptor
 functions described in section \ref{sec:descriptors} are shown in Figure
@@ -199,7 +201,7 @@ results of such a descriptor shown in this thesis are promising
 \end{figure}
 
 
-\section{Topological Descriptors And Kernels}
+\section{Topological Descriptors And Kernels}\label{sec:results_topo_kernels}
 
 \section{Runtime}\label{sec:results_runtime}
 
@@ -212,7 +214,7 @@ First, we see that one computation stands out: computing the Vietoris-Rips
 filtration of a point cloud. Together with a large memory footprint, the
 Vietoris-Rips filtration is quite lengthy to compute, due to a runtime of
 $\mathcal{O}(n^{3(k+2)})$, where $k$ is the number of dimensions (here, $k=3$)
-and $n$ the number of points. Although some optimizations have been carried out
+and $n$ the number of points \citep{adams2018persistent}. Although some optimizations have been carried out
 by \texttt{Ripser}, the software used to compute the Vietoris-Rips filtration,
 it remains very expensive to compute and does not enjoy the benefits of hardware
 acceleration through e.g. a GPU due to the difficulty of parallelizing such a

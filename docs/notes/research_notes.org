@@ -1542,6 +1542,17 @@ original paper from vietoris on VR complex filtrations
 }
 #+end_src
 
+Runtime complexity of VR filtration
+#+begin_src bibtex
+@article{adams2018persistent,
+  title={The persistent homology of cyclic graphs},
+  author={Adams, Henry and Coldren, Ethan and Willmot, Sean},
+  journal={arXiv preprint arXiv:1812.03374},
+  year={2018}
+}
+
+#+end_src
+
 Ripser VR optimizations
 #+begin_src bibtex
 @article{Bauer2021Ripser,
@@ -1707,6 +1718,7 @@ Research questions:
   representations = constant/
   representations = variable/
 
+
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
@@ -1732,7 +1744,6 @@ Research questions:
 *** artificial monomeric proteins in real data
 *** Make list of statements based on data analysis and make plots/tables accordingly
 *** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
-
 
 
 ** Cluster essentials
