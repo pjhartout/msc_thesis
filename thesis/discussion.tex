@@ -1,13 +1,54 @@
 \chapter{Discussion}
 
-% \section{Key Findings}
+% TODO Introduction
 
-% Stability of MMD
-% Stability of MMD
+\section{Key Findings}
 
-\section{Recommendations for the practitioner}\label{sec:discussion_recommendations}
+Overall, we found that MMD behaved surprisingly well on graphs extracted from
+proteins (e.g. see Figure \ref{fig:mmd_consistent_eps}). This finding is
+somewhat surprising considering recent findings indicating the relative
+instability of MMD on synthetic graphs such as Watts-Strogatz graphs and
+Barabási–Albert graphs under some combinations of kernels and descriptors
+\citep{o2021evaluation}. While we certainly found unstable configurations
+(see for instance Figure \ref{fig:mmd_consistent_eps} upper left pane with the degree histogram),
+this was not the rule.
 
-\subsection{The Right MMD For The Right Setting}
+Furthermore, we found that the sensitivity of the MMD to perturbation was
+greatly influenced by the graph representation extracted from the protein.
+Namely, for $\varepsilon$ graphs (which overall seemed more stable than $k$-NN
+graphs), the higher $\varepsilon$, the lower the sensitivity to low levels of
+perturbation (Figure \ref{fig:mmd_sensitivity_eps}).
+
+We introduced in Section \ref{sec:descriptors} and shown in Section
+\ref{sec:results_protein_descriptors} two \emph{novel} protein-specific descriptors for
+used in MMD, which are both extremely fast to compute (Table \ref{tab:runtimes})
+and are able to detect perturbations with a surprising sensitivity (Figure
+\ref{fig:protein_specific_descriptors}).
+
+Furthermore, we found that the Weisfeiler-Lehman kernel, introduced in Section
+\ref{sec:methods_kernels}, applied to MMD was able to detect perturbations
+unable to be detected by traditional graph descriptors such as point mutations,
+which are relevant for the protein domain (Section
+\ref{sec:results_graph_kernels}). However, as with the rest of perturbations,
+the Weisfeiler-Lehman kernel is not sensitive to lower regimes of perturbation
+(see Figure \ref{fig:wlk}).
+This can be alleviated by using an alternative descriptor such as the ESM
+protein embedding introduced in Section \ref{sec:evalproblem}, which is more
+sensitive to lower rates of point mutation (see Figure
+\ref{fig:esm_descriptor}).
+
+Finally, we analyzed the MMD obtained from kernels operating on persistence
+diagrams \ref{sec:results_topo_kernels}, which also seemed very promising.
+% TODO: complete
+
+\section{Recommendations for the
+practitioner}\label{sec:discussion_recommendations}
+
+Using those key findings, we now formulate a set of recommendations for a
+practitioner who needs to evaluate a generative protein model using one of the
+protein representations highlighted above.
+
+\subsection{The Right MMD For The Right Setting}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
 
 \subsection{Computational Requirements}
@@ -27,7 +68,8 @@
 \subsection{Expressive Power of Histograms}
 % Discuss descriptors with bin_ranges not able to capture extreme cases
 
-\subsection{Inductive Biases}
+\subsection{Neural Network Pathologies On Unseen Data}
+% Extrapolation is the issue
 % ESM might work unpredictably on unseen sequences
 % Mention unbiased kernels such as the spectrum kernel
 
