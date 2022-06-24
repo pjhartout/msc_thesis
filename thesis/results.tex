@@ -62,7 +62,7 @@ using $\varepsilon$-graphs.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_2.pdf}
-  \caption{MMD vs. Gaussian noise Perturbation (in \%) for various graph descriptors of the
+  \caption{MMD vs. Gaussian noise perturbation (in \%) for various graph descriptors of the
     8\si{\angstrom}-graphs. The kernel here is shown on top of each subplots.}
   \label{fig:mmd_effect_kernel}
 \end{figure}
@@ -70,7 +70,7 @@ using $\varepsilon$-graphs.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_3.pdf}
-  \caption{MMD vs. Gaussian noise Perturbation (in \%) for various graph descriptors of the
+  \caption{MMD vs. Gaussian noise perturbation (in \%) for various graph descriptors of the
     2-nearest-neighbour graphs.}
   \label{fig:mmd_k_nn_graphs}
 \end{figure}
@@ -166,7 +166,26 @@ Because the only constraint of the input vectors to the kernels accepting
 fixed-length vectors as inputs is that they are in $\R^d$, we can input
 fixed-length vector embeddings into them, leveraging the immense progress made
 in the past decade regarding embeddings of structured data, specifically protein
-sequences. As highlighted in Section
+sequences as highlighted in Section \ref{sec:mmd}. The only perturbation such a
+learned embedding would be sensitive to is changes in the protein sequence. As
+such, we investigated how the MMD values increase with increasing point mutation
+probabilities with various kernels, as seen in Figure \ref{fig:esm_descriptor}.
+We find that the kernel used does not have any bearing on the MMD behaviour as
+long as $\sigma<1$ for the RBF kernel. Overall, we see that even in these low
+mutation regimes, the ESM embedding is sensitive enough to detect such changes.
+More sequence-specific perturbations are required to assess the
+applicability of the ESM embedding as a sequence descriptor, such as
+translocation of subsequences, additions and deletions, etc. However, the early
+results of such a descriptor shown in this thesis are promising
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{./figures/results/res_5.pdf}
+  \caption[MMD vs. mutation probability using the ESM learned embeddings with
+  various kernels ]{MMD vs. mutation probability using the ESM learned embeddings with various kernels.}
+  \label{fig:esm_descriptor}
+\end{figure}
+
 
 \section{Topological descriptors and kernels}
 
@@ -175,15 +194,30 @@ sequences. As highlighted in Section
 One of the desiderata of MMD is a low computational complexity (see Section
 \ref{sec:evalproblem}). As such, we report the various computation times for
 each of the important elements of the pipelines outlined in this thesis. The
-summary of all execution times can be found in Table \ref{tab:runtimes}. First,
-we see that one computation stands out: computing the Vietoris-Rips filtration
-of a point cloud. Together with a large memory footprint, the Vietoris-Rips
-filtration is quite lengthy to compute, due to a runtime of
-$\mathcal{O}(n^{3(k+2)})$, where $k$ is the number of dimensions (here, $k=3$) and
-$n$ the number of points. Although some optimizations have been carried out by
-\texttt{Ripser}, the software used to compute the Vietoris-Rips filtration, it
-remains very expensive to compute and does not enjoy the benefits of hardware
-acceleration through e.g. a GPU due to the difficulty of parallelizing such a filtration \cite{Bauer2021Ripser}.
+summary of all execution times can be found in Table \ref{tab:runtimes}.
+
+First, we see that one computation stands out: computing the Vietoris-Rips
+filtration of a point cloud. Together with a large memory footprint, the
+Vietoris-Rips filtration is quite lengthy to compute, due to a runtime of
+$\mathcal{O}(n^{3(k+2)})$, where $k$ is the number of dimensions (here, $k=3$)
+and $n$ the number of points. Although some optimizations have been carried out
+by \texttt{Ripser}, the software used to compute the Vietoris-Rips filtration,
+it remains very expensive to compute and does not enjoy the benefits of hardware
+acceleration through e.g. a GPU due to the difficulty of parallelizing such a
+filtration \cite{Bauer2021Ripser}.
+
+Second, computing the distance histogram and dihedral angles histogram are the
+fastest descriptors to compute, making them suitable to evaluate large
+collections of generated proteins. Other graph descriptors are also reasonably
+fast to compute, but they depend on the settings used to extract the graphs, and
+generally the runtime increases in the number of edges of the graph.
+
+Third, the kernels used in this study all have reasonable runtimes, but we note
+the particular efficiency of the RBF and linear kernel compared to the
+persistence Fisher kernel, multi-scale and Weisfeiler-Lehmann kernel. The
+implications of these runtimes will be further explored when making
+recommendations to the practioner in Section
+\ref{sec:discussion_recommendations}.
 
 
 \begin{table}
@@ -196,15 +230,17 @@ acceleration through e.g. a GPU due to the difficulty of parallelizing such a fi
     \midrule
     Vietoris-Rips Filtration & 3332 s \\
     ESM Embedding & 163 s\\
-    Degree Distribution Histogram & 35 s\\
-    Clustering Coefficient Histogram & 175 s\\
-    Laplacian Spectrum Histogram & 35 s\\
+    Degree Distribution Histogram (32\si{\angstrom}-graph) & 35 s\\
+    Clustering Coefficient Histogram (32\si{\angstrom}-graph) & 175 s\\
+    Laplacian Spectrum Histogram (32\si{\angstrom}-graph) & 35 s\\
     Distance Histogram & 28 s\\
     Dihedral Angles Histogram & 4 s\\
     \midrule
     \textbf{Kernels} & \\
     \midrule
     Weisfeiler-Lehman Kernel (4 iterations) & 32 s \\
+    Persistence Fisher Kernel & 35 s \\
+    Multi-Scale Kernel & 11 s \\
     RBF Kernel  & 1.7 ms \\
     Linear Kernel  & 7.7 ms \\
     \bottomrule
@@ -216,22 +252,32 @@ spread across 10 CPU cores from an Intel Xeon Gold 6254 CPU clocked at 3.10GHz.}
 \end{table}
 
 
-% Scale FREE!!
-
-% \section{Fixed-Length Vectors}
-
-% \subsection{Domain agnostic descriptors}
-
-% \subsection{Protein-specific descriptors}
-
-% \subsection{Embeddings}
-
-% \section{Graph Kernels}
-
-% \subsection{Weisfeiler-Lehmann}
-
-% \section{Topological Representations and Kernels}
-
-% \subsection{Persistence Fisher Kernel}
 
 \section{Summary}
+
+In this chapter, we present the results of the behaviour of MMD under various
+configurations and subject to various perturbations. We first note that the
+overall behaviour of MMD under various perturbations is stable when sufficient
+care is put into the selection of the of the kernel parameters (Figure \ref{fig:mmd_consistent_eps}). As a side note,
+we see also that overall the correlations for descriptors of
+$\varepsilon$-graphs is better than for $k$-NN graphs (Figure \ref{fig:mmd_k_nn_graphs}). Second, we note that the
+choice of graph representation impacts the behaviour of MMD's behaviour: the
+lower the radius of the sphere used to extract the $\varepsilon$-graph, the more
+sensitive the resulting MMD configuration, i.e. the lower the perturbation
+required for the MMD to reach a certain threshold (Figure
+\ref{fig:mmd_sensitivity_eps}).
+
+We then present the results for more exotic configurations of MMD which we
+hypothesized might be uniquely suited for protein representations. First, we
+investigate the applicability of graph kernels, specifically the
+Weisfeiler-Lehman kernel, to graphs extracted from proteins, which revealed that
+high levels of perturbations are required to detect changes in MMD (Figure
+\ref{fig:wlk}). We then presented the results of the efficient and biologically
+relevant protein-specific descriptors, which seem to behave very well (Figure
+\ref{fig:protein_specific_descriptors}). Using learned embeddings as sequence descriptors
+such as the ESM embedding showed that the resulting MMD is sensitive to
+low rates of point mutation (Figure \ref{fig:esm_descriptor}). Using
+topological descriptors and appropriate kernels also seem to work well, despite
+a high computational cost (Figure). Finally, we expand on runtime analysis and show the results of the runtime
+of each significant operation (Table \ref{tab:runtimes}).
+% TODO add topo summary
