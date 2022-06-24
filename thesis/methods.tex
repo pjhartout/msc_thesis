@@ -1,4 +1,4 @@
-\chapter{Methods}
+\chapter{Methods}\label{chap:methods}
 
 % TODO: Show perturbation drawings + exact perturbation parameters
 
@@ -229,7 +229,10 @@ here.
 \paragraph{Coordinates descriptors} In order to capture the information of the
 3D structure of the protein beyond local neighbourhood information, a
 topological descriptor of each protein in the form of a persistence diagram is
-extracted using a Vietoris-Rips filtration introduced in detail in Section \ref{sec:tda}.
+extracted using a Vietoris-Rips filtration introduced in detail in Section
+\ref{sec:tda}. To speed up computation, we sampled every other point to
+dramatically reduce the running time and memory footprint without significantly
+affecting the shape of the protein.
 \paragraph{Protein-specific descriptors} In this thesis we introduce two novel
 protein-specific descriptor functions resulting in fixed-length vector
 representations. The first consists in a histogram of the pairwise distance of

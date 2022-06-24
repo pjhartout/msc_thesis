@@ -138,7 +138,7 @@ def main():
         kind="line",
         data=df,
         height=3,
-        aspect=1,
+        aspect=0.9,
         col_wrap=3,
         ci=100,
         palette=palette,

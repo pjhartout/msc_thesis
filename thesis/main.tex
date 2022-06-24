@@ -72,6 +72,11 @@
 % \usepackage[linkcolor=black,colorlinks=true,citecolor=black,filecolor=black]{hyperref}
 \usepackage{hyperref}
 
+\makeglossaries
+
+\newacronym{mmd}{MMD}{Maximum Mean Discrepancy}
+
+
 % TODO: set all to black before submitting
 \hypersetup{
   colorlinks=true,
@@ -126,6 +131,10 @@ on protein datasets.}
 \listoffigures
 \clearpage
 \listoftables
+\clearpage
+\printglossary[type=\acronymtype]
+\clearpage
+
 \mainmatter
 
 %% Your real content!

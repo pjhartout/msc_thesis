@@ -44,4 +44,11 @@
 *** ideal protein rep.
 *** k-nn better than epsilon graph?
 *** better protein representation?
-*** give idea of the screen of params
+*** give idea of the screen of
+
+
+* TODO <2022-06-24 Fri> Meeting with Tim and Leslie
+
+** Discuss need for baseline violin plots
+** Discuss outline discussion
+** Key findings necessary? repeat?
