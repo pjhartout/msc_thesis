@@ -222,23 +222,34 @@ here.
 
 \paragraph{Graph descriptors} They are defined in Section \ref{sec:mmd} and include
   the degree distribution histogram, the clustering coefficient histogram and
-  the laplacian spectrum histogram. These are all fixed-length vectors.
+  the laplacian spectrum histogram. These are all fixed-length vectors. Of note,
+  we let the degree histogram in a range of 2699, due to the fact that adding
+  edges between all nodes of the longest protein containing 2699 residues will
+  result in the highest-degree node to be 2698.
 \paragraph{Coordinates descriptors} In order to capture the information of the
 3D structure of the protein beyond local neighbourhood information, a
 topological descriptor of each protein in the form of a persistence diagram is
 extracted using a Vietoris-Rips filtration introduced in detail in Section \ref{sec:tda}.
-\paragraph{Protein-specific descriptors} In this thesis we introduce
-two novel protein-specific descriptor functions resulting in fixed-length vector
+\paragraph{Protein-specific descriptors} In this thesis we introduce two novel
+protein-specific descriptor functions resulting in fixed-length vector
 representations. The first consists in a histogram of the pairwise distance of
 each atom considered; the second consists in concatenating the two histograms of
-the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in Section
-\ref{sec:proteins}. The inspiration behind those two descriptors comes from
-elements of the validation pipeline of novel Protein Data Bank structures \citep{read2011new,
-  gore2012implementing, gore2017validation}, where atoms too close together are
-flagged and unusual dihedral angles are reported. Those unusual dihedral angles
-are also called ``Ramachandran outliers'', after the scientist who discovered
-those angles \citep{ramachandran1063Stereochemistry}.
-\paragraph{Sequence descriptors}
+the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in
+Section \ref{sec:proteins}. The inspiration behind those two descriptors comes
+from elements of the validation pipeline of novel Protein Data Bank structures
+\citep{read2011new, gore2012implementing, gore2017validation}, where atoms too
+close together are flagged and unusual dihedral angles are reported. Those
+unusual dihedral angles are also called ``Ramachandran outliers'', after the
+scientist who discovered a way to display the $\phi$ and $\psi$ in a 2-D
+histogram, and recovered items related to the secondary structure of the protein
+from such plots. \citep{ramachandran1063Stereochemistry}.
+
+\paragraph{Sequence descriptors} In Section \ref{sec:mmd}, we discussed the
+Evolutionary Scale Modelling family to construct descriptors of a fixed length
+using a learned embedding. We are going to use the 6-layer variant trained on
+the UniRef50 snapshot from March 2018 containing approximately 43 million
+parameters, because it is able to process the full range of sequence lengths
+that we have in our dataset (the longest sequence fragment is 2699 amino acids long).
 
 Table \ref{tab:descriptor_function_setup} summarizes the parameters used to set
 up the descriptor functions in this thesis.
