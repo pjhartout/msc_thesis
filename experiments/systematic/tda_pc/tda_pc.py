@@ -490,40 +490,51 @@ def tda_experiment_pc_perturbation(
     ]
 
     for run in range(cfg.meta.n_runs):
-        unperturbed = load_proteins_from_config_run(
-            cfg, perturbed=False, run=run
-        )
-        unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
-            unperturbed
-        )
-        perturbed = load_proteins_from_config_run(cfg, perturbed=True, run=run)
-        perturbed = pipeline.Pipeline([base_feature_steps[0]]).fit_transform(
-            perturbed
-        )
+        if not (
+            here()
+            / cfg.paths.data
+            / cfg.paths.systematic
+            / cfg.paths.human
+            / cfg.paths.tda
+            / perturbation
+            / str(run)
+        ).exists():
+            unperturbed = load_proteins_from_config_run(
+                cfg, perturbed=False, run=run
+            )
+            unperturbed = pipeline.Pipeline(base_feature_steps).fit_transform(
+                unperturbed
+            )
+            perturbed = load_proteins_from_config_run(
+                cfg, perturbed=True, run=run
+            )
+            perturbed = pipeline.Pipeline(
+                [base_feature_steps[0]]
+            ).fit_transform(perturbed)
 
-        if perturbation == "twist":
-            log.info("Compute twist")
-            twist_perturbation_pc(
-                cfg, perturbed, unperturbed, base_feature_steps, run
-            )
-        elif perturbation == "shear":
-            log.info("Compute shear")
-            shear_perturbation_pc(
-                cfg, perturbed, unperturbed, base_feature_steps, run
-            )
-        elif perturbation == "taper":
-            log.info("Compute taper")
-            taper_perturbation_pc(
-                cfg, perturbed, unperturbed, base_feature_steps, run
-            )
-        elif perturbation == "gaussian_noise":
-            log.info("Compute gaussian noise")
-            gaussian_perturbation_pc(
-                cfg, perturbed, unperturbed, base_feature_steps, run
-            )
+            if perturbation == "twist":
+                log.info("Compute twist")
+                twist_perturbation_pc(
+                    cfg, perturbed, unperturbed, base_feature_steps, run
+                )
+            elif perturbation == "shear":
+                log.info("Compute shear")
+                shear_perturbation_pc(
+                    cfg, perturbed, unperturbed, base_feature_steps, run
+                )
+            elif perturbation == "taper":
+                log.info("Compute taper")
+                taper_perturbation_pc(
+                    cfg, perturbed, unperturbed, base_feature_steps, run
+                )
+            elif perturbation == "gaussian_noise":
+                log.info("Compute gaussian noise")
+                gaussian_perturbation_pc(
+                    cfg, perturbed, unperturbed, base_feature_steps, run
+                )
 
-        else:
-            raise ValueError("Invalid perturbation")
+            else:
+                raise ValueError("Invalid perturbation")
 
 
 @hydra.main(
