@@ -135,7 +135,7 @@ The results of the behaviour of the Weisfeiler-Lehman kernel (see Sections
 kernels on 8\si{\angstrom} graphs are very insensitive to medium levels of perturbations,
 and even completely oblivious to rewiring of graphs and generally insensitive to
 graph perturbations unless highly perturbed (see upper row of Figure \ref{fig:wlk}). The most likely explanation
-is that the diversity of Weisfeiler-Lehman hashes observed within perturbed or
+is that the diversity of Weisfeiler-Lehman hashes (i.e. neighbourhoods) observed within perturbed or
 unperturbed samples is relatively high, which makes distinguishing between the
 two a high threshold to overcome. This drawback could dissapear if one is working on
 a more targeted set of morphologically similar proteins with a lower diversity
@@ -202,6 +202,29 @@ results of such a descriptor shown in this thesis are promising
 
 
 \section{Topological Descriptors And Kernels}\label{sec:results_topo_kernels}
+
+Figure \ref{fig:tda_kernels} shows the behaviour of both the multi-scale kernel
+and persistence Fisher kernel. Overall, we can see that they are among the best
+performing metrics in this thesis, with high correlations and low inter-run
+variation. While they cannot detect changes in node labels in the current
+setting, hence not being able to detect mutations, we will show in Section
+\ref{sec:tda_limitations} how this could be alleviated. For computational
+reasons, we did not compute variations of different kernel parameters, although
+one could speed up the operation by precomputing the kernel matrices, and only
+later multiplying the matrix by different constants (see Appendix A.5 of
+\citep{o2021evaluation}).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{./figures/results/res_6.pdf}
+  \caption[MMD vs. Perturbation (\%) using the multi-scale kernel and
+  persistence Fisher kernel.]{MMD vs. Perturbation (\%) using the multi-scale
+kernel and persistence Fisher kernel. For the persistence Fisher kernel, both
+the kernel bandwidth parameter and the Fisher bandwidth parameter are set to 1.
+For the multi-scale kernel, the bandwidth parameter is also set to 1.}
+  \label{fig:tda_kernels}
+\end{figure}
+
 
 \section{Runtime}\label{sec:results_runtime}
 
