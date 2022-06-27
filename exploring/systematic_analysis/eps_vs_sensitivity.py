@@ -195,29 +195,29 @@ def load_clustering():
 
 
 def load_gaussian_degree():
-    # clustering_eps_8 = normalize(
-    #     pd.read_csv(
-    #         here()
-    #         / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
-    #     )
-    # )[relevant_cols]
-    # clustering_eps_8 = clustering_eps_8.assign(
-    #     descriptor="Degree Histogram",
-    #     perturb_type="Gaussian Noise",
-    #     eps_value=8,
-    # )
+    clustering_eps_8 = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/fixed_length_kernels/eps_graph/8/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
+        )
+    )[relevant_cols]
+    clustering_eps_8 = clustering_eps_8.assign(
+        descriptor="Degree Histogram",
+        perturb_type="Gaussian Noise",
+        eps_value=8,
+    )
 
-    # clustering_eps_16 = normalize(
-    #     pd.read_csv(
-    #         here()
-    #         / "data/systematic/human/fixed_length_kernels/eps_graph/16/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
-    #     )
-    # )[relevant_cols]
-    # clustering_eps_16 = clustering_eps_16.assign(
-    #     descriptor="Degree Histogram",
-    #     perturb_type="Gaussian Noise",
-    #     eps_value=16,
-    # )
+    clustering_eps_16 = normalize(
+        pd.read_csv(
+            here()
+            / "data/systematic/human/fixed_length_kernels/eps_graph/16/gaussian_noise/degree_histogram/gaussian_noise_mmds.csv"
+        )
+    )[relevant_cols]
+    clustering_eps_16 = clustering_eps_16.assign(
+        descriptor="Degree Histogram",
+        perturb_type="Gaussian Noise",
+        eps_value=16,
+    )
 
     clustering_eps_32 = normalize(
         pd.read_csv(
@@ -614,6 +614,7 @@ def main():
     )
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["eps_value"].nunique())
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
 
     df.reset_index(drop=True, inplace=True)
     g = sns.relplot(

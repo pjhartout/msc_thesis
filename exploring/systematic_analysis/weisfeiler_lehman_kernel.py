@@ -129,7 +129,7 @@ def main():
     print("Loaded data")
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["Kernel Settings"].nunique())
-
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
     g = sns.relplot(
         x="Perturbation (%)",
         y="Normalized MMDs",
