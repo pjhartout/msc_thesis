@@ -187,6 +187,7 @@ def main():
     palette = sns.color_palette("mako_r", df["Descriptor"].nunique())
 
     df.reset_index(drop=True, inplace=True)
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
     g = sns.relplot(
         x="Perturbation (%)",
         y="Normalized MMD",

@@ -143,7 +143,7 @@ def load_degree():
     remove_edges = normalize(
         pd.read_csv(
             here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/remove_edges/degree_histogram/removedge_mmds.csv"
+            / "data/systematic/human/fixed_length_kernels/eps_graph/8/remove_edges/degree_histogram/remove_edges_mmds.csv"
         )
     )[relevant_cols]
     remove_edges = remove_edges.assign(perturb_type="Remove Edges")
@@ -151,7 +151,7 @@ def load_degree():
     rewire_edges = normalize(
         pd.read_csv(
             here()
-            / "data/systematic/human/fixed_length_kernels/eps_graph/8/rewire_edges/degree_histogram/rewireedge_mmds.csv"
+            / "data/systematic/human/fixed_length_kernels/eps_graph/8/rewire_edges/degree_histogram/rewire_edges_mmds.csv"
         )
     )[relevant_cols]
     rewire_edges = rewire_edges.assign(perturb_type="Rewire Edges")
@@ -351,6 +351,8 @@ def main():
     palette = sns.color_palette("mako_r", df["Descriptor"].nunique())
 
     df.reset_index(drop=True, inplace=True)
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
+
     df = df.loc[df["Perturbation Type"] == "Gaussian Noise"]
     g = sns.relplot(
         x="Perturbation (%)",

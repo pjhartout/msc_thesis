@@ -146,12 +146,7 @@ def filter_protein_using_name(protein, protein_names):
 
 
 def pc_perturbation_worker(
-    cfg,
-    experiment_steps,
-    perturbation,
-    unperturbed,
-    perturbed,
-    run,
+    cfg, experiment_steps, perturbation, unperturbed, perturbed, run,
 ):
     experiment_steps_perturbed = experiment_steps[1:]
     experiment_steps_perturbed.insert(0, perturbation)
@@ -173,14 +168,10 @@ def pc_perturbation_worker(
     log.info(f"Run {run}")
 
     unperturbed_descriptor_run = load_descriptor(
-        unperturbed,
-        graph_type="contact_graph",
-        descriptor="diagram",
+        unperturbed, graph_type="contact_graph", descriptor="diagram",
     )
     perturbed_descriptor_run = load_descriptor(
-        perturbed,
-        graph_type="contact_graph",
-        descriptor="diagram",
+        perturbed, graph_type="contact_graph", descriptor="diagram",
     )
 
     log.info("Computing the kernel.")
@@ -211,9 +202,7 @@ def pc_perturbation_worker(
         biased=False,
         squared=True,
         kernel=MultiScaleKernel(
-            sigma=1,
-            n_jobs=cfg.compute.n_jobs,
-            verbose=cfg.debug.verbose,
+            sigma=1, n_jobs=cfg.compute.n_jobs, verbose=cfg.debug.verbose,
         ),  # type: ignore
         verbose=cfg.debug.verbose,
     ).compute(unperturbed_descriptor_run, perturbed_descriptor_run)
@@ -252,12 +241,7 @@ def save_mmd_experiment(cfg, mmds, run, perturbation_type):
 
 
 def twist_perturbation_pc(
-    cfg,
-    perturbed,
-    unperturbed,
-    experiment_steps,
-    run,
-    **kwargs,
+    cfg, perturbed, unperturbed, experiment_steps, run, **kwargs,
 ):
     log.info("Perturbing proteins with twist.")
 
@@ -295,20 +279,12 @@ def twist_perturbation_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg,
-        mmds,
-        run,
-        perturbation_type="twist",
+        cfg, mmds, run, perturbation_type="twist",
     )
 
 
 def shear_perturbation_pc(
-    cfg,
-    perturbed,
-    unperturbed,
-    experiment_steps,
-    run,
-    **kwargs,
+    cfg, perturbed, unperturbed, experiment_steps, run, **kwargs,
 ):
     log.info("Perturbing proteins with shear.")
 
@@ -347,20 +323,12 @@ def shear_perturbation_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg,
-        mmds,
-        run,
-        perturbation_type="shear",
+        cfg, mmds, run, perturbation_type="shear",
     )
 
 
 def taper_perturbation_pc(
-    cfg,
-    perturbed,
-    unperturbed,
-    experiment_steps,
-    run,
-    **kwargs,
+    cfg, perturbed, unperturbed, experiment_steps, run, **kwargs,
 ):
     log.info("Perturbing proteins with taper.")
 
@@ -399,20 +367,12 @@ def taper_perturbation_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg,
-        mmds,
-        run,
-        perturbation_type="taper",
+        cfg, mmds, run, perturbation_type="taper",
     )
 
 
 def gaussian_perturbation_pc(
-    cfg,
-    perturbed,
-    unperturbed,
-    experiment_steps,
-    run,
-    **kwargs,
+    cfg, perturbed, unperturbed, experiment_steps, run, **kwargs,
 ):
     log.info("Perturbing proteins with gaussian.")
 
@@ -451,16 +411,12 @@ def gaussian_perturbation_pc(
         unperturbed=unperturbed,
     )
     save_mmd_experiment(
-        cfg,
-        mmds,
-        run,
-        perturbation_type="gaussian_noise",
+        cfg, mmds, run, perturbation_type="gaussian_noise",
     )
 
 
 def tda_experiment_pc_perturbation(
-    cfg: DictConfig,
-    perturbation: str,
+    cfg: DictConfig, perturbation: str,
 ):
     base_feature_steps = [
         (
@@ -544,8 +500,7 @@ def main(cfg: DictConfig):
     # outside for loops for n_iters and k.
 
     tda_experiment_pc_perturbation(
-        cfg=cfg,
-        perturbation=cfg.perturbation,
+        cfg=cfg, perturbation=cfg.perturbation,
     )
 
 

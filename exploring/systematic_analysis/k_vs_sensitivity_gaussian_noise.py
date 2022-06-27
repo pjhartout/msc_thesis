@@ -584,6 +584,7 @@ def main():
     )
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["k"].nunique())
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
 
     df.reset_index(drop=True, inplace=True)
     g = sns.relplot(

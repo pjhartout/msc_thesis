@@ -321,6 +321,7 @@ def main():
     # Plot relplot of kind "line"
     setup_plotting_parameters(resolution=100)
     palette = sns.color_palette("mako_r", df["Descriptor"].nunique())
+    df["Perturbation (%)"] = df["Perturbation (%)"] * 100
 
     df.reset_index(drop=True, inplace=True)
     g = sns.relplot(
