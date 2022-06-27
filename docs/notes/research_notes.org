@@ -1809,6 +1809,91 @@ Wasserstein-GANs
   organization={PMLR}
 }
 #+end_src
+
+#+begin_src bibtex
+@article{lopez2020enhancing,
+  title={Enhancing scientific discoveries in molecular biology with deep generative models},
+  author={Lopez, Romain and Gayoso, Adam and Yosef, Nir},
+  journal={Molecular Systems Biology},
+  volume={16},
+  number={9},
+  pages={e9198},
+  year={2020}
+}
+#+end_src
+
+If x represents an amino acid sequence, then the probability that x occurs in nature can be better estimated by a generative model that accounts for interactions between residues
+#+begin_src bibtex
+@article{riesselman2018deep,
+  title={Deep generative models of genetic variation capture the effects of mutations},
+  author={Riesselman, Adam J and Ingraham, John B and Marks, Debora S},
+  journal={Nature methods},
+  volume={15},
+  number={10},
+  pages={816--822},
+  year={2018},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
+reviews of deep generative modelling for protein design
+
+#+begin_src bibtex
+@article{strokach2022deep,
+  title={Deep generative modeling for protein design},
+  author={Strokach, Alexey and Kim, Philip M},
+  journal={Current opinion in structural biology},
+  volume={72},
+  pages={226--236},
+  year={2022},
+  publisher={Elsevier}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{jendrusch2021alphadesign,
+  title={AlphaDesign: A de novo protein design framework based on AlphaFold},
+  author={Jendrusch, Michael and Korbel, Jan O and Sadiq, S Kashif},
+  journal={bioRxiv},
+  year={2021},
+  publisher={Cold Spring Harbor Laboratory}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{strokach2020fast,
+  title={Fast and flexible protein design using deep graph neural networks},
+  author={Strokach, Alexey and Becerra, David and Corbi-Verge, Carles and Perez-Riba, Albert and Kim, Philip M},
+  journal={Cell systems},
+  volume={11},
+  number={4},
+  pages={402--411},
+  year={2020},
+  publisher={Elsevier}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{madani2021deep,
+  title={Deep neural language modeling enables functional protein generation across families},
+  author={Madani, Ali and Krause, Ben and Greene, Eric R and Subramanian, Subu and Mohr, Benjamin P and Holton, James M and Olmos, Jose Luis and Xiong, Caiming and Sun, Zachary Z and Socher, Richard and others},
+  journal={bioRxiv},
+  year={2021},
+  publisher={Cold Spring Harbor Laboratory}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{meier2021language,
+  title={Language models enable zero-shot prediction of the effects of mutations on protein function},
+  author={Meier, Joshua and Rao, Roshan and Verkuil, Robert and Liu, Jason and Sercu, Tom and Rives, Alex},
+  journal={Advances in Neural Information Processing Systems},
+  volume={34},
+  pages={29287--29303},
+  year={2021}
+}
+#+end_src
+
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
