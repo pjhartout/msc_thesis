@@ -110,7 +110,7 @@ resulting in insensitive and unstable MMD values. Investigating the median
 distance between the various embeddings of data points shows that ...
 % TODO: add supplementary plot
 
-\section{Limitations and Future Directions}
+\section{Limitations and Future Directions}\label{sec:discussion_limitations}
 
 Now that we summarized the main findings of this thesis (Section
 \ref{sec:key_findings}) and formulated a set of recommendations to the
@@ -206,7 +206,7 @@ thesis.
 % detailed some of the limitations of and future work that could be done building
 % on the findings presented in this thesis.
 
-In our key findings, we show that the MMD on the types of graphs used in this
+In Section \ref{sec:key_findings}, we show that the MMD on the types of graphs used in this
 thesis is more stable than for synthetic graphs used in the literature. We
 highlight the sensitivity of MMD to the underlying parameters used to extract
 graph representations of proteins. We then discuss the behaviour of the
@@ -215,18 +215,20 @@ summarize the findings related to the graph kernel investigated in this thesis.
 Finally, we sum up the results on a set of known kernels and descriptor
 functions used for MMD.
 
-In our recommendations, we first advise the practitioner to establish a positive control to
-establish a best case MMD value. Secondly, if conditions allow, one can also
-establish a negative control to estimate a worst-case MMD value. We also
-redirect the practitioner to our findings to use representations that are more
-or less susceptible to perturbations depending on the required fidelity of
-generated samples to the reference distribution. We then move on to discuss the
-various aspects that constitute the assessment of what makes a realistic
-protein. We conclude our recommendations with relevant kernel choices.
+In Section \ref{sec:discussion_recommendations}, we first advise the
+practitioner to establish a positive control to establish a best case MMD value.
+Secondly, if conditions allow, one can also establish a negative control to
+estimate a worst-case MMD value. We also redirect the practitioner to our
+findings to use representations that are more or less susceptible to
+perturbations depending on the required fidelity of generated samples to the
+reference distribution. We then move on to discuss the various aspects that
+constitute the assessment of what makes a realistic protein. We conclude our
+recommendations with relevant kernel choices.
 
-We discuss the limitations of this thesis by starting off with discussing the
-often unfeasible crafting of a negative control. We then move on to discussing
-the limitations of a particular set of MMD configurations using TDA and how to
+We discuss the limitations of this thesis in Section
+\ref{sec:discussion_limitations} by starting off with discussing the often
+unfeasible crafting of a negative control. We then move on to discussing the
+limitations of a particular set of MMD configurations using TDA and how to
 potentially solve it. We then highlight the fact that MMD is insensitive to
 generative model pathologies that do not affect the mean of the distributions
 due to the averaging the kernel matrices. We close our discussion by
