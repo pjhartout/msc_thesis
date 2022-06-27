@@ -415,10 +415,11 @@ Proof that graph laplacian spectrum eigenvalues are bounded in
 @book{chung1997spectral,
   title={Spectral graph theory},
   author={Chung, Fan RK and Graham, Fan Chung},
-  number={92},
+  volume={92},
   year={1997},
   publisher={American Mathematical Soc.}
 }
+
 #+end_src
 
 Spectrum determines graphs?
@@ -489,13 +490,15 @@ AlphaFold Human proteome
 
 ESM FAIR models
 #+begin_src bibtex
-@article{rives10biological,
-  title={Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences. bioRxiv. 2019},
-  author={Rives, A and Goyal, S and Meier, J and Guo, D and Ott, M and Zitnick, CL and others},
-  journal={doi},
-  volume={10},
-  number={622803},
-  pages={622803}
+@article{rives2021biological,
+  title={Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences},
+  author={Rives, Alexander and Meier, Joshua and Sercu, Tom and Goyal, Siddharth and Lin, Zeming and Liu, Jason and Guo, Demi and Ott, Myle and Zitnick, C Lawrence and Ma, Jerry and others},
+  journal={Proceedings of the National Academy of Sciences},
+  volume={118},
+  number={15},
+  pages={e2016239118},
+  year={2021},
+  publisher={National Acad Sciences}
 }
 #+end_src
 
@@ -1028,7 +1031,7 @@ Example of ramachandran plot
 }
 #+end_src
 
-* Matrix of experiments to perform
+* [#B] Matrix of experiments to perform
 
 | Graph extraction | Perturbations | Descriptor   | Kernels            | Organism | Sample size |
 | --               | twist         | tda          | persistence fisher | human    |         100 |
@@ -1550,7 +1553,29 @@ Runtime complexity of VR filtration
   journal={arXiv preprint arXiv:1812.03374},
   year={2018}
 }
+#+end_src
 
+de novo protein design, tim's paper
+#+begin_src bibtex
+@article{kucera2021conditional,
+  title={Conditional generative modeling for de novo protein design with hierarchical functions},
+  author={Kucera, Tim and Togninalli, Matteo and Meng-Papaxanthos, Laetitia},
+  journal={bioRxiv},
+  year={2021},
+  publisher={Cold Spring Harbor Laboratory}
+}
+#+end_src
+
+Sequence kernels best for proteins
+#+begin_src bibtex
+@incollection{leslie2001spectrum,
+  title={The spectrum kernel: A string kernel for SVM protein classification},
+  author={Leslie, Christina and Eskin, Eleazar and Noble, William Stafford},
+  booktitle={Biocomputing 2002},
+  pages={564--575},
+  year={2001},
+  publisher={World Scientific}
+}
 #+end_src
 
 Ripser VR optimizations
@@ -1667,6 +1692,7 @@ GNNs are able to extract meaningful representations without any training:
   pages={4602--4609},
   year={2019}
 }
+
 @article{xu2018powerful,
   title={How powerful are graph neural networks?},
   author={Xu, Keyulu and Hu, Weihua and Leskovec, Jure and Jegelka, Stefanie},
@@ -1719,6 +1745,70 @@ Research questions:
   representations = variable/
 
 
+CATH citation (protein database superfamilies)
+#+begin_src bibtex
+@article{orengo1997cath,
+  title={CATH--a hierarchic classification of protein domain structures},
+  author={Orengo, Christine A and Michie, Alex D and Jones, Susan and Jones, David T and Swindells, Mark B and Thornton, Janet M},
+  journal={Structure},
+  volume={5},
+  number={8},
+  pages={1093--1109},
+  year={1997},
+  publisher={Elsevier}
+}
+#+end_src
+
+SCOP citation (structural features)
+#+begin_src bibtex
+@article{murzin1995scop,
+  title={SCOP: a structural classification of proteins database for the investigation of sequences and structures},
+  author={Murzin, Alexey G and Brenner, Steven E and Hubbard, Tim and Chothia, Cyrus},
+  journal={Journal of molecular biology},
+  volume={247},
+  number={4},
+  pages={536--540},
+  year={1995},
+  publisher={Elsevier}
+}
+#+end_src
+
+Crystals and atom-type filtrations
+#+begin_src bibtex
+@article{jiang2021topological,
+  title={Topological representations of crystalline compounds for the machine-learning prediction of materials properties},
+  author={Jiang, Yi and Chen, Dong and Chen, Xin and Li, Tangyi and Wei, Guo-Wei and Pan, Feng},
+  journal={npj computational materials},
+  volume={7},
+  number={1},
+  pages={1--8},
+  year={2021},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
+Discusses failure modes (collapse, drop).
+#+begin_src bibtex
+@article{salimans2016improved,
+  title={Improved techniques for training gans},
+  author={Salimans, Tim and Goodfellow, Ian and Zaremba, Wojciech and Cheung, Vicki and Radford, Alec and Chen, Xi},
+  journal={Advances in neural information processing systems},
+  volume={29},
+  year={2016}
+}
+#+end_src
+
+Wasserstein-GANs
+#+begin_src bibtex
+@inproceedings{arjovsky2017wasserstein,
+  title={Wasserstein generative adversarial networks},
+  author={Arjovsky, Martin and Chintala, Soumith and Bottou, L{\'e}on},
+  booktitle={International conference on machine learning},
+  pages={214--223},
+  year={2017},
+  organization={PMLR}
+}
+#+end_src
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
