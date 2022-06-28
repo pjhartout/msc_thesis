@@ -1,5 +1,5 @@
 \chapter{Appendix}
-
+\vspace{12pt}
 \section{Influence of $k$ on sensitivity to perturbations of $k$-NN graphs}
 
 \begin{figure}[h]
@@ -39,15 +39,27 @@ on GitHub, and is available at the following URL: \url{https://github.com/pjhart
 \section{Distance Distribution of Descriptor Functions}\label{sec:distance_dist}
 To explain why certain Gaussian configurations tend to work better than others,
 it is useful to compute the pairwise distance of unperturbed proteins to get an
-idea of how far away in e.g. Euclidean space, each embedding is from one
-another.
+idea of how far away in e.g. Euclidean space each embedding is from one
+another. Figure \ref{fig:mean_distance_embedding} shows the pairwise Euclidean
+distance distribution within an unperturbed set of proteins. We can see that
+this varies quite a bit from descriptor to descriptor, and that this
+distribution is also affected by the parameters used to extract the graphs in
+the case of graph descriptors. This probably explains why we see different
+behaviours for different kernels in Figure \ref{fig:mmd_effect_kernel}.
+
+Although we did not do so in this thesis, one could leverage this information to
+set the $\sigma$ parameter for the RBF kernel by centering it around the mean,
+and (logarithmically) scaling it up and down to find configurations with the
+highest correlations.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{./figures/results/violin_protein_descriptors.pdf}
   \includegraphics[width=\textwidth]{./figures/results/violin_graph_descriptors.pdf}
-  \caption{Mean Euclidean distance between descriptor representations. The top
-    row shows the mean distance between each of the protein descriptors
-    introduced in this thesis while the bottom row shows the distance between
-    each graph descriptor for two $\varepsilon$-graph extraction settings.}
+  \caption[Mean Euclidean distance between typical descriptor vectors used in
+  this thesis]{Mean Euclidean distance between typical descriptor vectors used in
+this thesis. The top row shows the mean distance between each of the protein
+descriptors introduced in this thesis while the bottom row shows the distance
+between each graph descriptor for two $\varepsilon$-graph extraction settings.}
+  \label{fig:mean_distance_embedding}
 \end{figure}
