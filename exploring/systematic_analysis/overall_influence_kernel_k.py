@@ -281,7 +281,7 @@ def load_laplacian():
     return all_data
 
 
-def annotate(data, palette, **kws):
+def annotate(data, **kws):
     for i, descriptor in enumerate(data.Descriptor.unique()):
         descriptor_df = data[data["Descriptor"] == descriptor]
         r_ps = list()
@@ -371,7 +371,7 @@ def main():
 
     # leg = g._legend
     # leg.set_bbox_to_anchor([0.67, 0.2])
-    # g.map_dataframe(annotate, palette=palette)
+    g.map_dataframe(annotate)
     titles = [
         r"RBF Kernel $\sigma$ = 0.0001",
         r"RBF Kernel $\sigma$ = 0.001",
