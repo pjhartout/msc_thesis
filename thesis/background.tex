@@ -10,23 +10,24 @@
 % structural biology.
 
 This chapter introduces fundamental concepts built upon in this thesis, which
-lies at the interface between structural biology and machine learning. First, we
-start by defining some relevant biological properties of proteins, as well as
-several representations leveraged in later chapters. We then introduce
-generative models, applied to graphs and other domains. Crucially, we discuss in
-detail the evaluation problem when it comes to generative models, as well as
-some of the unique challenges arising in the graph domain. Finally,
-we discuss the current landscape of methods used to evaluate
-graph generative models, such as the maximum mean discrepancy. Finally, we
-introduce kernels can be used within the maximum mean discrepancy.
+lies at the interface between structural biology and machine learning. We start
+by defining some relevant biological properties of proteins, as well as several
+representations leveraged in later chapters. We then introduce generative
+models, applied to graphs and other domains. Crucially, we discuss in detail the
+evaluation problem when it comes to generative models, as well as some of the
+unique challenges arising in the graph domain. Finally, we discuss the current
+landscape of methods used to evaluate graph generative models, such as the
+maximum mean discrepancy. Finally, we introduce kernels can be used within the
+maximum mean discrepancy.
 
 \section{Proteins}\label{sec:proteins}
 
 Proteins are large biomolecules that are formed from a sequence of amino acids,
 performing their functions as determined by their three-dimensional structure,
-and amino acid sequence. Proteins support a vast array of functions in living
-organisms, such as catalysing metabolic reactions, DNA replication, providing
-structural support to cells, transporting molecules and sensing stimuli.
+in turn determined by their amino acid sequence. They support a vast array of
+functions in living organisms, such as catalysing metabolic reactions, DNA
+replication, providing structural support to cells, transporting molecules and
+sensing stimuli.
 
 Each protein is made up of one or more chains of amino acids, and contain a
 backbone and different side chains. The atoms in the backbone include a
