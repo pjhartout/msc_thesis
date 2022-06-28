@@ -115,7 +115,10 @@ In this thesis, we often observed that the linear kernel and RBF kernels with
 $\sigma<1$ were often effective to detect perturbations, and $\sigma>1$
 resulting in insensitive and unstable MMD values. Investigating the mean
 distance distribution between the various embeddings of data points (Appendix
-\ref{sec:distance_dist}) shows that ...
+\ref{sec:distance_dist}) we can see that this is probably because the order of
+magnitude of the data descriptors is consistently higher than this threshold. We
+discuss the rough order of magnitude of the data and its impact on the choice of
+$\sigma$ in Appendix \ref{sec:distance_dist} as well.
 % TODO: add supplementary plot
 
 \section{Limitations and Future Directions}\label{sec:discussion_limitations}
