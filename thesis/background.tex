@@ -373,18 +373,18 @@ measure to evaluate the quality of the graph.
 
 \section{Maximum Mean Discrepancy}\label{sec:mmd}
 
-A significant part of this thesis is centered around investigating the MMD
-statistic, so we define and examine existing MMD research here. Introduced by
+A significant part of this thesis is centered around investigating the \acrshort{mmd}
+statistic, so we define and examine existing \acrshort{mmd} research here. Introduced by
 \cite{borgwardt2006integrating} and further exposited by
 \cite{gretton2012kernel}, this measure leverages the expressive power and
 versatility of \emph{kernel functions} to evaluate distances between two sample
 distributions. What's more, \cite{gretton2012kernel} describe how this measure
 can be treated as a test statistic, from which a $p$-value can be computed, to
 test if two distributions are statistically significantly different from one
-another. MMD is therefore an ideal platform to leverage when trying to assess
+another. \acrshort{mmd} is therefore an ideal platform to leverage when trying to assess
 generative models.
 
-First, we define \emph{kernels}, an essential component of MMD. They measure the
+First, we define \emph{kernels}, an essential component of \acrshort{mmd}. They measure the
 similarity of two sets of any structured object. Let $\mathcal{X}$ be a
 non-empty set, and a \emph{kernel function}
 $\tk:\mathcal{X}\times \mathcal{X}\to\R $ satisfying the following
