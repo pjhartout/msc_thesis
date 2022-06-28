@@ -22,15 +22,15 @@ graphs used here. The three elements contributing to the speedup are the
 following:
 
 \begin{enumerate}
-\item Our implementation parallelizes the execution of Weisfeiler-Lehman hash
+\item Our implementation parallelizes the execution of the Weisfeiler-Lehman hash
 computations since each graph's hash can be computed independently prior to
 computing the kernel.
 \item It also parallelizes the computation of similarity of graphs in RKHS by
 computing batches of the inner products independently.
 \item When comparing graphs, lots of CPU cycles are spent processing
-positions/hashes that do not actually overlap between Weisfeiler-Lehman
+positions/hashes that do not overlap between Weisfeiler-Lehman
 histograms. As such, we manually loop over the overlapping keys, outperforming
-numpy dot product-based implementations on collections of sparse graphs.
+NumPy dot product-based implementations on collections of sparse graphs.
 \end{enumerate}
 
 We tested, covered, and open-sourced the implementation of this novel approach
@@ -42,10 +42,10 @@ it is useful to compute the pairwise distance of unperturbed proteins to get an
 idea of how far away in e.g. Euclidean space each embedding is from one
 another. Figure \ref{fig:mean_distance_embedding} shows the pairwise Euclidean
 distance distribution within an unperturbed set of proteins. We can see that
-this varies quite a bit from descriptor to descriptor, and that this
+this varies quite a bit from descriptor to descriptor and that this
 distribution is also affected by the parameters used to extract the graphs in
 the case of graph descriptors. This probably explains why we see different
-behaviours for different kernels in Figure \ref{fig:mmd_effect_kernel}.
+behaviors for different kernels in Figure \ref{fig:mmd_effect_kernel}.
 
 Although we did not do so in this thesis, one could leverage this information to
 set the $\sigma$ parameter for the RBF kernel by centering it around the mean,

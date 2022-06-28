@@ -30,7 +30,7 @@ Furthermore, we found that the Weisfeiler-Lehman kernel, introduced in Section
 \ref{sec:methods_kernels}, applied to MMD was able to detect perturbations
 unable to be detected by traditional graph descriptors such as point mutations,
 which are relevant for the protein domain (Section
-\ref{sec:results_graph_kernels}). However, as with the rest of perturbations,
+\ref{sec:results_graph_kernels}). However, as with the rest of the perturbations,
 the Weisfeiler-Lehman kernel is not sensitive to lower regimes of perturbation
 (see Figure \ref{fig:wlk}).
 This can be alleviated by using an alternative descriptor such as the ESM
@@ -60,7 +60,7 @@ expected in the best case, which we refer to as the \emph{positive control}.
 From there, an accurate assessment of the quality of the model can be made. If
 the kernel and data representation allows it, it is also advisable to establish
 a \emph{negative control}. This would show the worst possible performance
-between any two distribution. Typically, for the biased estimate of MMD, this
+between any two distributions. Typically, for the biased estimate of MMD, this
 value is $\sqrt{2}$. If this is not possible, as is the case in this thesis
 (e.g. there is no negative control for all MMD values perturbed using the Gaussian noise), it
 is useful to examine cases of extreme perturbations and compare the resulting
@@ -74,12 +74,12 @@ distribution and the empirical distribution.
 
 \subsection{Sensitivity of MMD}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
-Depending on the stage of modelling and the coarseness of the desired samples,
+Depending on the stage of modeling and the coarseness of the desired samples,
 one might choose different MMD configurations. As we have shown in Figure
 \ref{fig:mmd_sensitivity_eps} and discussed in Section
 \ref{sec:results_sensitivity}, choosing a lower threshold $\varepsilon$ to
 extract $\varepsilon$-graphs from a protein point cloud results in a higher
-sensitivity to a host of perturbation. In practice this means that the lower the
+sensitivity to a host of perturbation. In practice, this means that the lower the
 $\varepsilon$, the better the MMD will be at discerning perturbed (i.e.
 generated) samples from reference samples. This might be desirable if one needs
 highly similar distributions of graphs. However, it can sometimes be desirable
@@ -94,18 +94,18 @@ wide to make any assessment as to the quality of the generated samples
 \subsection{Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
 Another setting in which some key findings of this study can be useful is in the
-context of assessing \emph{realistic} proteins. Realistic proteins takes on a
+context of assessing \emph{realistic} proteins. Defining realistic proteins take on a
 myriad of aspects: i.e. are the generated protein sequences realistic? In this
 case, one might use a Weisfeiler-Lehman kernel or an ESM embedding to answer
 this. The literature, however, suggests that using embeddings does not yield the
 same kernel parameters depending on the perturbation applied to the sequence. As
 such, it is recommended to use a spectrum kernel \citep{leslie2001spectrum} for
 sequences (see \cite{kucera2021conditional}, Section 4.1). There are, however,
-other aspects of proteins related to its resulting shape to check. For this
+other aspects of proteins related to their resulting shape to check. For this
 purpose, the protein-specific descriptors devised in this thesis and introduced in
 Section \ref{sec:descriptors} whose results are shown in Section
 \ref{sec:results_protein_descriptors}, Figure
-\ref{fig:protein_specific_descriptors} can be used. This way, any unusual angle
+\ref{fig:protein_specific_descriptors} can be used. This way, an unusual angle
 or abnormal interatomic distance distribution observed in the data will be
 reflected in the MMD value.
 
@@ -137,7 +137,7 @@ In Section \ref{sec:discussion_baselines}, we highlighted the necessity of a
 the aforementioned spectrum kernel, see \cite{kucera2021conditional} for
 details), many of the settings discussed in this thesis do not have such a
 ``negative control''. While one could use absolute MMD values of perturbed sets
-of proteins as a reference for subpar performance, it still recommended to find
+of proteins as a reference for subpar performance, it is still recommended to find
 appropriate pathological cases for specific applications to estimate what a worse-case
 MMD value might take.
 
@@ -181,7 +181,7 @@ outputs) lacks variety. Mode drop refers to the situation when some modes of the
 data are not represented in the generated output. Both arise when implementing
 common generative model architectures such as GANs. Although some methods have
 been devised to tackle such issues for GANs \citep{arjovsky2017wasserstein,
-goodfellow2014generative}, it remains a challenges which need to be captured by
+goodfellow2014generative}, it remains a challenge that needs to be tackled by
 suitable evaluation measures. Since MMD takes the average of kernel matrices
 (see Equation \ref{eq:mmd}), we anticipate its potential to detect mode collapse
 limited, since MMD is invariant to changes that do not affect the mean of the
@@ -190,11 +190,11 @@ distributions to be compared.
 While others have simulated such pathologies in synthetic datasets by manually
 changing the composition of each mode and investigating evaluation metrics'
 behaviour to it \citep{thompson2022evaluation}, applying such mode-related
-perturbations to protein datasets has yet to be tackled and was beyond the scope
+perturbations to protein datasets have yet to be tackled and are beyond the scope
 of this thesis. One method that could be used to investigate such situations
 would be to modify the composition of various protein families, within which proteins
 share structural similarities. To simulate mode collapse, one could impoverish the number of proteins
-within a given family. To simulate mode drop, one could remove those protein entirely from
+within a given family. To simulate mode drop, one could remove those proteins entirely from
 the distribution. Defining protein families could be achieved by looking at
 evolutionary links between proteins using for instance CATH database
 \citep{orengo1997cath}. Alternatively, one could also use structural hierarchies
@@ -220,14 +220,14 @@ thesis.
 In Section \ref{sec:key_findings}, we show that the MMD on the types of graphs used in this
 thesis is more stable than for synthetic graphs used in the literature. We
 highlight the sensitivity of MMD to the underlying parameters used to extract
-graph representations of proteins. We then discuss the behaviour of the
+graph representations of proteins. We then discuss the behavior of the
 protein-specific descriptors introduced in this thesis. Furthermore, we
 summarize the findings related to the graph kernel investigated in this thesis.
 Finally, we sum up the results on a set of known kernels and descriptor
 functions used for MMD.
 
 In Section \ref{sec:discussion_recommendations}, we first advise the
-practitioner to establish a positive control to establish a best case MMD value.
+practitioner to establish a positive control to establish a best-case MMD value.
 Secondly, if conditions allow, one can also establish a negative control to
 estimate a worst-case MMD value. We also redirect the practitioner to our
 findings to use representations that are more or less susceptible to
@@ -238,10 +238,10 @@ recommendations with relevant kernel choices.
 
 We discuss the limitations of this thesis in Section
 \ref{sec:discussion_limitations} by starting off with discussing the often
-unfeasible crafting of a negative control. We then move on to discussing the
+unfeasible crafting of negative controls. We then move on to discussing the
 limitations of a particular set of MMD configurations using TDA and how to
 potentially solve it. We then highlight the fact that MMD is insensitive to
 generative model pathologies that do not affect the mean of the distributions
-due to the averaging the kernel matrices. We close our discussion by
+due to the averaging of the kernel matrices. We close our discussion by
 highlighting the composability of the kernels, which could greatly expand the
 building blocks highlighted in this thesis in future work.

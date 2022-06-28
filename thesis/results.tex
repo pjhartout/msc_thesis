@@ -2,18 +2,18 @@
 
 In this chapter, we will introduce the results of the experiments subjecting
 protein representations to various relevant perturbation regimes highlighted in
-chapter \ref{chap:methods}. We first discuss the results and implication of
+chapter \ref{chap:methods}. We first discuss the results and implications of
 classical MMD configurations, namely by showing how it behaves on protein
-graph descriptors. We then move on to show results of the sensitivity of the MMD
+graph descriptors. We then move on to show the results of the sensitivity of the MMD
 values based on the underlying graph representation used to extract the various
 graphs. Finally, we explore more exotic configurations of MMD that we
 hypothesize might be more suitable for proteins. We conclude this chapter with a
 short section on the runtimes of the various elements of the computational
 pipelines shown in this chapter.
 
-\section{Overall MMD behaviour}
+\section{Overall MMD behavior}
 
-Surprisingly, we found that the behaviour of MMD was not as inconsistent for the
+Surprisingly, we found that the behavior of MMD was not as inconsistent for the
 types of graphs extracted from proteins as was found on synthetic graphs by
 \cite{o2021evaluation}. Figure \ref{fig:mmd_consistent_eps} exhibits a typical
 trajectories of MMD values as different perturbation types are progressively
@@ -26,36 +26,36 @@ sensitive to the addition of edges and decreases in value as more and more edges
 are added. We expect that this pathology is not very common in real models and
 that this can be easily detected manually.
 
-The overall influence of the kernel on MMD's behaviour subject to perturbations
-such as Gaussian Noise, can be seen in Figure \ref{fig:mmd_effect_kernel}. We
+The overall influence of the kernel on MMD's behavior subject to perturbations
+such as Gaussian Noise can be seen in Figure \ref{fig:mmd_effect_kernel}. We
 can see that for low values of $\sigma$ (the hyperparameter of the Gaussian
 kernel, see Section \ref{sec:kernels}) and for the linear kernel, MMD values
 behave as desired. However, unpredictable patterns emerge when increasing
 $\sigma$ and the kernel matrices can ``saturate'' quite easily. This can have
-quite unpredictable behaviours: in the case of the degree histogram or the
+quite unpredictable behaviors: in the case of the degree histogram or the
 clustering histogram, this results in an overly sensitive kernel, while the
 clustering histogram remains oblivious to large amounts of perturbation.
 
 $k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
 able to detect perturbations - see Figure \ref{fig:mmd_k_nn_graphs} for an
 example with 2-NN graphs. However, they are extremely sensitive to Gaussian
-noise and to the addition of edges (see upper left and upper mid pane of Figure
+noise and to the addition of edges (see the upper left and the upper mid pane of Figure
 \ref{fig:mmd_k_nn_graphs}). Presumably, this is because very small amounts of
-noise ($<4$\si{\angstrom}) affect the direct local neighbourhood of each node
+noise ($<4$\si{\angstrom}) affect the direct local neighborhood of each node
 very significantly in such a way that the resulting $k$-NN graph is rapidly
 disrupted, which is not necessarily the case with other perturbations. We note
 that overall the $\varepsilon$-graphs behave more consistently than $k$-NN
 graphs, with 13 out of 21 Pearson's correlation coefficients being higher in
 $\varepsilon$-graphs compared to $k$-NN graphs and 11 out of 21 Spearman's
 correlation coefficients being higher in 8\si{\angstrom}-graphs compared to 2-NN
-graphs. Even when the $\varepsilon$-graphs did not compare favourably, it was by
-a considerable lower margin than $k$-NN graphs in a similar setting. This effect
+graphs. Even when the $\varepsilon$-graphs did not compare favorably, it was by
+a considerably lower margin than $k$-NN graphs in a similar setting. This effect
 seems to be mitigated by increasing $k$, but this comes at the cost of a lower
 Spearman correlation coefficient, which is even less desirable - see Figure
 \ref{fig:k_vs_turbulence_gaussian_noise}. Changing kernel parameters did not
 alleviate the pathologies (see Supplementary Figure
 \ref{fig:mmd_effect_kernel_knn}) and had the same overall effect as observed in
-Figure \ref{fig:mmd_effect_kernel}. We therefore proceed with further analysis
+Figure \ref{fig:mmd_effect_kernel}. We, therefore, proceed with further analysis
 using $\varepsilon$-graphs.
 
 
@@ -124,8 +124,8 @@ we investigate the impact of the $\varepsilon$ threshold on the resulting
 sensitivity of the MMD configuration to various perturbations affecting the
 underlying point cloud. Figure \ref{fig:mmd_sensitivity_eps} shows that, in
 general, the lower the $\varepsilon$, the more sensitive the MMD to
-perturbations. A low sensitivity to perturbation might be useful in the early
-stages of modelling, when generated samples only need to \emph{coarsely} match
+perturbations. Low sensitivity to perturbation might be useful in the early
+stages of modeling when generated samples only need to \emph{coarsely} match
 the reference samples. Conversely, a higher sensitivity to perturbations might
 be useful when trying to \emph{finely} distinguish a set of anomalous samples
 from the reference samples. Additionally, we can see that under the Gaussian
@@ -145,16 +145,16 @@ spectrum histogram descriptor under the tapering perturbation.}
 % TODO compare WL with ESM (no modelling bias for WL on paper, might be a
 % weakness since some mutations might not have a functional effect.)
 
-The results of the behaviour of the Weisfeiler-Lehman kernel (see Sections
+The results of the behavior of the Weisfeiler-Lehman kernel (see Sections
 \ref{sec:kernels} and \ref{sec:methods_kernels}) can be seen in Figure
 \ref{fig:wlk}. Contrary to the tendencies observed in Section
 \ref{sec:results_sensitivity}, MMDs obtained using the Weisfeiler-Lehmann
 kernels on 8\si{\angstrom} graphs are very insensitive to medium levels of perturbations,
 and even completely oblivious to rewiring of graphs and generally insensitive to
 graph perturbations unless highly perturbed (see upper row of Figure \ref{fig:wlk}). The most likely explanation
-is that the diversity of Weisfeiler-Lehman hashes (i.e. neighbourhoods) observed within perturbed or
+is that the diversity of Weisfeiler-Lehman hashes (i.e. neighborhoods) observed within perturbed or
 unperturbed samples is relatively high, which makes distinguishing between the
-two a high threshold to overcome. This drawback could dissapear if one is working on
+two a high threshold to overcome. This drawback could disappear if one is working on
 a more targeted set of morphologically similar proteins with a lower diversity
 of Weisfeiler-Lehman hashes, but this is beyond the scope of the thesis.
 
@@ -175,14 +175,14 @@ results in MMDs with a high inter-run variance.}
 The behaviour of MMD values derived from the protein-specific descriptor
 functions described in section \ref{sec:descriptors} are shown in Figure
 \ref{fig:protein_specific_descriptors}. The dihedral angles descriptor is
-extremely sensitive to any kind of Gaussian noise, and even decreases in value
+extremely sensitive to any kind of Gaussian noise and even decreases in value
 when the kernel is not parametrized properly when increasing the shearing. This
 is overall a good sign, as it will flag proteins that are unrealistic. The
 interatomic distance histogram also behaves well. However, it shows high
 variance when twisting the protein, presumably because the intra-sample variance
 in distances is a threshold hard to overcome. This phenomenon can also be
-noticed in Figure \ref{fig:wlk} with the Weisfeiler-Lehman kernel, and could
-dissapear when working on morphologically similar proteins as highlighted in
+noticed in Figure \ref{fig:wlk} with the Weisfeiler-Lehman kernel and could
+disappear when working on morphologically similar proteins as highlighted in
 Section \ref{sec:results_graph_kernels}. Another attractive aspect of this class
 of descriptors is that they are very cheap to compute -- see further results in
 Section \ref{sec:results_runtime}.
@@ -209,12 +209,12 @@ sequences as highlighted in Section \ref{sec:mmd}. The only perturbation such a
 learned embedding would be sensitive to is changes in the protein sequence. As
 such, we investigated how the MMD values increase with increasing point mutation
 probabilities with various kernels, as seen in Figure \ref{fig:esm_descriptor}.
-We find that the kernel used does not have any bearing on the MMD behaviour as
+We find that the kernel used does not have any bearing on the MMD behavior as
 long as $\sigma<1$ for the RBF kernel. Overall, we see that even in these low
 mutation regimes, the ESM embedding is sensitive enough to detect such changes.
 More sequence-specific perturbations are required to assess the
 applicability of the ESM embedding as a sequence descriptor, such as
-translocation of subsequences, additions and deletions, etc. However, the early
+translocation of subsequences, additions, deletions, etc. However, the early
 results of such a descriptor shown in this thesis are promising
 
 \begin{figure}
@@ -232,7 +232,7 @@ complemented by complementary sequence-specific perturbations -- see Section
 
 \section{Topological Descriptors And Kernels}\label{sec:results_topo_kernels}
 
-Figure \ref{fig:tda_kernels} shows the behaviour of both the multi-scale kernel
+Figure \ref{fig:tda_kernels} shows the behavior of both the multi-scale kernel
 and persistence Fisher kernel. Overall, we can see that they are among the best
 performing metrics in this thesis, with high correlations and low inter-run
 variation. While they cannot detect changes in node labels in the current
@@ -273,9 +273,9 @@ it comes to the twisting perturbation (lowest row). Furthermore, one of the
 descriptors devised for this thesis also exhibits high variance under twisting
 perturbations: the pairwise distance histogram, Figure
 \ref{fig:protein_specific_descriptors}. The consequence of a high normalized
-inter-run variance can be just as neferious as MMD configurations with low
-correlation coefficients, because the range of absolute MMD values can too wide
-to make an accurate assessment as to the quality of generated samples.
+inter-run variance can be just as nefarious as MMD configurations with low
+correlation coefficients because the range of absolute MMD values can be too wide
+to make an accurate assessment of the quality of generated samples.
 
 
 \section{Runtime}\label{sec:results_runtime}
@@ -295,11 +295,11 @@ it remains very expensive to compute and does not enjoy the benefits of hardware
 acceleration through e.g. a GPU due to the difficulty of parallelizing such a
 filtration \citep{Bauer2021Ripser}.
 
-Second, computing the distance histogram and dihedral angles histogram are the
+Second, computing the distance histogram and dihedral angles histogram is the
 fastest descriptors to compute, making them suitable to evaluate large
 collections of generated proteins. Other graph descriptors are also reasonably
 fast to compute, but they depend on the settings used to extract the graphs, and
-generally the runtime increases in the number of edges of the graph.
+generally, the runtime increases in the number of edges of the graph.
 
 Third, the kernels used in this study all have reasonable runtimes, but we note
 the particular efficiency of the RBF and linear kernel compared to the
@@ -344,13 +344,13 @@ spread across 10 CPU cores from an Intel Xeon Gold 6254 CPU clocked at 3.10GHz.}
 
 \section{Summary}
 
-In this chapter, we present the results of the behaviour of MMD under various
+In this chapter, we present the results of the behavior of MMD under various
 configurations and subject to various perturbations. We first note that the
-overall behaviour of MMD under various perturbations is stable when sufficient
+overall behavior of MMD under various perturbations is stable when sufficient
 care is put into the selection of the of the kernel parameters (Figure \ref{fig:mmd_consistent_eps}). As a side note,
 we see also that overall the correlations for descriptors of
 $\varepsilon$-graphs is better than for $k$-NN graphs (Figure \ref{fig:mmd_k_nn_graphs}). Second, we note that the
-choice of graph representation impacts the behaviour of MMD's behaviour: the
+choice of graph representation impacts the behavior of MMD's behavior: the
 lower the radius of the sphere used to extract the $\varepsilon$-graph, the more
 sensitive the resulting MMD configuration, i.e. the lower the perturbation
 required for the MMD to reach a certain threshold (Figure
@@ -366,7 +366,7 @@ relevant protein-specific descriptors, which seem to behave very well (Figure
 \ref{fig:protein_specific_descriptors}). Using learned embeddings as sequence
 descriptors such as the ESM embedding showed that the resulting MMD is sensitive
 to low rates of point mutation (Figure \ref{fig:esm_descriptor}). Using
-topological descriptors and appropriate kernels also seem to work very well, despite
+topological descriptors and appropriate kernels also seems to work very well, despite
 a high computational cost (Figure \ref{fig:tda_kernels}). Finally, we show the
 results of the runtime of each significant operation of the workflow highlighted
 in this thesis (Table \ref{tab:runtimes}).
