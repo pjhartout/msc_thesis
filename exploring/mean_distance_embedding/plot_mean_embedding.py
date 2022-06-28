@@ -242,7 +242,7 @@ def main():
 
     titles = [
         "Dihedral Angles Histogram",
-        "Pairwise Interatomic Distance Histogram",
+        "Interatomic Distance Histogram",
     ]
     for i, ax in enumerate(g.axes.flatten()):
         ax.set_title(titles[i])
