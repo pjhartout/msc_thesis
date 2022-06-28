@@ -36,6 +36,18 @@ numpy dot product-based implementations on collections of sparse graphs.
 We tested, covered, and open-sourced the implementation of this novel approach
 on GitHub, and is available at the following URL: \url{https://github.com/pjhartout/fastwlk}.
 
+\section{Distance Distribution of Descriptor Functions}
+To explain why certain Gaussian configurations tend to work better than others,
+it is useful to compute the pairwise distance of unperturbed proteins to get an
+idea of how far away in e.g. Euclidean space, each embedding is from one
+another.
 
-% \section{Median distance in embedding space of various proteins descriptors}
-% TODO
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{./figures/results/violin_protein_descriptors.pdf}
+  \includegraphics[width=\textwidth]{./figures/results/violin_graph_descriptors.pdf}
+  \caption{Mean Euclidean distance between descriptor representations. The top
+    row shows the mean distance between each of the protein descriptors
+    introduced in this thesis while the bottom row shows the distance between
+    each graph descriptor for two $\varepsilon$-graph extraction settings.}
+\end{figure}
