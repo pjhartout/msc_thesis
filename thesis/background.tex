@@ -10,37 +10,38 @@
 % structural biology.
 
 This chapter introduces fundamental concepts built upon in this thesis, which
-lies at the interface between structural biology and machine learning. First, we
-start by defining some relevant biological properties of proteins, as well as
-several representations leveraged in later chapters. We then introduce
-generative models, applied to graphs and other domains. Crucially, we discuss in
-detail the evaluation problem when it comes to generative models, as well as
-some of the unique challenges arising in the graph domain specifically. Finally,
-we discuss the current landscape of methods used to evaluate
-graph generative models, such as the maximum mean discrepancy. Finally, we
-introduce kernels can be used within the maximum mean discrepancy.
+lies at the interface between structural biology and machine learning. We start
+by defining some relevant biological properties of proteins, as well as several
+representations leveraged in later chapters. We then introduce generative
+models, applied to graphs and other domains. Crucially, we discuss in detail the
+evaluation problem when it comes to generative models, as well as some of the
+unique challenges arising in the graph domain. Finally, we discuss the current
+landscape of methods used to evaluate graph generative models, such as the
+maximum mean discrepancy. Finally, we introduce kernels that can be used within the
+maximum mean discrepancy.
 
 \section{Proteins}\label{sec:proteins}
 
 Proteins are large biomolecules that are formed from a sequence of amino acids,
 performing their functions as determined by their three-dimensional structure,
-and amino acid sequence. Proteins support a vast array of functions in living
-organisms, such as catalysing metabolic reactions, DNA replication, providing
-structural support to cells, transporting molecules and sensing stimuli.
+which in turn is determined by their amino acid sequence. They support a vast array of
+functions in living organisms, such as catalyzing metabolic reactions, DNA
+replication, providing structural support to cells, transporting molecules and
+sensing stimuli.
 
-Each protein is made up of one or more chains of amino acids, and contain a
+Each protein is made up of one or more chains of amino acids and contains a
 backbone and different side chains. The atoms in the backbone include a
-\textalpha{}-carbon, another carbon and a nitrogen atom. An overview of the
+\textalpha{}-carbon, another carbon, and a nitrogen atom. An overview of the
 peptide backbone is shown in Figure \ref{fig:backbone}. Interestingly, a plane
-is forned by two alpha carbons, the carboxyl group, and the hydrogen atom
+is formed by two alpha carbons, the carboxyl group, and the hydrogen atom
 attached to the nitrogen atom (see Figure \ref{fig:backbone}), making the
 peptide bond between the nitrogen and carbon atom resistant to twisting. That
-means that the rotations enabling the 3D folding of a protein is governed by the
-angle of the bonds linking the nitrogen atom to the \textalpha{}-carbon and the
-other carbon atom to the \textalpha{}-carbon, named \textphi{} and \textpsi{}.
-These angles' values are frequently used to validate proteins, characterise the
-secondary structure of proteins (i.e. structural features observed in certain
-segments of proteins), etc.
+means that the rotations of these planes enabling the 3D folding of a protein
+are governed by the angle of the bonds linking the nitrogen atom to the
+\textalpha{}-carbon and the other carbon atom to the \textalpha{}-carbon, named
+\textphi{} and \textpsi{}. These angles' values are frequently used to validate
+proteins, characterize the secondary structure of proteins (i.e. structural
+features observed in certain segments of proteins), etc.
 
 
 \begin{figure}[h]
@@ -99,8 +100,8 @@ extract a \emph{contact map} of a protein by computing the (euclidean) distance
 between any two points belonging to each amino acid. The \textalpha-carbon is
 often used for this purpose. This is a fully connected graph with continuously
 labeled edges representing the distance between each node. From there, it is
-possible to either extract a $k$-nearest neighbour ($k$-NN) graph, where
-$k\in\mathbb{N}>0$ defines the amount of nodes directly connected to any given
+possible to either extract a $k$-nearest neighbor ($k$-NN) graph, where
+$k\in\mathbb{N}>0$ defines the number of nodes directly connected to any given
 nodes; or an $\varepsilon$-graph, where each node within a given distance
 $\varepsilon\in\mathbb{R^+}\setminus \{0\}$ of another node is connected. Both
 are graphs where each node is labeled with the residue name to which the
@@ -108,7 +109,7 @@ are graphs where each node is labeled with the residue name to which the
 
 \section{Topological Data Analysis}\label{sec:tda}
 
-Although graphs are powerful representation of proteins, the latter can also be
+Although graphs are a powerful representation of proteins, the latter can also be
 represented as \emph{point clouds}. One powerful field of study of topological
 properties of point clouds (among other structured data) is \emph{topological
 data analysis}.
@@ -124,14 +125,14 @@ material providing an extensive and formal introduction to topology and
 persistent homology, please refer to~\citep{freedman2009algebraic,
 edelsbrunner2010computational}, and \citep{ghrist2008barcodes}.
 
-A powerful computational technique to analyse topological properties of point
+A powerful computational technique to analyze topological properties of point
 clouds is \emph{persistent homology}, which first requires us to define
 simplicial homology. Simplicial homology refers to a way of assigning
 connectivity information to topological objects, such as point clouds, which are
 represented by simplicial complexes. A simplicial complex $K$ is a set of
-simplices which correspond to vertices in dimension 0, edges in dimension 1 and
+simplices that correspond to vertices in dimension 0, edges in dimension 1, and
 triangles in dimension 2. The subsets of a simplex $\sigma\in K$ are referred to
-as its faces, and every face $\tau\in K$. Moreover, any non-empty intersection
+as its faces, and each face $\tau\in K$. Moreover, any non-empty intersection
 of two simplices also needs to be part of the simplicial complex, i.e.
 $\sigma\cap\sigma '\neq\emptyset$ for $\sigma,\sigma '\in K$ implies
 $\sigma\cap\sigma'\in K$, meaning that $K$ is closed under calculating the faces
@@ -176,8 +177,8 @@ dimensions, instead of only connected nodes.
 Note that the multiplicity of the persistence diagram corresponds to the number
 of homology dimensions under study. In this thesis, given proteins are
 represented as three-dimensional point clouds, we choose to track topological
-features across three homology dimension: 0,1 and 2. Effectively, this tracks
-connected components in dimension 0, circular holes in dimension 1 and two
+features across three homology dimensions: 0,1 and 2. Effectively, this tracks
+connected components in dimension 0, circular holes in dimension 1, and two
 dimensional voids or cavities in dimension 2 as the filtration function is
 applied. For a more thorough introduction to homology and homology groups,
 please refer to \cite{edelsbrunner2010computational}.
@@ -194,7 +195,7 @@ related methods is intractable in many cases; as such, new learning paradigms
 were established to enable the modeling of complex, real-world distributions
 through gradient-based methods.
 
-One such seminal method was that of generative adversarial learning, pioneered
+One such seminal method was that of generative adversarial learning, which was pioneered
 by \cite{goodfellow2014generative}, where a (deep) generator is pitted against
 a (deep) discriminator. The former's goal is to generate samples identical to
 the training distribution, while the latter is to classify whether or not the
@@ -206,7 +207,7 @@ to perform approximate inference. In both cases, the two networks (i.e. the
 generator and the discriminator/inference network) are jointly trained using
 backpropagation to minimize some appropriate loss function.
 
-A recent review of the existing landscape of generative modelling methods has
+A recent review of the existing landscape of generative modeling methods has
 been provided by \cite{bond2021deep}.
 
 These techniques have been particularly successful in the image domain, where
@@ -216,8 +217,8 @@ seen in Figure \ref{fig:styleganxl}. More pertinent to this thesis is the
 application of generative models to graphs. The application domain has been
 reviewed by \cite{zhou2020graph}. In short, graph generative networks are
 capable of operating on the highly versatile and extensible graph domain. It has
-been shown that they can produce small molecules, generate social networks,
-knowledge graphs, among many other real-world tasks. Generative networks can be
+been shown that they can produce small molecules, and generate social networks,
+and knowledge graphs, among many other real-world tasks. Generative networks can be
 grouped into two categories: those that generate nodes in each graph
 sequentially, such as GraphRNN by \cite{you2018graphrnn}, and those that generate
 graphs from some latent distribution directly, such as MolGAN by
@@ -231,16 +232,16 @@ by \cite{sauer2022stylegan} at the time of writing.}
   \label{fig:styleganxl}
 \end{figure}
 
-Operating in the graph domain incurs some unique challenges. From a modelling
+Operating in the graph domain incurs some unique challenges. From a modeling
 standpoint, dealing with graphs means dealing with a much larger and variable
 output space. In the general case, at least $n^2$ values need to be specified.
-Additionally, the number of edges and nodes vary from sample to sample, which
-also needs to be accounted for in the model structure. Additionally, building a
+Additionally, the number of edges and nodes varies from sample to sample, which
+also needs to be accounted for in the model structure. Additionally, by building a
 generative model generating graphs of up to $n$ nodes, $n!$ possible adjacency
 matrices can be generated. Such a high representation complexity is challenging
 to model, expensive to compute, and difficult for objective functions to
-optimize. The last modelling-related issue when dealing with graphs is that the
-presence of one edge is not independent from another, i.e. real-world graphs
+optimize. The last modeling-related issue when dealing with graphs is that the
+presence of one edge is not independent of another, i.e. real-world graphs
 often exhibit patterns of local connectedness which need to be accounted for in
 the model.
 
@@ -287,15 +288,15 @@ fast to calculate should scale well with size and number of graphs.
 For images, an interesting metric (and the current standard for that domain) is
 the Fr\'echet Inception Score, as introduced by \cite{heusel2017gans}. Overall,
 the goal of this metric is to calculate some distance between the activations of
-a neural network feature computed from both the real-world images the network
-was trained on and the synthesized images. Concretely, this is achieved by
-calculating the squared Wasserstein metric between the generated and real
-representations computed from a neural neural network (commonly, the Inception
-v3 architecture from \cite{szegedy2015rethinking} is used) as two
-multidimensional Gaussian distributions with parameters $\mathcal{N}(\mu,
-\Sigma)$ and $\mathcal{N}(\mu_{rw}, \Sigma_{rw})$, respectively. The general
-formulation of the $p$\textsuperscript{th} Wasserstein distance between two
-distributions $u$ and $v$ is given by
+a neural network feature computed from both real-world images and the
+synthesized images. Concretely, this is achieved by calculating the squared
+Wasserstein metric between the generated and real representations computed from
+a neural network (commonly, the Inception v3 architecture from
+\cite{szegedy2015rethinking} is used) as two multidimensional Gaussian
+distributions with parameters $\mathcal{N}(\mu, \Sigma)$ and
+$\mathcal{N}(\mu_{rw}, \Sigma_{rw})$, respectively. The general formulation of
+the $p$\textsuperscript{th} Wasserstein distance between two distributions $u$
+and $v$ is given by
 
 \begin{equation}
   \label{eq:wasserstein_distance} W_p(u,v) := \left(\inf _{\gamma \in \Gamma
@@ -327,7 +328,7 @@ the output graphs and the lack of common consensus on embedding methods, partly
 due to the diversity of graph types, although progress is being made on this
 front, as reviewed by \cite{xu2021understanding}. Interesting strides have been
 made in some domains, such as in the drug discovery field, where the penultimate
-layer of the ChemNet neural network can be used as input to the FID as showed by
+layer of the ChemNet neural network can be used as input to the FID as shown by
 \cite{preuer2018frechet}.
 
 However, an interesting approach recently explored by
@@ -367,14 +368,15 @@ where $g$ can be chosen from the same set of functions as $f^{(l)}$. \textbf{[]}
 
 While these developments are encouraging, practitioners designing generative
 GNNs such as \cite{liao2019efficient, niu2020permutation}, and
-\cite{you2018graphrnn} have generally gravitated towards the \acrfull{mmd} measure to evaluate the quality of the graph.
+\cite{you2018graphrnn} have generally gravitated towards the \acrfull{mmd}
+measure to evaluate the quality of the graph.
 
 \section{Maximum Mean Discrepancy}\label{sec:mmd}
 
 A significant part of this thesis is centered around investigating the MMD
-statistic, so we define and examine existing around MMD research here. Introduced by
+statistic, so we define and examine existing MMD research here. Introduced by
 \cite{borgwardt2006integrating} and further exposited by
-\cite{gretton2012kernel}, this measures leverages the expressive power and
+\cite{gretton2012kernel}, this measure leverages the expressive power and
 versatility of \emph{kernel functions} to evaluate distances between two sample
 distributions. What's more, \cite{gretton2012kernel} describe how this measure
 can be treated as a test statistic, from which a $p$-value can be computed, to
@@ -410,9 +412,9 @@ obtain an unbiased estimate of $\MMD$.
 In the graph domain, it is now incumbent upon the practitioner to (i) choose an
 appropriate (optional) graph descriptor and (ii) kernel with (iii) appropriate
 kernel hyperparameters. This process, along with its pitfalls and current
-practices, are discussed in more detail by \cite{o2021evaluation}, but we want
+practices are discussed in more detail by \cite{o2021evaluation}, but we want
 to give an overview of possible, common, and sensible choices for descriptor,
-kernel, and hyperparameter.
+kernel, and hyperparameter here.
 
 A common practice in the literature is to first extract some fixed-length graph
 representation using a range of commonly used descriptors such as:
@@ -434,17 +436,17 @@ representation using a range of commonly used descriptors such as:
   captured for each graph in a histogram, which is also normalized.
 
 \item \textbf{The Laplacian spectrum histogram.} The normalized graph Laplacian
-  is given by $\laplace :=I-D^{-{1\over 2}}AD^{-{1\over 2}}$ where $A$ is the
-  adjacency matrix (see Section \ref{sec:graphs}), $I$ the identity
-  matrix and $D$ the degree matrix, where $D_{ii}=\deg(v_i)$ and $D_{ij}=0,
-  i\neq j$. Since $A$ is symmetric (all graphs in this thesis are undirected),
-  and that $\laplace$ is real-valued, it is also diagnonalizable, with
-  eigenvalues $\eig_1\leq\eig_2\leq\ldots\forall\eig\in \left[0,2\right]$ -- see
-  \cite{chung1997spectral}, 1997, Chapter 1, Lemma 1.7 for a proof of the boundedness. This lends
-  itself again to some bounded, normalized histogram representation. As
-  discussed by \cite{o2021evaluation}, it is unknown if graphs can be fully
-  determined by their spectrum, and we know that for certain classes of graphs
-  this is not the case \citep{schwenk1973almost}.
+is given by $\laplace :=I-D^{-{1\over 2}}AD^{-{1\over 2}}$ where $A$ is the
+adjacency matrix (see Section \ref{sec:graphs}), $I$ the identity matrix and $D$
+the degree matrix, where $D_{ii}=\deg(v_i)$ and $D_{ij}=0, i\neq j$. Since $A$
+is symmetric (all graphs in this thesis are undirected), and that $\laplace$ is
+real-valued, it is also diagnonalizable, with eigenvalues
+$\eig_1\leq\eig_2\leq\ldots\forall\eig\in \left[0,2\right]$ -- see
+\cite{chung1997spectral}, 1997, Chapter 1, Lemma 1.7 for a proof of the
+boundedness. This lends itself again to some bounded, normalized histogram
+representation. As discussed by \cite{o2021evaluation}, it is unknown if graphs
+can be fully determined by their spectrum, and we know that for certain classes
+of graphs this is not the case \citep{schwenk1973almost}.
 
 \end{itemize}
 
@@ -452,12 +454,12 @@ Of note, none of those three descriptors take node labels into account. This is
 why we are going to investigate alternative kernels leveraging node labels (see
 Section \ref{sec:kernels}), as well as use fixed-length vectors derived from
 powerful transformer-based protein language models, specifically from the
-Evolutionary Scale Modeling family \citep{rives2021biological}. This family of
-models allows us to obtain an embedding vector $h\in\R^d$ for each residue,
-which we can then average to obtain one protein-level embedding by taking the
-average across residues. Because transformers don't constitute an essential part
-of this thesis, we redirect the reader to the original publication describing it
-by \cite{vaswani2017attention}, as well as the excellent explainer by
+\acrfull{esm} family \citep{rives2021biological}. This family of models allows
+us to obtain an embedding vector $h\in\R^d$ for each residue, which we can then
+average to obtain one protein-level embedding by taking the average across
+residues. Because transformers don't constitute an essential part of this
+thesis, we redirect the reader to the original publication describing it by
+\cite{vaswani2017attention}, as well as the excellent explainer by
 \cite{alammar2018} for a fundamental discussion of the topic.
 
 \section{Kernels}\label{sec:kernels}
@@ -492,11 +494,11 @@ Earth mover's distance-based kernel \citep{o2021evaluation}.
 
 We will, however, leverage two new classes of kernels that are applicable to
 models evaluating protein generative model performance. The first are graph
-kernels (reviewed by \cite{borgwardt2020graph}). In particular we will examine
+kernels (reviewed by \cite{borgwardt2020graph}). In particular, we will examine
 an efficient and expressive kernel used for biological
 data: the Weisfeiler-Lehmann kernel. The second class of kernels leveraged here
 operate directly on the persistence diagrams obtained using the filtration
-procedures described in section \ref{sec:tda}, in particular the
+procedures described in section \ref{sec:tda}, in particular, the
 persistence Fisher kernel introduced by \cite{le2018persistence}. We define both
 in the next paragraphs.
 
@@ -506,7 +508,7 @@ algorithm provides a powerful and computationally efficient way of capturing
 local node neighborhood information to quantify the degree of similarity between
 any two graphs, which works for both labeled and unlabeled graphs. The capturing
 of local neighborhood information is achieved by relabelling each node based on
-the hashed value obtained from concatenating the node label of each neighbour
+the hashed value obtained from concatenating the node label of each neighbor
 $h$ times. The degree of each node can be used when dealing with unlabeled
 graphs. In this thesis, however, the amino acid type will be used as a node
 label. An example of a Weisfeiler-Lehman procedure can be seen in Figure
@@ -541,9 +543,9 @@ Weisfeiler-Lehman algorithm \citep{shervashidze2011weisfeiler}.
 \end{figure}
 
 \paragraph{Persistence diagram kernels} Kernels between persistence diagrams
-also offer powerful similarity measures between the global shape of proteins using the
-persistence diagrams produced by the Vietoris-Rips filtration, thereby going
-beyond just looking at the neighbourhoods of each node in the case of the
+also offer powerful similarity measures between the global shape of proteins
+using the persistence diagrams produced by the Vietoris-Rips filtration, thereby
+going beyond just looking at the neighborhoods of each node in the case of the
 Weisfeiler-Lehman procedure described above.
 
 We first look at the Persistence Fisher kernel, introduced by
@@ -585,21 +587,21 @@ compute the Fisher information metric
 
 \section{Summary}
 
-In this section we introduced fundamental characteristics of proteins by
+In this section, we introduced the fundamental characteristics of proteins by
 first discussing how amino acids form a backbone and each of them forms two dihedral
-angles with their neighbour to make up the three-dimensional structure of the
+angles with their neighbor to make up the three-dimensional structure of the
 protein. We then showed how one can represent proteins using graphs, either by
 using $k$-nn graphs or $\varepsilon$-graphs. We explored an alternative
 representation strategy using topological data analysis and discussed how it
-allows one to capture global structural features of the protein.
+allows one to capture the global structural features of the protein.
 
 We then moved on to introduce generative models, and discuss recent advances in
 such models in the image domain, where such models were first developed. We then
 proceed to discuss generative models in the graph domain, along with the unique
-computational challenges that it incurs from a modelling standpoint.
+computational challenges that it incurs from a modeling standpoint.
 Importantly, we outline the evaluation problem arising when evaluating
 generative networks, specifically in the graph domain, and outline the
-desiderata for good metrics: expressivity, robustness and efficiency. We examine
-current accepted practices and introduce the maximum mean discrepancy, the main
+desiderata for good metrics: expressivity, robustness, and efficiency. We examine
+currently accepted practices and introduce the maximum mean discrepancy, the main
 method used in this thesis. We finally introduce the collection of kernels that
 we are going to leverage using the maximum mean discrepancy.

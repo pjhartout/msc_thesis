@@ -1,24 +1,23 @@
 \begin{abstract}
-Generative models applied proteins are poised to revolutionize the \emph{in
-silico} design of novel proteins satisfying various functional and shape-related
-constraints. However, such models are hard to evaluate -- determining how
-realistic a generated set of proteins is represents one of the major challenges
-in the field of generative models applied to proteins. For graphs, a
-representation often used to investigate proteins, the community has gravitated
-toward using a kernel two-sample test statistic called the maximum mean
-discrepancy. While recent works highlighted some of its pitfalls, this statistic
-remains highly versatile since any kernel can be used.
+ Generative models applied to proteins models are poised to revolutionize the
+\emph{in silico} design of novel proteins satisfying various functional and
+shape constraints. However, such models are hard to evaluate -- determining the
+feasibility and realism of a protein represents one of the major challenges when
+applying generative models applied to proteins. For graphs, a representation
+often used to investigate proteins, the research community has gravitated toward
+using a kernel two-sample test statistic called the maximum mean discrepancy.
+While recent works highlighted some of its pitfalls, this statistic remains
+highly versatile since any kernel can be used.
 
-In this thesis, we start by evaluating the expressivity, robustness and
-efficiency of maximum mean discrepancy on graph descriptors using graphs
-directly extracted from proteins. We then expand the use of MMD by using novel
-representations, descriptor functions, and kernels. Specifically, we investigate
-the use of graph kernels in MMD. We also devise and apply novel protein-specific
-descriptors, such as the dihedral angles histogram formed by each amino acid,
-and the pairwise distance histogram of each amino acid, which are both highly
-expressive and effecient. Finally, we apply a class of kernels able to operate
-on persistence diagrams, a powerful topological descriptor leveraging the
-shape-related information in the point clouds formed by each protein structure.
-
+In this thesis, we start by evaluating the expressivity, robustness, and
+efficiency of maximum mean discrepancy on graph descriptors extracted directly
+from proteins. We then expand the use of MMD by using novel representations,
+descriptor functions, and kernels. Specifically, we investigate the use of graph
+kernels in MMD. We also devise and apply novel protein-specific descriptors,
+such as the dihedral angles histogram formed by each amino acid, and the
+pairwise distance histogram of each amino acid, which are both highly expressive
+and efficient. Finally, we apply a class of kernels able to operate on
+persistence diagrams, a powerful topological descriptor leveraging the shape of
+the point clouds formed by each protein structure.
 
 \end{abstract}

@@ -1,19 +1,19 @@
 \chapter{Methods}\label{chap:methods}
 
 The primary methodology employed in this thesis to assess the quality of metrics
-used to evaluate generative protein models follows a fundamentally similar
+used to evaluate generative protein models follows the fundamentally similar
 approach used by \cite{o2021evaluation}, which we adapt to include the following
 steps:
 
 \begin{enumerate}
-\item Take two i.i.d. samples a database of proteins.
+\item Take two i.i.d. samples of a database of proteins.
 \item Progressively add some perturbation to one of the samples.
 \item Measure the MMD between the unperturbed and perturbed sample.
 \end{enumerate}
 
 We start by motivating the datasets that will be used to simulate a generative
 protein model. We then describe and motivate the experimental setups -- i.e.
-perturbations -- that we will employ to test the various configurations MMD.
+perturbations -- that we will employ to test the various configurations of MMD.
 Finally, we enumerate and justify which configurations of MMD are tested,
 including all the combinations of protein representations, descriptor functions,
 and kernels. Finally, we describe and motivate the experimental setups -- i.e.
@@ -24,7 +24,7 @@ perturbations -- that we will employ to test the various metric configurations.
 
 Because generative models have not been applied to proteins yet, which is partly
 due to the lack of suitable evaluation metrics, no generative model can be used
-here. In this thesis, except otherwise stated, all results will be dervied from
+here. In this thesis, except otherwise stated, all results will be derived from
 10 random samples from the \textit{homo sapiens} monomeric proteome downloaded
 from the EBI AlphaFold2 database
 \citep{varadi2022alphafold,tunyasuvunakool2021highly}, a repository comprising
@@ -38,7 +38,7 @@ simplifies downstream processing.
 \section{Perturbations}
 
 While \cite{o2021evaluation} focused on \emph{graph perturbations} specifically,
-we wanted to augment and refine the set of perturbation applied to the perturbed
+we wanted to augment and refine the set of perturbations applied to the perturbed
 sample of proteins to be more pertinent to proteins. Three
 categories of perturbations can be distinguished:
 
@@ -47,11 +47,11 @@ defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
 (ii) removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
 graph.
 \paragraph{Point cloud perturbations} These perturbations aim to add changes
-to the underlying coordinates of each of the atom in the protein. Such
+to the underlying coordinates of each atom in the protein. Such
 perturbations include injecting Gaussian noise (Equation
 \ref{eq:gaussian_noise}), (ii) twisting, , (iii) shearing, and
-(iv) tapering. We proceed to detailing each of the equations governing the
-perturbations below. An illustration of each of those perturbation can be found
+(iv) tapering. We proceed to detail each of the equations governing the
+perturbations below. An illustration of each of those perturbations can be found
 in Figure \ref{fig:perturbation_illustration}
 
 In the notations that follow, $x$, $y$ $z$ represent the unperturbed coordinates, and
@@ -139,13 +139,13 @@ protein, the lighter colors are located closer to the viewer.}
 
 \paragraph{Mutation} These simply consist in swapping node labels, i.e.
 changing an existing node label, with another. While graph perturbation
-probabilities (e.g. of adding an edge) ranges from 0 to 1, here we mostly
+probabilities (e.g. of adding an edge) range from 0 to 1, here we mostly
 concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
 sensitive the MMD to a few point mutations, which covers some of the
 real-world protein engineering use cases \citep{poluri2016protein}.
 
-For each perturbation, a range of degree of perturbation is defined and 20
-different evenly-spaced degrees of perturbation is examined and repeated 10
+For each perturbation, a range of degrees of perturbation is defined and 20
+different evenly-spaced degrees of perturbation are examined and repeated 10
 times with 10 pairs of i.i.d. proteins to estimate the sensitivity of the
 particular MMD configuration to the perturbation. The ranges used for each
 parameter used in this thesis is shown in Table \ref{tab:perturbation_ranges}
@@ -177,11 +177,11 @@ noted that an important part of MMD consists in choosing the right set of
 descriptor function and kernel. Here, we list and motivate all graph extraction techniques,
 descriptor functions employed, and kernels adopted in this experiment.
 
-First, throughout our experiments we will use the unbiased squared MMD estimate,
+First, throughout our experiments, we will use the unbiased squared MMD estimate,
 which removes self-comparison terms in the kernel matrices
 (\cite{gretton2012kernel}, Lemma 6), which can result in negative values. We
 will normalize the resulting MMD over the whole range of perturbation for each
-curve as well to compare behaviours of different MMD configurations not
+curve as well to compare behaviors of different MMD configurations not
 operating on the same scale.
 
 \begin{equation}
@@ -201,7 +201,7 @@ and $\varepsilon$-graphs, introduced in Section \ref{sec:graphs}. A summary
 table of the different types of graphs extracted from proteins in this thesis
 can be found in Table \ref{tab:graph_extraction}. The third is the simple
 protein \emph{sequence}. Each protein's sequence parsed from each \texttt{.pdb}
-file as is. Since we are only dealing with monomers, no additional processing is
+file as-is. Since we are only dealing with monomers, no additional processing is
 required.
 
 \begin{table}
@@ -221,27 +221,27 @@ required.
 
 \subsection{Descriptor functions}\label{sec:descriptors}
 
-As discussed Section \ref{sec:mmd}, some kernels require some alternative vectorized
+As discussed in Section \ref{sec:mmd}, some kernels require some alternative vectorized
 representation to work. We will use the following protein descriptor functions
 here.
 
 
 \paragraph{Graph descriptors} They are defined in Section \ref{sec:mmd} and include
   the degree distribution histogram, the clustering coefficient histogram and
-  the laplacian spectrum histogram. These are all fixed-length vectors. Of note,
+  the Laplacian spectrum histogram. These are all fixed-length vectors. Of note,
   we let the degree histogram in a range of 2699, due to the fact that adding
   edges between all nodes of the longest protein containing 2699 residues will
   result in the highest-degree node to be 2698.
 \paragraph{Coordinates descriptors} In order to capture the information of the
-3D structure of the protein beyond local neighbourhood information, a
-topological descriptor of each protein in the form of a persistence diagram is
+3D structure of the protein beyond local neighborhood information,
+a topological descriptor of each protein in the form of a persistence diagram is
 extracted using a Vietoris-Rips filtration introduced in detail in Section
 \ref{sec:tda}. To speed up computation, we sampled every other point to
 dramatically reduce the running time and memory footprint without significantly
 affecting the shape of the protein.
 \paragraph{Protein-specific descriptors} In this thesis we introduce two novel
 protein-specific descriptor functions resulting in fixed-length vector
-representations. The first consists in a histogram of the pairwise distance of
+representations. The first consists of a histogram of the pairwise distance of
 each atom considered; the second consists in concatenating the two histograms of
 the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in
 Section \ref{sec:proteins}. The inspiration behind those two descriptors comes
@@ -255,8 +255,8 @@ from such plots. \citep{ramachandran1063Stereochemistry}.
 
 \paragraph{Sequence descriptors} In Section \ref{sec:mmd}, we discussed the
 Evolutionary Scale Modelling family to construct descriptors of a fixed length
-using a learned embedding. We are going to use the 6-layer variant trained on
-the UniRef50 snapshot from March 2018 containing approximately 43 million
+using a learned embedding. We use the 6-layer variant trained on
+the UniRef50 snapshot from March 2018 which contains approximately 43 million
 parameters, because it is able to process the full range of sequence lengths
 that we have in our dataset (the longest sequence fragment is 2699 amino acids long).
 
@@ -294,21 +294,21 @@ The first category has been discussed in the literature extensively since it was
 used to evaluate generative graph neural network models, i.e. the
 \emph{fixed-length vector kernels} like the Gaussian (RBF) kernel and the linear
 kernel, both of which are defined in Section \ref{sec:kernels}\footnote{We will
-  follow the speed up trick outlined in Appendix A.5 by \cite{o2021evaluation}
+  follow the speed-up trick outlined in Appendix A.5 by \cite{o2021evaluation}
   to reduce the computation time of each different bandwidth parameter}. Since the only
 condition for each vector to be valid inputs for those kernels is that they are
 in $\R^d$, the protein-specific vector representations outlined in Section
 \ref{sec:descriptors} are valid inputs.
 % Special implementation of wl-k
 
-As aluded to in Section \ref{sec:kernels}, we introduce two new classes of
+As alluded to in Section \ref{sec:kernels}, we introduce two new classes of
 kernels for use in MMD which so far have not been used to evaluate generative
 models due to the unique aspects of proteins that need to be captured. This
 brings us to the second category of kernels used in this thesis: \emph{graph kernels}.
 Specifically, we are going to use the Weisfeiler-Lehman kernel discussed in
 Section \ref{sec:kernels} because it captures \emph{local} patterns in the
 neighbourhood of each node. In Appendix \ref{sec:sparse_wl}, we detail how we
-achieved an 80\% improvement in runtime of the Weisfeiler-Lehman kernel by
+achieved an 80\% improvement in the runtime of the Weisfeiler-Lehman kernel by
 leveraging the sparsity of the graphs used in this thesis.
 
 To estimate \emph{global} changes in the shape of the protein, we will also use
@@ -338,8 +338,8 @@ setting, a high Spearman correlation coefficient (Equation \ref{eq:spearman}) is
 crucial to satisfy the first criterium of a performance metric: expressivity
 (see Section \ref{sec:evalproblem}). This will guarantee that the metric
 increases monotonically with the amount of perturbation. As
-\cite{o2021evaluation} have showed, some configurations of MMD on synthetic
-datasets showed that an increasing MMD value with increasing perturbation is not
+\cite{o2021evaluation} have shown, some configurations of MMD on synthetic
+datasets revealed that an increasing MMD value with increasing perturbation is not
 guaranteed. While \cite{thompson2022evaluation} highlighted that linearity is
 not a requirement, the Pearson correlation coefficient (Equation
 \ref{eq:pearson}) will allow us to further refine the selection of the metrics
@@ -347,6 +347,7 @@ behaving most predictably, and distill the most relevant configurations for a
 given perturbation range.
 
 \subsection{Software Library Design}
+
 
 Due to the complexity and modularity of the methodology outlined above, it is
 required to have a scalable library to execute all the evaluation experiments at
@@ -357,15 +358,14 @@ multiple modules following the same design patterns to ensure that we could
 build \texttt{Pipeline} objects with the necessary steps required to compute an
 MMD.
 
-% Ranked and pearson correlation used to rank metrics.
-% Compute, library setup, modularity.
+% Plot of the library structure.
 
 \section{Summary}
 
 In this chapter, we detailed the methodological setup employed in this thesis.
 We first described the datasets we used, as well as the type of perturbations
 applied to them. We then discussed the representations of the proteins used in
-this study, as well as describing the descriptor functions used for those
+this study, as well as described the descriptor functions used for those
 representations. Crucially, we motivated our choice for the collection of
 kernels used for estimating the MMD. Finally, we consider the different ways we
 will use to describe our experimental setup to choose the best MMD values.
