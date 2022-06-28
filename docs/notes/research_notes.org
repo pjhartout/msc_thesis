@@ -1688,10 +1688,10 @@ GNNs are able to extract meaningful representations without any training:
   author={Morris, Christopher and Ritzert, Martin and Fey, Matthias and Hamilton, William L and Lenssen, Jan Eric and Rattan, Gaurav and Grohe, Martin},
   booktitle={Proceedings of the AAAI conference on artificial intelligence},
   volume={33},
-  number={01},
   pages={4602--4609},
   year={2019}
 }
+
 
 @article{xu2018powerful,
   title={How powerful are graph neural networks?},
