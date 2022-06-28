@@ -1,10 +1,5 @@
 \chapter{Methods}\label{chap:methods}
 
-% TODO: Show perturbation drawings + exact perturbation parameters
-
-% Dummy text.% Don't forget about precomputign difference between x and y in
-% % Gaussian kernels
-
 The primary methodology employed in this thesis to assess the quality of metrics
 used to evaluate generative protein models follows a fundamentally similar
 approach used by \cite{o2021evaluation}, which we adapt to include the following
@@ -24,7 +19,6 @@ including all the combinations of protein representations, descriptor functions,
 and kernels. Finally, we describe and motivate the experimental setups -- i.e.
 perturbations -- that we will employ to test the various metric configurations.
 
-% TODO: refs to tables and emphasize on doing things \emph{in detail}
 
 \section{Datasets}
 
@@ -281,7 +275,8 @@ up the descriptor functions in this thesis.
     Dihedral Angles Histogram & 100 & [$-\pi$, $+\pi$] (rad) \\
     \bottomrule
   \end{tabular}
-  \caption{Descriptor function bin numbers and ranges of descriptor functions
+  \caption[Descriptor function bin numbers and ranges of descriptor functions
+  used in this thesis.]{Descriptor function bin numbers and ranges of descriptor functions
     used in this thesis. The ranges are given by
     [minimum value, maximum value] and (unit) when applicable.}
   \label{tab:descriptor_function_setup}
@@ -312,9 +307,9 @@ models due to the unique aspects of proteins that need to be captured. This
 brings us to the second category of kernels used in this thesis: \emph{graph kernels}.
 Specifically, we are going to use the Weisfeiler-Lehman kernel discussed in
 Section \ref{sec:kernels} because it captures \emph{local} patterns in the
-neighbourhood of each node.
-
-% TODO: show speedup and link to repo
+neighbourhood of each node. In Appendix \ref{sec:sparse_wl}, we detail how we
+achieved an 80\% improvement in runtime of the Weisfeiler-Lehman kernel by
+leveraging the sparsity of the graphs used in this thesis.
 
 To estimate \emph{global} changes in the shape of the protein, we will also use
 kernels using persistence diagrams as input, specifically using the Persistence

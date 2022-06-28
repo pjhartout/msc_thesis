@@ -5,11 +5,37 @@
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_5.pdf}
-  \caption[MMD vs. Gaussian Noise Perturbation (in \%) for various graph descriptors of the
-  2-NN-graphs.]{MMD vs. Gaussian Noise Perturbation (in \%) for various graph descriptors of the
-    2-NN-graphs. The kernel here is shown on top of each subplots.}
+  \caption[MMD vs. Gaussian Noise Perturbation (in \%) for various graph
+descriptors of the 2-NN-graphs.]{MMD vs. Gaussian Noise Perturbation (in \%) for
+various graph descriptors of the 2-NN-graphs. The kernel here is shown on top of
+each subplots.}
   \label{fig:mmd_effect_kernel_knn}
 \end{figure}
+
+
+\section{Weisfeiler-Lehman Runtime Improvements for Sparse
+  Graphs}\label{sec:sparse_wl}
+
+In this thesis, we devised a three-pronged method to speed up the runtime of the
+Weisfeiler-Lehman kernel by approximately 80\% by leveraging the sparsity of the
+graphs used here. The three elements contributing to the speedup are the
+following:
+
+\begin{enumerate}
+\item Our implementation parallelizes the execution of Weisfeiler-Lehman hash
+computations since each graph's hash can be computed independently prior to
+computing the kernel.
+\item It also parallelizes the computation of similarity of graphs in RKHS by
+computing batches of the inner products independently.
+\item When comparing graphs, lots of CPU cycles are spent processing
+positions/hashes that do not actually overlap between Weisfeiler-Lehman
+histograms. As such, we manually loop over the overlapping keys, outperforming
+numpy dot product-based implementations on collections of sparse graphs.
+\end{enumerate}
+
+We tested, covered, and open-sourced the implementation of this novel approach
+on GitHub, and is available at the following URL: \url{https://github.com/pjhartout/fastwlk}.
+
 
 % \section{Median distance in embedding space of various proteins descriptors}
 % TODO
