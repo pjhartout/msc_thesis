@@ -38,9 +38,10 @@ protein embedding introduced in Section \ref{sec:evalproblem}, which is more
 sensitive to lower rates of point mutation (see Figure
 \ref{fig:esm_descriptor}).
 
-We analyzed the MMD obtained from kernels operating on persistence
-diagrams \ref{sec:results_topo_kernels}, which also seemed very promising.
-% TODO: complete
+We analyzed the MMD obtained from kernels operating on persistence diagrams in
+Section \ref{sec:results_topo_kernels}, which also seemed very promising since
+MMD values leveraging topological kernels both exhibit high correlations to
+point cloud perturbations and low inter-run variance.
 
 \section{Practical Recommendations}\label{sec:discussion_recommendations}
 
@@ -112,8 +113,9 @@ reflected in the MMD value.
 % Kernel recommendations
 In this thesis, we often observed that the linear kernel and RBF kernels with
 $\sigma<1$ were often effective to detect perturbations, and $\sigma>1$
-resulting in insensitive and unstable MMD values. Investigating the median
-distance between the various embeddings of data points shows that ...
+resulting in insensitive and unstable MMD values. Investigating the mean
+distance distribution between the various embeddings of data points (Appendix
+\ref{sec:distance_dist}) shows that ...
 % TODO: add supplementary plot
 
 \section{Limitations and Future Directions}\label{sec:discussion_limitations}
