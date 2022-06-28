@@ -48,7 +48,6 @@ we wanted to augment and refine the set of perturbation applied to the perturbed
 sample of proteins to be more pertinent to proteins. Three
 categories of perturbations can be distinguished:
 
-% TODO add illustrations + range of perturbations
 \paragraph{Graph Perturbations} These perturbations mostly overlap with those
 defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
 (ii) removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
@@ -58,7 +57,8 @@ to the underlying coordinates of each of the atom in the protein. Such
 perturbations include injecting Gaussian noise (Equation
 \ref{eq:gaussian_noise}), (ii) twisting, , (iii) shearing, and
 (iv) tapering. We proceed to detailing each of the equations governing the
-perturbations below.
+perturbations below. An illustration of each of those perturbation can be found
+in Figure \ref{fig:perturbation_illustration}
 
 In the notations that follow, $x$, $y$ $z$ represent the unperturbed coordinates, and
 $x'$, $y'$, and $z'$ represent the perturbed coordinates. The Gaussian noise added to a coordinate system is given by:
@@ -130,6 +130,18 @@ tapering is achieved by applying
 
 where $a, b\in\R$ are in \si{\angstrom} and set by the user. Similarly to
 Equation \ref{eq:shearing}, we set $a=b$ in this thesis.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{./figures/protein_unperturbed.pdf}
+  \includegraphics[width=\textwidth]{./figures/protein_perturbed.pdf}
+  \caption[Illustration of the perturbations applied to proteins.]{Illustration
+of the perturbations applied to proteins. The protein displayed here is the
+Cilia- and flagella-associated protein 53 (PDB entry: Q96M91). Each $\alpha$
+carbon is colored according to its position on the chain. On the unperturbed
+protein, the lighter colors are located closer to the viewer.}
+  \label{fig:perturbation_illustration}
+\end{figure}
 
 \paragraph{Mutation} These simply consist in swapping node labels, i.e.
 changing an existing node label, with another. While graph perturbation
@@ -208,7 +220,7 @@ required.
     $\varepsilon$-graphs & 8, 16, 32 \\
     \bottomrule
   \end{tabular}
-  \caption{Ranges of graphs extracted in this thesis.}
+  \caption{Ranges of parameters used to extract graphs from point clouds in this thesis.}
   \label{tab:graph_extraction}
 \end{table}
 
@@ -286,7 +298,9 @@ three separate categories.
 The first category has been discussed in the literature extensively since it was
 used to evaluate generative graph neural network models, i.e. the
 \emph{fixed-length vector kernels} like the Gaussian (RBF) kernel and the linear
-kernel, both of which are defined in Section \ref{sec:kernels}. Since the only
+kernel, both of which are defined in Section \ref{sec:kernels}\footnote{We will
+  follow the speed up trick outlined in Appendix A.5 by \cite{o2021evaluation}
+  to reduce the computation time of each different bandwidth parameter}. Since the only
 condition for each vector to be valid inputs for those kernels is that they are
 in $\R^d$, the protein-specific vector representations outlined in Section
 \ref{sec:descriptors} are valid inputs.

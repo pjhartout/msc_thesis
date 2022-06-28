@@ -1,4 +1,3 @@
-% TODO comment on standard deviation
 \chapter{Results}\label{chap:results}
 
 In this chapter, we will introduce the results of the experiments subjecting
@@ -63,10 +62,14 @@ using $\varepsilon$-graphs.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_1.pdf}
-  \caption{MMD vs. perturbation (in \%) for various graph descriptors of the 8\si{\angstrom}-graphs under different perturbations regimes. The kernel
-    used to obtain these graphs is the RBF Kernel with bandwidth 0.01.
-    $\rho_{S}$: average Spearman correlation coefficient across runs.
-    $\rho_{P}$: average Pearson correlation coefficient across runs.}
+  \caption[Overall behaviour of MMD using graph-based descriptors.]{MMD vs.
+perturbation (in \%) for various graph descriptors of the 8\si{\angstrom}-graphs
+under different perturbations regimes. The kernel used to obtain these graphs is
+the RBF Kernel with bandwidth 0.01. $\rho_{S}$: average Spearman correlation
+coefficient across runs. $\rho_{P}$: average Pearson correlation coefficient
+across runs. Save for the degree histogram behaviour when edges are added, we
+see that most MMD configurations behave well, i.e. there is a high correlation
+betweeen the MMD values and the perturbation.}
   \label{fig:mmd_consistent_eps}
 \end{figure}
 
@@ -74,23 +77,38 @@ using $\varepsilon$-graphs.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_2.pdf}
-  \caption{MMD vs. Gaussian noise perturbation (in \%) for various graph descriptors of the
-    8\si{\angstrom}-graphs. The kernel here is shown on top of each subplots.}
+  \caption[Influence of kernel parameters on MMD behaviour.]{MMD vs. Gaussian
+noise perturbation (in \%) for various graph descriptors of the
+8\si{\angstrom}-graphs. $\rho_{S}$: average Spearman correlation coefficient
+across runs. $\rho_{P}$: average Pearson correlation coefficient across runs.
+The kernel here is shown on top of each subplots. We can see that reasonable
+behaviour of the RBF kernel can be seen when $\sigma<1$. The linear kernel also
+behaves well.}
   \label{fig:mmd_effect_kernel}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_3.pdf}
-  \caption{MMD vs. Gaussian noise perturbation (in \%) for various graph descriptors of the
-    2-nearest-neighbour graphs.}
+  \caption[2-nearest-neighbour graphs result in descriptors highly sensitive to
+the addition of edges and Gaussian noise.]{MMD vs. Gaussian noise perturbation
+(in \%) for various graph descriptors of the 2-nearest-neighbour graphs.
+$\rho_{S}$: average Spearman correlation coefficient across runs. $\rho_{P}$:
+average Pearson correlation coefficient across runs. We can see that this
+particular representation results in MMD values that are very sensitive to the
+addition of edges or Gaussian noise, regardless of the descriptor used.}
   \label{fig:mmd_k_nn_graphs}
 \end{figure}
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_1_4.pdf}
-  \caption{MMD vs. Gaussian noise Perturbation (in \%) for various graph
-    descriptors and values of $k$ used to extract the $k$-NN graph.}
+  \caption[Influence of $k$ on the resulting MMD values.]{MMD vs. Gaussian noise
+perturbation (in \%) for various graph descriptors and values of $k$ used to
+extract the $k$-NN graph. $\rho_{S}$: average Spearman correlation
+coefficient across runs. $\rho_{P}$: average Pearson correlation coefficient
+across runs. Overall, the smaller the $k$, the more sensitive the
+MMD. Choosing $k=2$ results in sometimes unpredictable behaviour depending on
+the descriptor chosen (like the clustering and laplacian spectrum histograms).}
   \label{fig:k_vs_turbulence_gaussian_noise}
 
 \end{figure}
@@ -116,11 +134,10 @@ introduce larger variations in MMD values.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_2_1.pdf}
-  \caption[MMD vs. point cloud perturbation for various descriptors.]{MMD vs. point cloud perturbation for various descriptors. In general,
+  \caption[Influence of $\varepsilon$ on the sensitivity of MMD to perturbations.]{MMD vs. point cloud perturbation for various descriptors. In general,
 when graphs are extracted with a lower $\varepsilon$ value, the MMD curve
 increases more rapidly. The only exception to this trend is the laplacian
-spectrum histogram descriptor under the tapering perturbation. In multiple
-instances, we see that increasing the $\varepsilon$ value increases the MMD variance}
+spectrum histogram descriptor under the tapering perturbation.}
   \label{fig:mmd_sensitivity_eps}
 \end{figure}
 
@@ -143,9 +160,13 @@ of Weisfeiler-Lehman hashes, but this is beyond the scope of the thesis.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_3.pdf}
-  \caption[MMD vs. perturbations using the Weisfeiler-Lehman kernel.]{MMD vs.
-    perturbations using the Weisfeiler-Lehman kernel using the
-    8\si{\angstrom}-graphs as inputs.}
+  \caption[Normalized MMD values using the Weisfeiler-Lehman kernel subject to
+  various perturbations.]{MMD vs.
+perturbations using the Weisfeiler-Lehman kernel using the
+8\si{\angstrom}-graphs as inputs. We see that high levels of perturbations are
+required to raise the normalized MMD values. We also see that MMDs computed with
+the Weisfeiler-Lehman kernel are insensitive to the rewiring of edges, and
+results in MMDs with a high inter-run variance.}
   \label{fig:wlk}
 \end{figure}
 
@@ -168,9 +189,13 @@ Section \ref{sec:results_runtime}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_4.pdf}
-  \caption[MMD vs. perturbations using the two novel protein descriptors.]{MMD vs. perturbations using the two novel protein descriptors shown
-    in Section \ref{sec:descriptors}. Various kernel configurations are shown
-    here.}
+  \caption[MMD vs. perturbations using the two novel protein descriptors.]{MMD
+vs. perturbations (in \%) using the two novel protein descriptors shown in Section
+\ref{sec:descriptors}. Various kernel configurations are shown here. Those
+descriptors behave very well overall, with the dihedral angles descriptors being
+especially sensitive to Gaussian noise. The distance histogram exhibits
+particularly higher inter-run variance especially when subject to twisting
+pertubations.}
   \label{fig:protein_specific_descriptors}
 \end{figure}
 
@@ -195,8 +220,12 @@ results of such a descriptor shown in this thesis are promising
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_5.pdf}
-  \caption[MMD vs. mutation probability using the ESM learned embeddings with
-  various kernels ]{MMD vs. mutation probability using the ESM learned embeddings with various kernels.}
+  \caption[MMD using ESM embeddings.]{MMD vs. mutation probability using the ESM
+learned embeddings with various kernels. The correlation coefficients of the
+resulting MMDs with RBF kernels with $\sigma<1$ and the linear kernel are high,
+therefore making them good configurations for sequences. This analysis should be
+complemented by complementary sequence-specific perturbations -- see Section
+\ref{sec:discussion_realistic_proteins} for details.}
   \label{fig:esm_descriptor}
 \end{figure}
 
@@ -217,13 +246,36 @@ later multiplying the matrix by different constants (see Appendix A.5 of
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_6.pdf}
-  \caption[MMD vs. Perturbation (\%) using the multi-scale kernel and
-  persistence Fisher kernel.]{MMD vs. Perturbation (\%) using the multi-scale
+  \caption[MMD using topological kernels.]{MMD vs. Perturbation (in \%) using the multi-scale
 kernel and persistence Fisher kernel. For the persistence Fisher kernel, both
 the kernel bandwidth parameter and the Fisher bandwidth parameter are set to 1.
-For the multi-scale kernel, the bandwidth parameter is also set to 1.}
+For the multi-scale kernel, the bandwidth parameter is also set to 1. Overall,
+the correlation coefficients for those kernels are very high and show little
+inter-run variance.}
   \label{fig:tda_kernels}
 \end{figure}
+
+
+\section{Variance}
+
+In Figures \ref{fig:mmd_consistent_eps} through \ref{fig:tda_kernels}, we mostly
+commented on the correlation coefficients between the (normalized) MMD values
+and the amount perturbation applied. While a high correlation is certainly a
+good indicator of a particular MMD configuration, one should also carefully
+consider the (normalized) inter-run variance observed between independent
+samples of proteins. We can see that in Figures \ref{fig:mmd_consistent_eps}
+through \ref{fig:tda_kernels}, this variance changes quite a lot depending on
+the MMD configuration. It can be especially high for certain representations.
+For instance in Figure \ref{fig:mmd_sensitivity_eps}, one can see that a higher
+$\varepsilon$ value (e.g. 32\si{\angstrom}) show a higher inter-run variance
+compared to a lower $\varepsilon$ value (e.g. 8\si{\angstrom}), especially when
+it comes to the twisting perturbation (lowest row). Furthermore, one of the
+descriptors devised for this thesis also exhibits high variance under twisting
+perturbations: the pairwise distance histogram, Figure
+\ref{fig:protein_specific_descriptors}. The consequence of a high normalized
+inter-run variance can be just as neferious as MMD configurations with low
+correlation coefficients, because the range of absolute MMD values can too wide
+to make an accurate assessment as to the quality of generated samples.
 
 
 \section{Runtime}\label{sec:results_runtime}
@@ -241,7 +293,7 @@ and $n$ the number of points \citep{adams2018persistent}. Although some optimiza
 by \texttt{Ripser}, the software used to compute the Vietoris-Rips filtration,
 it remains very expensive to compute and does not enjoy the benefits of hardware
 acceleration through e.g. a GPU due to the difficulty of parallelizing such a
-filtration \cite{Bauer2021Ripser}.
+filtration \citep{Bauer2021Ripser}.
 
 Second, computing the distance histogram and dihedral angles histogram are the
 fastest descriptors to compute, making them suitable to evaluate large
@@ -251,7 +303,7 @@ generally the runtime increases in the number of edges of the graph.
 
 Third, the kernels used in this study all have reasonable runtimes, but we note
 the particular efficiency of the RBF and linear kernel compared to the
-persistence Fisher kernel, multi-scale and Weisfeiler-Lehmann kernel. The
+persistence Fisher, multi-scale and Weisfeiler-Lehmann kernel. The
 implications of these runtimes will be further explored when making
 recommendations to the practioner in Section
 \ref{sec:discussion_recommendations}.
@@ -289,7 +341,6 @@ spread across 10 CPU cores from an Intel Xeon Gold 6254 CPU clocked at 3.10GHz.}
 \end{table}
 
 
-
 \section{Summary}
 
 In this chapter, we present the results of the behaviour of MMD under various
@@ -311,10 +362,10 @@ Weisfeiler-Lehman kernel, to graphs extracted from proteins, which revealed that
 high levels of perturbations are required to detect changes in MMD (Figure
 \ref{fig:wlk}). We then presented the results of the efficient and biologically
 relevant protein-specific descriptors, which seem to behave very well (Figure
-\ref{fig:protein_specific_descriptors}). Using learned embeddings as sequence descriptors
-such as the ESM embedding showed that the resulting MMD is sensitive to
-low rates of point mutation (Figure \ref{fig:esm_descriptor}). Using
-topological descriptors and appropriate kernels also seem to work well, despite
-a high computational cost (Figure). Finally, we expand on runtime analysis and show the results of the runtime
-of each significant operation (Table \ref{tab:runtimes}).
-% TODO add topo summary
+\ref{fig:protein_specific_descriptors}). Using learned embeddings as sequence
+descriptors such as the ESM embedding showed that the resulting MMD is sensitive
+to low rates of point mutation (Figure \ref{fig:esm_descriptor}). Using
+topological descriptors and appropriate kernels also seem to work very well, despite
+a high computational cost (Figure \ref{fig:tda_kernels}). Finally, we show the
+results of the runtime of each significant operation of the workflow highlighted
+in this thesis (Table \ref{tab:runtimes}).

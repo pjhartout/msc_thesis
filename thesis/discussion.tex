@@ -1,6 +1,7 @@
 \chapter{Discussion}\label{chap:discussion}
 
-% TODO Introduction
+In this chapter, we discuss the findings of this thesis presented in Chapter
+\ref{chap:results}, which we will summarize in Section \ref{sec:key_findings}.
 
 \section{Key Findings}\label{sec:key_findings}
 
@@ -84,7 +85,12 @@ highly similar distributions of graphs. However, it can sometimes be desirable
 to relax this requirement, e.g. to explore a larger part of the design landscape
 or make a rougher assessment of the generated samples for debugging purposes.
 
-\subsection{Realistic Proteins}
+In addition, when choosing an MMD configuration, one should also investigate the
+magnitude of inter-run variance, as it can also render a particular
+configuration of MMD useless since the possible ranges of MMD values can be too
+wide to make any assessment as to the quality of the generated samples
+
+\subsection{Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
 Another setting in which some key findings of this study can be useful is in the
 context of assessing \emph{realistic} proteins. Realistic proteins takes on a

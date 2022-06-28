@@ -8,9 +8,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy as sp
 import seaborn as sns
 from pyprojroot import here
-from torch import normal
 
 from proteinmetrics.utils.plots import setup_plotting_parameters
 
@@ -109,6 +109,42 @@ def load_data():
     ).reset_index(drop=True)
 
 
+def annotate(data, **kws):
+    for i, settings in enumerate(data["Kernel Settings"].unique()):
+        kernel_settings_df = data[data["Kernel Settings"] == settings]
+        r_ps = list()
+        r_ss = list()
+        for run in kernel_settings_df.run.unique():
+            run_df = kernel_settings_df[kernel_settings_df["run"] == run]
+            r_p, p_p = sp.stats.pearsonr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ps.append(r_p)
+            r_s, p_s = sp.stats.spearmanr(
+                run_df["Perturbation (%)"], run_df["Normalized MMD"]
+            )
+            r_ss.append(r_s)
+
+        avg_rp = np.nanmean(r_ps)
+        avg_rs = np.nanmean(r_ss)
+        if np.isnan(avg_rp):
+            avg_rp = 0
+        ax = plt.gca()
+        ax.text(
+            0.5 - 0.23 * i,
+            0.8,
+            f"Iters: {settings[-1]}" + "\n"
+            r"$\rho_P=$"
+            + f"{round(avg_rp, 2)}"
+            + "\n"
+            + r"$\rho_S=$"
+            + f"{round(avg_rs, 2)}",
+            # color=palette[i],
+            transform=ax.transAxes,
+            fontsize=8,
+        )
+
+
 def main():
     df = load_data()
     df = df.melt(id_vars=["run", "perturb", "perturb_type"])
@@ -116,7 +152,7 @@ def main():
     df = df.rename(
         columns={
             "variable": "Kernel Settings",
-            "value": "Normalized MMDs",
+            "value": "Normalized MMD",
             "perturb": "Perturbation (%)",
         }
     )
@@ -132,7 +168,7 @@ def main():
     df["Perturbation (%)"] = df["Perturbation (%)"] * 100
     g = sns.relplot(
         x="Perturbation (%)",
-        y="Normalized MMDs",
+        y="Normalized MMD",
         col="perturb_type",
         hue="Kernel Settings",
         kind="line",
@@ -154,6 +190,7 @@ def main():
         ]
         # facet_kws={"sharex": False},
     )
+    g.map_dataframe(annotate)
 
     title = [
         "Add Edges",
