@@ -15,7 +15,7 @@ start by defining some relevant biological properties of proteins, as well as
 several representations leveraged in later chapters. We then introduce
 generative models, applied to graphs and other domains. Crucially, we discuss in
 detail the evaluation problem when it comes to generative models, as well as
-some of the unique challenges arising in the graph domain specifically. Finally,
+some of the unique challenges arising in the graph domain. Finally,
 we discuss the current landscape of methods used to evaluate
 graph generative models, such as the maximum mean discrepancy. Finally, we
 introduce kernels can be used within the maximum mean discrepancy.
@@ -452,12 +452,12 @@ Of note, none of those three descriptors take node labels into account. This is
 why we are going to investigate alternative kernels leveraging node labels (see
 Section \ref{sec:kernels}), as well as use fixed-length vectors derived from
 powerful transformer-based protein language models, specifically from the
-Evolutionary Scale Modeling family \citep{rives2021biological}. This family of
-models allows us to obtain an embedding vector $h\in\R^d$ for each residue,
-which we can then average to obtain one protein-level embedding by taking the
-average across residues. Because transformers don't constitute an essential part
-of this thesis, we redirect the reader to the original publication describing it
-by \cite{vaswani2017attention}, as well as the excellent explainer by
+\acrfull{esm} family \citep{rives2021biological}. This family of models allows
+us to obtain an embedding vector $h\in\R^d$ for each residue, which we can then
+average to obtain one protein-level embedding by taking the average across
+residues. Because transformers don't constitute an essential part of this
+thesis, we redirect the reader to the original publication describing it by
+\cite{vaswani2017attention}, as well as the excellent explainer by
 \cite{alammar2018} for a fundamental discussion of the topic.
 
 \section{Kernels}\label{sec:kernels}
