@@ -594,8 +594,8 @@ def main():
         col="combo",
         kind="line",
         data=df,
-        height=3,
-        aspect=1,
+        height=3.5,
+        aspect=0.75,
         col_wrap=3,
         ci=100,
         palette=palette,
@@ -639,8 +639,11 @@ def main():
     # leg = g._legend
     # leg.set_bbox_to_anchor([1, 0.5])
     # plt.legend([], [], frameon=False)
-    g._legend.set_title(r"$\varepsilon$-value" + "\n" + "(in $\AA$)")
-    g.tight_layout(rect=[0, 0, 0.93, 1.0])
+    sns.move_legend(
+        g, "lower center", bbox_to_anchor=(0.5, 0), ncol=3, frameon=False,
+    )
+    g._legend.set_title(r"$\varepsilon$-value " + "(in $\AA$)")
+    g.tight_layout(rect=[0, 0.15, 1, 1])
     plt.savefig(here() / "exploring/systematic_analysis/res_1_4.pdf")
 
 

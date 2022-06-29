@@ -362,7 +362,7 @@ def main():
         kind="line",
         data=df,
         height=3,
-        aspect=1,
+        aspect=0.75,
         col_wrap=3,
         palette=palette,
         ci=100,
@@ -390,8 +390,16 @@ def main():
     #     r"MMD vs. Perturbation (%) For Various Graph Descriptors of the 8$\AA$-Graphs Under Different Perturbations Regimes."
     # )
 
-    plt.legend([], [], frameon=False)
-    g.tight_layout(rect=[0, 0, 0.8, 1.0])
+    sns.move_legend(
+        g,
+        "lower center",
+        bbox_to_anchor=(0.5, 0),
+        ncol=3,
+        title=None,
+        frameon=False,
+    )
+    g._legend.set_title(r"$\varepsilon$-value " + "(in $\AA$)")
+    g.tight_layout(rect=[0, 0.045, 1, 1])
     plt.savefig(here() / "exploring/systematic_analysis/res_1_2.pdf")
 
     # sns.lineplot(data=add_edges, x="perturb", y="sigma=0.01")
