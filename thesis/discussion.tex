@@ -54,18 +54,21 @@ protein representations highlighted above.
 % p-values, violin plots to visualize mmd.
 
 Overall, we advise the practitioner to carefully evaluate certain baselines when
-possible. The first would be to evaluate the \acrshort{mmd} between different i.i.d.
-samples of the reference distribution to establish the range of \acrshort{mmd} to be
-expected in the best case, which we refer to as the \emph{positive control}.
-From there, an accurate assessment of the quality of the model can be made. If
-the kernel and data representation allows it, it is also advisable to establish
-a \emph{negative control}. This would show the worst possible performance
-between any two distributions. Typically, for the biased estimate of \acrshort{mmd}, this
-value is $\sqrt{2}$. If this is not possible, as is the case in this thesis
-(e.g. there is no negative control for all \acrshort{mmd} values perturbed using the Gaussian noise), it
-is useful to examine cases of extreme perturbations and compare the resulting
-\acrshort{mmd} values to those. Such an assessment can provide a surrogate for the negative
-control and confers a sense of scale for the particular problem tackled.
+possible. The first would be to evaluate the \acrshort{mmd} between different
+i.i.d. samples of the reference distribution to establish the range of
+\acrshort{mmd} to be expected in the best case, which we refer to as the
+\emph{positive control}. We conducted such positive control for various MMD
+configurations in Appendix \ref{sec:mmd_baselines}. From there, an accurate
+assessment of the quality of the model can be made. If the kernel and data
+representation allows it, it is also advisable to establish a \emph{negative
+control}. This would show the worst possible performance between any two
+distributions. Typically, for the biased estimate of \acrshort{mmd}, this value
+is $\sqrt{2}$. If this is not possible, as is the case in this thesis (e.g.
+there is no negative control for all \acrshort{mmd} values perturbed using the
+Gaussian noise), it is useful to examine cases of extreme perturbations and
+compare the resulting \acrshort{mmd} values to those. Such an assessment can
+provide a surrogate for the negative control and confers a sense of scale for
+the particular problem tackled.
 
 Moreover, since the \acrshort{mmd} statistic is the basis for a kernel two-sample test
 \citep{gretton2012kernel} (see also Section \ref{sec:mmd}), one can easily
