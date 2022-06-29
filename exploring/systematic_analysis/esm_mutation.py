@@ -12,6 +12,8 @@ import scipy as sp
 import seaborn as sns
 from pyprojroot import here
 
+from proteinmetrics.utils.plots import setup_plotting_parameters
+
 N_RUNS = 10
 
 
@@ -90,7 +92,7 @@ def main():
         & (df["kernel"] != "sigma=10000.0")
         & (df["kernel"] != "sigma=100000.0")
     ]
-
+    setup_plotting_parameters()
     df.reset_index(drop=True, inplace=True)
     df = df.assign(cst=1)
     g = sns.relplot(

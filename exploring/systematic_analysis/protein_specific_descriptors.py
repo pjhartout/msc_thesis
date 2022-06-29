@@ -196,15 +196,23 @@ def main():
         kind="line",
         data=df,
         height=3,
-        aspect=0.9,
+        aspect=0.75,
         col_wrap=3,
         ci=100,
         palette=palette,
         col_order=df.sort_values(by=["perturb_type", "kernel"]).combo.unique(),
     )
     g.map_dataframe(annotate, palette=palette)
-
-    g.tight_layout(rect=[0, 0, 0.80, 0.97])
+    sns.move_legend(
+        g,
+        "lower center",
+        bbox_to_anchor=(0.5, 0),
+        ncol=3,
+        title=None,
+        frameon=False,
+    )
+    g._legend.set_title(r"Protein Descriptor")
+    g.tight_layout(rect=[0, 0.045, 1, 0.99])
 
     titles = [
         "Gaussian Noise" + "\n" + "Linear Kernel",
