@@ -11,7 +11,7 @@ hypothesize might be more suitable for proteins. We conclude this chapter with a
 short section on the runtimes of the various elements of the computational
 pipelines shown in this chapter.
 
-\section{Overall \acrshort{mmd} behavior}
+\section{Overall \acrshort{mmd} Behavior}
 
 Surprisingly, we found that the behavior of \acrshort{mmd} was not as inconsistent for the
 types of graphs extracted from proteins as was found on synthetic graphs by
@@ -23,8 +23,22 @@ across runs are high, indicating a high correlation between the amount of
 perturbation and the normalized \acrshort{mmd} values. There is, however, an exception: the
 \acrshort{mmd} obtained from the degree histogram does not behave as expected, and is very
 sensitive to the addition of edges and decreases in value as more and more edges
-are added. We expect that this pathology is not very common in real models and
+are added. We anticipate that this pathology is not very common in real models and
 that this can be easily detected manually.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{./figures/results/res_1_1.pdf}
+  \caption[Overall behaviour of \acrshort{mmd} using graph-based descriptors.]{\acrshort{mmd} vs.
+    perturbation (in \%) for various graph descriptors of the 8\si{\angstrom}-graphs
+    under different perturbations regimes. The kernel used to obtain these graphs is
+    the RBF Kernel with bandwidth 0.01. $\rho_{S}$: average Spearman correlation
+    coefficient across runs. $\rho_{P}$: average Pearson correlation coefficient
+    across runs. Save for the degree histogram behaviour when edges are added, we
+    see that most \acrshort{mmd} configurations behave well, i.e. there is a high correlation
+    betweeen the \acrshort{mmd} values and the perturbation.}
+  \label{fig:mmd_consistent_eps}
+\end{figure}
 
 The overall influence of the kernel on \acrshort{mmd}'s behavior subject to perturbations
 such as Gaussian Noise can be seen in Figure \ref{fig:mmd_effect_kernel}. We
@@ -35,6 +49,19 @@ $\sigma$ and the kernel matrices can ``saturate'' quite easily. This can have
 quite unpredictable behaviors: in the case of the degree histogram or the
 clustering histogram, this results in an overly sensitive kernel, while the
 clustering histogram remains oblivious to large amounts of perturbation.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{./figures/results/res_1_2.pdf}
+  \caption[Influence of kernel parameters on \acrshort{mmd} behaviour.]{\acrshort{mmd} vs. Gaussian
+    noise perturbation (in \%) for various graph descriptors of the
+    8\si{\angstrom}-graphs. $\rho_{S}$: average Spearman correlation coefficient
+    across runs. $\rho_{P}$: average Pearson correlation coefficient across runs.
+    The kernel here is shown on top of each subplots. We can see that reasonable
+    behaviour of the RBF kernel can be seen when $\sigma<1$. The linear kernel also
+    behaves well.}
+  \label{fig:mmd_effect_kernel}
+\end{figure}
 
 $k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
 able to detect perturbations - see Figure \ref{fig:mmd_k_nn_graphs} for an
@@ -58,36 +85,7 @@ alleviate the pathologies (see Supplementary Figure
 Figure \ref{fig:mmd_effect_kernel}. We, therefore, proceed with further analysis
 using $\varepsilon$-graphs.
 
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{./figures/results/res_1_1.pdf}
-  \caption[Overall behaviour of \acrshort{mmd} using graph-based descriptors.]{\acrshort{mmd} vs.
-perturbation (in \%) for various graph descriptors of the 8\si{\angstrom}-graphs
-under different perturbations regimes. The kernel used to obtain these graphs is
-the RBF Kernel with bandwidth 0.01. $\rho_{S}$: average Spearman correlation
-coefficient across runs. $\rho_{P}$: average Pearson correlation coefficient
-across runs. Save for the degree histogram behaviour when edges are added, we
-see that most \acrshort{mmd} configurations behave well, i.e. there is a high correlation
-betweeen the \acrshort{mmd} values and the perturbation.}
-  \label{fig:mmd_consistent_eps}
-\end{figure}
-
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{./figures/results/res_1_2.pdf}
-  \caption[Influence of kernel parameters on \acrshort{mmd} behaviour.]{\acrshort{mmd} vs. Gaussian
-noise perturbation (in \%) for various graph descriptors of the
-8\si{\angstrom}-graphs. $\rho_{S}$: average Spearman correlation coefficient
-across runs. $\rho_{P}$: average Pearson correlation coefficient across runs.
-The kernel here is shown on top of each subplots. We can see that reasonable
-behaviour of the RBF kernel can be seen when $\sigma<1$. The linear kernel also
-behaves well.}
-  \label{fig:mmd_effect_kernel}
-\end{figure}
-
-\begin{figure}
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_3.pdf}
   \caption[2-nearest-neighbour graphs result in descriptors highly sensitive to
@@ -100,7 +98,7 @@ addition of edges or Gaussian noise, regardless of the descriptor used.}
   \label{fig:mmd_k_nn_graphs}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htbp]
   \includegraphics[width=\textwidth]{./figures/results/res_1_4.pdf}
   \caption[Influence of $k$ on the resulting \acrshort{mmd} values.]{\acrshort{mmd} vs. Gaussian noise
 perturbation (in \%) for various graph descriptors and values of $k$ used to
@@ -116,7 +114,7 @@ the descriptor chosen (like the clustering and laplacian spectrum histograms).}
 % \acrshort{mmd} is quite stable, somewhat contradicts what obray is saying. Maybe due to
 % the different nature of the graphs.
 
-\section{Influence of the graph representation on the sensitivity to perturbations}\label{sec:results_sensitivity}
+\section{Influence Of The Graph Representation On The Sensitivity To Perturbations}\label{sec:results_sensitivity}
 
 In the last section, we discussed the notion of sensitivity of a particular \acrshort{mmd}
 configuration to perturbations. We explore this idea further here. Specifically,
@@ -148,7 +146,7 @@ spectrum histogram descriptor under the tapering perturbation.}
 The results of the behavior of the Weisfeiler-Lehman kernel (see Sections
 \ref{sec:kernels} and \ref{sec:methods_kernels}) can be seen in Figure
 \ref{fig:wlk}. Contrary to the tendencies observed in Section
-\ref{sec:results_sensitivity}, \acrshort{mmd}s obtained using the Weisfeiler-Lehmann
+\ref{sec:results_sensitivity}, \acrshort{mmd}s obtained using the Weisfeiler-Lehman
 kernels on 8\si{\angstrom} graphs are very insensitive to medium levels of perturbations,
 and even completely oblivious to rewiring of graphs and generally insensitive to
 graph perturbations unless highly perturbed (see upper row of Figure \ref{fig:wlk}). The most likely explanation
@@ -170,7 +168,7 @@ results in \acrshort{mmd}s with a high inter-run variance.}
   \label{fig:wlk}
 \end{figure}
 
-\section{Protein-specific descriptors}\label{sec:results_protein_descriptors}
+\section{Protein-Specific Descriptors}\label{sec:results_protein_descriptors}
 
 The behaviour of \acrshort{mmd} values derived from the protein-specific descriptor
 functions described in section \ref{sec:descriptors} are shown in Figure
@@ -215,7 +213,7 @@ mutation regimes, the \acrshort{esm} embedding is sensitive enough to detect suc
 More sequence-specific perturbations are required to assess the
 applicability of the \acrshort{esm} embedding as a sequence descriptor, such as
 translocation of subsequences, additions, deletions, etc. However, the early
-results of such a descriptor shown in this thesis are promising
+results of such a descriptor shown in this thesis are promising.
 
 \begin{figure}
   \centering
@@ -256,7 +254,7 @@ inter-run variance.}
 \end{figure}
 
 
-\section{Variance}
+\section{Inter-Run Variance}
 
 In Figures \ref{fig:mmd_consistent_eps} through \ref{fig:tda_kernels}, we mostly
 commented on the correlation coefficients between the (normalized) \acrshort{mmd} values
@@ -303,7 +301,7 @@ generally, the runtime increases in the number of edges of the graph.
 
 Third, the kernels used in this study all have reasonable runtimes, but we note
 the particular efficiency of the RBF and linear kernel compared to the
-persistence Fisher, multi-scale and Weisfeiler-Lehmann kernel. The
+persistence Fisher, multi-scale and Weisfeiler-Lehman kernel. The
 implications of these runtimes will be further explored when making
 recommendations to the practioner in Section
 \ref{sec:discussion_recommendations}.

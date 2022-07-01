@@ -2,6 +2,9 @@
 
 In this chapter, we discuss the findings of this thesis presented in Chapter
 \ref{chap:results}, which we will summarize in Section \ref{sec:key_findings}.
+We then formulate a set of recommendations in Section
+\ref{sec:discussion_recommendations}, and then highlight some limitations and
+future directions of research in Section \ref{sec:discussion_limitations}.
 
 \section{Key Findings}\label{sec:key_findings}
 
@@ -12,7 +15,22 @@ instability of \acrshort{mmd} on synthetic graphs such as Watts-Strogatz graphs 
 Barabási–Albert graphs under some combinations of kernels and descriptors
 \citep{o2021evaluation}. While we certainly found unstable configurations
 (see for instance Figure \ref{fig:mmd_consistent_eps} upper left pane with the degree histogram),
-this was not the rule.
+this was not the rule. We hypothesize that this is due to the highly structured
+nature of the graphs used in this thesis (see Figure
+\ref{fig:er_comparison_8a_graph} for an example).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{./figures/results/8_a_graph.pdf}
+  \includegraphics[width=0.4\textwidth]{./figures/results/er_graph_8_a_params.pdf}
+  \caption[Example 8-\si{\angstrom}-graph vs Erd\"os-Rényi graph with the same
+  number of nodes and edges.]{Example 8-\si{\angstrom}-graph vs Erd\"os-Rényi graph with the same
+    number of nodes and edges. The protein entry used here to obtain the
+    8-\si{\angstrom} graph is an uncharacterized protein with TrEMBL ID
+    A0A6Q8PFQ6. We chose it because it was the shortest protein found in the
+    human proteome as predicted by the AlphaFold2 model.}
+  \label{fig:er_comparison_8a_graph}
+\end{figure}
 
 Furthermore, we found that the sensitivity of the \acrshort{mmd} to perturbation was
 greatly influenced by the graph representation extracted from the protein.
@@ -75,7 +93,7 @@ Moreover, since the \acrshort{mmd} statistic is the basis for a kernel two-sampl
 estimate a $p$-value from the statistic between the model's generated
 distribution and the empirical distribution.
 
-\subsection{Sensitivity of MMD}\label{sec:discussion_right_mmd}
+\subsection{Sensitivity Of MMD}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
 Depending on the stage of modeling and the coarseness of the desired samples,
 one might choose different \acrshort{mmd} configurations. As we have shown in Figure
@@ -124,7 +142,7 @@ discuss the rough order of magnitude of the data and its impact on the choice of
 $\sigma$ in Appendix \ref{sec:distance_dist} as well.
 % TODO: add supplementary plot
 
-\section{Limitations and Future Directions}\label{sec:discussion_limitations}
+\section{Limitations And Future Directions}\label{sec:discussion_limitations}
 
 Now that we summarized the main findings of this thesis (Section
 \ref{sec:key_findings}) and formulated a set of recommendations to the
@@ -156,7 +174,7 @@ appropriate pathological cases for specific applications to estimate what a wors
 \subsection{TDA Limitations}\label{sec:tda_limitations}
 
 One of the novel applications of \acrshort{tda} discussed in this thesis is its adoption in
-\acrshort{mmd} by computing the kernel of two collections of point clouds, hence leveraging
+\acrshort{mmd} by computing the kernel on two collections of point clouds, hence leveraging
 the shape of the proteins in the calculations. Two challenges face this
 approach. The first is computation time (see Table \ref{tab:runtimes} and
 discussion in Section \ref{sec:results_runtime}): the Vietoris-Rips filtration
@@ -175,33 +193,35 @@ each amino acid-specific point cloud can be computed in parallel.
 % \acrshort{tda} on different point clouds
 % computational complexity
 
-\subsection{Mode Collapse and Mode Drop}
+\subsection{Mode Collapse And Mode Drop}\label{sec:mode_collapse_mode_drop}
 
 Mode collapse and mode dropping are the two distinctive and common failure modes
 of generative models \citep{salimans2016improved}. We define mode collapse as
 the situation when a particular type of generated output (i.e. intra-mode
 outputs) lacks variety. Mode drop refers to the situation when some modes of the
 data are not represented in the generated output. Both arise when implementing
-common generative model architectures such as \acrshort{gans}. Although some methods have
-been devised to tackle such issues for \acrshort{gans} \citep{arjovsky2017wasserstein,
-goodfellow2014generative}, it remains a challenge that needs to be tackled by
-suitable evaluation measures. Since \acrshort{mmd} takes the average of kernel matrices
-(see Equation \ref{eq:mmd}), we anticipate its potential to detect mode collapse
-limited, since \acrshort{mmd} is invariant to changes that do not affect the mean of the
+common generative model architectures such as \acrshort{gans}. Although some
+methods have been devised to tackle such issues for \acrshort{gans}
+\citep{arjovsky2017wasserstein, goodfellow2014generative}, it remains a
+challenge that needs to be tackled by suitable evaluation measures. Since
+\acrshort{mmd} takes the average of kernel matrices (see Equation \ref{eq:mmd}),
+we anticipate its potential to detect mode collapse is limited, since
+\acrshort{mmd} is invariant to changes that do not affect the mean of the
 distributions to be compared.
 
 While others have simulated such pathologies in synthetic datasets by manually
 changing the composition of each mode and investigating evaluation metrics'
 behaviour to it \citep{thompson2022evaluation}, applying such mode-related
-perturbations to protein datasets have yet to be tackled and are beyond the scope
-of this thesis. One method that could be used to investigate such situations
-would be to modify the composition of various protein families, within which proteins
-share structural similarities. To simulate mode collapse, one could impoverish the number of proteins
-within a given family. To simulate mode drop, one could remove those proteins entirely from
-the distribution. Defining protein families could be achieved by looking at
-evolutionary links between proteins using for instance CATH database
-\citep{orengo1997cath}. Alternatively, one could also use structural hierarchies
-to define protein families using the SCOP database \citep{murzin1995scop}.
+perturbations to protein datasets have yet to be tackled and are beyond the
+scope of this thesis. One method that could be used to investigate such
+situations would be to modify the composition of various protein families,
+within which proteins share structural similarities. To simulate mode collapse,
+one could impoverish the number of proteins within a given family. To simulate
+mode drop, one could remove those proteins entirely from the distribution.
+Defining protein families could be achieved by looking at evolutionary links
+between proteins using for instance CATH database \citep{orengo1997cath}.
+Alternatively, one could also use structural hierarchies to define protein
+families using the SCOP database \citep{murzin1995scop}.
 
 \subsection{Kernel Composition}
 

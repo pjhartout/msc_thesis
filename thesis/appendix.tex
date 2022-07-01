@@ -1,19 +1,19 @@
 \chapter{Appendix}
 \vspace{12pt}
-\section{Influence of $k$ on sensitivity to perturbations of $k$-NN graphs}
+\section{Influence Of Kernel Parameters On Sensitivity To Perturbations Of $k$-NN Graphs}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_5.pdf}
   \caption[MMD vs. Gaussian Noise Perturbation (in \%) for various graph
 descriptors of the 2-NN-graphs.]{MMD vs. Gaussian Noise Perturbation (in \%) for
-various graph descriptors of the 2-NN-graphs. The kernel here is shown on top of
-each subplots.}
+various graph descriptors and kernel parameters of the 2-NN-graphs. The kernel
+here is shown on top of each subplots.}
   \label{fig:mmd_effect_kernel_knn}
 \end{figure}
 
 
-\section{Weisfeiler-Lehman Runtime Improvements for Sparse
+\section{Weisfeiler-Lehman Runtime Improvements For Sparse
   Graphs}\label{sec:sparse_wl}
 
 In this thesis, we devised a three-pronged method to speed up the runtime of the
@@ -36,7 +36,7 @@ NumPy dot product-based implementations on collections of sparse graphs.
 We tested, covered, and open-sourced the implementation of this novel approach
 on GitHub, and is available at the following URL: \url{https://github.com/pjhartout/fastwlk}.
 
-\section{Distance Distribution of Descriptor Functions}\label{sec:distance_dist}
+\section{Distance Distribution Of Descriptor Functions}\label{sec:distance_dist}
 To explain why certain Gaussian configurations tend to work better than others,
 it is useful to compute the pairwise distance of unperturbed proteins to get an
 idea of how far away in e.g. Euclidean space each embedding is from one
@@ -65,7 +65,7 @@ between each graph descriptor for two $\varepsilon$-graph extraction settings.}
 \end{figure}
 
 \clearpage
-\section{MMD baselines for various configurations}\label{sec:mmd_baselines}
+\section{MMD Baselines For Various Configurations}\label{sec:mmd_baselines}
 
 \acrshort{mmd} distributions between two sets of 100 unperturbed proteins with
 various \acrshort{mmd} configurations are shown here. This motivates why the
