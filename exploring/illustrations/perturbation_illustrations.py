@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""gaussian_noise.py
+"""illustrationss.py
 
 Introduce gaussian noise to proteins and save resulting point cloud images.
 
@@ -202,10 +202,7 @@ def main():
     # fig.colorbar(sc, shrink=0.5, aspect=10)
 
     plt.savefig(
-        here()
-        / "exploring"
-        / "perturbation_illustration"
-        / "protein_perturbed.pdf",
+        here() / "exploring" / "illustrations" / "protein_perturbed.pdf",
         bbox_inches="tight",
     )
 
@@ -232,10 +229,7 @@ def main():
     ax.title.set_text(r"Unperturbed")
 
     plt.savefig(
-        here()
-        / "exploring"
-        / "perturbation_illustration"
-        / "protein_unperturbed.pdf",
+        here() / "exploring" / "illustrations" / "protein_unperturbed.pdf",
         bbox_inches="tight",
     )
 

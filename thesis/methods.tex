@@ -6,7 +6,7 @@ approach used by \cite{o2021evaluation}, which we adapt to include the following
 steps:
 
 \begin{enumerate}
-\item Take two i.i.d. samples of a database of proteins.
+\item Take two i.i.d. samples from a database of proteins.
 \item Progressively add some perturbation to one of the samples.
 \item Measure the \acrshort{mmd} between the unperturbed and perturbed sample.
 \end{enumerate}
@@ -32,7 +32,7 @@ predicted 3D structures of protein sequences obtained from AlphaFold2, the
 current state-of-the-art method to predict protein structure from sequences
 \citep{jumper2021highly}. This dataset was chosen because it contains
 consistently formatted \texttt{pdb} files only containing information from
-heavy atom directly contributing to the 3D structure of a single monomer, which
+heavy atoms directly contributing to the 3D structure of a single monomer, which
 simplifies downstream processing.
 
 \section{Perturbations}
@@ -44,18 +44,18 @@ categories of perturbations can be distinguished:
 
 \paragraph{Graph Perturbations} These perturbations mostly overlap with those
 defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
-(ii) removing edges from a graph (iii) rewiring, i.e. swapping, edges within a
+(ii) removing edges from a graph, and (iii) rewiring, i.e. swapping, edges within a
 graph.
-\paragraph{Point cloud perturbations} These perturbations aim to add changes
+\paragraph{Point Cloud Perturbations} These perturbations aim to add changes
 to the underlying coordinates of each atom in the protein. Such
 perturbations include injecting Gaussian noise (Equation
-\ref{eq:gaussian_noise}), (ii) twisting, , (iii) shearing, and
+\ref{eq:gaussian_noise}), (ii) twisting, (iii) shearing, and
 (iv) tapering. We proceed to detail each of the equations governing the
 perturbations below. An illustration of each of those perturbations can be found
 in Figure \ref{fig:perturbation_illustration}
 
-In the notations that follow, $x$, $y$ $z$ represent the unperturbed coordinates, and
-$x'$, $y'$, and $z'$ represent the perturbed coordinates. The Gaussian noise added to a coordinate system is given by:
+In the notation that follows, $x$, $y$ $z$ represent the unperturbed coordinates, and
+$x'$, $y'$, and $z'$ represent the perturbed coordinates. The \emph{Gaussian noise} added to a coordinate system is given by:
 \begin{equation}
   \label{eq:gaussian_noise}
   \begin{bmatrix}
@@ -64,13 +64,14 @@ $x'$, $y'$, and $z'$ represent the perturbed coordinates. The Gaussian noise add
     z'
   \end{bmatrix} =
   \begin{bmatrix}
-    x + \sigma \\
-    y+ \sigma \\
-    z+ \sigma
+    x+ \text{Noise} \\
+    y+ \text{Noise} \\
+    z+ \text{Noise}
   \end{bmatrix}
 \end{equation}
-where $\sigma\sim\caln(0,\sigma)$ is set by the user. Twisting is achieved by
-adding the following transformation to the coordinate system:
+where $\text{Noise}\sim\caln(0,\sigma)$ and $\sigma$ is set by the user.
+\emph{Twisting} is achieved by adding the following transformation to the coordinate
+system:
 
 \begin{equation}
   \label{eq:twisting}
@@ -87,7 +88,7 @@ adding the following transformation to the coordinate system:
 \end{equation}
 
 where $\alpha\in\R$ is in $\rad\cdot\si{
-\angstrom}^{-1}$ is set by the user. Shearing the coordinate system is achieved
+\angstrom}^{-1}$ is set by the user. \emph{Shearing} the coordinate system is achieved
 by applying
 
 \begin{equation}
@@ -105,7 +106,7 @@ by applying
 \end{equation}
 
 to the coordinate system, where $a, b\in\R$ are in \si{\angstrom} and set by the user. In this thesis, we set $a=b$. Similarly,
-tapering is achieved by applying
+\emph{tapering} is achieved by applying
 
 
 \begin{equation}
@@ -148,7 +149,7 @@ For each perturbation, a range of degrees of perturbation is defined and 20
 different evenly-spaced degrees of perturbation are examined and repeated 10
 times with 10 pairs of i.i.d. proteins to estimate the sensitivity of the
 particular \acrshort{mmd} configuration to the perturbation. The ranges used for each
-parameter used in this thesis is shown in Table \ref{tab:perturbation_ranges}
+parameter used in this thesis are shown in Table \ref{tab:perturbation_ranges}
 
 
 \begin{table}
@@ -165,17 +166,18 @@ parameter used in this thesis is shown in Table \ref{tab:perturbation_ranges}
     Graph Perturbations (remove, add, rewire edges) & [0, 1]\\
     \bottomrule
   \end{tabular}
-  \caption{Perturbation ranges used in this thesis. Each interval was split into
+  \caption[Perturbation ranges used in this thesis.]{Perturbation ranges used in this thesis. Each interval was split into
     20 evenly-spaced degrees of perturbation.}
   \label{tab:perturbation_ranges}
 \end{table}
 
 \section{MMD Configurations}
 
-We introduced \acrshort{mmd} in Section \ref{sec:mmd}, Equation \ref{eq:mmd}, and
-noted that an important part of \acrshort{mmd} consists in choosing the right set of
-descriptor function and kernel. Here, we list and motivate all graph extraction techniques,
-descriptor functions employed, and kernels adopted in this experiment.
+We introduced \acrshort{mmd} in Section \ref{sec:mmd}, Equation \ref{eq:mmd},
+and noted that an important aspect of using \acrshort{mmd} in practice consists
+in choosing the right descriptor function and kernel. Here, we list and motivate
+all graph extraction techniques, descriptor functions employed, and kernels
+adopted in this experiment.
 
 First, throughout our experiments, we will use the unbiased squared \acrshort{mmd} estimate,
 which removes self-comparison terms in the kernel matrices
@@ -194,14 +196,14 @@ experiment, i.e. a particular \acrshort{mmd} configuration tracked through the w
 of a particular perturbation.
 
 \subsection{Representations}
-We will use several different representations in this thesis, which can be
+We will use several different representations of proteins in this thesis, which can be
 grouped into three categories. The first is \emph{coordinates}. These are parsed
 from each \texttt{.pdb} file. The second is \emph{graphs}. They include $k$-NN
 and $\varepsilon$-graphs, introduced in Section \ref{sec:graphs}. A summary
 table of the different types of graphs extracted from proteins in this thesis
 can be found in Table \ref{tab:graph_extraction}. The third is the simple
 protein \emph{sequence}. Each protein's sequence parsed from each \texttt{.pdb}
-file as-is. Since we are only dealing with monomers, no additional processing is
+file as is. Since we are only dealing with monomers, no additional processing is
 required.
 
 \begin{table}
@@ -210,8 +212,8 @@ required.
     \toprule
     \textbf{Graph type} & \textbf{Values} \\
     \midrule
-    $k$-NN graphs & 2, 6, 8 \\
-    $\varepsilon$-graphs & 8, 16, 32 \\
+    $k$-NN graphs & $k\in \{2, 6, 8\}$ \\
+    $\varepsilon$-graphs & $\varepsilon\in\{8, 16, 32\}$ \\
     \bottomrule
   \end{tabular}
   \caption{Ranges of parameters used to extract graphs from point clouds in this thesis.}
@@ -219,7 +221,7 @@ required.
 \end{table}
 
 
-\subsection{Descriptor functions}\label{sec:descriptors}
+\subsection{Descriptor Functions}\label{sec:descriptors}
 
 As discussed in Section \ref{sec:mmd}, some kernels require some alternative vectorized
 representation to work. We will use the following protein descriptor functions
@@ -295,7 +297,7 @@ used to evaluate generative graph neural network models, i.e. the
 \emph{fixed-length vector kernels} like the Gaussian (RBF) kernel and the linear
 kernel, both of which are defined in Section \ref{sec:kernels}\footnote{We will
   follow the speed-up trick outlined in Appendix A.5 by \cite{o2021evaluation}
-  to reduce the computation time of each different bandwidth parameter}. Since the only
+  to reduce the computation time of each different bandwidth parameter.}. Since the only
 condition for each vector to be valid inputs for those kernels is that they are
 in $\R^d$, the protein-specific vector representations outlined in Section
 \ref{sec:descriptors} are valid inputs.
@@ -318,18 +320,18 @@ Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
 
 \section{Experimental Setup}
 
-\subsection{Measuring the quality of \acrshort{mmd} configurations}
+\subsection{Measuring The Quality Of \acrshort{mmd} Configurations}
 
 To objectively evaluate the various representation, descriptor, and kernel
 combinations used in \acrshort{mmd}, we will use two correlation coefficients, namely the
 Spearman's correlation coefficient and Pearson's correlation coefficient, each
 given by:
 \begin{equation}
-  \label{eq:spearman} \rho_p(X,Y) = {\cov(\rank(X), \rank(Y)) \over
+  \label{eq:spearman} \rho_s(X,Y) = {\cov(\rank(X), \rank(Y)) \over
 \sigma_{\rank(X)}\sigma_{\rank(Y)}},
 \end{equation} and
 \begin{equation}
-  \label{eq:pearson} \rho_s(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
+  \label{eq:pearson} \rho_p(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
 \end{equation}
 respectively. Here, $X$ is the vector containing the ordered set of values used
 to perturb one of the protein sets and $Y$ the vector of ordered \acrshort{mmd} values

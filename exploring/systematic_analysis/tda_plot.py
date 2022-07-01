@@ -13,6 +13,8 @@ import seaborn as sns
 from pyprojroot import here
 from torch import normal
 
+from proteinmetrics.utils.plots import setup_plotting_parameters
+
 N_RUNS = 10
 
 
@@ -96,6 +98,7 @@ def annotate(data, **kws):
 
 
 def main():
+    setup_plotting_parameters()
     df = load_data()
     df = df.melt(id_vars=["run", "perturb", "perturb_type"])
     df = df.rename(
