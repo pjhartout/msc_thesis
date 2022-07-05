@@ -272,7 +272,7 @@ to attempt to rank models more adequately.
 
 Before going through existing metrics, it is useful to state broad goals, or
 \emph{desiderata} of metrics concerning generative modelling. As highlighted by
-\cite{o2021evaluation}, (pseudo)-metrics must be endowed with the following
+\cite{obray2022evaluation}, (pseudo)-metrics must be endowed with the following
 properties:
 
 \begin{enumerate}
@@ -294,7 +294,7 @@ a neural network feature computed from both real-world images and the
 synthetic images. Concretely, this is achieved by calculating the squared
 Wasserstein metric between the generated and real representations computed from
 a neural network (commonly, the Inception v3 architecture from
-\cite{szegedy2015rethinking} is used) as two multidimensional Gaussian
+\cite{szegedy2016rethinking} is used) as two multidimensional Gaussian
 distributions with parameters $\mathcal{N}(\mu, \Sigma)$ and
 $\mathcal{N}(\mu_{rw}, \Sigma_{rw})$, respectively. The general formulation of
 the $p$\textsuperscript{th} Wasserstein distance between two distributions $u$
@@ -340,7 +340,7 @@ However, an interesting approach recently explored by
 certain GNNs have the ability to extract meaningful
 representations without any training. Through a set of two perturbation
 experiments, similar to the work done by \cite{xu2018empirical} and
-\cite{o2021evaluation}, \cite{thompson2022evaluation} show that using a
+\cite{obray2022evaluation}, \cite{thompson2022evaluation} show that using a
 randomly initialized Graph Isormorphism Network (GINs), first introduced by
 \cite{xu2018powerful}, provides a strong, domain-agnostic metric to evaluate
 generative GNNs. GINs --like the majority of GNNs for discriminative machine
@@ -415,7 +415,7 @@ obtain an unbiased estimate of $\MMD$.
 In the graph domain, it is now incumbent upon the practitioner to (i) choose an
 appropriate (optional) graph descriptor and (ii) kernel with (iii) appropriate
 kernel hyperparameters. This process, along with its pitfalls and current
-practices are discussed in more detail by \cite{o2021evaluation}, but we want
+practices are discussed in more detail by \cite{obray2022evaluation}, but we want
 to give an overview of possible, common, and sensible choices for descriptor,
 kernel, and hyperparameter here.
 
@@ -447,7 +447,7 @@ real-valued, it is also diagnonalizable, with eigenvalues
 $\eig_1\leq\eig_2\leq\ldots\forall\eig\in \left[0,2\right]$ -- see
 \cite{chung1997spectral}, 1997, Chapter 1, Lemma 1.7 for a proof of the
 boundedness. This lends itself again to some bounded, normalized histogram
-representation. As discussed by \cite{o2021evaluation}, it is unknown if graphs
+representation. As discussed by \cite{obray2022evaluation}, it is unknown if graphs
 can be fully determined by their spectrum, and we know that for certain classes
 of graphs this is not the case \citep{schwenk1973almost}.
 
@@ -490,10 +490,10 @@ using kernels. In this thesis, we will use:
 
 We will neglect certain kernels used in the literature, either because they are not
 positive semi-definite, such as the total variation kernel (see
-\cite{o2021evaluation}, Appendix A1 for a proof), or because they bring capture
+\cite{obray2022evaluation}, Appendix A1 for a proof), or because they bring capture
 little more information compared to existing accepted alternatives, they are
 inefficient to compute and therefore not recommended to evaluate generative GNNs, e.g. the
-Earth mover's distance-based kernel \citep{o2021evaluation}.
+Earth mover's distance-based kernel \citep{obray2022evaluation}.
 
 We will, however, leverage two new classes of kernels that are applicable to
 models evaluating protein generative model performance. The first are graph

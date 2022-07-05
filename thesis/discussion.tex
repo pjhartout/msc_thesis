@@ -13,7 +13,7 @@ proteins (e.g. see Figure \ref{fig:mmd_consistent_eps}). This finding is
 somewhat surprising considering recent findings indicating the relative
 instability of \acrshort{mmd} on synthetic graphs such as Watts-Strogatz graphs and
 Barabási–Albert graphs under some combinations of kernels and descriptors
-\citep{o2021evaluation}. While we certainly found unstable configurations
+\citep{obray2022evaluation}. While we certainly found unstable configurations
 (see for instance Figure \ref{fig:mmd_consistent_eps} upper left pane with the degree histogram),
 this was not the rule. We hypothesize that this is due to the highly structured
 nature of the graphs used in this thesis (see Figure
@@ -120,8 +120,8 @@ myriad of aspects: i.e. are the generated protein sequences realistic? In this
 case, one might use a Weisfeiler-Lehman kernel or an ESM embedding to answer
 this. The literature, however, suggests that using embeddings does not yield the
 same kernel parameters depending on the perturbation applied to the sequence. As
-such, it is recommended to use a spectrum kernel \citep{leslie2001spectrum} for
-sequences (see \cite{kucera2021conditional}, Section 4.1). There are, however,
+such, it is recommended to use a spectrum kernel \citep{leslie2002spectrum} for
+sequences (see \cite{kucera2022conditional}, Section 4.1). There are, however,
 other aspects of proteins related to their resulting shape to check. For this
 purpose, the protein-specific descriptors devised in this thesis and introduced in
 Section \ref{sec:descriptors} whose results are shown in Section
@@ -155,7 +155,7 @@ important limitations of this thesis.
 
 In Section \ref{sec:discussion_baselines}, we highlighted the necessity of a
 \emph{positive control}. While this is possible for certain kernels (e.g. for
-the aforementioned spectrum kernel, see \cite{kucera2021conditional} for
+the aforementioned spectrum kernel, see \cite{kucera2022conditional} for
 details), many of the settings discussed in this thesis do not have such a
 ``negative control''. While one could use absolute \acrshort{mmd} values of perturbed sets
 of proteins as a reference for subpar performance, it is still recommended to find

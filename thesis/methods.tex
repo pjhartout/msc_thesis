@@ -2,7 +2,7 @@
 
 The primary methodology employed in this thesis to assess the quality of metrics
 used to evaluate generative protein models follows the fundamentally similar
-approach used by \cite{o2021evaluation}, which we adapt to include the following
+approach used by \cite{obray2022evaluation}, which we adapt to include the following
 steps:
 
 \begin{enumerate}
@@ -37,13 +37,13 @@ simplifies downstream processing.
 
 \section{Perturbations}
 
-While \cite{o2021evaluation} focused on \emph{graph perturbations} specifically,
+While \cite{obray2022evaluation} focused on \emph{graph perturbations} specifically,
 we wanted to augment and refine the set of perturbations applied to the perturbed
 sample of proteins to be more pertinent to proteins. Three
 categories of perturbations can be distinguished:
 
 \paragraph{Graph Perturbations} These perturbations mostly overlap with those
-defined by \cite{o2021evaluation}, as they include (i) adding edges to a graph
+defined by \cite{obray2022evaluation}, as they include (i) adding edges to a graph
 (ii) removing edges from a graph, and (iii) rewiring, i.e. swapping, edges within a
 graph.
 \paragraph{Point Cloud Perturbations} These perturbations aim to add changes
@@ -143,7 +143,7 @@ changing an existing node label, with another. While graph perturbation
 probabilities (e.g. of adding an edge) range from 0 to 1, here we mostly
 concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
 sensitive the \acrshort{mmd} to a few point mutations, which covers some of the
-real-world protein engineering use cases \citep{poluri2016protein}.
+real-world protein engineering use cases \citep{poluri2017protein}.
 
 For each perturbation, a range of degrees of perturbation is defined and 20
 different evenly-spaced degrees of perturbation are examined and repeated 10
@@ -296,7 +296,7 @@ The first category has been discussed in the literature extensively since it was
 used to evaluate generative graph neural network models, i.e. the
 \emph{fixed-length vector kernels} like the Gaussian (RBF) kernel and the linear
 kernel, both of which are defined in Section \ref{sec:kernels}\footnote{We will
-  follow the speed-up trick outlined in Appendix A.5 by \cite{o2021evaluation}
+  follow the speed-up trick outlined in Appendix A.5 by \cite{obray2022evaluation}
   to reduce the computation time of each different bandwidth parameter.}. Since the only
 condition for each vector to be valid inputs for those kernels is that they are
 in $\R^d$, the protein-specific vector representations outlined in Section
@@ -340,7 +340,7 @@ setting, a high Spearman correlation coefficient (Equation \ref{eq:spearman}) is
 crucial to satisfy the first criterium of a performance metric: expressivity
 (see Section \ref{sec:evalproblem}). This will guarantee that the metric
 increases monotonically with the amount of perturbation. As
-\cite{o2021evaluation} have shown, some configurations of \acrshort{mmd} on synthetic
+\cite{obray2022evaluation} have shown, some configurations of \acrshort{mmd} on synthetic
 datasets revealed that an increasing \acrshort{mmd} value with increasing perturbation is not
 guaranteed. While \cite{thompson2022evaluation} highlighted that linearity is
 not a requirement, the Pearson correlation coefficient (Equation
