@@ -500,3 +500,51 @@ Set of meetings in Notion: https://rectangular-answer-964.notion.site/6b95962afd
 *** Metric more or less relevant for modelling stage = coarse and picks up extreme cases in the beginning and more refined later on.
 ** Add-edges - necessary to do for all?
 ** AlphaFold2 - caries potential inductive biases?
+
+* DONE <2022-06-24 Fri> Meeting with Tim and Leslie
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-07-05 Tue 13:01
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:ARCHIVE_TODO: DONE
+:END:
+
+** Discuss need for baseline violin plots
+** Discuss outline discussion
+** Key findings necessary? repeat?
+** Fraction instead of percent. Refer to methods every time.
+** take set of natural proteins,
+** unperturbed -> compute embedding -> pairwise distance
+
+* DONE <2022-06-16 Thu> Meeting with Tim
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-07-05 Tue 13:01
+:ARCHIVE_FILE: ~/Documents/Git/msc_thesis/docs/notes/meeting_notes/meeting_notes.org
+:ARCHIVE_CATEGORY: meeting_notes
+:ARCHIVE_TODO: DONE
+:END:
+** Plot summary:
+** Overall graph descriptor behaviour
+*** Compare with exactly the same kernels on random graphs
+*** Erdos-Reynii.
+*** Show different kernels as well
+*** TODO when all else is wrapped up.
+** Sensitivity to representation
+*** Flip axes (3*4)
+** Protein descriptor behaviour
+*** extend point from above
+** Variation across species
+*** baseline unpertubred mmd values impervious to organism
+** Overall TDA descriptor behaviour, Weisfeiler-Lehman behaviour, Learned Embeddings.
+** Plot when the p-value becomes significant
+** Discussion point: recommendations to practitioner
+*** choose rep depending on stage of modelling
+*** choose mmd config based on scale of data (choose fast configs for large datasets, i..e protein descriptors.)
+*** kernel hyperparam values.
+*** make recommendation on type of kernel and descriptor and hyperparam of kernels
+*** computing p-values allows for a statistical underpinning of whether or not generated samples acutally overlap.
+*** Can make violin plot to compare as well.
+*** ideal protein rep.
+*** k-nn better than epsilon graph?
+*** better protein representation?
+*** give idea of the screen of
