@@ -68,7 +68,7 @@ practitioner who needs to evaluate a generative protein model using one of the
 protein representations highlighted above.
 
 
-\subsection{Setup And Baselines}\label{sec:discussion_baselines}
+\subsection{Setup and Baselines}\label{sec:discussion_baselines}
 % p-values, violin plots to visualize mmd.
 
 Overall, we advise the practitioner to carefully evaluate certain baselines when
@@ -93,7 +93,7 @@ Moreover, since the \acrshort{mmd} statistic is the basis for a kernel two-sampl
 estimate a $p$-value from the statistic between the model's generated
 distribution and the empirical distribution.
 
-\subsection{Sensitivity Of MMD}\label{sec:discussion_right_mmd}
+\subsection{Sensitivity of MMD}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
 Depending on the stage of modeling and the coarseness of the desired samples,
 one might choose different \acrshort{mmd} configurations. As we have shown in Figure
@@ -114,6 +114,7 @@ wide to make any assessment as to the quality of the generated samples
 
 \subsection{Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
+% TODO: Sequence, see RITA.
 Another setting in which some key findings of this study can be useful is in the
 context of assessing \emph{realistic} proteins. Defining realistic proteins take on a
 myriad of aspects: i.e. are the generated protein sequences realistic? In this
@@ -142,7 +143,7 @@ discuss the rough order of magnitude of the data and its impact on the choice of
 $\sigma$ in Appendix \ref{sec:distance_dist} as well.
 % TODO: add supplementary plot
 
-\section{Limitations And Future Directions}\label{sec:discussion_limitations}
+\section{Limitations and Future Directions}\label{sec:discussion_limitations}
 
 Now that we summarized the main findings of this thesis (Section
 \ref{sec:key_findings}) and formulated a set of recommendations to the
@@ -193,7 +194,7 @@ each amino acid-specific point cloud can be computed in parallel.
 % \acrshort{tda} on different point clouds
 % computational complexity
 
-\subsection{Mode Collapse And Mode Drop}\label{sec:mode_collapse_mode_drop}
+\subsection{Mode Collapse and Mode Drop}\label{sec:mode_collapse_mode_drop}
 
 Mode collapse and mode dropping are the two distinctive and common failure modes
 of generative models \citep{salimans2016improved}. We define mode collapse as
