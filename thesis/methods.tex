@@ -1,17 +1,28 @@
 \chapter{Methods}\label{chap:methods}
 
 The primary methodology employed in this thesis to assess the quality of metrics
-used to evaluate generative protein models follows the fundamentally similar
-approach used by \cite{obray2022evaluation}, which we adapt to include the following
-steps:
+used to evaluate generative protein models is heavily inspired by
+\cite{obray2022evaluation}, and consists in evaluating how well a particular
+combination of representation, optional descriptor function, kernel and
+parameters applied to all three aforementioned elements\footnote{We also
+subsequently refer to the parametrization and choice of all these options as an
+\acrshort{mmd} \emph{configuration}.} correlates with the amount of
+perturbation % TODO: check with Tim to see if use of term configuration is OK.
+applied to one set of proteins. This can be broken down in the following steps:
 
 \begin{enumerate}
 \item Take two i.i.d. samples from a database of proteins.
-\item Progressively add some perturbation to one of the samples.
+\item Progressively perturb to one of the samples.
 \item Measure the \acrshort{mmd} between the unperturbed and perturbed sample.
+\item Once the varying degrees of perturbations have been applied and
+accompanying \acrshort{mmd}s catalogued, compute the correlation coefficient
+between the \acrshort{mmd} and the amount of perturbation.
 \end{enumerate}
 
-We start by motivating the datasets that will be used to simulate a generative
+A particular MMD configuration is considered superior to another if the
+resulting correlation coefficients of the former are higher than that of the latter.
+
+In this chapter, we start by motivating the datasets that will be used to simulate a generative
 protein model. We then describe and motivate the experimental setups -- i.e.
 perturbations -- that we will employ to test the various configurations of \acrshort{mmd}.
 Finally, we enumerate and justify which configurations of \acrshort{mmd} are tested,
@@ -19,21 +30,27 @@ including all the combinations of protein representations, descriptor functions,
 and kernels. Finally, we describe and motivate the experimental setups -- i.e.
 perturbations -- that we will employ to test the various metric configurations.
 
-
 \section{Datasets}
 
-Because generative models have not been applied to proteins yet, which is partly
-due to the lack of suitable evaluation metrics, no generative model can be used
-here. In this thesis, except otherwise stated, all results will be derived from
-10 random samples from the \textit{homo sapiens} monomeric proteome downloaded
-from the EBI AlphaFold2 database
+In this thesis, except otherwise stated, all results will be derived from 10
+random samples from the \textit{homo sapiens} monomeric proteome downloaded from
+the EBI AlphaFold2 database
 \citep{varadi2022alphafold,tunyasuvunakool2021highly}, a repository comprising
 predicted 3D structures of protein sequences obtained from AlphaFold2, the
 current state-of-the-art method to predict protein structure from sequences
-\citep{jumper2021highly}. This dataset was chosen because it contains
-consistently formatted \texttt{pdb} files only containing information from
-heavy atoms directly contributing to the 3D structure of a single monomer, which
-simplifies downstream processing.
+\citep{jumper2021highly}. Multiple reasons justify this choice. First, despite
+being a proxy for experimentally validated proteins, AlphaFold2 is known to
+provide predicted 3D structures for naturally occurring proteins with the same
+accuracy as experimentally acquired 3D structures \citep{jumper2021highly},
+ensuring that the conclusions we reach in this thesis will be broadly applicable
+to experimentally acquired protein structures. Second, this allows us to
+establish the ground truth of a range of \acrshort{mmd} configurations, hence
+also enabling the gauging the quality of Third, there are practical advantages
+related to this database because it contains consistently formatted \texttt{pdb}
+files exclusively cataloguing heavy atoms directly contributing to the 3D
+structure of a single monomer, which simplifies downstream processing.
+% TODO: not sure what was meant in the reasonable generated samples (2nd
+% reason).
 
 \section{Perturbations}
 
@@ -50,7 +67,9 @@ graph.
 to the underlying coordinates of each atom in the protein. Such
 perturbations include injecting Gaussian noise (Equation
 \ref{eq:gaussian_noise}), (ii) twisting, (iii) shearing, and
-(iv) tapering. We proceed to detail each of the equations governing the
+(iv) tapering. Importantly, where appropriate, we extract the graphs \emph{after} applying the
+point cloud perturbation, to ensure the changes in the point cloud can be
+reflected in the graph structure. We proceed to detail each of the equations governing the
 perturbations below. An illustration of each of those perturbations can be found
 in Figure \ref{fig:perturbation_illustration}
 
@@ -130,20 +149,26 @@ Equation \ref{eq:shearing}, we set $a=b$ in this thesis.
   \centering
   \includegraphics[width=0.5\textwidth]{./figures/protein_unperturbed.pdf}
   \includegraphics[width=\textwidth]{./figures/protein_perturbed.pdf}
-  \caption[Illustration of the perturbations applied to proteins.]{Illustration
-of the perturbations applied to proteins. The protein displayed here is the
-Cilia- and flagella-associated protein 53 (PDB entry: Q96M91). Each $\alpha$
-carbon is colored according to its position on the chain. On the unperturbed
-protein, the lighter colors are located closer to the viewer.}
+  \caption[Illustration of all point cloud perturbations applied to a
+protein.]{Illustration of all point cloud perturbations applied to a protein.
+The amount of each perturbation shown here corresponds to 10\% of the maximum
+value of the maximum value of each perturbation as shown in Table
+\ref{tab:perturbation_ranges}. The protein displayed here is the cilia- and
+flagella-associated protein 53 (UniProt code Q96M91). Each $\alpha$ carbon is
+colored according to its position on the chain. On the unperturbed protein, the
+lighter colors are located closer to the viewer.}
   \label{fig:perturbation_illustration}
 \end{figure}
 
-\paragraph{Mutation} These simply consist in swapping node labels, i.e.
-changing an existing node label, with another. While graph perturbation
-probabilities (e.g. of adding an edge) range from 0 to 1, here we mostly
-concentrate on lower regimes of mutation, i.e. between 0 and 0.1, so see how
-sensitive the \acrshort{mmd} to a few point mutations, which covers some of the
-real-world protein engineering use cases \citep{poluri2017protein}.
+\paragraph{Mutation} These simply consist in (i) selecting the positions that
+will be mutated by sampling from a Bernoulli distribution with parameter $p$ and
+(ii) for selected positions, swap the amino acid by any of the 20 possible
+naturally-occurring amino acids. While graph perturbation probabilities (e.g. of
+adding an edge) range from 0 to 1, here we mostly concentrate on lower regimes
+of mutation, i.e. between 0 and 0.1, so see how sensitive various \acrshort{mmd}
+configurations are to a few point mutations, which covers most of the
+real-world % TODO: some -> most OK?
+protein engineering use cases \citep{poluri2017protein}.
 
 For each perturbation, a range of degrees of perturbation is defined and 20
 different evenly-spaced degrees of perturbation are examined and repeated 10
@@ -173,18 +198,24 @@ parameter used in this thesis are shown in Table \ref{tab:perturbation_ranges}
 
 \section{MMD Configurations}
 
-We introduced \acrshort{mmd} in Section \ref{sec:mmd}, Equation \ref{eq:mmd},
-and noted that an important aspect of using \acrshort{mmd} in practice consists
-in choosing the right descriptor function and kernel. Here, we list and motivate
-all graph extraction techniques, descriptor functions employed, and kernels
-adopted in this experiment.
+We introduced \acrshort{mmd} in Section \ref{sec:mmd} (Equation \ref{eq:mmd} and
+\ref{eq:mmd_unbiased}), and noted that an important aspect of using
+\acrshort{mmd} in practice consists in choosing the right descriptor function
+and kernel, because it heavily impacts which aspects of the data are distilled
+for analysis in MMD and also heavily impacts how the data is processed by the
+kernel functions inside of MMD. Here, we list and motivate all graph extraction
+techniques, descriptor functions employed, and kernels adopted in this
+experiment.
 
-First, throughout our experiments, we will use the unbiased squared \acrshort{mmd} estimate,
-which removes self-comparison terms in the kernel matrices
-(\cite{gretton2012kernel}, Lemma 6), which can result in negative values. We
-will normalize the resulting \acrshort{mmd} over the whole range of perturbation for each
-curve as well to compare behaviors of different \acrshort{mmd} configurations not
-operating on the same scale.
+First, throughout our experiments, we will use the unbiased squared
+\acrshort{mmd} estimate, which removes self-comparison terms in the kernel
+matrices (\cite{gretton2012kernel}, Lemma 6), which can result in negative
+values. We will normalize the resulting \acrshort{mmd} over the whole range of
+perturbation for each curve as well to compare behaviors of different
+\acrshort{mmd} configurations not operating on the same scale. As highlighted in
+Section \ref{sec:mmd}, \acrshort{mmd} does not have an inherent sense of scale
+anyway, so this normalization step does not impact our analysis negatively.
+% TODO: check syntax
 
 \begin{equation}
   \label{eq:normalization}
@@ -230,30 +261,44 @@ here.
 
 \paragraph{Graph descriptors} They are defined in Section \ref{sec:mmd} and include
   the degree distribution histogram, the clustering coefficient histogram and
-  the Laplacian spectrum histogram. These are all fixed-length vectors. Of note,
-  we let the degree histogram in a range of 2699, due to the fact that adding
-  edges between all nodes of the longest protein containing 2699 residues will
-  result in the highest-degree node to be 2698.
+  the Laplacian spectrum histogram. These are all fixed-length vectors. The
+  maximum value of the degree histogram was determined based on the longest
+  sequence length of the proteins in the dataset (2699), because the node degree
+  of any given graph will be at most equal to the size of the largest graph in
+  the dataset. This aspect is particularly relevant when considering the
+  perturbation adding edges to a protein graph.
+
 \paragraph{Coordinates descriptors} In order to capture the information of the
-3D structure of the protein beyond local neighborhood information,
-a topological descriptor of each protein in the form of a persistence diagram is
-extracted using a Vietoris-Rips filtration introduced in detail in Section
-\ref{sec:tda}. To speed up computation, we sampled every other point to
-dramatically reduce the running time and memory footprint without significantly
-affecting the shape of the protein.
+3D structure of the protein beyond local neighborhood information, a topological
+descriptor of each protein in the form of a persistence diagram is extracted
+using a Vietoris-Rips filtration introduced in detail in Section \ref{sec:tda}.
+To speed up computation (and since we do not take amino acid type into account
+for this analysis), we sampled every other point to dramatically reduce the
+running time and memory footprint without significantly affecting the shape of
+the protein. % TODO: build validation script. Ideas:% compute persistence diagrams and show similarity.
+
 \paragraph{Protein-specific descriptors} In this thesis we introduce two novel
 protein-specific descriptor functions resulting in fixed-length vector
-representations. The first consists of a histogram of the pairwise distance of
-each atom considered; the second consists in concatenating the two histograms of
-the two dihedral angles $\phi$ and $\psi$ formed by each amino acid discussed in
-Section \ref{sec:proteins}. The inspiration behind those two descriptors comes
-from elements of the validation pipeline of novel Protein Data Bank structures
-\citep{read2011new, gore2012implementing, gore2017validation}, where atoms too
-close together are flagged and unusual dihedral angles are reported. Those
-unusual dihedral angles are also called ``Ramachandran outliers'', after the
-scientist who discovered a way to display the $\phi$ and $\psi$ in a 2-D
-histogram, and recovered items related to the secondary structure of the protein
-from such plots. \citep{ramachandran1063Stereochemistry}.
+representations for subsequent use in kernels accepting inputs in $\R^d$. The
+first consists of a histogram of the pairwise distance of each
+\textalpha{}-carbon\footnote{In principle, an all-atom histogram could also be
+computed; we just anticipate that the added value of such an all-atom histogram
+would be minimal in comparison to the significantly increase computation cost
+and memory footprint of the resulting histogram.}; the second consists in
+concatenating the two histograms of the two dihedral angles $\phi$ and $\psi$
+formed by each amino acid discussed in Section \ref{sec:proteins}. The
+inspiration behind those two descriptors comes from elements of the validation
+pipeline of novel Protein Data Bank structures \citep{read2011new,
+gore2012implementing, gore2017validation}, where atoms too close together are
+flagged and unusual dihedral angles are reported to penalize the overall
+validity of the protein 3D model to be validated. Those unusual dihedral angles
+are also called ``Ramachandran outliers'', after the scientist who discovered a
+way to display the $\phi$ and $\psi$ in a 2-D histogram, and recovered features
+in this histogram related to the secondary structure of the protein from such
+plots. \citep{ramachandran1063Stereochemistry}. Overall, both the biological
+relevance and the established scientific success of distance histograms and
+dihedral angles histogram in both the validation and analysis of proteins lend
+credence to those newly established descriptors.
 
 \paragraph{Sequence descriptors} In Section \ref{sec:mmd}, we discussed the
 Evolutionary Scale Modelling family to construct descriptors of a fixed length
@@ -314,13 +359,14 @@ achieved an 80\% improvement in the runtime of the Weisfeiler-Lehman kernel by
 leveraging the sparsity of the graphs used in this thesis.
 
 To estimate \emph{global} changes in the shape of the protein, we will also use
-kernels using persistence diagrams as input, specifically using the Persistence
-Fisher kernel defined in Section \ref{sec:kernels} \citep{le2018persistence}.
+kernels accepting persistence diagrams as input, specifically, we will adopt the
+Persistence Fisher kernel \citep{le2018persistence} and the multi-scale kernel
+\citep{reininghaus2015stable} defined in Section \ref{sec:kernels}.
 
 
 \section{Experimental Setup}
 
-\subsection{Measuring The Quality Of \acrshort{mmd} Configurations}
+\subsection{Measuring the Quality of \acrshort{mmd} Configurations}
 
 To objectively evaluate the various representation, descriptor, and kernel
 combinations used in \acrshort{mmd}, we will use two correlation coefficients, namely the
@@ -333,25 +379,25 @@ given by:
 \begin{equation}
   \label{eq:pearson} \rho_p(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
 \end{equation}
-respectively. Here, $X$ is the vector containing the ordered set of values used
-to perturb one of the protein sets and $Y$ the vector of ordered \acrshort{mmd} values
+respectively. Here, $X$ is the vector containing the set of values used to
+perturb one of the protein sets and $Y$ the vector of \acrshort{mmd} values
 between the unperturbed and perturbed set for each perturbation level. In this
 setting, a high Spearman correlation coefficient (Equation \ref{eq:spearman}) is
 crucial to satisfy the first criterium of a performance metric: expressivity
 (see Section \ref{sec:evalproblem}). This will guarantee that the metric
 increases monotonically with the amount of perturbation. As
-\cite{obray2022evaluation} have shown, some configurations of \acrshort{mmd} on synthetic
-datasets revealed that an increasing \acrshort{mmd} value with increasing perturbation is not
-guaranteed. While \cite{thompson2022evaluation} highlighted that linearity is
-not a requirement, the Pearson correlation coefficient (Equation
-\ref{eq:pearson}) will allow us to further refine the selection of the metrics
-behaving most predictably, and distill the most relevant configurations for a
-given perturbation range.
+\cite{obray2022evaluation} have shown, some configurations of \acrshort{mmd} on
+synthetic datasets revealed that an increasing \acrshort{mmd} value with
+increasing perturbation is not guaranteed. While \cite{thompson2022evaluation}
+highlighted that linearity is not a requirement, the Pearson correlation
+coefficient (Equation \ref{eq:pearson}) will allow us to further refine the
+selection of the metrics behaving most predictably, and distill the most
+relevant configurations for a given perturbation range.
 
 \subsection{Software Library Design}
 
 
-Due to the complexity and modularity of the methodology outlined above, it is
+Due to the complexity and modularity of the methodology explored above, it is
 required to have a scalable library to execute all the evaluation experiments at
 scale and efficiently. To accomplish this task, we developed a custom Python
 library leveraging parallel processing of data to the greatest extent possible.
@@ -361,7 +407,7 @@ build \texttt{Pipeline} objects with the necessary steps required to compute an
 \acrshort{mmd}. All the code used for this thesis can be found here:
 \url{https://github.com/pjhartout/msc_thesis}
 
-% Plot of the library structure.
+% TODO: Plot of the library structure.
 
 \section{Summary}
 
@@ -370,5 +416,6 @@ We first described the datasets we used, as well as the type of perturbations
 applied to them. We then discussed the representations of the proteins used in
 this study, as well as described the descriptor functions used for those
 representations. Crucially, we motivated our choice for the collection of
-kernels used for estimating the \acrshort{mmd}. Finally, we consider the different ways we
-will use to describe our experimental setup to choose the best \acrshort{mmd} values.
+kernels used for estimating the \acrshort{mmd}. Finally, we outlined the
+methodology leveraged to rank the quality of various \acrshort{mmd}
+configurations objectively.

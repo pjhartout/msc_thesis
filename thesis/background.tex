@@ -471,7 +471,7 @@ following properties:
 \end{itemize}
 
 At last, we then arrive at the biased empirical estimate of MMD using kernel
-functions
+functions, which is given by:
 
 \begin{equation}
   \label{eq:mmd}
@@ -496,7 +496,10 @@ $g:\mathcal{X}\to\R^d$ prior to being used in a kernel. Descriptor functions,
 which we will investigate in more detail below, can be designed in such a way
 that they can distill relevant properties of the structured data under study,
 potentially saving on computation costs. Similarly, the kernel choice and
-parameters also heavily impacts how each dataset is being analyzed. % TODO: sufficient?
+parameters also heavily impacts how each dataset is being analyzed. Importantly,
+one consequence of the free choice of descriptor functions and kernel functions is
+that \acrshort{mmd} does not inherently have a scale \citep{obray2022evaluation}
+% TODO: sufficient?
 
 In the graph domain, it is incumbent upon the practitioner to (i) choose an
 appropriate (optional) graph descriptor and (ii) kernel with (iii) appropriate
