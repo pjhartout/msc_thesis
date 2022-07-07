@@ -703,15 +703,6 @@ Increased the number of metrics by performing MMD directly with node and edge fe
 #+end_src
 
 Inverse protein folding problem, maybe good to look at to see what makes a good protein.
-#+begin_src bibtex
-@inproceedings{ingraham2019generative,
-  title={{Generative Models for Graph-Based Protein Design}},
-  author={Ingraham, John and Garg, Vikas K and Barzilay, Regina and Jaakkola, Tommi},
-  booktitle={Proceedings of the 33rd International Conference on Neural Information Processing Systems},
-  pages={15820--15831},
-  year={2019}
-}
-#+end_src
 
 Papers discussing Delaunay graphs (dual graph of Voronoi diagram), obtained through Delaunay triangulation. Useful for extracting hierarchical structures. Graph edges can also be added on the basis of the Delaunay triangulation. Delaunay triangles correspond to joining points that share a face in the 3D Voronoi diagram of the protein structures. For distance-based edges, a Long Interaction Network (LIN) parameter controls the minimum required separation in the amino acid sequence for edge creation. This can be useful in reducing the number of noisy edges under distance-based edge creation schemes. Edge featurisation for atom-level graphs is provided by annotations of bond type and ring status.
 #+begin_src bibtex
@@ -835,7 +826,7 @@ Sliced Wasserstein kernel (approximates the wasserstein distance in kernel space
 @inproceedings{carriere2017sliced,
   title={{Sliced Wasserstein kernel for persistence diagrams}},
   author={Carri{\`e}re, Mathieu and Cuturi, Marco and Oudot, Steve},
-  booktitle={Proceedings of the 34th International Conference on Machine Learning-Volume 70},
+  booktitle={Proceedings of the 34th International Conference on Machine Learning},
   pages={664--673},
   year={2017}
 }
@@ -1877,6 +1868,241 @@ reviews of deep generative modelling for protein design
 }
 #+end_src
 
+Low-N
+#+begin_src bibtex
+@article{biswas2021low,
+  title={{Low-$N$ protein engineering with data-efficient deep learning}},
+  author={Biswas, Surojit and Khimulya, Grigory and Alley, Ethan C and Esvelt, Kevin M and Church, George M},
+  journal={Nature Methods},
+  volume={18},
+  number={4},
+  pages={389--396},
+  year={2021},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{madani2020progen,
+  title={{ProGen: Language Modeling for Protein Generation}},
+  author={Madani, Ali and McCann, Bryan and Naik, Nikhil and Keskar, Nitish Shirish and Anand, Namrata and Eguchi, Raphael R and Huang, Po-Ssu and Socher, Richard},
+  journal={arXiv preprint arXiv:2004.03497},
+  year={2020}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{maddhuri2021protein,
+  title={Protein contact map refinement for improving structure prediction using generative adversarial networks},
+  author={Maddhuri, Venkata Subramaniya and Sai, Raghavendra and Terashi, Genki and Jain, Aashish and Kagaya, Yuki and Kihara, Daisuke},
+  journal={Bioinformatics},
+  volume={37},
+  number={19},
+  pages={3168--3174},
+  year={2021},
+  publisher={Oxford University Press}
+}
+#+end_src
+
+#+begin_src bibtex
+@inproceedings{ingraham2019generative,
+  title={{Generative Models for Graph-Based Protein Design}},
+  author={Ingraham, John and Garg, Vikas and Barzilay, Regina and Jaakkola, Tommi},
+  journal={Proceedings of the 32nd Conference on Advances in Neural Information Processing Systems},
+  year={2019}
+}
+
+@inproceedings{anand2018generative,
+  title={Generative modeling for protein structures},
+  author={Anand, Namrata and Huang, Possu},
+  journal={Proceedings of the 31st Conference on Advances in neural information processing systems},
+  year={2018}
+}
+
+#+end_src
+
+#+begin_src bibtex
+@article{brown2020language,
+  title={{Large Language Models are Zero-Shot Reasoners}},
+  author={Kojima, Takeshi and Gu, Shixiang Shane and Reid, Machel and Matsuo, Yutaka and Iwasawa, Yusuke},
+  journal={arXiv preprint arXiv:2205.11916},
+  year={2022}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{ramesh2022hierarchical,
+  title={{Hierarchical Text-Conditional Image Generation with CLIP Latents}},
+  author={Ramesh, Aditya and Dhariwal, Prafulla and Nichol, Alex and Chu, Casey and Chen, Mark},
+  journal={arXiv preprint arXiv:1803.03324},
+  year={2022}
+}
+@article{saharia2022hierarchical,
+  title={{Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding}},
+  author={Saharia, Chitwan and Chan, William and Saxena, Saurabh and Li, Lala and Whang, Jay and Denton, Emily and Ghasemipour, Seyed Kamyar Seyed and Ayan, Burcu Karagol and Mahdavi, S. Sara and Lopes, Rapha Gontijo and Salimans, Tim and Ho, Jonathan and Fleet, David J and Norouzi, Mohammad},
+  journal={arXiv preprint arXiv:2205.11487},
+  year={2022}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{guo2020systematic,
+  author    = {Xiaojie Guo and Liang Zhao},
+  title     = {{A Systematic Survey on Deep Generative Models for Graph Generation}},
+  journal   = {arXiv preprint arXiv:2007.06686},
+  year      = {2020},
+}
+#+end_src
+
+#+begin_src bibtex
+@inproceedings{weinstein2021structured,
+  title={A structured observation distribution for generative biological sequence prediction and forecasting},
+  author={Weinstein, Eli N and Marks, Debora},
+  booktitle={International Conference on Machine Learning},
+  year={2021},
+}
+#+end_src
+
+#+begin_src bibtex
+@article{wang2021directed,
+  title={Directed Evolution: Methodologies and Applications},
+  author={Wang, Yajie and Xue, Pu and Cao, Mingfeng and Yu, Tianhao and Lane, Stephan T and Zhao, Huimin},
+  journal={Chemical Reviews},
+  volume={121},
+  number={20},
+  pages={12384--12444},
+  year={2021},
+  publisher={ACS Publications}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{repecka2021expanding,
+  title={Expanding functional protein sequence spaces using generative adversarial networks},
+  author={Repecka, Donatas and Jauniskis, Vykintas and Karpus, Laurynas and Rembeza, Elzbieta and Rokaitis, Irmantas and Zrimec, Jan and Poviloniene, Simona and Laurynenas, Audrius and Viknander, Sandra and Abuajwa, Wissam and others},
+  journal={Nature Machine Intelligence},
+  volume={3},
+  number={4},
+  pages={324--333},
+  year={2021},
+  publisher={Nature Publishing Group}
+}
+#+end_src
+
+This + AlphaFold paper shows importance of
+#+begin_src bibtex
+@article{hornak2006comparison,
+  title={{Comparison of multiple Amber force fields and development of improved protein backbone parameters}},
+  author={Hornak, Viktor and Abel, Robert and Okur, Asim and Strockbine, Bentley and Roitberg, Adrian and Simmerling, Carlos},
+  journal={Proteins: Structure, Function, and Bioinformatics},
+  volume={65},
+  number={3},
+  pages={712--725},
+  year={2006},
+  publisher={Wiley Online Library}
+}
+#+end_src
+
+
+#+begin_src bibtex
+@inproceedings{binkowksi2018demystifying,
+  title={{Demystifying MMD GANs}},
+  author={Bi{\'n}kowski, Miko{\l}aj and Sutherland, Danica J and Arbel, Michael and Gretton, Arthur},
+  booktitle={Proceedings of the International Conference on Learning Representations},
+  year={2018},
+}
+#+end_src
+
+#+begin_src bibtex
+@article{betzalel2022study,
+  title={{A Study on the Evaluation of Generative Models}},
+  author={Betzalel, Eyal and Penso, Coby and Navon, Aviv and Fetaya, Ethan},
+  journal={arXiv preprint arXiv:2206.10935},
+  year={2022}
+}
+#+end_src
+
+
+#+begin_src bibtex
+@article{wood2005protein,
+  title={{Protein Secondary Structure Prediction with Dihedral Angles}},
+  author={Wood, Matthew J and Hirst, Jonathan D},
+  journal={PROTEINS: Structure, Function, and Bioinformatics},
+  volume={59},
+  number={3},
+  pages={476--481},
+  year={2005},
+  publisher={Wiley Online Library}
+}
+#+end_src
+
+#+begin_src bibtex
+@article{o20102,
+  title={{2.4 The Functions of Proteins Are Determined by Their Three-Dimensional Structures, in The Essentials of Cell Biology}},
+  author={O'Connor, CM and Adams, JU},
+  journal={Cambridge, MA: NPG Education},
+  year={2010}
+}
+#+end_src
+
+intractable likelihood functions
+#+begin_src bibtex
+@article{yildirim2015parameter,
+  title={{Parameter Estimation in Hidden Markov Models with Intractable Likelihoods Using Sequential Monte Carlo}},
+  author={Y{\i}ld{\i}r{\i}m, Sinan and Singh, Sumeetpal S and Dean, Thomas and Jasra, Ajay},
+  journal={Journal of Computational and Graphical Statistics},
+  volume={24},
+  number={3},
+  pages={846--865},
+  year={2015},
+  publisher={Taylor \& Francis}
+}
+@article{drovandi2011likelihood,
+  title={{Likelihood-free Bayesian estimation of multivariate quantile distributions}},
+  author={Drovandi, Christopher C and Pettitt, Anthony N},
+  journal={Computational Statistics \& Data Analysis},
+  volume={55},
+  number={9},
+  pages={2541--2556},
+  year={2011},
+  publisher={Elsevier}
+}
+@article{rayner2002numerical,
+  title={Numerical maximum likelihood estimation for the g-and-k and generalized g-and-h distributions},
+  author={Rayner, Glen D and MacGillivray, Helen L},
+  journal={Statistics and Computing},
+  volume={12},
+  number={1},
+  pages={57--75},
+  year={2002},
+  publisher={Springer}
+}
+#+end_src
+
+HMMs
+#+begin_src bibtex
+@article{baum1968growth,
+  title={Growth transformations for functions on manifolds},
+  author={Baum, Leonard E and Sell, George},
+  journal={Pacific Journal of Mathematics},
+  volume={27},
+  number={2},
+  pages={211--227},
+  year={1968},
+  publisher={Mathematical Sciences Publishers}
+}
+@article{baum1970maximization,
+  title={{A maximization technique occurring in the statistical analysis of probabilistic functions of Markov chains}},
+  author={Baum, Leonard E and Petrie, Ted and Soules, George and Weiss, Norman},
+  journal={The annals of mathematical statistics},
+  volume={41},
+  number={1},
+  pages={164--171},
+  year={1970},
+  publisher={JSTOR}
+}
+
+#+end_src
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
