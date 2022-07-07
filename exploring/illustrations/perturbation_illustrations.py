@@ -7,8 +7,11 @@ Introduce gaussian noise to proteins and save resulting point cloud images.
 
 """
 
+from typing import Dict
+
 import hydra
 import matplotlib.pyplot as plt
+import numpy as np
 import plotly.graph_objs as gobj
 import seaborn as sns
 from gtda import pipeline
@@ -29,9 +32,45 @@ from proteinmetrics.utils.plots import setup_plotting_parameters
 
 poi = 3
 
+percent_perturbation = 0.1
 
-def main():
+
+@hydra.main(
+    version_base=None,
+    config_path=str(here()) + "/conf/",
+    config_name="systematic",
+)
+def main(cfg: DictConfig) -> None:
     pdb_files = list_pdb_files(HUMAN_PROTEOME)
+    gaussian_noise_level = (
+        np.linspace(
+            cfg.perturbations.gaussian_noise.min,
+            cfg.perturbations.gaussian_noise.max,
+            cfg.perturbations.n_perturbations,
+        )[int(percent_perturbation * cfg.perturbations.n_perturbations)],
+    )[0]
+    twist_level = (
+        np.linspace(
+            cfg.perturbations.twist.min,
+            cfg.perturbations.twist.max,
+            cfg.perturbations.n_perturbations,
+        )[int(percent_perturbation * cfg.perturbations.n_perturbations)],
+    )[0]
+    taper_level = (
+        np.linspace(
+            cfg.perturbations.taper.min,
+            cfg.perturbations.taper.max,
+            cfg.perturbations.n_perturbations,
+        )[int(percent_perturbation * cfg.perturbations.n_perturbations)],
+    )[0]
+    shear_level = (
+        np.linspace(
+            cfg.perturbations.shear.min,
+            cfg.perturbations.shear.max,
+            cfg.perturbations.n_perturbations,
+        )[int(percent_perturbation * cfg.perturbations.n_perturbations)],
+    )[0]
+
     setup_plotting_parameters()
     base_feature_steps = [
         ("coordinates", Coordinates(granularity="CA", n_jobs=1),),
@@ -45,7 +84,7 @@ def main():
             "gaussian noise",
             GaussianNoise(
                 noise_mean=0,
-                noise_std=3,
+                noise_std=gaussian_noise_level,
                 n_jobs=1,
                 verbose=False,
                 random_state=42,
@@ -58,7 +97,9 @@ def main():
     twist_steps.append(
         (
             "twist",
-            Twist(alpha=0.02, n_jobs=1, verbose=False, random_state=42,),
+            Twist(
+                alpha=twist_level, n_jobs=1, verbose=False, random_state=42,
+            ),
         ),  # type: ignore
     )
     twist_pipeline = pipeline.Pipeline(twist_steps, verbose=False)
@@ -67,7 +108,13 @@ def main():
     taper_steps.append(
         (
             "taper",
-            Taper(a=0.008, b=0.008, n_jobs=1, verbose=False, random_state=42,),
+            Taper(
+                a=taper_level,
+                b=taper_level,
+                n_jobs=1,
+                verbose=False,
+                random_state=42,
+            ),
         ),  # type: ignore
     )
     taper_pipeline = pipeline.Pipeline(taper_steps, verbose=False)
@@ -77,17 +124,21 @@ def main():
         (
             "shear",
             Shear(
-                shear_x=1, shear_y=1, n_jobs=1, verbose=False, random_state=42,
+                shear_x=shear_level,
+                shear_y=shear_level,
+                n_jobs=1,
+                verbose=False,
+                random_state=42,
             ),
         ),  # type: ignore
     )
     shear_pipeline = pipeline.Pipeline(shear_steps, verbose=False)
 
-    protein = base_feature_pipeline.fit_transform([pdb_files[3]])
-    protein_gauss = gn_pipeline.fit_transform([pdb_files[3]])
-    protein_twist = twist_pipeline.fit_transform([pdb_files[3]])
-    protein_taper = taper_pipeline.fit_transform([pdb_files[3]])
-    protein_shear = shear_pipeline.fit_transform([pdb_files[3]])
+    protein = base_feature_pipeline.fit_transform([pdb_files[poi]])
+    protein_gauss = gn_pipeline.fit_transform([pdb_files[poi]])
+    protein_twist = twist_pipeline.fit_transform([pdb_files[poi]])
+    protein_taper = taper_pipeline.fit_transform([pdb_files[poi]])
+    protein_shear = shear_pipeline.fit_transform([pdb_files[poi]])
 
     # fig = plt.figure(figsize=plt.figaspect(0.5))
     fig = plt.figure(figsize=(10, 10))
@@ -116,7 +167,11 @@ def main():
     ax.set_xlim(-130, 130)
     ax.set_ylim(-60, 60)
     ax.set_zlim(-150, 150)
-    ax.title.set_text(r"Gaussian Noise ($\sigma=3\mathring{A}$)")
+    ax.title.set_text(
+        r"Gaussian Noise ($\sigma=$"
+        + f"{round(gaussian_noise_level,2)}"
+        + r"$\mathring{A}$)"
+    )
 
     # fig.colorbar(sc, shrink=0.5, aspect=10)
 
@@ -143,7 +198,11 @@ def main():
     ax.set_xlim(-130, 130)
     ax.set_ylim(-60, 60)
     ax.set_zlim(-150, 150)
-    ax.title.set_text(r"Twist ($\alpha=0.02$ rad $\cdot \mathring{A}^{-1}$)")
+    ax.title.set_text(
+        r"Twist ($\alpha=$"
+        + f"{round(twist_level,2)}"
+        + r" rad $\cdot \mathring{A}^{-1}$)"
+    )
 
     # fig.colorbar(sc, shrink=0.5, aspect=10)
 
@@ -170,7 +229,7 @@ def main():
     ax.set_xlim(-130, 130)
     ax.set_ylim(-60, 60)
     ax.set_zlim(-150, 150)
-    ax.title.set_text(r"Taper ($a=b=0.08$)")
+    ax.title.set_text(r"Taper ($a=b=$" + f"{round(taper_level, 2)}")
 
     # fig.colorbar(sc, shrink=0.5, aspect=10)
 
@@ -197,7 +256,7 @@ def main():
     ax.set_xlim(-130, 130)
     ax.set_ylim(-60, 60)
     ax.set_zlim(-150, 150)
-    ax.title.set_text(r"Shear ($x=y=1$)")
+    ax.title.set_text(r"Shear ($x=y=$" + f"{round(shear_level,2)}" + ")")
 
     # fig.colorbar(sc, shrink=0.5, aspect=10)
 
