@@ -2104,8 +2104,21 @@ HMMs
   year={1994},
   publisher={IEEE}
 }
-
 #+end_src
+
+MWU
+#+begin_src bibtex
+@article{fay2010wilcoxon,
+  title={Wilcoxon-Mann-Whitney or t-test? On assumptions for hypothesis tests and multiple interpretations of decision rules},
+  author={Fay, Michael P and Proschan, Michael A},
+  journal={Statistics surveys},
+  volume={4},
+  pages={1},
+  year={2010},
+  publisher={NIH Public Access}
+}
+#+end_src
+
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases
