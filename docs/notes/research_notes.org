@@ -140,7 +140,7 @@ Generative models popular today:
  + Li 2018 - also generates nodes and edges sequentially uses the hidden state to decide what to do at the next step
  #+begin_src bibtex
 @article{li2018learning,
-  title={Learning deep generative models of graphs},
+  title={{Learning Deep Generative Models of Graphs}},
   author={Li, Yujia and Vinyals, Oriol and Dyer, Chris and Pascanu, Razvan and Battaglia, Peter},
   journal={arXiv preprint arXiv:1803.03324},
   year={2018}
@@ -590,16 +590,7 @@ Giotto-TDA library
 
 #+end_src
 
-Heat kernel on persistence diagrams
-#+begin_src bibtex
-@inproceedings{reininghaus2015stable,
-  title={{A Stable Multi-Scale Kernel for Topological Machine Learning}},
-  author={Reininghaus, Jan and Huber, Stefan and Bauer, Ulrich and Kwitt, Roland},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
-  pages={4741--4748},
-  year={2015}
-}
-#+end_src
+
 
 original mmd papers
 #+begin_src bibtex
@@ -834,6 +825,8 @@ Sliced Wasserstein kernel (approximates the wasserstein distance in kernel space
 
 Proof that the Wasserstein distance is not negative definite and that
 transforming it to a similarity measure is not possible. (See Appendix A.)
+
+Heat kernel on persistence diagrams
 #+begin_src bibtex
 @inproceedings{reininghaus2015stable,
   title={{A Stable Multi-Scale Kernel for Topological Machine Learning}},
@@ -2094,15 +2087,38 @@ HMMs
 @article{baum1970maximization,
   title={{A maximization technique occurring in the statistical analysis of probabilistic functions of Markov chains}},
   author={Baum, Leonard E and Petrie, Ted and Soules, George and Weiss, Norman},
-  journal={The annals of mathematical statistics},
+  journal={The Annals of Mathematical Statistics},
   volume={41},
   number={1},
   pages={164--171},
   year={1970},
   publisher={JSTOR}
 }
-
+@article{hwang1994nonparametric,
+  title={Nonparametric multivariate density estimation: a comparative study},
+  author={Hwang, Jenq-Neng and Lay, Shyh-Rong and Lippman, Alan},
+  journal={IEEE Transactions on Signal Processing},
+  volume={42},
+  number={10},
+  pages={2795--2810},
+  year={1994},
+  publisher={IEEE}
+}
 #+end_src
+
+MWU
+#+begin_src bibtex
+@article{fay2010wilcoxon,
+  title={Wilcoxon-Mann-Whitney or t-test? On assumptions for hypothesis tests and multiple interpretations of decision rules},
+  author={Fay, Michael P and Proschan, Michael A},
+  journal={Statistics surveys},
+  volume={4},
+  pages={1},
+  year={2010},
+  publisher={NIH Public Access}
+}
+#+end_src
+
 ** Notes for thesis
 *** Discuss mode collapse and mode dropping
 *** Discuss descriptors with bin_ranges not able to capture extreme cases

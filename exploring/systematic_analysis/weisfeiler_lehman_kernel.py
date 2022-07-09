@@ -210,6 +210,16 @@ def main():
     plt.tight_layout()
     plt.savefig(here() / "exploring/systematic_analysis/res_3.pdf")
 
+    df.groupby(["Perturbation (%)", "perturb_type", "Kernel Settings"]).std()[
+        "Normalized MMD"
+    ].reset_index().groupby(["perturb_type", "Kernel Settings"])[
+        "Normalized MMD"
+    ].mean().round(
+        3
+    ).to_latex(
+        here() / "exploring/systematic_analysis/res_3_std.tex"
+    )
+
 
 if __name__ == "__main__":
     main()

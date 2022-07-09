@@ -7,9 +7,6 @@
 % Dependencies
 \usepackage{ETHlogo}
 
-% Turn extra space before chapter headings off.
-\setlength{\beforechapskip}{0pt}
-
 \nonzeroparskip
 \parindent=0pt
 \defaultlists
@@ -91,11 +88,14 @@
     \@department, ETH Z\"urich
   \end{flushright}
 }
-% Set same size of margins for both sides
+% Set same size of margins
 \setlrmargins{*}{*}{1}
 \checkandfixthelayout
 
-\setlength{\droptitle}{-48pt}
+% \setlength{\droptitle}{-48pt}
+
+% Turn extra space before chapter headings off.
+\setlength{\beforechapskip}{0pt}
 
 \makeatother
 

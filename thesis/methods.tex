@@ -394,6 +394,24 @@ coefficient (Equation \ref{eq:pearson}) will allow us to further refine the
 selection of the metrics behaving most predictably, and distill the most
 relevant configurations for a given perturbation range.
 
+Another important metric we can employ to quantify the quality of a particular
+\acrshort{mmd} configuration is the standard deviation of the various
+\acrshort{mmd} values across runs over the whole range of pertubations. As
+indicated in Section \ref{sec:evalproblem}, one of the desiderata for a
+generative model metric is robustness. Since all experiments have been run with
+the same number of i.i.d. samples every time, using the standard deviation
+allows us to estimate how much a particular \acrshort{mmd} configuration is sensitive
+to the underlying data used. An \acrshort{mmd} configuration with a high standard
+deviation under a particular perturbation regime would be indicative of low
+robustness, and would therefore be a less reliable estimate of the quality of
+the samples compared to an \acrshort{mmd} configuration with a high standard
+deviation. We abbreviate this standard deviation measure as $\sigma_\MMD$ to
+avoid confusion with the $\sigma$ parameter of the RBF kernel presented in
+Section \ref{sec:methods_kernels}. In Chapter \ref{chap:results}, wherever we
+conduct statistical tests, our highest significance threshold is $5\cdot 10^{-2}$.
+significance threshold is
+
+
 \subsection{Software Library Design}
 
 

@@ -31,14 +31,16 @@
 \usepackage[sc]{mathpazo}
 
 %% The AMS-LaTeX extensions for mathematical typesetting.  Do not
-%% remove.
+
 \usepackage{amsmath,amssymb,amsfonts,mathrsfs}
 
 %% NTheorem is a reimplementation of the AMS Theorem package. This
+
 %% will allow us to typeset theorems like examples, proofs and
 %% similar.  Do not remove.
 %% NOTE: Must be loaded AFTER amsmath, or the \qed placement will
 %% break
+
 \usepackage[amsmath,thmmarks]{ntheorem}
 
 %% LaTeX' own graphics handling
@@ -54,6 +56,7 @@
 
 %% Some more packages that you may want to use.  Have a look at the
 %% file, and consult the package docs for each.
+
 \input{extrapackages}
 
 %% Our layout configuration.  DO NOT CHANGE.
@@ -79,29 +82,33 @@
 \newacronym{tda}{TDA}{Topological Data Analysis}
 \newacronym{rkhs}{RKHS}{Reproducing Kernel Hilbert Space}
 \newacronym{esm}{ESM}{Evolutionary Scale Modeling}
+\newacronym{hmms}{HMMs}{Hidden Markov Models}
+\newacronym{vaes}{VAEs}{Variational Auto-Encoders}
+\newacronym{gnns}{GNNs}{Graph Neural Networks}
+\newacronym{gins}{GINs}{Graph Isormorphism Networks}
 
-% TODO: set all to black before submitting
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
   filecolor=black,
   urlcolor=blue,
   citecolor=black,
-  pdftitle={Designing performance measures to evaluate generative models on
-protein data sets.},
+  pdftitle={Designing Performance Measures to Evaluate Generative Models
+    on Protein Data Sets},
   pdfpagemode=FullScreen,
 }
 
 %% Document information
 %% ====================
 
-\title{Designing performance measures to evaluate generative models
-  on protein data sets}
+\title{Designing Performance Measures to Evaluate Generative Models
+  on Protein Data Sets}
 \author{Philip Jean Hartout}
 \thesistype{Master Thesis}
 \advisors{Advisors: Tim Kucera, Leslie O'Bray, Prof. Dr. Karsten Michael Borgwardt}
 \department{Department of Biosystems Science and Engineering}
 \date{July 11, 2022}
+
 \begin{document}
 
 \frontmatter
@@ -125,7 +132,6 @@ protein data sets.},
 \tableofcontents
 \clearpage
 \listoffigures
-\clearpage
 \listoftables
 \clearpage
 \printglossary[type=\acronymtype]
@@ -133,6 +139,7 @@ protein data sets.},
 
 \mainmatter
 
+% TODO: action titles
 %% Your real content!
 \input{introduction}
 \input{background}
@@ -142,7 +149,6 @@ protein data sets.},
 \input{conclusion}
 
 \appendix
-
 
 \input{appendix}
 
