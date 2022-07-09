@@ -12,7 +12,7 @@ suitable for proteins. We conclude this chapter with a short section on the
 runtimes of the various elements of the computational pipelines shown in this
 chapter.
 
-\section{Overall \acrshort{mmd} Behavior}
+\section{Overall \acrshort{mmd} Behavior}\label{sec:overall_behaviour}
 
 \paragraph{General observations on the correlation coefficients} Surprisingly,
 we found that the behavior of \acrshort{mmd} was not as inconsistent for the
@@ -397,29 +397,78 @@ and denser graphs.
 
 The results of the perturbation experiments using the Weisfeiler-Lehman kernel
 (see Sections \ref{sec:kernels} and \ref{sec:methods_kernels}) in MMD can be
-seen in Figure \ref{fig:wlk}. Two important takeaways can be
+seen in Figure \ref{fig:wlk}. Two important takeaways can be be derived from
+this figure.
 
-% Lead time
+% TODO: WL glossary entry
+\paragraph{Quality of MMD using Weisfeiler-Lehman} The first conclusion is
+derived from the observation of the meta metrics. We can see that, correlations
+are relatively low for graph perturbations (Figure \ref{fig:wlk}, top row). If
+we take the kernel using 5 iterations for instance, we get $\rho_P=0.4$ and
+$\rho_S=0.44$ when adding edges. Additionally, from the shape of the curve, we
+can also derive that the Weisfeiler-Lehman kernel is not sensitive to changes in
+the number of edges unless an extreme amount is added. Removing edges also
+results in a similar curve, but correlation coefficients are higher, with
+$\rho_P=0.68$ and $\rho_S=1.0$ ( $\rho_P$ is still considerably lower than other
+configurations of MMD examined thus far, see earlier Sections
+\ref{sec:overall_behaviour} and \ref{sec:results_sensitivity} for details). The
+next perturbation (rewiring edges), highlights the need for the standard
+deviation estimation of different samples (see Table
+\ref{tab:std_graph_kernel}), because although the correlation coefficients are
+reasonable ($\rho_P=0.71$, $\rho_S=0.99$), one could realistically not
+distinguish highly rewired protein graphs from another, because $\sigma_\MMD$ is
+extremely high compared to other configurations or other types of perturbations
+(for the rewiring, all $\sigma_\MMD>0.28$ while the other $\sigma_\MMD<0.15$).
+This reflects the high confidence internal we see in the upper right pane of
+Figure \ref{fig:wlk}. For point cloud perturbations, correlation coefficients
+are in line with the coefficients we have seen before ($\rho_P>0.94$ and we
+consistently have $\rho_S=1$), there seems to be a crucial caveat in the curves
+that we see in Figure \ref{fig:wlk} which we discuss next.
 
-% Correlations
+\paragraph{Insensitivity to low regimes of perturbation} Figure \ref{fig:wlk}
+indeed reveals a systematic pathology when using the Weisfeiler-Lehman kernel in
+MMD. When applying a low amount of perturbation, there does not seem to be a
+proportional rise in the (normalized) MMD value. As an example, the normalized
+MMD only rises substantially from the observed value on the unperturbed set
+after adding 10\% of Gaussian noise to the data (which corresponds to
+3.16\si{\angstrom}, see Figure \ref{fig:perturbation_illustration} for an
+illustration of what 10\% of Gaussian noise looks like for a given protein).
+This `inverted elbow' shape of the curve seen in almost all perturbation types
+except for the rewiring regime, where the very high $\sigma_\MMD$ seems to obscure
+any meaningful pattern as discussed in the previous paragraph. This phenomenon
+is particularly pronounced in the other two graph perturbation scenarios, where
+80\%-95\% of the perturbation needs to be added to observe any meaningful change
+in MMD. This has dramatic implications for practitioners, as this means that one
+cannot distinguish between a generated sample of graphs and a real one unless
+the generated sample exhibits highly pathological features, which is
+undesirable for evaluation purposes. While the reason for these findings are not
+entirely clear, it is possible that the diversity of the hashes obtained during
+the Weisfeiler-Lehman algorithm is so high that substantial changes need to
+occur prior to observing any shifts in the dot product of the resulting hash
+histograms. Further analyses on the diversity of hashes and their relative
+population needs to be done to validate this hypothesis. Another way to remedy
+this pathology would be to not use the amino acid as node labels. While this
+would entail loosing sensitivity to mutations, the diversity of hashes might be
+substantially reduced so as to ensure that the resulting dot products will be
+more sensitive to changes in hash populations.
 
 
-Contrary to the tendencies observed in Section
-\ref{sec:results_sensitivity}, \acrshort{mmd}s obtained using the
-Weisfeiler-Lehman kernels on 8\si{\angstrom} graphs are very \emph{insensitive} to
-medium levels of perturbations (the resulting curves only start to increase
-anywhere starting from 5\% to 85\% of the perturbation range), and seems to even completely oblivious to rewiring of
-graphs and generally insensitive to graph perturbations unless highly perturbed
-(see upper row of Figure \ref{fig:wlk}).
+% Contrary to the tendencies observed in Section
+% \ref{sec:results_sensitivity}, \acrshort{mmd}s obtained using the
+% Weisfeiler-Lehman kernels on 8\si{\angstrom} graphs are very \emph{insensitive} to
+% medium levels of perturbations (the resulting curves only start to increase
+% anywhere starting from 5\% to 85\% of the perturbation range), and seems to even completely oblivious to rewiring of
+% graphs and generally insensitive to graph perturbations unless highly perturbed
+% (see upper row of Figure \ref{fig:wlk}).
 
 
-The most likely explanation is that the
-diversity of Weisfeiler-Lehman hashes (i.e. neighborhoods) observed within
-perturbed or unperturbed samples is relatively high, which makes distinguishing
-between the two a high threshold to overcome. This drawback could disappear if
-one is working on a more targeted set of morphologically similar proteins with a
-lower diversity of Weisfeiler-Lehman hashes, but this is beyond the scope of the
-thesis.
+% The most likely explanation is that the
+% diversity of Weisfeiler-Lehman hashes (i.e. neighborhoods) observed within
+% perturbed or unperturbed samples is relatively high, which makes distinguishing
+% between the two a high threshold to overcome. This drawback could disappear if
+% one is working on a more targeted set of morphologically similar proteins with a
+% lower diversity of Weisfeiler-Lehman hashes, but this is beyond the scope of the
+% thesis.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_3.pdf}
@@ -471,7 +520,7 @@ results in \acrshort{mmd}s with a high inter-run variance.}
   \caption{Standard deviations of the various Weisfeiler-Lehman configurations
 under different perturbation regimes. Values higher than 0.1 are in bold.
 Rewiring edges results in the highest standard deviations by far with
-$\sigma_\MMD>0.2$. Lower iterations of the algorithm also results in higher
+$\sigma_\MMD>0.28$. Lower iterations of the algorithm also results in higher
 standard deviations.}
   \label{tab:std_graph_kernel}
 \end{table}
