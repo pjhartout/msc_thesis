@@ -231,11 +231,7 @@ def load_gaussian_degree():
         eps_value=32,
     )
     df = pd.concat(
-        [
-            # clustering_eps_8,
-            clustering_eps_16,
-            clustering_eps_32,
-        ],
+        [clustering_eps_8, clustering_eps_16, clustering_eps_32,],
         ignore_index=True,
     )
     return df
