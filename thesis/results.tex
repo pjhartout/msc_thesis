@@ -14,31 +14,31 @@ chapter.
 
 \section{Overall \acrshort{mmd} Behavior}
 
-Surprisingly, we found that the behavior of \acrshort{mmd} was not as
-inconsistent for the types of graphs extracted from proteins as was found on
-synthetic graphs by \cite{obray2022evaluation}. Figure
-\ref{fig:mmd_consistent_eps} show trajectories and correlations of
-\acrshort{mmd} values with different perturbation types using
-$\varepsilon$-graphs with $\varepsilon$ set to $8$ \si{\angstrom}. Both the
-Spearman and Pearson correlation coefficients averaged across runs are high.
-There is, however, an exception: the correlation between the \acrshort{mmd}
-obtained from the degree histogram and the addition of edges is comparatively
-low with $\rho_P=0.25$ and $\rho_S=-0.44$ versus that obtained from the
-Laplacian spectrum histogram (with $\rho_P=0.95$, $\rho_S=0.98$), and the
-clustering histogram (with $\rho_P=0.95$, $\rho_S=0.97$). Curiously, the next
-lowest (Pearson) correlation coefficient from Figure
+\paragraph{General observations on the correlation coefficients} Surprisingly,
+we found that the behavior of \acrshort{mmd} was not as inconsistent for the
+types of graphs extracted from proteins as was found on synthetic graphs by
+\cite{obray2022evaluation}. Figure \ref{fig:mmd_consistent_eps} show
+trajectories and correlations of \acrshort{mmd} values with different
+perturbation types using $\varepsilon$-graphs with $\varepsilon$ set to $8$
+\si{\angstrom}. Both the Spearman and Pearson correlation coefficients averaged
+across runs are high. There is, however, an exception: the correlation between
+the \acrshort{mmd} obtained from the degree histogram and the addition of edges
+is comparatively low with $\rho_P=0.25$ and $\rho_S=-0.44$ versus that obtained
+from the Laplacian spectrum histogram (with $\rho_P=0.95$, $\rho_S=0.98$), and
+the clustering histogram (with $\rho_P=0.95$, $\rho_S=0.97$). Curiously, the
+next lowest (Pearson) correlation coefficient from Figure
 \ref{fig:mmd_consistent_eps} is also associated to the degree distribution
 histogram under the rewiring perturbation regime ($\rho_p=0.82$ $\rho_S=0.98$).
 
-In parallel, Table \ref{tab:1_1_std} also supports the fact that the standard
-deviation of the normalized \acrshort{mmd} of the degree distribution descriptor
-is the highest, suggesting that this is not a very robust descriptor. Since
-modelling graph connectivity is one of the primary challenges of generative
-graph models \citep{li2018learning}, based on these results we do not recommend
-using a degree histogram as a descriptor function for \acrshort{mmd}. The
-remaining descriptors do show high correlations ($\rho_P\geq 0.89$, $\rho_S\geq
-0.97$) and reasonably low standard deviations ($>0.64$), which make them good
-candidates.
+\paragraph{General observations on the standard deviations} In parallel, Table
+\ref{tab:1_1_std} also supports the fact that the standard deviation of the
+normalized \acrshort{mmd} of the degree distribution descriptor is the highest,
+suggesting that this is not a very robust descriptor. Since modelling graph
+connectivity is one of the primary challenges of generative graph models
+\citep{li2018learning}, based on these results we do not recommend using a
+degree histogram as a descriptor function for \acrshort{mmd}. The remaining
+descriptors do show high correlations ($\rho_P\geq 0.89$, $\rho_S\geq 0.97$) and
+reasonably low standard deviations ($>0.64$), which make them good candidates.
 
 \begin{figure}[!htbp]
   \centering
@@ -97,26 +97,26 @@ Twist & Clustering Histogram &        0.052784 \\
 
   \label{tab:1_1_std}
 \end{table}
+% TODO: shave significant digits
 \clearpage
 
-We next investigate the overall influence of the kernel on the correlations
-between perturbations and \acrshort{mmd} shown in Figure
-\ref{fig:mmd_effect_kernel}. We can see that for $\sigma\lessapprox 0.1$
-($\sigma$ being the hyperparameter of the Gaussian kernel, see Section
-\ref{sec:kernels}) and for the linear kernel, \acrshort{mmd} values behave as
-desired, i.e. $\rho_P,\rho_S\geq 0.8$ and, if one excludes the Laplacian
-spectrum histogram at $\sigma=0.1$, we have $\rho_P,\rho_S>0.95$. However,
-correlation coefficients drop sharply when increasing $\sigma<0.1$, most likely
-due to oversmoothing, which is a phenomenon arising when the bandwidth of the
-kernel is large enough to obscure any structure in the data
-\citep{hwang1994nonparametric}. This can have unpredictable consequences
-on resulting MMD values: in the case of the degree histogram or the clustering
+\paragraph{Influence of the choice of kernel} We next investigate the overall
+influence of the kernel on the correlations between perturbations and
+\acrshort{mmd} shown in Figure \ref{fig:mmd_effect_kernel}. We can see that for
+$\sigma\lessapprox 0.1$ ($\sigma$ being the hyperparameter of the Gaussian
+kernel, see Section \ref{sec:kernels}) and for the linear kernel, \acrshort{mmd}
+values behave as desired, i.e. $\rho_P,\rho_S\geq 0.8$ and, if one excludes the
+Laplacian spectrum histogram at $\sigma=0.1$, we have $\rho_P,\rho_S>0.95$.
+However, correlation coefficients drop sharply when increasing $\sigma>0.1$,
+most likely due to oversmoothing, which is a phenomenon arising when the
+bandwidth of the kernel is large enough to obscure any structure in the data
+\citep{hwang1994nonparametric}. This can have unpredictable consequences on
+resulting MMD values: in the case of the degree histogram or the clustering
 histogram, this results in an overly sensitive kernel sharply increasing in
-value at the slightest perturbation, while the clustering
-histogram remains oblivious to large amounts of perturbation. This can be
-explained by the relative scale of each of the embeddings and their pairwise
-distances, which we catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh
-                                % this out a bit further maybe.
+value at the slightest perturbation, while the clustering histogram remains
+oblivious to large amounts of perturbation. This can be explained by the
+relative scale of each of the embeddings and their pairwise distances, which we
+catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh this out a bit further maybe.
 
 \begin{figure}[!htbp]
   \centering
@@ -132,86 +132,235 @@ distances, which we catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh
   \label{fig:mmd_effect_kernel}
 \end{figure}
 
-$k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
-able to detect perturbations - see Figure \ref{fig:mmd_k_nn_graphs} for an
-example with 2-NN graphs. However, they are extremely sensitive to Gaussian
-noise and to the addition of edges (see the upper left and the upper mid pane of Figure
-\ref{fig:mmd_k_nn_graphs}). Presumably, this is because very small amounts of
-noise ($<4$\si{\angstrom}) affect the direct local neighborhood of each node
-very significantly in such a way that the resulting $k$-NN graph is rapidly
-disrupted, which is not necessarily the case with other perturbations. We note
-that overall the $\varepsilon$-graphs behave more consistently than $k$-NN
-graphs, with 13 out of 21 Pearson's correlation coefficients being higher in
-$\varepsilon$-graphs compared to $k$-NN graphs and 11 out of 21 Spearman's
-correlation coefficients being higher in 8\si{\angstrom}-graphs compared to 2-NN
-graphs. Even when the $\varepsilon$-graphs did not compare favorably, it was by
-a considerably lower margin than $k$-NN graphs in a similar setting. This effect
-seems to be mitigated by increasing $k$, but this comes at the cost of a lower
-Spearman correlation coefficient, which is even less desirable - see Figure
-\ref{fig:k_vs_turbulence_gaussian_noise}. Changing kernel parameters did not
-alleviate the pathologies (see Supplementary Figure
-\ref{fig:mmd_effect_kernel_knn}) and had the same overall effect as observed in
-Figure \ref{fig:mmd_effect_kernel}. We, therefore, proceed with further analysis
-using $\varepsilon$-graphs.
+\paragraph{Comparing graph construction techniques from proteins} To compare which graph
+construction technique was overall most adviseable, we computed the correlation
+coefficients of the various available combinations of graph type, graph
+extraction parameter, and description function with an RBF kernel with
+$\sigma=0.01$, which was shown to behave reasonably stably across descriptors
+(Figure \ref{fig:mmd_effect_kernel}). We then compared the distributions of the
+two correlation coefficients and computed a Mann-Whitney $\mathcal{U}$ test
+\citep{fay2010wilcoxon}. Figure \ref{fig:correlations_graph_construction} shows
+the distributions of both $\rho_S$ and $\rho_P$ for the $k$-NN and
+$\varepsilon$-graphs. Both the test for the Pearson correlation coefficient and
+the Spearman correlation coefficient were significant ($p=8.35\cdot 10^{-4}$ and
+$p=1.765\cdot 10^{-2}$, respectively) indicating that one distribution is
+stochastically greater than the other. In both cases, the distribution of the
+correlation coefficients from the $\varepsilon$-graphs is higher, as we can see
+in the legend of Figure \ref{fig:correlations_graph_construction}. This result
+is intuitive, because $\epsilon$-graphs are likely more sensitive to the
+underlying topology of the protein. We therefore proceed with $\epsilon$-graphs
+in the subsequent results discussed below.
 
 \begin{figure}[!htbp]
   \centering
-  \includegraphics[width=\textwidth]{./figures/results/res_1_3.pdf}
-  \caption[2-nearest-neighbour graphs result in descriptors highly sensitive to
-the addition of edges and Gaussian noise.]{\acrshort{mmd} vs. Gaussian noise
-perturbation (in \% of the maximum values shown in Table
-\ref{tab:perturbation_ranges}) for various graph descriptors of the
-2-nearest-neighbour graphs. $\rho_{S}$: average Spearman correlation coefficient
-across runs. $\rho_{P}$: average Pearson correlation coefficient across runs. We
-can see that this particular representation results in \acrshort{mmd} values
-that are very sensitive to the addition of edges or Gaussian noise, regardless
-of the descriptor used.}
-  \label{fig:mmd_k_nn_graphs}
+  \includegraphics[width=0.8\textwidth]{./figures/results/compare_corrs_graph_construction.pdf}
+  \caption[Violin plot of the distributions of the correlation coefficients of
+various \acrshort{mmd} configurations derived from the two different graph
+construction methods.]{Violin plot of the distributions of the correlation
+coefficients of various \acrshort{mmd} configurations derived from the two
+different graph construction methods. Each distribution contains various
+combinations of descriptor functions, perturbation types, and various values of
+the parameter used to extract the graphs (i.e. $k$ in the case of $k$-NN graphs
+and $\varepsilon$ in the case of $\varepsilon$-graphs). The distributions are
+then compared using a Mann-Whitney $U$ test, yielding significant $p$-values for
+both $\rho_S$ and $\rho_P$ ($p=8.35\cdot 10^{-4}$ and $p=1.765\cdot 10^{-2}$,
+respectively), indicating that the correlation coefficients obtained from $k$-NN
+graphs are statisitcally significantly worse than those obtained from
+$\varepsilon$-graphs. }
+  \label{fig:correlations_graph_construction}
 \end{figure}
+% TODO: discuss the idea of the M-W U test with Tim
 
-\begin{figure}[!htbp]
-  \includegraphics[width=\textwidth]{./figures/results/res_1_4.pdf}
-  \caption[Influence of $k$ on the resulting \acrshort{mmd}
-values.]{\acrshort{mmd} vs. Gaussian noise perturbation (in \% of the maximum
-values shown in Table \ref{tab:perturbation_ranges}) for various graph
-descriptors and values of $k$ used to extract the $k$-NN graph. $\rho_{S}$:
-average Spearman correlation coefficient across runs. $\rho_{P}$: average
-Pearson correlation coefficient across runs. Overall, the smaller the $k$, the
-more sensitive the \acrshort{mmd}. Choosing $k=2$ results in sometimes
-unpredictable behaviour depending on the descriptor chosen (like the clustering
-and laplacian spectrum histograms).}
-  \label{fig:k_vs_turbulence_gaussian_noise}
 
-\end{figure}
+
+
+% $k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
+% able to detect perturbations - see Figure \ref{fig:mmd_k_nn_graphs} for an
+% example with 2-NN graphs. However, they are extremely sensitive to Gaussian
+% noise and to the addition of edges (see the upper left and the upper mid pane of Figure
+% \ref{fig:mmd_k_nn_graphs}). Presumably, this is because very small amounts of
+% noise ($<4$\si{\angstrom}) affect the direct local neighborhood of each node
+% very significantly in such a way that the resulting $k$-NN graph is rapidly
+% disrupted, which is not necessarily the case with other perturbations. We note
+% that overall the $\varepsilon$-graphs behave more consistently than $k$-NN
+% graphs, with 13 out of 21 Pearson's correlation coefficients being higher in
+% $\varepsilon$-graphs compared to $k$-NN graphs and 11 out of 21 Spearman's
+% correlation coefficients being higher in 8\si{\angstrom}-graphs compared to 2-NN
+% graphs. Even when the $\varepsilon$-graphs did not compare favorably, it was by
+% a considerably lower margin than $k$-NN graphs in a similar setting. This effect
+% seems to be mitigated by increasing $k$, but this comes at the cost of a lower
+% Spearman correlation coefficient, which is even less desirable - see Figure
+% \ref{fig:k_vs_turbulence_gaussian_noise}. Changing kernel parameters did not
+% alleviate the pathologies (see Supplementary Figure
+% \ref{fig:mmd_effect_kernel_knn}) and had the same overall effect as observed in
+% Figure \ref{fig:mmd_effect_kernel}. We, therefore, proceed with further analysis
+% using $\varepsilon$-graphs.
+
 
 % \acrshort{mmd} is quite stable, somewhat contradicts what obray is saying. Maybe due to
 % the different nature of the graphs.
-
+\clearpage
 \section{Influence of the Graph Representation on the Sensitivity to
 Perturbations}\label{sec:results_sensitivity}
 
-In the last section, we discussed the notion of sensitivity of a particular \acrshort{mmd}
-configuration to perturbations. We explore this idea further here. Specifically,
-we investigate the impact of the $\varepsilon$ threshold on the resulting
-sensitivity of the \acrshort{mmd} configuration to various perturbations affecting the
-underlying point cloud. Figure \ref{fig:mmd_sensitivity_eps} shows that, in
-general, the lower the $\varepsilon$, the more sensitive the \acrshort{mmd} to
-perturbations. Low sensitivity to perturbation might be useful in the early
-stages of modeling when generated samples only need to \emph{coarsely} match
-the reference samples. Conversely, a higher sensitivity to perturbations might
-be useful when trying to \emph{finely} distinguish a set of anomalous samples
-from the reference samples. Additionally, we can see that under the Gaussian
-noise, twisting and tapering perturbation, larger values of $\varepsilon$
-introduce larger variations in \acrshort{mmd} values.
+\paragraph{Lower values of $\varepsilon$ are more stable} In the previous paragraph, we established that $\varepsilon$-graphs were more
+appropriate to compute the \acrshort{mmd}. Now, we investigate which specific
+threshold(s) $\varepsilon$ are most appropriate using the same meta-metrics as
+before. Figure \ref{fig:mmd_sensitivity_eps} shows the normalized MMD values
+with the varying degree of different types of perturbations with various graph
+descriptors. While most configurations exhibit high correlations: excluding
+seven outliers of the 72 coefficients calculated, we have $\rho_P>0.97$ and
+$\rho_S>0.98$. In Figure \ref{fig:mmd_sensitivity_eps}, we can also see that
+lower coefficients tend to be reached when using a high threshold $\varepsilon$.
+For instance, in the case of the twisting perturbation and using the clustering
+histogram as a graph descriptor, we see $\rho_P=0.73$ and $\rho_S=0.71$ for 32
+\si{\angstrom}-graphs vs $\rho_P=0.96$ and $\rho_S=1.0$ for both 16 and 8
+\si{\angstrom} graphs. While this is the most extreme example, we also see a
+similar pattern when using a different descriptor, such as the Laplacian
+spectrum histogram, where we have $\rho_P=\rho_S=0.93$ for 32-\si{\angstrom}
+graphs vs $\rho_P=0.99 \rho_S=1.0$ for 16 \si{\angstrom}-graphs and $\rho_P=1.0
+\rho_S=1.0$ for 8-\si{\angstrom} graphs. While there are some exceptions to this
+pattern, the differences are not nearly as substantial (the highest difference
+where the correlation coefficient for the 32-\si{\angstrom} graph is higher than
+the other two $\varepsilon$ thresholds is 0.03, see lower mid pane of Figure
+\ref{fig:mmd_sensitivity_eps}).
+
+The finding that increasing $\varepsilon$ decreases the overall quality of MMD
+is further supported by the changes in standard deviation of the different runs
+averaged across the applied perturbation range, which is summarized in Table
+\ref{tab:std_dev_epsilon_influence}. In this table, we can see that higher
+values of $\varepsilon$ almost consistently incur a higher standard deviation,
+i.e. we almost always have $\sigma_{\MMD, 32-\AA}>\sigma_{\MMD,
+16-\AA}>\sigma_{\MMD, 8-\AA}$. The degree histogram descriptor under shearing
+and tapering perturbations seems to be the two exceptions out of 12 cases.
+Interestingly, the standard deviations were highest when subjecting proteins to
+the twisting perturbation, most likely due to the fact that the spheres used to
+construct the graphs most likely increasingly overlap when some degree of twist
+is applied. In short, the conclusion of the last two paragraphs is that the
+sparser the graph representation by lowering $\varepsilon$, the more stable the
+resulting MMD.
+% TODO: change MMD with acrshort.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_2_1.pdf}
   \caption[Influence of $\varepsilon$ on the sensitivity of \acrshort{mmd} to perturbations.]{\acrshort{mmd} vs. point cloud perturbation for various descriptors. In general,
 when graphs are extracted with a lower $\varepsilon$ value, the \acrshort{mmd} curve
-increases more rapidly. The only exception to this trend is the laplacian
+increases more rapidly. The only exception to this trend is the Laplacian
 spectrum histogram descriptor under the tapering perturbation.}
   \label{fig:mmd_sensitivity_eps}
 \end{figure}
+
+\begin{table}
+  \centering
+  \scalebox{0.75}{
+  \begin{tabular}{lllr}
+    \toprule
+    &                              &    &  \textbf{Normalized MMD} \\
+    Perturbation Type & Descriptor Function & $\varepsilon$ & \textbf{Standard Deviation} \\
+    \midrule
+    Gaussian Noise & Clustering Histogram & 8  &           0.011 \\
+    &                              & 16 &           0.015 \\
+    &                              & 32 &           0.043 \\
+    & Degree Histogram & 8  &           0.013 \\
+    &                              & 16 &           0.017 \\
+    &                              & 32 &           0.024 \\
+    & Laplacian Spectrum Histogram & 8  &           0.027 \\
+    &                              & 16 &           0.030 \\
+    &                              & 32 &           0.034 \\
+    Shear & Clustering Histogram & 8  &           0.031 \\
+    &                              & 16 &           0.049 \\
+    &                              & 32 &           0.055 \\
+    & Degree Histogram & 8  &           0.041 \\
+    &                              & 16 &           0.038 \\
+    &                              & 32 &           0.030 \\
+    & Laplacian Spectrum Histogram & 8  &           0.041 \\
+    &                              & 16 &           0.048 \\
+    &                              & 32 &           0.050 \\
+    Taper & Clustering Histogram & 8  &           0.026 \\
+    &                              & 16 &           0.031 \\
+    &                              & 32 &           0.088 \\
+    & Degree Histogram & 8  &           0.035 \\
+    &                              & 16 &           0.049 \\
+    &                              & 32 &           0.044 \\
+    & Laplacian Spectrum Histogram & 8  &           0.043 \\
+    &                              & 16 &           0.053 \\
+    &                              & 32 &           \textbf{0.089} \\
+    Twist & Clustering Histogram & 8  &           0.053 \\
+    &                              & 16 &           \textbf{0.082} \\
+    &                              & 32 &           \textbf{0.179} \\
+    & Degree Histogram & 8  &           \textbf{0.081} \\
+    &                              & 16 &           \textbf{0.103} \\
+    &                              & 32 &           \textbf{0.104} \\
+    & Laplacian Spectrum Histogram & 8  &           0.064 \\
+    &                              & 16 &           \textbf{0.145} \\
+    &                              & 32 &           \textbf{0.229} \\
+    \bottomrule
+  \end{tabular}
+}
+\caption[Inter-run standard deviation values averaged across the whole
+pertubation range for all combinations of perturbation type, descriptor
+functions, and $\varepsilon$ values.]{Inter-run standard deviation values
+averaged across the whole pertubation range for all combinations of perturbation
+type, descriptor functions, and $\varepsilon$ values. Values higher than $0.08$
+are in bold. Twisting perturbations show particularly high average standard
+deviations $>0.05$, and higher $\varepsilon$ values also shows the highest
+standard deviation values $>0.1$ for the twisting perturbations. In almost all
+cases, we have $\sigma_{\MMD, 32-\AA}>\sigma_{\MMD, 16-\AA}>\sigma_{\MMD,
+8-\AA}$. The degree histogram descriptor under shearing and tapering
+perturbations seems to be the exceptions.}
+  \label{tab:std_dev_epsilon_influence}
+\end{table}
+
+
+\paragraph{Sensitivity to perturbation in low perturbation regimes} While we
+noted that choosing a lower $\varepsilon$ value to extract the graph would
+likely improve the stability of resulting MMDs, there is also another
+consideration when choosing a graph representation. As shown in Figure
+\ref{fig:mmd_sensitivity_eps}, when 20\% of perturbation applied, in seven out
+of 12 cases, the normalized MMD 8\si{\angstrom} is higher than that of the 16-
+or 32 \si{\angstrom}-graphs. In addition, we find that, generally, in lower
+perturbation regimes, higher percentages of the MMD are reached with graphs
+constructed with a lower $\varepsilon$. Figure
+
+% TODO: the sparser, the better?
+
+% Among these outliers, we also see that the correlations are
+% substantially lower when perturbing proteins with the twisting perturbation for
+% the 32-\si{\angstrom}-graphs (the lowest are $\rho_P=0.73$ and $\rho_S=0.71$
+% when using the clustering histogram as a graph descriptor).
+% The overall quality
+% of the \acrshort{mmd} configurations with various $\varepsilon$ thresholds can be further
+% assessed using the standard deviation of the \acrshort{mmd} values across runs over the
+% range of perturbations applied, which we summarize in Table
+% \ref{tab:std_dev_epsilon_influence}. From
+
+% we see that twisting
+% perturbations show particularly high average standard deviations $>0.05$, and
+% higher $\varepsilon$ values also show higher standard deviation values
+% (culminating above $0.1$ for the twisting perturbation) for the twisting perturbations. In almost all cases, we have
+% $\sigma_{\MMD, 32-\AA}>\sigma_{\MMD, 16-\AA}>\sigma_{\MMD, 8-\AA}$. The degree
+% histogram descriptor under shearing and tapering perturbations seems to be the
+% exceptions.
+
+
+% TODO: erase/rewrite
+
+% In the last section, we discussed the notion of sensitivity of a particular
+% \acrshort{mmd} configuration to perturbations. We explore this idea further
+% here. Specifically, we investigate the impact of the $\varepsilon$ threshold on
+% the resulting sensitivity of the \acrshort{mmd} configuration to various
+% perturbations affecting the underlying point cloud. Figure
+% \ref{fig:mmd_sensitivity_eps} shows that, in general, the lower the
+% $\varepsilon$, the more sensitive the \acrshort{mmd} to perturbations. Low
+% sensitivity to perturbation might be useful in the early stages of modeling when
+% generated samples only need to \emph{coarsely} match the reference samples.
+% Conversely, a higher sensitivity to perturbations might be useful when trying to
+% \emph{finely} distinguish a set of anomalous samples from the reference samples.
+% Additionally, we can see that under the Gaussian noise, twisting and tapering
+% perturbation, larger values of $\varepsilon$ introduce larger variations in
+% \acrshort{mmd} values.
+
+
 
 \section{Graph Kernels}\label{sec:results_graph_kernels}
 % TODO compare WL with ESM (no modelling bias for WL on paper, might be a
@@ -362,10 +511,11 @@ filtration of a point cloud. Together with a large memory footprint, the
 Vietoris-Rips filtration is quite lengthy to compute, due to a runtime of
 $\mathcal{O}(n^{3(k+2)})$, where $k$ is the number of dimensions (here, $k=3$)
 and $n$ the number of points \citep{adams2018persistent}. Although some optimizations have been carried out
-by \texttt{Ripser}, the software used to compute the Vietoris-Rips filtration,
+by \texttt{Ripser}, the software used to compute the Vietoris-Rips filtration by
+\cite{Bauer2021Ripser},
 it remains very expensive to compute and does not enjoy the benefits of hardware
 acceleration through e.g. a GPU due to the difficulty of parallelizing such a
-filtration \citep{Bauer2021Ripser}.
+filtration.
 
 Second, computing the distance histogram and dihedral angles histogram is the
 fastest descriptors to compute, making them suitable to evaluate large
