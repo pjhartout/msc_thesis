@@ -665,9 +665,8 @@ def main():
     for i, ax in enumerate(g.axes.flatten()):
         ax.set_title(f"{title[i]}")
 
-    # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-    # leg = g._legend
-    # plt.legend([], [], frameon=False)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
+    plt.legend([], [], frameon=False)
     sns.move_legend(
         g,
         "lower center",
@@ -680,6 +679,64 @@ def main():
 
     g.tight_layout(rect=[0, 0.04, 1, 1])
     plt.savefig(here() / "exploring/systematic_analysis/res_2_1.pdf")
+
+    plt.clf()
+
+    setup_plotting_parameters(size=(2, 2))
+
+    df.groupby(
+        ["Perturbation (%)", "perturb_type", "descriptor", "eps_value"]
+    ).std()["Normalized MMD"].reset_index().groupby(
+        ["perturb_type", "descriptor", "eps_value"]
+    )[
+        "Normalized MMD"
+    ].mean().round(
+        3
+    ).to_latex(
+        here() / "exploring/systematic_analysis/res_2_1_std.tex"
+    )
+
+    df["Perturbation (%)"] = df["Perturbation (%)"].round(2)
+    df = df.loc[
+        df["Perturbation (%)"]
+        == df["Perturbation (%)"].unique()[int(20 * 0.2)]
+    ]
+    res = df.groupby(
+        ["Perturbation (%)", "perturb_type", "descriptor", "eps_value"]
+    ).mean()["Normalized MMD"]
+    res = res.reset_index()
+
+    U1, p_8_32 = sp.stats.mannwhitneyu(
+        res.loc[res.eps_value == 8]["Normalized MMD"].values,
+        res.loc[res.eps_value == 32]["Normalized MMD"].values,
+        method="exact",
+    )
+    print(f"p 8-32: {p_8_32}")
+    U1, p_8_16 = sp.stats.mannwhitneyu(
+        res.loc[res.eps_value == 8]["Normalized MMD"].values,
+        res.loc[res.eps_value == 16]["Normalized MMD"].values,
+        method="exact",
+    )
+    print(f"p 8-16: {p_8_16}")
+    U1, p_16_32 = sp.stats.mannwhitneyu(
+        res.loc[res.eps_value == 16]["Normalized MMD"].values,
+        res.loc[res.eps_value == 32]["Normalized MMD"].values,
+        method="exact",
+    )
+    print(f"p 16-32: {p_16_32}")
+
+    plt.rcParams["figure.figsize"] = (2, 2)
+    g = sns.swarmplot(
+        x="eps_value",
+        y="Normalized MMD",
+        hue="eps_value",
+        data=res,
+        palette=palette,
+    )
+    g.set_xlabel(r"$\varepsilon$-value (in $\AA$)")
+    g.set_ylabel("Normalized MMD at 20% Perturbation")
+    plt.legend([], [], frameon=False)
+    plt.savefig(here() / "exploring/systematic_analysis/swarmplot_2_1.pdf")
 
 
 if __name__ == "__main__":
