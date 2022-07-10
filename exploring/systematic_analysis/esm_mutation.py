@@ -32,7 +32,7 @@ def load_data():
     for run in range(N_RUNS):
         df_run = pd.read_csv(
             here()
-            / f"data/systematic/human/fixed_length_kernels/esm/mutation/{run}/mutation_mmds.csv"
+            / f"data/systematic/human/esm/mutation/{run}/mutation_mmds.csv"
         )
         df_run = df_run.assign(run=run)
 
@@ -124,6 +124,14 @@ def main():
         ax.set_title(titles[i])
 
     plt.savefig(here() / "exploring/systematic_analysis/res_5.pdf")
+
+    df.groupby(["Mutation Probability", "kernel"]).std()[
+        "Normalized MMD"
+    ].reset_index().groupby(["kernel",])["Normalized MMD"].mean().round(
+        3
+    ).to_latex(
+        here() / "exploring/systematic_analysis/res_5_std.tex"
+    )
 
 
 if __name__ == "__main__":

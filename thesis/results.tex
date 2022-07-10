@@ -310,8 +310,9 @@ perturbations seems to be the exceptions.}
 \end{table}
 
 
-\subsection{Lower $\varepsilon$ are more sensitive to smaller perturbations than
-higher $\varepsilon$} While we noted that choosing a lower $\varepsilon$ value
+\subsection{Lower thresholds $\varepsilon$ for graph contruction are more
+sensitive to smaller perturbations than higher $\varepsilon$ thresholds}
+While we noted that choosing a lower $\varepsilon$ value
 to extract the graph would likely improve the stability of resulting MMDs, there
 is also another consideration when choosing a graph representation. As shown in
 Figure \ref{fig:mmd_sensitivity_eps}, when 20\% of the maximum amount of
@@ -427,32 +428,33 @@ are in line with the coefficients we have seen before ($\rho_P>0.94$ and we
 consistently have $\rho_S=1$), there seems to be a crucial caveat in the curves
 that we see in Figure \ref{fig:wlk} which we discuss next.
 
-\subsection{Insensitivity to low regimes of perturbation} Figure \ref{fig:wlk}
-indeed reveals a systematic pathology when using the Weisfeiler-Lehman kernel in
-MMD. When applying a low amount of perturbation, there does not seem to be a
-proportional rise in the (normalized) MMD value. As an example, the normalized
-MMD only rises substantially from the observed value on the unperturbed set
-after adding 10\% of Gaussian noise to the data (which corresponds to
-3.16\si{\angstrom}, see Figure \ref{fig:perturbation_illustration} for an
-illustration of what 10\% of Gaussian noise looks like for a given protein).
-This `inverted elbow' shape of the curve seen in almost all perturbation types
-except for the rewiring regime, where the very high $\sigma_\MMD$ seems to obscure
-any meaningful pattern as discussed in the previous paragraph. This phenomenon
-is particularly pronounced in the other two graph perturbation scenarios, where
-80\%-95\% of the perturbation needs to be added to observe any meaningful change
-in MMD. This has dramatic implications for practitioners, as this means that one
-cannot distinguish between a generated sample of graphs and a real one unless
-the generated sample exhibits highly pathological features, which is
-undesirable for evaluation purposes. While the reason for these findings are not
-entirely clear, it is possible that the diversity of the hashes obtained during
-the Weisfeiler-Lehman algorithm is so high that substantial changes need to
-occur prior to observing any shifts in the dot product of the resulting hash
-histograms. Further analyses on the diversity of hashes and their relative
-population needs to be done to validate this hypothesis. Another way to remedy
-this pathology would be to not use the amino acid as node labels. While this
-would entail loosing sensitivity to mutations, the diversity of hashes might be
-substantially reduced so as to ensure that the resulting dot products will be
-more sensitive to changes in hash populations.
+\subsection{No increase in normalized MMD in low regimes of
+perturbation} \label{sec:insensitivity_wl_kernel}
+Figure \ref{fig:wlk} indeed reveals a systematic pathology when using the
+Weisfeiler-Lehman kernel in MMD. When applying a low amount of perturbation,
+there does not seem to be a proportional rise in the (normalized) MMD value. As
+an example, the normalized MMD only rises substantially from the observed value
+on the unperturbed set after adding 10\% of Gaussian noise to the data (which
+corresponds to 3.16\si{\angstrom}, see Figure
+\ref{fig:perturbation_illustration} for an illustration of what 10\% of Gaussian
+noise looks like for a given protein). This `inverted elbow' shape of the curve
+seen in almost all perturbation types except for the rewiring regime, where the
+very high $\sigma_\MMD$ seems to obscure any meaningful pattern as discussed in
+the previous paragraph. This phenomenon is particularly pronounced in the other
+two graph perturbation scenarios, where 80\%-95\% of the perturbation needs to
+be added to observe any meaningful change in MMD. This has dramatic implications
+for practitioners, as this means that one cannot distinguish between a generated
+sample of graphs and a real one unless the generated sample exhibits highly
+pathological features, which is undesirable for evaluation purposes. While the
+reason for these findings are not entirely clear, it is possible that the
+diversity of the hashes obtained during the Weisfeiler-Lehman algorithm is so
+high that substantial changes need to occur prior to observing any shifts in the
+dot product of the resulting hash histograms. Further analyses on the diversity
+of hashes and their relative population needs to be done to validate this
+hypothesis. Another way to remedy this pathology would be to not use the amino
+acid as node labels. While this would entail loosing sensitivity to mutations,
+the diversity of hashes might be substantially reduced so as to ensure that the
+resulting dot products will be more sensitive to changes in hash populations.
 
 
 % Contrary to the tendencies observed in Section
@@ -571,7 +573,7 @@ coefficients as well as $\sigma_\MMD$ provide powerful quantitative tools to
 gauge the quality of a metric, i.e. meta-metrics, one should still carefully
 consider the profile of individual perturbation experiments as well as reason
 through the expressive power of a particular descriptor or kernel to accurately
-assess the practicality of a particular MMD configuration.
+assess the practicality of a particular MMD configurations.
 
 % TODO:
 
@@ -591,40 +593,23 @@ high standard deviations. While the RBF kernel configurations seem to have a
 high correlation ($\rho_P,\rho_S\geq 0.95$), using the linear kernel yields
 correlation coefficients as low as $\rho_P=0.35$ and $\rho_P=0.37$.
 Additionally, the standard deviation for the MMD curves obtained using the
-\textalpha{}-carbon distance histogram descriptor are high across kernel
-choices, consistently exceeding 0.22, which does not make it a very robust
-descriptor.
+\textalpha{}-carbon distance histogram descriptor are high across kernel choices
+($\sigma_\MMD>0.22$), which does not make it a very robust descriptor.
 
 While less sensitive than the dihedral angles descriptor, the
 \textalpha{}-carbon distance histogram descriptor still provides several
-advantages over, say, the dihedral angles histogram. Although we have not tested
-this here due to it being out of scope for this thesis, this descriptor can
-certainly be used to accurately gauge the size in 3D space of the proteins
-generated. This can be useful when crafting generative models that generate
-proteins conditioned on overall size in 3D space. Additionally, as reflected
-through the different perturbations shown in Figure
+advantages over the dihedral angles histogram. Although we have not tested
+this here, this descriptor can certainly be used to accurately gauge the size in
+3D space of the proteins generated. This can be useful when crafting generative
+models that generate proteins conditioned on overall size in 3D space.
+Additionally, as reflected through the different perturbations shown in Figure
 \ref{fig:protein_specific_descriptors}, this descriptor is mostly able to detect
 changes in the interatomic space. This can also allow a practitioner to detect
-atom clashes and overall unrealistic interatomic distances in a protein model,
-much like the interatomic clash detection steps in the PDB validation pipeline
-\citep{read2011new, gore2012implementing, gore2017validation}.
-
-
-
-% The behaviour of \acrshort{mmd} values derived from the protein-specific descriptor
-% functions described in section \ref{sec:descriptors} are shown in Figure
-% \ref{fig:protein_specific_descriptors}. The dihedral angles descriptor is
-% extremely sensitive to any kind of Gaussian noise and even decreases in value
-% when the kernel is not parametrized properly when increasing the shearing. This
-% is overall a good sign, as it will flag proteins that are unrealistic. The
-% interatomic distance histogram also behaves well. However, it shows high
-% variance when twisting the protein, presumably because the intra-sample variance
-% in distances is a threshold hard to overcome. This phenomenon can also be
-% noticed in Figure \ref{fig:wlk} with the Weisfeiler-Lehman kernel and could
-% disappear when working on morphologically similar proteins as highlighted in
-% Section \ref{sec:results_graph_kernels}. Another attractive aspect of this class
-% of descriptors is that they are very cheap to compute -- see further results in
-% Section \ref{sec:results_runtime}.
+atom clashes and overall unrealistic distances in a protein model, much like the
+atom clash detection steps in the PDB validation pipeline \citep{read2011new,
+gore2012implementing, gore2017validation}. This could be further validated by
+progressively increasing the distance of each atom from the center of mass of
+the proteins.
 
 \begin{figure}[htpb!]
   \includegraphics[width=\textwidth]{./figures/results/res_4.pdf}
@@ -687,23 +672,47 @@ subject to twisting perturbations.
   \label{tab:protein_descriptors_std}
 \end{table}
 
-\section{\acrshort{mmd} from Learned Embeddings}
+\section{\acrshort{mmd} from Learned Embeddings}\label{sec:insensitivity_wl_kernel}
 
-Because the only constraint of the input vectors to the kernels accepting
-fixed-length vectors as inputs is that they are in $\R^d$, we can input
-fixed-length vector embeddings into them, leveraging the immense progress made
-in the past decade regarding embeddings of structured data, specifically protein
-sequences as highlighted in Section \ref{sec:mmd}. The only perturbation such a
-learned embedding would be sensitive to is changes in the protein sequence. As
-such, we investigated how the \acrshort{mmd} values increase with increasing point mutation
-probabilities with various kernels, as seen in Figure \ref{fig:esm_descriptor}.
-We find that the kernel used does not have any bearing on the \acrshort{mmd} behavior as
-long as $\sigma<1$ for the RBF kernel. Overall, we see that even in these low
-mutation regimes, the \acrshort{esm} embedding is sensitive enough to detect such changes.
-More sequence-specific perturbations are required to assess the
-applicability of the \acrshort{esm} embedding as a sequence descriptor, such as
-translocation of subsequences, additions, deletions, etc. However, the early
-results of such a descriptor shown in this thesis are promising.
+As we noted in Section \ref{sec:kernels}, the only constraint on some of the
+input vectors is that they need to be in $\R^d$. Additionally, as noted at the
+end of Section \ref{sec:insensitivity_wl_kernel}, there has been much progress
+in the development of learned embeddings. Finally, due to some of the
+shortcomings of the Weisfeiler-Lehman kernel highlighted in Section
+\ref{sec:insensitivity_wl_kernel}, we wanted to investigate the representative
+power of learned embeddings in MMD, the result of which are shown in Figure
+\ref{fig:esm_descriptor}. In this figure, we see that choosing an RBF kernel
+with $\sigma\leq 0.01$ or a linear kernel results in excellent correlation
+coefficients with $\rho_P=0.94$ and $\rho_S\geq 0.96$ across kernels with
+$\sigma\leq 0.01$. The standard deviation of the MMD across this range of
+kernels is also reasonable, with $\sigma_\MMD<0.1$ across the linear kernel and
+RBF kernel with $\sigma<0.1$ (see Table \ref{tab:std_esm} for details). Further
+work should focus on different kinds of perturbations applied to sequences and
+see if correlation coefficients stay consistent across kernel configurations.
+Results conducted by \cite{kucera2022conditional} suggest that this is not the
+case, highlighting the need for further evaluation.
+
+
+
+
+% TODO: discuss kucera and more in-depth work on evaluating generative sequence models.
+
+
+% Because the only constraint of the input vectors to the kernels accepting
+% fixed-length vectors as inputs is that they are in $\R^d$, we can input
+% fixed-length vector embeddings into them, leveraging the immense progress made
+% in the past decade regarding embeddings of structured data, specifically protein
+% sequences as highlighted in Section \ref{sec:mmd}. The only perturbation such a
+% learned embedding would be sensitive to is changes in the protein sequence. As
+% such, we investigated how the \acrshort{mmd} values increase with increasing point mutation
+% probabilities with various kernels, as seen in Figure \ref{fig:esm_descriptor}.
+% We find that the kernel used does not have any bearing on the \acrshort{mmd} behavior as
+% long as $\sigma<1$ for the RBF kernel. Overall, we see that even in these low
+% mutation regimes, the \acrshort{esm} embedding is sensitive enough to detect such changes.
+% More sequence-specific perturbations are required to assess the
+% applicability of the \acrshort{esm} embedding as a sequence descriptor, such as
+% translocation of subsequences, additions, deletions, etc. However, the early
+% results of such a descriptor shown in this thesis are promising.
 
 \begin{figure}
   \centering
@@ -716,6 +725,33 @@ complemented by complementary sequence-specific perturbations -- see Section
 \ref{sec:discussion_realistic_proteins} for details.}
   \label{fig:esm_descriptor}
 \end{figure}
+
+\begin{table}
+  \centering
+  \scalebox{0.75}{
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Kernel} & $\sigma_\MMD$  \\
+    \midrule
+    Linear Kernel &           0.091 \\
+    RBF ($\sigma=1e-05$)   &           0.089 \\
+    RBF ($\sigma=0.0001$)  &           0.092 \\
+    RBF ($\sigma=0.001$)   &           0.093 \\
+    RBF ($\sigma=0.01$)    &           0.093 \\
+    RBF ($\sigma=0.1$)     &           0.095 \\
+    RBF ($\sigma=1$)       &           \textbf{0.235} \\
+    RBF ($\sigma=10.0$)    &           \textbf{0.447} \\
+    \bottomrule
+  \end{tabular}
+  }
+  \caption[$\sigma_\MMD$ values for the MMD using the ESM learned
+embedding.]{$\sigma_\MMD$ values for the MMD using the ESM learned embedding.
+$\sigma_\MMD>0.1$ are in bold. These findings corroborate the correlation
+coefficients shown in Figure \ref{fig:esm_descriptor}: using a linear kernel or
+an RBF kernel with$\sigma<0.1$, we get $\sigma_\MMD<0.1$, we obtain higher
+quality (here, more robust) metrics, since $\sigma_\MMD$ is relatively low.}
+  \label{tab:std_esm}
+\end{table}
 
 
 \section{Topological Descriptors and Kernels}\label{sec:results_topo_kernels}
