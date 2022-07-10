@@ -14,7 +14,7 @@ chapter.
 
 \section{Overall \acrshort{mmd} Behavior}\label{sec:overall_behaviour}
 
-\paragraph{General observations on the correlation coefficients} Surprisingly,
+\subsection{General observations on the correlation coefficients} Surprisingly,
 we found that the behavior of \acrshort{mmd} was not as inconsistent for the
 types of graphs extracted from proteins as was found on synthetic graphs by
 \cite{obray2022evaluation}. Figure \ref{fig:mmd_consistent_eps} show
@@ -30,7 +30,7 @@ next lowest (Pearson) correlation coefficient from Figure
 \ref{fig:mmd_consistent_eps} is also associated to the degree distribution
 histogram under the rewiring perturbation regime ($\rho_p=0.82$ $\rho_S=0.98$).
 
-\paragraph{General observations on the standard deviations} In parallel, Table
+\subsection{General observations on the standard deviations} In parallel, Table
 \ref{tab:1_1_std} also supports the fact that the standard deviation of the
 normalized \acrshort{mmd} of the degree distribution descriptor is the highest,
 suggesting that this is not a very robust descriptor. Since modelling graph
@@ -99,7 +99,7 @@ Twist & Clustering Histogram &        0.052784 \\
 % TODO: shave significant digits
 \clearpage
 
-\paragraph{Influence of the choice of kernel} We next investigate the overall
+\subsection{Influence of the choice of kernel} We next investigate the overall
 influence of the kernel on the correlations between perturbations and
 \acrshort{mmd} shown in Figure \ref{fig:mmd_effect_kernel}. We can see that for
 $\sigma\lessapprox 0.1$ ($\sigma$ being the hyperparameter of the Gaussian
@@ -131,7 +131,7 @@ catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh this out a bit furt
   \label{fig:mmd_effect_kernel}
 \end{figure}
 
-\paragraph{Comparing graph construction techniques from proteins} To compare which graph
+\subsection{Comparing graph construction techniques from proteins} To compare which graph
 construction technique was overall most adviseable, we computed the correlation
 coefficients of the various available combinations of graph type, graph
 extraction parameter, and description function with an RBF kernel with
@@ -202,7 +202,7 @@ $\varepsilon$-graphs. }
 \section{Influence of the Graph Representation on the Sensitivity to
 Perturbations}\label{sec:results_sensitivity}
 
-\paragraph{Lower values of $\varepsilon$ are more stable} In the previous paragraph, we established that $\varepsilon$-graphs were more
+\subsection{Lower values of $\varepsilon$ are more stable} In the previous paragraph, we established that $\varepsilon$-graphs were more
 appropriate to compute the \acrshort{mmd}. Now, we investigate which specific
 threshold(s) $\varepsilon$ are most appropriate using the same meta-metrics as
 before. Figure \ref{fig:mmd_sensitivity_eps} shows the normalized MMD values
@@ -310,7 +310,7 @@ perturbations seems to be the exceptions.}
 \end{table}
 
 
-\paragraph{Lower $\varepsilon$ are more sensitive to smaller perturbations than
+\subsection{Lower $\varepsilon$ are more sensitive to smaller perturbations than
 higher $\varepsilon$} While we noted that choosing a lower $\varepsilon$ value
 to extract the graph would likely improve the stability of resulting MMDs, there
 is also another consideration when choosing a graph representation. As shown in
@@ -335,15 +335,17 @@ and denser graphs.
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/swarmplot_2_1.pdf}
-  \caption{Normalized MMD value at 20\% of the maximum
-    perturbation amount (as shown in Table \ref{tab:perturbation_ranges}) for
-    various MMD configurations at different $\varepsilon$ values. The difference
-    between the 8\si{\angstrom}- and 32\si{\angstrom} graphs is significant
-    (Mann-Whitney $\mathcal{U}$-test $p=1.08\cdot 10^{-4}$). The difference
-    between the 16\si{\angstrom}- and 32\si{\angstrom} graphs is also
-    significant ($p=5.56\cdot 10^{-3}$). However, the difference between the
-    8\si{\angstrom}- and 16\si{\angstrom} graphs was not signicant ($p=3.47\cdot
-    10^{-1}, 5\cdot 10^{-2}$ is our highest significance threshold.)}
+  \caption[Normalized MMD value at 20\% of the maximum perturbation amount for
+various MMD configurations at different $\varepsilon$ values.]{Normalized MMD
+value at 20\% of the maximum perturbation amount (as shown in Table
+\ref{tab:perturbation_ranges}) for various MMD configurations at different
+$\varepsilon$ values. The difference between the 8\si{\angstrom}- and
+32\si{\angstrom} graphs is significant (Mann-Whitney $\mathcal{U}$-test
+$p=1.08\cdot 10^{-4}$). The difference between the 16\si{\angstrom}- and
+32\si{\angstrom} graphs is also significant ($p=5.56\cdot 10^{-3}$). However,
+the difference between the 8\si{\angstrom}- and 16\si{\angstrom} graphs was not
+signicant ($p=3.47\cdot 10^{-1}, 5\cdot 10^{-2}$ is our highest significance
+threshold.)}
   \label{fig:difference_sensitivity_20_percent}
 \end{figure}
 
@@ -401,7 +403,7 @@ seen in Figure \ref{fig:wlk}. Two important takeaways can be be derived from
 this figure.
 
 % TODO: WL glossary entry
-\paragraph{Quality of MMD using Weisfeiler-Lehman} The first conclusion is
+\subsection{Quality of MMD using Weisfeiler-Lehman} The first conclusion is
 derived from the observation of the meta metrics. We can see that, correlations
 are relatively low for graph perturbations (Figure \ref{fig:wlk}, top row). If
 we take the kernel using 5 iterations for instance, we get $\rho_P=0.4$ and
@@ -425,7 +427,7 @@ are in line with the coefficients we have seen before ($\rho_P>0.94$ and we
 consistently have $\rho_S=1$), there seems to be a crucial caveat in the curves
 that we see in Figure \ref{fig:wlk} which we discuss next.
 
-\paragraph{Insensitivity to low regimes of perturbation} Figure \ref{fig:wlk}
+\subsection{Insensitivity to low regimes of perturbation} Figure \ref{fig:wlk}
 indeed reveals a systematic pathology when using the Weisfeiler-Lehman kernel in
 MMD. When applying a low amount of perturbation, there does not seem to be a
 proportional rise in the (normalized) MMD value. As an example, the normalized
@@ -526,34 +528,164 @@ standard deviations.}
 \end{table}
 
 
-\section{Protein-Specific Descriptors}\label{sec:results_protein_descriptors}
+\section{Protein-Specific Descriptors Are Inexpensive, High-Quality Descriptor
+Functions}\label{sec:results_protein_descriptors}
 
-The behaviour of \acrshort{mmd} values derived from the protein-specific descriptor
-functions described in section \ref{sec:descriptors} are shown in Figure
-\ref{fig:protein_specific_descriptors}. The dihedral angles descriptor is
-extremely sensitive to any kind of Gaussian noise and even decreases in value
-when the kernel is not parametrized properly when increasing the shearing. This
-is overall a good sign, as it will flag proteins that are unrealistic. The
-interatomic distance histogram also behaves well. However, it shows high
-variance when twisting the protein, presumably because the intra-sample variance
-in distances is a threshold hard to overcome. This phenomenon can also be
-noticed in Figure \ref{fig:wlk} with the Weisfeiler-Lehman kernel and could
-disappear when working on morphologically similar proteins as highlighted in
-Section \ref{sec:results_graph_kernels}. Another attractive aspect of this class
-of descriptors is that they are very cheap to compute -- see further results in
-Section \ref{sec:results_runtime}.
+Figure \ref{fig:protein_specific_descriptors} shows the normalized MMD as
+various types of perturbations are added to one set of proteins, where each row
+has a corresponding perturbation type. Each column also corresponds to a
+different kernel and kernel parameter configuration.
 
-\begin{figure}
+\subsection{Dihedral Angles Histograms}\label{sec:res_dihedral_angles}
+We start our examination of the novel, protein-specific descriptors outlined in
+Section \ref{sec:descriptors} by discussing the dihedral angles histograms of
+the \textphi{} and \textpsi{} bond angles. We see that for this descriptor, the
+kernel choice heavily influences the correlation coefficients; indeed, if one
+chooses the linear kernel or the RBF kernel with a low bandwidth ($10^{-5}$) or
+the parameter-free linear kernel, we obtain high correlation coefficients
+($\rho_P>0.95$ and $\rho_S=1$) if we exclude the Gaussian noise perturbation,
+which we discuss below. Indeed, correlation coefficients are low for this
+descriptor when subject to Gaussian noise ($0.41>\rho_P>0.39$ and
+$0.59>\rho_S>0.5$). While their associated standard deviation is not
+particularly high (see Table \ref{tab:protein_descriptors_std}), this would
+indicate that they would not be useful for use in MMD.
+
+However, when examining the profile of the perturbation curve (Figure
+\ref{fig:protein_specific_descriptors}, top row), we can see that with very low
+Gaussian noise levels (as low as 5\%, which in this thesis corresponds to
+1.5\si{\angstrom}, see Table \ref{tab:perturbation_ranges}), the MMD already
+reaches its highest point. This phenomenon entails that the dihedral angles
+histogram is not necessarily an inappropriate descriptor, but a very sensitive
+one. This can be useful to practitioners; indeed, when predicting the 3D
+structure of proteins from the amino acid sequence for instance,
+\cite{jumper2021highly} had to apply an additional refinement algorithm
+leveraging Amber force fields \citep{hornak2006comparison} to ensure that the
+bond geometries were not violated (see \citep{jumper2021highly} p. 586 for a
+detailed discussion). Such a descriptor used in MMD can therefore provide
+statistical evidence to support the statement that (generated) bond geometries
+follow a natural distribution.
+
+One conclusion additional conclusion from the analysis of this particular
+protein descriptor is that although both Pearson and Spearman correlation
+coefficients as well as $\sigma_\MMD$ provide powerful quantitative tools to
+gauge the quality of a metric, i.e. meta-metrics, one should still carefully
+consider the profile of individual perturbation experiments as well as reason
+through the expressive power of a particular descriptor or kernel to accurately
+assess the practicality of a particular MMD configuration.
+
+% TODO:
+
+\subsection{\textalpha{}-Carbon Distance Histogram}
+
+The distance histogram also serves as a good protein descriptor, and does not
+exhibit some of the sensitivity-related pathologies that we discussed in Section.
+\ref{sec:res_dihedral_angles}. If we set aside the twisting perturbation, which
+we discuss below, we get high correlation coefficients ($\rho_P>0.97$ and
+$\rho_S>0.99$ irrespective of the kernel or perturbation type chosen). Standard
+deviations are also reasonably low, since we consistently have $\sigma_\MMD<0.1$
+not considering twisting.
+
+The \textalpha{}-carbon distance histogram descriptor as used in MMD does not
+seem to behave well under twisting perturbations, with both low correlations and
+high standard deviations. While the RBF kernel configurations seem to have a
+high correlation ($\rho_P,\rho_S\geq 0.95$), using the linear kernel yields
+correlation coefficients as low as $\rho_P=0.35$ and $\rho_P=0.37$.
+Additionally, the standard deviation for the MMD curves obtained using the
+\textalpha{}-carbon distance histogram descriptor are high across kernel
+choices, consistently exceeding 0.22, which does not make it a very robust
+descriptor.
+
+While less sensitive than the dihedral angles descriptor, the
+\textalpha{}-carbon distance histogram descriptor still provides several
+advantages over, say, the dihedral angles histogram. Although we have not tested
+this here due to it being out of scope for this thesis, this descriptor can
+certainly be used to accurately gauge the size in 3D space of the proteins
+generated. This can be useful when crafting generative models that generate
+proteins conditioned on overall size in 3D space. Additionally, as reflected
+through the different perturbations shown in Figure
+\ref{fig:protein_specific_descriptors}, this descriptor is mostly able to detect
+changes in the interatomic space. This can also allow a practitioner to detect
+atom clashes and overall unrealistic interatomic distances in a protein model,
+much like the interatomic clash detection steps in the PDB validation pipeline
+\citep{read2011new, gore2012implementing, gore2017validation}.
+
+
+
+% The behaviour of \acrshort{mmd} values derived from the protein-specific descriptor
+% functions described in section \ref{sec:descriptors} are shown in Figure
+% \ref{fig:protein_specific_descriptors}. The dihedral angles descriptor is
+% extremely sensitive to any kind of Gaussian noise and even decreases in value
+% when the kernel is not parametrized properly when increasing the shearing. This
+% is overall a good sign, as it will flag proteins that are unrealistic. The
+% interatomic distance histogram also behaves well. However, it shows high
+% variance when twisting the protein, presumably because the intra-sample variance
+% in distances is a threshold hard to overcome. This phenomenon can also be
+% noticed in Figure \ref{fig:wlk} with the Weisfeiler-Lehman kernel and could
+% disappear when working on morphologically similar proteins as highlighted in
+% Section \ref{sec:results_graph_kernels}. Another attractive aspect of this class
+% of descriptors is that they are very cheap to compute -- see further results in
+% Section \ref{sec:results_runtime}.
+
+\begin{figure}[htpb!]
   \includegraphics[width=\textwidth]{./figures/results/res_4.pdf}
-  \caption[\acrshort{mmd} vs. perturbations using the two novel protein descriptors.]{\acrshort{mmd}
-vs. perturbations (in \%) using the two novel protein descriptors shown in Section
-\ref{sec:descriptors}. Various kernel configurations are shown here. Those
-descriptors behave very well overall, with the dihedral angles descriptors being
-particularly sensitive to Gaussian noise. The distance histogram exhibits
- higher inter-run variance when subject to twisting
+  \caption[\acrshort{mmd} vs. perturbations using the two novel protein
+descriptors.]{\acrshort{mmd} vs. perturbations (in \% of the maximum values
+shown in Table \ref{tab:perturbation_ranges}) using the two novel protein
+descriptors shown in Section \ref{sec:descriptors}. Each row has a corresponding
+perturbation type. Each column also corresponds to a different kernel and kernel
+parameter configuration. Those descriptors behave very well overall, with the
+dihedral angles descriptors being particularly sensitive to Gaussian noise. The
+distance histogram exhibits higher inter-run variance when subject to twisting
 pertubations.}
   \label{fig:protein_specific_descriptors}
 \end{figure}
+
+
+\begin{table}
+  \centering
+  \scalebox{0.75}{
+    \begin{tabular}{lllr}
+      \toprule
+      \textbf{Perturbation Type} & \textbf{Kernel} & \textbf{Descriptor} &  $\sigma_\MMD$ \\
+      \midrule
+      Gaussian noise & Linear Kernel & Dihedral Angles Histogram &           0.062 \\
+                    &             & Distance Histogram &           0.071 \\
+                    & RBF Kernel ($\sigma=1$) & Dihedral Angles Histogram &           0.048 \\
+                    &             & Distance Histogram &           0.059 \\
+                    & RBF Kernel ($\sigma=1\cdot 10^{-5}$) & Dihedral Angles Histogram &           0.042 \\
+                    &             & Distance Histogram &           0.060 \\
+      Shear & Linear Kernel & Dihedral Angles Histogram &           0.037 \\
+                    &             & Distance Histogram &           0.066 \\
+                    & RBF Kernel ($\sigma=1$) & Dihedral Angles Histogram &           0.035 \\
+                    &             & Distance Histogram &           0.050 \\
+                    & RBF Kernel ($\sigma=1\cdot 10^{-5}$) & Dihedral Angles Histogram &           0.028 \\
+                    &             & Distance Histogram &           0.051 \\
+      Taper & Linear Kernel & Dihedral Angles Histogram &           0.059 \\
+                    &             & Distance Histogram &           0.079 \\
+                    & RBF Kernel ($\sigma=1$) & Dihedral Angles Histogram &           0.040 \\
+                    &             & Distance Histogram &           0.062 \\
+                    & RBF Kernel ($\sigma=1\cdot 10^{-5}$) & Dihedral Angles Histogram &           0.049 \\
+                    &             & Distance Histogram &           0.063 \\
+      Twist & Linear Kernel & Dihedral Angles Histogram &           0.060 \\
+                    &             & Distance Histogram &           \textbf{0.250} \\
+                    & RBF Kernel ($\sigma=1$) & Dihedral Angles Histogram &           0.039 \\
+                    &             & Distance Histogram &           \textbf{0.228} \\
+                    & RBF Kernel ($\sigma=1\cdot 10^{-5}$) & Dihedral Angles Histogram &           0.050 \\
+                    &             & Distance Histogram &           \textbf{0.230} \\
+      \bottomrule
+    \end{tabular}
+  }
+  \caption[Standard deviation of the various protein-specific descriptors
+devised in this thesis.]{Standard deviation of the various protein-specific
+descriptors devised in this thesis. $\sigma_\MMD>0.2$ are in bold. This table
+reflects two observations made from Figure
+\ref{fig:protein_specific_descriptors}: first, that overall standard deviation
+of the MMD values across the perturbation range is quite low. Second, the
+distance histogram seem to result in particularly high standard deviations when
+subject to twisting perturbations.
+}
+  \label{tab:protein_descriptors_std}
+\end{table}
 
 \section{\acrshort{mmd} from Learned Embeddings}
 
@@ -602,11 +734,13 @@ later multiplying the matrix by different constants (see Appendix A.5 of
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_6.pdf}
-  \caption[\acrshort{mmd} using topological kernels.]{\acrshort{mmd} vs. Perturbation (in \%) using the multi-scale
-kernel and persistence Fisher kernel. For the persistence Fisher kernel (PFK), both
-the kernel bandwidth parameter and the Fisher bandwidth parameter are set to 1.
-For the multi-scale kernel (MSK), the bandwidth parameter is also set to 1. Overall,
-the correlation coefficients for those kernels are very high and show little
+  \caption[\acrshort{mmd} using topological kernels.]{\acrshort{mmd} vs.
+Perturbation (in \% of the maximum values shown in Table
+\ref{tab:perturbation_ranges}) using the multi-scale kernel and persistence
+Fisher kernel. For the persistence Fisher kernel (PFK), both the kernel
+bandwidth parameter and the Fisher bandwidth parameter are set to 1. For the
+multi-scale kernel (MSK), the bandwidth parameter is also set to 1. Overall, the
+correlation coefficients for those kernels are very high and show little
 inter-run variance.}
   \label{fig:tda_kernels}
 \end{figure}
@@ -706,7 +840,7 @@ configurations and subject to various perturbations. We first note that the
 overall behavior of \acrshort{mmd} under various perturbations is stable when sufficient
 care is put into the selection of the of the kernel parameters (Figure \ref{fig:mmd_consistent_eps}). As a side note,
 we see also that overall the correlations for descriptors of
-$\varepsilon$-graphs is better than for $k$-NN graphs (Figure \ref{fig:mmd_k_nn_graphs}). Second, we note that the
+$\varepsilon$-graphs is better than for $k$-NN graphs (Figure TODO). Second, we note that the
 choice of graph representation impacts the behavior of \acrshort{mmd}'s behavior: the
 lower the radius of the sphere used to extract the $\varepsilon$-graph, the more
 sensitive the resulting \acrshort{mmd} configuration, i.e. the lower the perturbation

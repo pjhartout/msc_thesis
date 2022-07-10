@@ -32,17 +32,18 @@ nature of the graphs used in this thesis (see Figure
   \label{fig:er_comparison_8a_graph}
 \end{figure}
 
-Furthermore, we found that the sensitivity of the \acrshort{mmd} to perturbation was
-greatly influenced by the graph representation extracted from the protein.
+Furthermore, we found that the sensitivity of the \acrshort{mmd} to perturbation
+was greatly influenced by the graph representation extracted from the protein.
 Namely, for $\varepsilon$ graphs (which overall seemed more stable than $k$-NN
 graphs), the higher $\varepsilon$, the lower the sensitivity to low levels of
 perturbation (Figure \ref{fig:mmd_sensitivity_eps}).
 
 We introduced in Section \ref{sec:descriptors} and shown in Section
-\ref{sec:results_protein_descriptors} two \emph{novel} protein-specific descriptors for
-used in \acrshort{mmd}, which are both extremely fast to compute (Table \ref{tab:runtimes})
-and are able to detect perturbations with a surprising sensitivity (Figure
-\ref{fig:protein_specific_descriptors}).
+\ref{sec:results_protein_descriptors} two \emph{novel} protein-specific
+descriptors for used in \acrshort{mmd}, which are both extremely fast to compute
+(Table \ref{tab:runtimes}) and are able to detect perturbations with a
+surprising sensitivity (Figure \ref{fig:protein_specific_descriptors}).
+
 
 Furthermore, we found that the Weisfeiler-Lehman kernel, introduced in Section
 \ref{sec:methods_kernels}, applied to \acrshort{mmd} was able to detect perturbations
@@ -107,10 +108,11 @@ highly similar distributions of graphs. However, it can sometimes be desirable
 to relax this requirement, e.g. to explore a larger part of the design landscape
 or make a rougher assessment of the generated samples for debugging purposes.
 
-In addition, when choosing an \acrshort{mmd} configuration, one should also investigate the
-magnitude of inter-run variance, as it can also render a particular
-configuration of \acrshort{mmd} useless since the possible ranges of \acrshort{mmd} values can be too
-wide to make any assessment as to the quality of the generated samples
+In addition, when choosing an \acrshort{mmd} configuration, one should also
+investigate the magnitude of inter-run variance, as it can also render a
+particular configuration of \acrshort{mmd} useless since the possible ranges of
+\acrshort{mmd} values can be too wide to make any assessment as to the quality
+of the generated samples.
 
 \subsection{Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
@@ -130,6 +132,13 @@ Section \ref{sec:descriptors} whose results are shown in Section
 \ref{fig:protein_specific_descriptors} can be used. This way, an unusual angle
 or abnormal interatomic distance distribution observed in the data will be
 reflected in the \acrshort{mmd} value.
+
+% % TODO: compare with alphafold . Exact enforcement of peptide bond geometry is
+% only achieved in the post-prediction relaxation of the structure by gradient
+% descent in the Amber32 force field. Empirically, this final relaxa- tion does
+% not improve the accuracy of the model as measured by the global distance test
+% (GDT)33 or lDDT-Cα34 but does remove distracting stereochemical violations
+% without the loss of accuracy.
 
 \subsection{Kernels and Kernel Parameters}
 % Kernel recommendations

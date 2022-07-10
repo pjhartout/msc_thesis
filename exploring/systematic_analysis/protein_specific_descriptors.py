@@ -234,6 +234,18 @@ def main():
     plt.subplots_adjust(hspace=0.3)
     plt.savefig(here() / "exploring/systematic_analysis/res_4.pdf")
 
+    df.groupby(
+        ["Perturbation (%)", "perturb_type", "kernel", "Descriptor"]
+    ).std()["Normalized MMD"].reset_index().groupby(
+        ["perturb_type", "kernel", "Descriptor"]
+    )[
+        "Normalized MMD"
+    ].mean().round(
+        3
+    ).to_latex(
+        here() / "exploring/systematic_analysis/res_4_std.tex"
+    )
+
 
 if __name__ == "__main__":
     main()
