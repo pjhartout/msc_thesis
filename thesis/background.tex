@@ -20,7 +20,7 @@ evaluation problem when it comes to generative models, as well as some of the
 unique challenges arising in the graph domain. Furthermore, we discuss the
 current landscape of methods used to evaluate graph generative models, such as
 the \acrfull{mmd}. Finally, we introduce kernels that can be used
-within the \acrshort{mmd} computational framework.
+within the \gls{mmd} computational framework.
 
 \section{Proteins}\label{sec:proteins}
 
@@ -411,7 +411,7 @@ where $g$ can be chosen from the same set of functions as $f^{(l)}$.
 
 While these developments are encouraging, practitioners designing generative
 \acrshort{gnns} such as \cite{liao2019efficient, niu2020permutation}, and
-\cite{you2018graphrnn} have generally gravitated towards the \acrshort{mmd}
+\cite{you2018graphrnn} have generally gravitated towards the \gls{mmd}
 measure to evaluate the quality of the graph, most likely due to the fact that
 it provides a solid statistical framework that can yield solid statistically
 significant evidence that two sample distributions are issued from the same distribution.
@@ -420,14 +420,14 @@ significant evidence that two sample distributions are issued from the same dist
                                 % with TIM
 
 A significant part of this thesis is centered around investigating the
-\acrshort{mmd} statistic, so we define and examine existing \acrshort{mmd}
+\gls{mmd} statistic, so we define and examine existing \gls{mmd}
 research here. Introduced by \cite{borgwardt2006integrating} and further
 exposited by \cite{gretton2012kernel}, it leverages the expressive power and
 versatility of \emph{kernel functions} to evaluate a distance function between
 two sample distributions. Moreover, \cite{gretton2012kernel} describe how this
 distance function can be treated as a statistic, from which various tests can be
 derived to evaluate whether or not two distributions are equivalent.
-\acrshort{mmd} is therefore an ideal platform to leverage when trying to assess
+\gls{mmd} is therefore an ideal platform to leverage when trying to assess
 generative models.
 
 Let us now reformulate the problem described above more formally following the
@@ -448,7 +448,7 @@ $C(\mathcal{X})$ is able to identify $p=q$ uniquely, such a function class is
 not practical to work with. They therefore define a more general class of
 statistic $\mathcal{F}$ to measure the disparity between $q$ and $p$ to be
 $f:\mathcal{X}\to\R, f\in\mathcal{F}$. From there, they defined the
-\acrshort{mmd} as:
+\gls{mmd} as:
 
 \begin{equation}
   \label{eq:mmd_general}
@@ -474,7 +474,7 @@ following properties:
   \forall\ c_i,c_j\in\R$.
 \end{itemize}
 
-At last, we then arrive at the biased empirical estimate of MMD using kernel
+At last, we then arrive at the biased empirical estimate of \gls{mmd} using kernel
 functions, which is given by:
 
 \begin{equation}
@@ -502,7 +502,7 @@ that they can distill relevant properties of the structured data under study,
 potentially saving on computation costs. Similarly, the kernel choice and
 parameters also heavily impacts how each dataset is being analyzed. Importantly,
 one consequence of the free choice of descriptor functions and kernel functions is
-that \acrshort{mmd} does not inherently have a scale \citep{obray2022evaluation}
+that \gls{mmd} does not inherently have a scale \citep{obray2022evaluation}
 % TODO: sufficient?
 
 In the graph domain, it is incumbent upon the practitioner to (i) choose an
@@ -728,6 +728,6 @@ computational challenges that it incurs from a modeling standpoint.
 Importantly, we outlined the evaluation problem arising when evaluating
 generative networks, specifically in the graph domain, and highlighted the
 desiderata for good metrics: expressivity, robustness, and efficiency. We examined
-currently accepted practices and introduced \acrshort{mmd}, the main
+currently accepted practices and introduced \gls{mmd}, the main
 method used in this thesis. We finally introduced the collection of kernels that
-we are going to leverage when using the \acrshort{mmd}.
+we are going to leverage when using the \gls{mmd}.

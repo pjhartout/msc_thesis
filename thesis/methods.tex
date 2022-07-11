@@ -6,26 +6,26 @@ used to evaluate generative protein models is heavily inspired by
 combination of representation, optional descriptor function, kernel and
 parameters applied to all three aforementioned elements\footnote{We also
 subsequently refer to the parametrization and choice of all these options as an
-\acrshort{mmd} \emph{configuration}.} correlates with the amount of
+\gls{mmd} \emph{configuration}.} correlates with the amount of
 perturbation % TODO: check with Tim to see if use of term configuration is OK.
 applied to one set of proteins. This can be broken down in the following steps:
 
 \begin{enumerate}
 \item Take two i.i.d. samples from a database of proteins.
 \item Progressively perturb to one of the samples.
-\item Measure the \acrshort{mmd} between the unperturbed and perturbed sample.
+\item Measure the \gls{mmd} between the unperturbed and perturbed sample.
 \item Once the varying degrees of perturbations have been applied and
-accompanying \acrshort{mmd}s catalogued, compute the correlation coefficient
-between the \acrshort{mmd} and the amount of perturbation.
+accompanying \gls{mmd}s catalogued, compute the correlation coefficient
+between the \gls{mmd} and the amount of perturbation.
 \end{enumerate}
 
-A particular MMD configuration is considered superior to another if the
+A particular \gls{mmd} configuration is considered superior to another if the
 resulting correlation coefficients of the former are higher than that of the latter.
 
 In this chapter, we start by motivating the datasets that will be used to simulate a generative
 protein model. We then describe and motivate the experimental setups -- i.e.
-perturbations -- that we will employ to test the various configurations of \acrshort{mmd}.
-Finally, we enumerate and justify which configurations of \acrshort{mmd} are tested,
+perturbations -- that we will employ to test the various configurations of \gls{mmd}.
+Finally, we enumerate and justify which configurations of \gls{mmd} are tested,
 including all the combinations of protein representations, descriptor functions,
 and kernels. Finally, we describe and motivate the experimental setups -- i.e.
 perturbations -- that we will employ to test the various metric configurations.
@@ -44,7 +44,7 @@ provide predicted 3D structures for naturally occurring proteins with the same
 accuracy as experimentally acquired 3D structures \citep{jumper2021highly},
 ensuring that the conclusions we reach in this thesis will be broadly applicable
 to experimentally acquired protein structures. Second, this allows us to
-establish the ground truth of a range of \acrshort{mmd} configurations, hence
+establish the ground truth of a range of \gls{mmd} configurations, hence
 also enabling the gauging the quality of Third, there are practical advantages
 related to this database because it contains consistently formatted \texttt{pdb}
 files exclusively cataloguing heavy atoms directly contributing to the 3D
@@ -165,7 +165,7 @@ will be mutated by sampling from a Bernoulli distribution with parameter $p$ and
 (ii) for selected positions, swap the amino acid by any of the 20 possible
 naturally-occurring amino acids. While graph perturbation probabilities (e.g. of
 adding an edge) range from 0 to 1, here we mostly concentrate on lower regimes
-of mutation, i.e. between 0 and 0.1, so see how sensitive various \acrshort{mmd}
+of mutation, i.e. between 0 and 0.1, so see how sensitive various \gls{mmd}
 configurations are to a few point mutations, which covers most of the
 real-world % TODO: some -> most OK?
 protein engineering use cases \citep{poluri2017protein}.
@@ -173,7 +173,7 @@ protein engineering use cases \citep{poluri2017protein}.
 For each perturbation, a range of degrees of perturbation is defined and 20
 different evenly-spaced degrees of perturbation are examined and repeated 10
 times with 10 pairs of i.i.d. proteins to estimate the sensitivity of the
-particular \acrshort{mmd} configuration to the perturbation. The ranges used for each
+particular \gls{mmd} configuration to the perturbation. The ranges used for each
 parameter used in this thesis are shown in Table \ref{tab:perturbation_ranges}
 
 
@@ -196,24 +196,24 @@ parameter used in this thesis are shown in Table \ref{tab:perturbation_ranges}
   \label{tab:perturbation_ranges}
 \end{table}
 
-\section{MMD Configurations}
+\section{\gls{mmd} Configurations}
 
-We introduced \acrshort{mmd} in Section \ref{sec:mmd} (Equation \ref{eq:mmd} and
+We introduced \gls{mmd} in Section \ref{sec:mmd} (Equation \ref{eq:mmd} and
 \ref{eq:mmd_unbiased}), and noted that an important aspect of using
-\acrshort{mmd} in practice consists in choosing the right descriptor function
+\gls{mmd} in practice consists in choosing the right descriptor function
 and kernel, because it heavily impacts which aspects of the data are distilled
-for analysis in MMD and also heavily impacts how the data is processed by the
-kernel functions inside of MMD. Here, we list and motivate all graph extraction
+for analysis in \gls{mmd} and also heavily impacts how the data is processed by the
+kernel functions inside of \gls{mmd}. Here, we list and motivate all graph extraction
 techniques, descriptor functions employed, and kernels adopted in this
 experiment.
 
 First, throughout our experiments, we will use the unbiased squared
-\acrshort{mmd} estimate, which removes self-comparison terms in the kernel
+\gls{mmd} estimate, which removes self-comparison terms in the kernel
 matrices (\cite{gretton2012kernel}, Lemma 6), which can result in negative
-values. We will normalize the resulting \acrshort{mmd} over the whole range of
+values. We will normalize the resulting \gls{mmd} over the whole range of
 perturbation for each curve as well to compare behaviors of different
-\acrshort{mmd} configurations not operating on the same scale. As highlighted in
-Section \ref{sec:mmd}, \acrshort{mmd} does not have an inherent sense of scale
+\gls{mmd} configurations not operating on the same scale. As highlighted in
+Section \ref{sec:mmd}, \gls{mmd} does not have an inherent sense of scale
 anyway, so this normalization step does not impact our analysis negatively.
 % TODO: check syntax
 
@@ -222,8 +222,8 @@ anyway, so this normalization step does not impact our analysis negatively.
   \MMD_{\textnormal{Normalized}} = {\MMD - \min(\MMD_{\textnormal{Experiment}}) \over \max(\MMD_{\textnormal{Experiment}}) - \min(\MMD_{\textnormal{Experiment}})}
 \end{equation}
 
-Where $\MMD_{\textnormal{Experiment}}$ is the collection of \acrshort{mmd} values for a particular
-experiment, i.e. a particular \acrshort{mmd} configuration tracked through the whole range
+Where $\MMD_{\textnormal{Experiment}}$ is the collection of \gls{mmd} values for a particular
+experiment, i.e. a particular \gls{mmd} configuration tracked through the whole range
 of a particular perturbation.
 
 \subsection{Representations}
@@ -335,7 +335,7 @@ up the descriptor functions in this thesis.
 
 \subsection{Kernels}\label{sec:methods_kernels}
 Once a suitable representation and descriptor function is selected, one requires
-a kernel to evaluate the \acrshort{mmd} in the corresponding \acrshort{rkhs}. We
+a kernel to evaluate the \gls{mmd} in the corresponding \acrshort{rkhs}. We
 detail which kernels we are going to evaluate and why in this section. Kernels
 used in this thesis can be grouped into three separate categories.
 
@@ -351,7 +351,7 @@ in $\R^d$, the protein-specific vector representations outlined in Section
 % Special implementation of wl-k
 
 As alluded to in Section \ref{sec:kernels}, we introduce two new classes of
-kernels for use in \acrshort{mmd} which so far have not been used to evaluate generative
+kernels for use in \gls{mmd} which so far have not been used to evaluate generative
 models due to the unique aspects of proteins that need to be captured. This
 brings us to the second category of kernels used in this thesis: \emph{graph kernels}.
 Specifically, we are going to use the Weisfeiler-Lehman kernel discussed in
@@ -368,10 +368,10 @@ Persistence Fisher kernel \citep{le2018persistence} and the multi-scale kernel
 
 \section{Experimental Setup}
 
-\subsection{Measuring the Quality of \acrshort{mmd} Configurations}
+\subsection{Measuring the Quality of \gls{mmd} Configurations}
 
 To objectively evaluate the various representation, descriptor, and kernel
-combinations used in \acrshort{mmd}, we will use two correlation coefficients, namely the
+combinations used in \gls{mmd}, we will use two correlation coefficients, namely the
 Spearman's correlation coefficient and Pearson's correlation coefficient, each
 given by:
 \begin{equation}
@@ -382,14 +382,14 @@ given by:
   \label{eq:pearson} \rho_p(X,Y) = {\cov(X, Y)\over \sigma_X\sigma_Y},
 \end{equation}
 respectively. Here, $X$ is the vector containing the set of values used to
-perturb one of the protein sets and $Y$ the vector of \acrshort{mmd} values
+perturb one of the protein sets and $Y$ the vector of \gls{mmd} values
 between the unperturbed and perturbed set for each perturbation level. In this
 setting, a high Spearman correlation coefficient (Equation \ref{eq:spearman}) is
 crucial to satisfy the first criterium of a performance metric: expressivity
 (see Section \ref{sec:evalproblem}). This will guarantee that the metric
 increases monotonically with the amount of perturbation. As
-\cite{obray2022evaluation} have shown, some configurations of \acrshort{mmd} on
-synthetic datasets revealed that an increasing \acrshort{mmd} value with
+\cite{obray2022evaluation} have shown, some configurations of \gls{mmd} on
+synthetic datasets revealed that an increasing \gls{mmd} value with
 increasing perturbation is not guaranteed. While \cite{thompson2022evaluation}
 highlighted that linearity is not a requirement, the Pearson correlation
 coefficient (Equation \ref{eq:pearson}) will allow us to further refine the
@@ -397,16 +397,16 @@ selection of the metrics behaving most predictably, and distill the most
 relevant configurations for a given perturbation range.
 
 Another important metric we can employ to quantify the quality of a particular
-\acrshort{mmd} configuration is the standard deviation of the various
-\acrshort{mmd} values across runs over the whole range of pertubations. As
+\gls{mmd} configuration is the standard deviation of the various
+\gls{mmd} values across runs over the whole range of pertubations. As
 indicated in Section \ref{sec:evalproblem}, one of the desiderata for a
 generative model metric is robustness. Since all experiments have been run with
 the same number of i.i.d. samples every time, using the standard deviation
-allows us to estimate how much a particular \acrshort{mmd} configuration is sensitive
-to the underlying data used. An \acrshort{mmd} configuration with a high standard
+allows us to estimate how much a particular \gls{mmd} configuration is sensitive
+to the underlying data used. An \gls{mmd} configuration with a high standard
 deviation under a particular perturbation regime would be indicative of low
 robustness, and would therefore be a less reliable estimate of the quality of
-the samples compared to an \acrshort{mmd} configuration with a high standard
+the samples compared to an \gls{mmd} configuration with a high standard
 deviation. We abbreviate this standard deviation measure as $\sigma_\MMD$ to
 avoid confusion with the $\sigma$ parameter of the RBF kernel presented in
 Section \ref{sec:methods_kernels}. In Chapter \ref{chap:results}, wherever we
@@ -422,7 +422,7 @@ library leveraging parallel processing of data to the greatest extent possible.
 We were inspired by the standards of \texttt{scikit-learn} and implemented
 multiple modules following the same design patterns to ensure that we could
 build \texttt{Pipeline} objects with the necessary steps required to compute an
-\acrshort{mmd}. All the code used for this thesis can be found here:
+\gls{mmd}. All the code used for this thesis can be found here:
 \url{https://github.com/pjhartout/msc_thesis}. Access can be granted upon request.
 
 % TODO: Plot of the library structure.
@@ -434,6 +434,6 @@ We first described the datasets we used, as well as the type of perturbations
 applied to them. We then discussed the representations of the proteins used in
 this study, as well as described the descriptor functions used for those
 representations. Crucially, we motivated our choice for the collection of
-kernels used for estimating the \acrshort{mmd}. Finally, we outlined the
-methodology leveraged to assess the quality of various \acrshort{mmd}
+kernels used for estimating the \gls{mmd}. Finally, we outlined the
+methodology leveraged to assess the quality of various \gls{mmd}
 configurations objectively.

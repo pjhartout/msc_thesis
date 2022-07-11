@@ -38,7 +38,7 @@ representations \citep{heusel2017gans}. Recently, the community has investigated
 this challenge specifically for a common representation of proteins: graphs
 \citep{thompson2022evaluation, obray2022evaluation}. In this domain, the
 standard measure used is a highly versatile statistic for a kernel two-sample
-test called \acrfull{mmd} introduced by \cite{gretton2012kernel}. \acrshort{mmd}
+test called \acrfull{mmd} introduced by \cite{gretton2012kernel}. \gls{mmd}
 computes the distance between two sets of data by computing a distance measure
 in a \acrfull{rkhs}, so its versatily stems from the fact that any valid kernel
 and appropriate underlying data representation can be used. However, this
@@ -50,38 +50,38 @@ physics-based tools to validate 3D structures such as RosettaRemodel
 which has sometimes limited applicability \citep{leman2020macromolecular}, or
 experimental validation \citep{strokach2020fast}. While experimental validation
 is the ultimate metric, better metrics for the fast \emph{in-silico} assessment
-of generative proteins is required, and the flexibility of MMD could be
+of generative proteins is required, and the flexibility of \gls{mmd} could be
 leveraged to fill this gap.
 
 \cite{obray2022evaluation} recently performed an in-depth evaluation of
-\acrshort{mmd}, and their results unveiled a number of pitfalls related to
-\acrshort{mmd}. Depending on the kernel and its associated parameters,
-different \acrshort{mmd} configurations ranked the quality of samples generated
+\gls{mmd}, and their results unveiled a number of pitfalls related to
+\gls{mmd}. Depending on the kernel and its associated parameters,
+different \gls{mmd} configurations ranked the quality of samples generated
 by different models differently. In addition, when progressively perturbing a
-set of synthetic graphs, certain \acrshort{mmd} configurations with respect to
+set of synthetic graphs, certain \gls{mmd} configurations with respect to
 another set of unperturbed graphs issued from the same distribution was not
 always found to monotonically increase with increasing amounts of perturbations,
-casting doubt on the expressivity of \acrshort{mmd} in certain configurations
+casting doubt on the expressivity of \gls{mmd} in certain configurations
 and data.
 
-In this thesis, we set out to clarify the behaviour of different \acrshort{mmd}
+In this thesis, we set out to clarify the behaviour of different \gls{mmd}
 configurations on protein data sets and perform a meta-evaluation of
-\acrshort{mmd}-based metrics. We investigate the behaviour of various
-\acrshort{mmd} configurations by applying perturbations to one set of proteins.
+\gls{mmd}-based metrics. We investigate the behaviour of various
+\gls{mmd} configurations by applying perturbations to one set of proteins.
 These perturbations were actively designed to be relevant for protein design use
 cases and include sequence perturbations, graph perturbations and geometric
 perturbations. In this setting, we investigate the behaviour of frequently used
-\acrshort{mmd} configurations typically used to evaluate generative models in
+\gls{mmd} configurations typically used to evaluate generative models in
 the graph domain. In addition, we expand this set of configurations by devising
 novel combinations of protein representations, descriptors, and kernels, all
 relevant for different aspects of protein design, and integrate them to the
-well-established \acrshort{mmd} evaluation framework.
+well-established \gls{mmd} evaluation framework.
 
 This thesis is organized as follows: first, Chapter \ref{chap:background}
 introduces fundamental concepts that we are going to build upon, and discusses
 the surrounding literature. Chapter \ref{chap:methods} details the methodology
 of the experiments that we carry out in this thesis, as well as
-describes all the configurations of \acrshort{mmd} that we will explore (i.e. all
+describes all the configurations of \gls{mmd} that we will explore (i.e. all
 combinations of representations, descriptor functions, kernels, and kernel
 parameters). Chapter \ref{chap:results} presents and contextualizes the findings of those
 experiments. We summarize key findings, make recommendations for practitioners and

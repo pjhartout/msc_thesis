@@ -8,17 +8,17 @@ future directions of research in Section \ref{sec:discussion_limitations}.
 
 \section{Key Findings}\label{sec:key_findings}
 
-Overall, we found that \acrshort{mmd}s show high correlation coefficients on
+Overall, we found that \gls{mmd}s show high correlation coefficients on
 graphs extracted from proteins (see Section \ref{sec:overall_behaviour}). This
 finding is somewhat surprising considering recent findings indicating that
-\acrshort{mmd} seems often me unstable on synthetic graphs such as Erd\"os-Rényi
+\gls{mmd} seems often me unstable on synthetic graphs such as Erd\"os-Rényi
 graphs, Watts-Strogatz graphs, and Barabási–Albert graphs under some
 combinations of perturbation types, kernels and descriptors
-\citep{obray2022evaluation}. While we found configurations of MMD with
+\citep{obray2022evaluation}. While we found configurations of \gls{mmd} with
 low correlations and high $\sigma_\MMD$ (see for instance Figure
 \ref{fig:mmd_consistent_eps} upper left pane with the degree histogram and the
-Weisfeiler-Lehman kernel-based MMDs where protein graphs are subject to
-rewiring, see Figure \ref{fig:wlk}), such \acrshort{mmd} configurations were not
+Weisfeiler-Lehman kernel-based \gls{mmd}s where protein graphs are subject to
+rewiring, see Figure \ref{fig:wlk}), such \gls{mmd} configurations were not
 prevalent. We hypothesize that this is due to the highly structured nature of
 the graphs used in this thesis (see Figure \ref{fig:er_comparison_8a_graph} for
 an example).
@@ -40,7 +40,7 @@ thesis.}
 \end{figure}
 
 Furthermore, we found that the correlation coefficients and standard deviation
-of \acrshort{mmd} configurations were greatly influenced by the graph
+of \gls{mmd} configurations were greatly influenced by the graph
 representation extracted from the protein. Namely, for $\varepsilon$ graphs
 (which overall seemed more stable than $k$-NN graphs, see Figure
 \ref{fig:correlations_graph_construction}), the higher the $\varepsilon$ value
@@ -48,7 +48,7 @@ to extract the graph, the lower the correlation to the perturbation applied
 (Figure \ref{fig:mmd_sensitivity_eps}).
 
 Next, we introduced in Section \ref{sec:descriptors} two \emph{novel}
-protein-specific descriptors that can be used in \acrshort{mmd}. In Section
+protein-specific descriptors that can be used in \gls{mmd}. In Section
 \ref{sec:results_protein_descriptors}, we show that those descriptors are both
 fast to compute (Table \ref{tab:runtimes}) and are able to detect point cloud
 perturbations with high fidelity (Figure \ref{fig:protein_specific_descriptors},
@@ -57,28 +57,28 @@ discussion).
 
 
 We found that the Weisfeiler-Lehman kernel, introduced in Section
-\ref{sec:methods_kernels} applied to \acrshort{mmd} was able to detect
+\ref{sec:methods_kernels} applied to \gls{mmd} was able to detect
 perturbations unable to be detected by traditional graph descriptors such as
 point mutations, which are relevant for the protein domain (see Section
-\ref{sec:results_graph_kernels}). However, the resulting MMD meta metrics
-obtained using the Weisfeiler-Lehman kernel were not as high as for other MMD
+\ref{sec:results_graph_kernels}). However, the resulting \gls{mmd} meta metrics
+obtained using the Weisfeiler-Lehman kernel were not as high as for other \gls{mmd}
 configurations used in this thesis (see Section \ref{sec:quality_wl} for a
-detailed examination). Furthermore, we found that Weisfeiler-Lehman-based MMD
-configurations are not sensitive (i.e. the normalize MMD does not increase) when
+detailed examination). Furthermore, we found that Weisfeiler-Lehman-based \gls{mmd}
+configurations are not sensitive (i.e. the normalize \gls{mmd} does not increase) when
 lower levels of perturbation are applied (see Figure \ref{fig:wlk}). This can be
 alleviated by using an alternative descriptor such as the ESM protein embedding
 introduced in Section \ref{sec:evalproblem}, which is more sensitive (i.e.
-requires less perturbation to reach higher normalized MMD values) to lower rates
+requires less perturbation to reach higher normalized \gls{mmd} values) to lower rates
 of point mutation (see Figure \ref{fig:esm_descriptor}).
 
-We analyzed the \acrshort{mmd} obtained from kernels operating on persistence diagrams in
+We analyzed the \gls{mmd} obtained from kernels operating on persistence diagrams in
 Section \ref{sec:results_topo_kernels}, which show excellent meta metric performance since
-\acrshort{mmd} values leveraging topological kernels both exhibit high correlations to
+\gls{mmd} values leveraging topological kernels both exhibit high correlations to
 point cloud perturbations and low $\sigma_\MMD$. While unable to detect
 point mutations, we propose an alternative to be topological investigation of such point
 clouds in Section \ref{sec:tda_limitations}.
 
-\section{MMD in Practice: Recommendations}\label{sec:discussion_recommendations}
+\section{\gls{mmd} in Practice: Recommendations}\label{sec:discussion_recommendations}
 
 Leveraging those key findings, we now formulate a set of recommendations for a
 practitioner who needs to evaluate a generative protein model using one of the
@@ -88,53 +88,53 @@ protein representations highlighted above.
 \subsection{Setting Up Appropriate Baselines}\label{sec:discussion_baselines}
 
 Overall, we advise the practitioner to carefully evaluate certain baselines when
-possible. The first baseline would be to evaluate the \acrshort{mmd} between
+possible. The first baseline would be to evaluate the \gls{mmd} between
 different i.i.d. samples of the reference distribution to establish the range of
-\acrshort{mmd} to be expected in the best case, which we refer to as the
-\emph{positive control}. We conducted such positive controls for various MMD
+\gls{mmd} to be expected in the best case, which we refer to as the
+\emph{positive control}. We conducted such positive controls for various \gls{mmd}
 configurations in Appendix \ref{sec:mmd_baselines}. From there, an accurate
 assessment of the quality of the model can be made. If the kernel and data
 representation allows it, it is also advisable to establish a \emph{negative
 control}. This would show the worst possible performance between any two
 distributions. If this is not possible, as is the case in this thesis (e.g.
-there is no negative control for all \acrshort{mmd} values perturbed using the
+there is no negative control for all \gls{mmd} values perturbed using the
 Gaussian noise), it is useful to examine cases of extreme perturbations and
-compare the resulting \acrshort{mmd} values to those. Such an assessment can
+compare the resulting \gls{mmd} values to those. Such an assessment can
 provide a surrogate for the negative control and confers a sense of scale for
 the particular problem tackled. As with discriminative models, it is also useful
-to compare the MMD obtained from the generated model with other MMDs obtained
+to compare the \gls{mmd} obtained from the generated model with other \gls{mmd}s obtained
 from other models used in the literature to make comparative benchmarks of
 performance. In such a context, taking into account the values of $\sigma_\MMD$
-to establish the robustness of a particular MMD configuration is important to
-establish the reliability of the resulting MMD values.
+to establish the robustness of a particular \gls{mmd} configuration is important to
+establish the reliability of the resulting \gls{mmd} values.
 
-Moreover, since the \acrshort{mmd} statistic is the basis for a kernel
+Moreover, since the \gls{mmd} statistic is the basis for a kernel
 two-sample test \citep{gretton2012kernel} (see also Section \ref{sec:mmd}),
 provided the kernel is powerful enough and can be computed with reasonable
 computational resources, one can estimate a $p$-value from the statistic between
 the model's generated distribution and the empirical distribution.
 
-\subsection{Taking MMD Sensitivity into Consideration}\label{sec:discussion_right_mmd}
+\subsection{Taking \gls{mmd} Sensitivity into Consideration}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
 Depending on the stage of modeling and the coarseness of the desired samples,
-one might choose different \acrshort{mmd} configurations. As we have shown in Figure
+one might choose different \gls{mmd} configurations. As we have shown in Figure
 \ref{fig:mmd_sensitivity_eps} and discussed in Section
 \ref{sec:results_sensitivity}, choosing a lower threshold $\varepsilon$ to
 extract $\varepsilon$-graphs from a protein point cloud results in a higher
 sensitivity to a host of perturbation. In practice, this means that the lower the
-$\varepsilon$, the better the \acrshort{mmd} will be at discerning perturbed (i.e.
+$\varepsilon$, the better the \gls{mmd} will be at discerning perturbed (i.e.
 generated) samples from reference samples. This might be desirable if one needs
 highly similar distributions of graphs. However, it can sometimes be desirable
 to relax this requirement, e.g. to explore a larger part of the design landscape
 or make a more approximate assessment of the generated samples for model selection purposes.
 
-In addition, when choosing an \acrshort{mmd} configuration, one should also
+In addition, when choosing an \gls{mmd} configuration, one should also
 investigate the magnitude of inter-run variance as a proxy for robustness, since
-the possible ranges of \acrshort{mmd} values can be too wide to make any
+the possible ranges of \gls{mmd} values can be too wide to make any
 assessment as to the quality of the generated samples in the real-world. This
 can be achieved either by running perturbation experiments as we did in this
 thesis, or by sampling subsets of the generated and real data to estimate how
-much a particular MMD configuration varies from one subset to another.
+much a particular \gls{mmd} configuration varies from one subset to another.
 
 \subsection{Assessing Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
@@ -154,7 +154,7 @@ protein-specific descriptors devised in this thesis and introduced in Section
 \ref{sec:results_protein_descriptors}, Figure
 \ref{fig:protein_specific_descriptors} can be used. This way, an unusual angle
 or abnormal interatomic distance distribution observed in the data will be
-reflected in the \acrshort{mmd} value.
+reflected in the \gls{mmd} value.
 
 % % TODO: compare with alphafold . Exact enforcement of peptide bond geometry is
 % only achieved in the post-prediction relaxation of the structure by gradient
@@ -168,7 +168,7 @@ reflected in the \acrshort{mmd} value.
 In this thesis, we consistently observed that the linear kernel and RBF kernels
 with $\sigma<0.01$ were often effective to detect perturbations and have shown
 increased correlations and lower standard deviations. Conversely, $\sigma>1$
-often resulted in insensitive and unstable \acrshort{mmd} values. When
+often resulted in insensitive and unstable \gls{mmd} values. When
 investigating the mean distance distribution between the various embeddings of
 data points (Appendix \ref{sec:distance_dist}), we can see that this is because
 the order of magnitude of the data descriptors is consistently higher than this
@@ -192,10 +192,10 @@ In Section \ref{sec:discussion_baselines}, we highlighted the necessity of a
 \emph{positive control}. While this is possible for certain kernels (e.g. for
 the aforementioned spectrum kernel, see \cite{kucera2022conditional}), many of
 the settings discussed in this thesis do not have such a \emph{negative control}.
-While one could use absolute \acrshort{mmd} values of perturbed sets of proteins
+While one could use absolute \gls{mmd} values of perturbed sets of proteins
 as a reference for subpar performance, it is still highly recommended to find
 appropriate pathological cases for specific applications to estimate what a
-worst-case \acrshort{mmd} value might take, i.e. establish a pseudo-negative control.
+worst-case \gls{mmd} value might take, i.e. establish a pseudo-negative control.
 
 % Useful??
 % \subsection{Expressive Power of Histograms}
@@ -206,11 +206,11 @@ worst-case \acrshort{mmd} value might take, i.e. establish a pseudo-negative con
 % ESM might work unpredictably on unseen sequences
 % Mention unbiased kernels such as the spectrum kernel
 
-\subsection{Limitations and Future Directions of TDA in MMD}\label{sec:tda_limitations}
+\subsection{Limitations and Future Directions of \gls{tda} in \gls{mmd}}\label{sec:tda_limitations}
 
-One of the novel applications of \acrshort{tda} discussed in this thesis is its
-adoption in \acrshort{mmd} by computing the kernel on two collections of point
-clouds, hence leveraging the shape of the proteins in the computation of MMD.
+One of the novel applications of \gls{tda} discussed in this thesis is its
+adoption in \gls{mmd} by computing the kernel on two collections of point
+clouds, hence leveraging the shape of the proteins in the computation of \gls{mmd}.
 Two challenges could potentially be prohibitive in adopting this approach. The
 first is computation time (see Table \ref{tab:runtimes} and discussion in
 Section \ref{sec:results_runtime}): the Vietoris-Rips filtration is expensive
@@ -226,10 +226,10 @@ cloud is more sparsely populated (see Section \ref{sec:results_runtime} for
 details), and because each amino acid-specific point cloud can be computed in
 parallel.
 
-% \acrshort{tda} on different point clouds
+% \gls{tda} on different point clouds
 % computational complexity
 
-\subsection{MMD and  Mode Collapse}\label{sec:mode_collapse_mode_drop}
+\subsection{\gls{mmd} and  Mode Collapse}\label{sec:mode_collapse_mode_drop}
 
 Mode collapse and mode dropping are the two distinctive and common failure modes
 of generative models \citep{salimans2016improved}. We define mode collapse as
@@ -240,9 +240,9 @@ common generative model architectures such as \acrshort{gans}. Although some
 methods have been devised to tackle such issues for \acrshort{gans}
 \citep{arjovsky2017wasserstein, goodfellow2014generative}, it remains a
 challenge that needs to be tackled by suitable evaluation measures. Since
-\acrshort{mmd} takes the average of kernel matrices (see Equation \ref{eq:mmd}),
+\gls{mmd} takes the average of kernel matrices (see Equation \ref{eq:mmd}),
 we anticipate its potential to detect mode collapse is limited, since
-\acrshort{mmd} is invariant to changes that do not affect the mean of the
+\gls{mmd} is invariant to changes that do not affect the mean of the
 distributions to be compared.
 
 While others have simulated such pathologies in synthetic datasets by manually
@@ -266,8 +266,8 @@ combine different representations of data points by either multiplying or adding
 kernel matrices. Although we did not investigate kernel composition here,
 because we wanted to assess the expressive power of individual kernels and
 representations, a practitioner could combine those to obtain an even richer
-descriptors combining the advantages of various \acrshort{mmd} configurations in this
-thesis. As such, a practitioner might consider TDA-derived kernels together with
+descriptors combining the advantages of various \gls{mmd} configurations in this
+thesis. As such, a practitioner might consider \gls{tda}-derived kernels together with
 protein-specific descriptors to capture global properties of proteins while
 ensuring that bond geometry is not violated between residues. Note that this
 approach would also have the effect of propagating any lack of robustness of one
@@ -283,21 +283,21 @@ of descriptor functions and kernels that capture those aspects appropriately.
 % detailed some of the limitations of and future work that could be done building
 % on the findings presented in this thesis.
 
-In Section \ref{sec:key_findings}, we show that the \acrshort{mmd} on the
+In Section \ref{sec:key_findings}, we show that the \gls{mmd} on the
 real-world graphs used in this thesis is more stable than for synthetic graphs
-used in the literature. We highlight the sensitivity of \acrshort{mmd} to the
+used in the literature. We highlight the sensitivity of \gls{mmd} to the
 underlying parameters used to extract graph representations of proteins. We then
 discuss the novel, computationally efficient, and expressive novel protein
 descriptors. Furthermore, we summarize the findings related to the graph
-kernels, namely that they seem to not be the most appropriate kernels for MMD based on
+kernels, namely that they seem to not be the most appropriate kernels for \gls{mmd} based on
 correlation and standard deviation meta-metrics. We close this section with a
-discussion on TDA-derived kernels in \acrshort{mmd}, which seem to be excellent
+discussion on \gls{tda}-derived kernels in \gls{mmd}, which seem to be excellent
 kernels despite being less inefficient.
 
 In Section \ref{sec:discussion_recommendations}, we first advise the
 practitioner to establish a positive control to estimate what a best-case
-\acrshort{mmd} value could be. Secondly, if conditions allow, one can also
-establish a negative control to estimate a worst-case \acrshort{mmd} value. We
+\gls{mmd} value could be. Secondly, if conditions allow, one can also
+establish a negative control to estimate a worst-case \gls{mmd} value. We
 also redirect the practitioner to our findings to use representations that are
 more or less susceptible to perturbations depending on the required fidelity of
 generated samples to the reference distribution. We then move on to discuss the
@@ -307,8 +307,8 @@ protein. We conclude our recommendations with relevant kernel choices.
 We outline the limitations of this thesis in Section
 \ref{sec:discussion_limitations} by starting off with discussing the often
 unfeasible crafting of negative controls. We then move on to discuss the
-limitations of a particular set of \acrshort{mmd} configurations using \acrshort{tda} and how to
-potentially solve it. We then highlight the fact that \acrshort{mmd} is insensitive to
+limitations of a particular set of \gls{mmd} configurations using \gls{tda} and how to
+potentially solve it. We then highlight the fact that \gls{mmd} is insensitive to
 generative model pathologies that do not affect the mean of the distributions
 due to the averaging of the kernel matrices. We close our discussion by
 highlighting the composability of the kernels, which could greatly expand the
