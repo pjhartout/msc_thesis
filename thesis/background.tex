@@ -1,5 +1,5 @@
 
-\chapter{Background \& Related Work}\label{chap:background}
+\chapter{Background and Related Work}\label{chap:background}
 
 % TODO: how did anand2018generative evaluate?
 
@@ -597,7 +597,7 @@ unused in the literature. The first are graph kernels (reviewed by
 expressive kernel used for biological data: the Weisfeiler-Lehman kernel. The
 second class of kernels leveraged here operate directly on the persistence
 diagrams obtained using the filtration procedures described in section
-\ref{sec:tda}. Specifically, we will use the persistence Fisher kernel introduced by
+\ref{sec:tda}. Specifically, we will use the \gls{pfk} introduced by
 \cite{le2018persistence}. We define both in the next paragraphs.
 
 \paragraph{The Weisfeiler-Lehman algorithm} Originally designed as a graph
@@ -698,9 +698,9 @@ compute the Fisher information metric
 
 \paragraph{Multi-scale kernel}.
 
-In this thesis, we will also use the multi-scale kernel introduced by
+In this thesis, we will also use the \gls{msk} introduced by
 \cite{reininghaus2015stable}. Using the same notation as above, they define the
-multi-scale kernel $k_{\text{MS}}$ as:
+\gls{msk} $k_{\text{MS}}$ as:
 \begin{equation}
   \label{eq:msk}
   k_{\text{MS}}(\dgi,\dgj) = {1\over 8\pi\sigma} \sum_{\substack{p\in\dgi\\ q\in\dgj}} e^{-{\|p-q\|^2\over 8\sigma}}-e^{-{\|p-\bar{q}\|^2\over 8\sigma}}

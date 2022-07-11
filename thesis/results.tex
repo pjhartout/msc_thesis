@@ -717,15 +717,15 @@ quality (here, more robust) metrics, since $\sigma_\MMD$ is relatively low.}
 \section{Topological Descriptors and Kernels}\label{sec:results_topo_kernels}
 
 % TODO kernel acronyms, \gls{tda} acronyms
-Figure \ref{fig:tda_kernels} shows the behavior of both the multi-scale kernel
-and persistence Fisher kernel. Overall, we can see that they are among the best
+Figure \ref{fig:tda_kernels} shows the behavior of both the \gls{msk}
+and \gls{pfk}. Overall, we can see that they are among the best
 performing metrics in this thesis, with high correlations and low inter-run
-variation. The persistence Fisher kernel seems to perform the best based on the
+variation. The \gls{pfk} seems to perform the best based on the
 correlation coefficients, with $\rho_P>0.95$ and $\rho_S=1$ across perturbation
-types -- while the the multi-scale kernel shows $\rho_P>0.93$ and $\rho_S>0.99$.
-The persistence Fisher kernel also has slightly lower $\sigma_\MMD$ values than
-the multi-scale kernel with $\sigma_\MMD$, with a maximum of 0.024 vs 0.044 for
-the multi-scale kernel -- see Table \ref{tab:std_tda}. Additionally, when
+types -- while the the \gls{msk} shows $\rho_P>0.93$ and $\rho_S>0.99$.
+The \gls{pfk} also has slightly lower $\sigma_\MMD$ values than
+the \gls{msk} with $\sigma_\MMD$, with a maximum of 0.024 vs 0.044 for
+the \gls{msk} -- see Table \ref{tab:std_tda}. Additionally, when
 looking at each perturbation type, we seem to have $\sigma_{\MMD
   ,\,\text{PSK}}<\sigma_{\MMD,\,\text{MSK}}$ except for the tapering
 perturbation type, where there is a 0.02 difference $\sigma_{\MMD
@@ -749,13 +749,12 @@ modified version of the speed up trick explored in Appendix A.5 of
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_6.pdf}
-  \caption[\gls{mmd} using topological kernels.]{\gls{mmd} vs.
-Perturbation (in \% of the maximum values shown in Table
-\ref{tab:perturbation_ranges}) using the multi-scale kernel and persistence
-Fisher kernel. For the persistence Fisher kernel (PFK), both the kernel
-bandwidth parameter and the Fisher bandwidth parameter are set to 1. For the
-multi-scale kernel (MSK), the bandwidth parameter is also set to 1. Overall, the
-correlation coefficients for those kernels are very high and show little
+  \caption[\gls{mmd} using topological kernels.]{\gls{mmd} vs. Perturbation (in
+\% of the maximum values shown in Table \ref{tab:perturbation_ranges}) using the
+\gls{msk} and persistence Fisher kernel. For the \gls{pfk}, both the
+kernel bandwidth parameter and the Fisher bandwidth parameter are set to 1. For
+the \gls{msk} (MSK), the bandwidth parameter is also set to 1. Overall,
+the correlation coefficients for those kernels are very high and show little
 inter-run variance, which is also supported by the $\sigma_\MMD$ values in Table
 \ref{tab:std_tda}.}
   \label{fig:tda_kernels}
@@ -838,8 +837,8 @@ edges of the graph.
 Third, the kernels used in this study all have reasonable runtimes, but we note
 the particular efficiency of the RBF and linear kernel ($<7.7$ms in our
 benchmarks) compared to the persistence Fisher, multi-scale and
-Weisfeiler-Lehman kernel. In addition, the persistence Fisher kernel ran thee
-times slower (35s) than the multi-scale kernel (11s). The implications of these
+Weisfeiler-Lehman kernel. In addition, the \gls{pfk} ran thee
+times slower (35s) than the \gls{msk} (11s). The implications of these
 runtimes will be further explored when making recommendations to the practioner
 in Section \ref{sec:discussion_recommendations}.
 
