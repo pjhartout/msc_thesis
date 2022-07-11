@@ -6,8 +6,7 @@ used to evaluate generative protein models is heavily inspired by
 combination of representation, optional descriptor function, kernel and
 parameters applied to all three aforementioned elements\footnote{We also
 subsequently refer to the parametrization and choice of all these options as an
-\gls{mmd} \emph{configuration}.} correlates with the amount of
-perturbation % TODO: check with Tim to see if use of term configuration is OK.
+\gls{mmd} \emph{configuration}.} correlates with the amount of perturbation
 applied to one set of proteins. This can be broken down in the following steps:
 
 \begin{enumerate}
@@ -49,8 +48,6 @@ also enabling the gauging the quality of Third, there are practical advantages
 related to this database because it contains consistently formatted \texttt{pdb}
 files exclusively cataloguing heavy atoms directly contributing to the 3D
 structure of a single monomer, which simplifies downstream processing.
-% TODO: not sure what was meant in the reasonable generated samples (2nd
-% reason).
 
 \section{Perturbations}
 
@@ -167,8 +164,7 @@ naturally-occurring amino acids. While graph perturbation probabilities (e.g. of
 adding an edge) range from 0 to 1, here we mostly concentrate on lower regimes
 of mutation, i.e. between 0 and 0.1, so see how sensitive various \gls{mmd}
 configurations are to a few point mutations, which covers most of the
-real-world % TODO: some -> most OK?
-protein engineering use cases \citep{poluri2017protein}.
+real-world protein engineering use cases \citep{poluri2017protein}.
 
 For each perturbation, a range of degrees of perturbation is defined and 20
 different evenly-spaced degrees of perturbation are examined and repeated 10
@@ -215,7 +211,7 @@ perturbation for each curve as well to compare behaviors of different
 \gls{mmd} configurations not operating on the same scale. As highlighted in
 Section \ref{sec:mmd}, \gls{mmd} does not have an inherent sense of scale
 anyway, so this normalization step does not impact our analysis negatively.
-% TODO: check syntax
+
 
 \begin{equation}
   \label{eq:normalization}
@@ -275,7 +271,7 @@ using a Vietoris-Rips filtration introduced in detail in Section \ref{sec:tda}.
 To speed up computation (and since we do not take amino acid type into account
 for this analysis), we sampled every other point to dramatically reduce the
 running time and memory footprint without significantly affecting the shape of
-the protein. % TODO: build validation script. Ideas:% compute persistence diagrams and show similarity.
+the protein.
 
 \paragraph{Protein-specific descriptors} In this thesis we introduce two novel
 protein-specific descriptor functions resulting in fixed-length vector
@@ -300,7 +296,6 @@ relevance and the established scientific success of distance histograms and
 dihedral angles histogram in both the validation and analysis of proteins lend
 credence to those newly established descriptors.
 
-% TODO: flattened distogram?
 
 \paragraph{Sequence descriptors} In Section \ref{sec:mmd}, we discussed the
 Evolutionary Scale Modelling family to construct descriptors of a fixed length
@@ -331,8 +326,6 @@ up the descriptor functions in this thesis.
   \label{tab:descriptor_function_setup}
 \end{table}
 
-% TODO: add pgfplots figure of this workflow.
-
 \subsection{Kernels}\label{sec:methods_kernels}
 Once a suitable representation and descriptor function is selected, one requires
 a kernel to evaluate the \gls{mmd} in the corresponding \acrshort{rkhs}. We
@@ -362,7 +355,7 @@ leveraging the sparsity of the graphs used in this thesis.
 
 To estimate \emph{global} changes in the shape of the protein, we will also use
 kernels accepting persistence diagrams as input, specifically, we will adopt the
-Persistence Fisher kernel \citep{le2018persistence} and the \gls{msk}
+\gls{pfk} \citep{le2018persistence} and the \gls{msk}
 \citep{reininghaus2015stable} defined in Section \ref{sec:kernels}.
 
 
@@ -424,8 +417,6 @@ multiple modules following the same design patterns to ensure that we could
 build \texttt{Pipeline} objects with the necessary steps required to compute an
 \gls{mmd}. All the code used for this thesis can be found here:
 \url{https://github.com/pjhartout/msc_thesis}. Access can be granted upon request.
-
-% TODO: Plot of the library structure.
 
 \section{Summary}
 

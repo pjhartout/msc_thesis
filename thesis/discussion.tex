@@ -138,7 +138,6 @@ much a particular \gls{mmd} configuration varies from one subset to another.
 
 \subsection{Assessing Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
-% TODO: Sequence, see RITA.
 Some key findings of this study can be useful is in the context of assessing
 \emph{realistic} proteins. Defining realistic proteins take on a myriad of
 aspects: i.e. are the generated protein \emph{sequences} realistic? In this
@@ -156,12 +155,6 @@ protein-specific descriptors devised in this thesis and introduced in Section
 or abnormal interatomic distance distribution observed in the data will be
 reflected in the \gls{mmd} value.
 
-% % TODO: compare with alphafold . Exact enforcement of peptide bond geometry is
-% only achieved in the post-prediction relaxation of the structure by gradient
-% descent in the Amber32 force field. Empirically, this final relaxa- tion does
-% not improve the accuracy of the model as measured by the global distance test
-% (GDT)33 or lDDT-Cα34 but does remove distracting stereochemical violations
-% without the loss of accuracy.
 
 \subsection{Choosing the Right Kernel and Kernel Parameters}
 % Kernel recommendations
@@ -175,7 +168,6 @@ the order of magnitude of the data descriptors is consistently higher than this
 threshold, and choosing a threshold that is excessively high results in
 oversmoothing. We discuss the order of magnitude of the data and its impact on
 the choice of $\sigma$ in Appendix \ref{sec:distance_dist} as well.
-% TODO: add supplementary plot
 
 \section{Limitations and Future Directions}\label{sec:discussion_limitations}
 
@@ -183,8 +175,6 @@ We summarized the main findings of this thesis (Section \ref{sec:key_findings})
 and formulated a set of recommendations to the practitioner (Section
 \ref{sec:discussion_recommendations}). We finish this chapter by highlighting
 important limitations of this thesis.
-
-% TODO: investigate mean reciprocal rank
 
 \subsection{Establishing Pseudo-Negative Controls}
 
@@ -283,13 +273,13 @@ of descriptor functions and kernels that capture those aspects appropriately.
 % detailed some of the limitations of and future work that could be done building
 % on the findings presented in this thesis.
 
-In Section \ref{sec:key_findings}, we show that the \gls{mmd} on the
-real-world graphs used in this thesis is more stable than for synthetic graphs
-used in the literature. We highlight the sensitivity of \gls{mmd} to the
-underlying parameters used to extract graph representations of proteins. We then
-discuss the novel, computationally efficient, and expressive novel protein
-descriptors. Furthermore, we summarize the findings related to the graph
-kernels, namely that they seem to not be the most appropriate kernels for \gls{mmd} based on
+In Section \ref{sec:key_findings}, we show that the \gls{mmd} on the real-world
+graphs used in this thesis is more stable than for synthetic graphs used in the
+literature. We highlight the sensitivity of \gls{mmd} to the underlying
+parameters used to extract graph representations of proteins. We then discuss
+the novel, computationally efficient, and expressive novel protein descriptors.
+Furthermore, we summarize the findings related to the graph kernels, namely that
+they seem to not be the most appropriate kernels for \gls{mmd} based on
 correlation and standard deviation meta-metrics. We close this section with a
 discussion on \gls{tda}-derived kernels in \gls{mmd}, which seem to be excellent
 kernels despite being less inefficient.

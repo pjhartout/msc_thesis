@@ -1,16 +1,6 @@
 
 \chapter{Background and Related Work}\label{chap:background}
 
-% TODO: how did anand2018generative evaluate?
-
-% This chapter introduces the core concepts built upon in this thesis and surveys
-% recent literature tackling the evaluation of generative graph neural networks (GNNs)
-% and the relevance of this problem in structural biology. Section
-% [\textbf{REVISE}] defines core mathematical and biological concepts that will
-% be built upon in the thesis. Section [\textbf{REVISE}] will discuss recent
-% advances in the design of measures used to evaluate generative GNNs and in
-% structural biology.
-
 This chapter introduces fundamental concepts built upon in this thesis, which
 lies at the interface between structural biology and machine learning. We start
 by defining some relevant biological properties of proteins, as well as several
@@ -62,7 +52,6 @@ structure of proteins \citep{wood2005protein}.
     side chains of the amino acid. Image by
     \href{https://bio.libretexts.org/Under_Construction/Purgatory/Core_\%28Britt\%27s_page\%29/Proteins*\%23}{Marc
       T. Facciotti}.}
-  % TODO: not a paper: sourcing ok?
   \label{fig:backbone}
 \end{figure}
 
@@ -287,7 +276,6 @@ connectedness which need to be accounted for in the model.
 
 \section{The Evaluation Problem}\label{sec:evalproblem}
 
-% TODO: address comments: While this gives some intuition, there have been quantifiable metrics devised for the image domain also
 Perhaps the most significant problem plaguing all generative models is the
 evaluation problem, which consists in evaluating the quality of generated
 samples from a model with respect to a test set. While sidestepping the problem
@@ -373,7 +361,6 @@ made in some domains, such as in the drug discovery field, where the penultimate
 layer of the ChemNet neural network can be used as input to the FID as shown by
 \cite{preuer2018frechet}.
 
-% TODO: mode to discussion?
 However, an interesting approach recently explored by
 \cite{thompson2022evaluation} leverages the observation, made in part by
 \cite{xu2018powerful,morris2019weisfeiler}, and \cite{kipf2016semi}, that
@@ -416,8 +403,7 @@ measure to evaluate the quality of the graph, most likely due to the fact that
 it provides a solid statistical framework that can yield solid statistically
 significant evidence that two sample distributions are issued from the same distribution.
 
-\section{Maximum Mean Discrepancy}\label{sec:mmd} % TODO: Check intro of MMD
-                                % with TIM
+\section{Maximum Mean Discrepancy}\label{sec:mmd}
 
 A significant part of this thesis is centered around investigating the
 \gls{mmd} statistic, so we define and examine existing \gls{mmd}
@@ -503,7 +489,6 @@ potentially saving on computation costs. Similarly, the kernel choice and
 parameters also heavily impacts how each dataset is being analyzed. Importantly,
 one consequence of the free choice of descriptor functions and kernel functions is
 that \gls{mmd} does not inherently have a scale \citep{obray2022evaluation}
-% TODO: sufficient?
 
 In the graph domain, it is incumbent upon the practitioner to (i) choose an
 appropriate (optional) graph descriptor and (ii) kernel with (iii) appropriate
@@ -598,7 +583,8 @@ expressive kernel used for biological data: the Weisfeiler-Lehman kernel. The
 second class of kernels leveraged here operate directly on the persistence
 diagrams obtained using the filtration procedures described in section
 \ref{sec:tda}. Specifically, we will use the \gls{pfk} introduced by
-\cite{le2018persistence}. We define both in the next paragraphs.
+\cite{le2018persistence} and the \gls{msk} introduced by
+\citep{reininghaus2015stable}. We define both in the next paragraphs.
 
 \paragraph{The Weisfeiler-Lehman algorithm} Originally designed as a graph
 isomorphism test by \cite{weisfeiler1968reduction}, the eponymous
@@ -649,7 +635,6 @@ explanation of each step of the algorithm are provided in the main text. The
 kernel between the two graphs can be computed by computing
 $k_{WL}(G,G')=\phi_2(G)\cdot\phi_2(G')$. Imagery adapted from
 \cite{mengin2019}.}
-  % TODO check with Tim.
   \label{fig:wl_algo}
 \end{figure}
 

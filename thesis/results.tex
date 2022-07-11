@@ -65,27 +65,27 @@ configurations behave well, i.e. there is a high correlation betweeen the
     \toprule
     \textbf{Perturbation Type} & \textbf{Descriptor} & $\sigma_\MMD$ \\
     \midrule
-Add Edges & Clustering Histogram &        0.023058 \\
+Add Edges & Clustering Histogram &        0.023 \\
       & Degree Histogram &        0.024943 \\
-      & Laplacian Spectrum Histogram &        0.039320 \\
-Gaussian Noise & Clustering Histogram &        0.010556 \\
+      & Laplacian Spectrum Histogram &        0.039\\
+Gaussian Noise & Clustering Histogram &        0.011 \\
       & Degree Histogram &        0.012793 \\
-      & Laplacian Spectrum Histogram &        0.027411 \\
-Remove Edges & Clustering Histogram &        0.009075 \\
+      & Laplacian Spectrum Histogram &        0.027 \\
+Remove Edges & Clustering Histogram &        0.009 \\
       & Degree Histogram &        0.004400 \\
-      & Laplacian Spectrum Histogram &        0.018033 \\
-Rewire Edges & Clustering Histogram &        0.028672 \\
-      & Degree Histogram &        \textbf{0.103612} \\
-      & Laplacian Spectrum Histogram &        0.032276 \\
-Shear & Clustering Histogram &        0.030793 \\
-      & Degree Histogram &        0.041350 \\
-      & Laplacian Spectrum Histogram &        0.040984 \\
-Taper & Clustering Histogram &        0.025951 \\
-      & Degree Histogram &        0.035282 \\
-      & Laplacian Spectrum Histogram &        0.043468 \\
-Twist & Clustering Histogram &        0.052784 \\
-      & Degree Histogram &        0.081318 \\
-    & Laplacian Spectrum Histogram &        0.063795 \\
+      & Laplacian Spectrum Histogram &        0.018 \\
+Rewire Edges & Clustering Histogram &        0.029 \\
+      & Degree Histogram &        \textbf{0.104} \\
+      & Laplacian Spectrum Histogram &        0.032 \\
+Shear & Clustering Histogram &        0.031 \\
+      & Degree Histogram &        0.041 \\
+      & Laplacian Spectrum Histogram &        0.0410 \\
+Taper & Clustering Histogram &        0.026 \\
+      & Degree Histogram &        0.035 \\
+      & Laplacian Spectrum Histogram &        0.043 \\
+Twist & Clustering Histogram &        0.053 \\
+      & Degree Histogram &        0.081 \\
+    & Laplacian Spectrum Histogram &        0.064 \\
     \bottomrule
   \end{tabular}
 }
@@ -98,7 +98,6 @@ Twist & Clustering Histogram &        0.052784 \\
 
   \label{tab:1_1_std}
 \end{table}
-% TODO: shave significant digits
 \clearpage
 
 \subsection{Influence of the choice of kernel}
@@ -119,7 +118,7 @@ histogram, this results in an overly sensitive kernel sharply increasing in
 value at the slightest perturbation, while the clustering histogram remains
 oblivious to large amounts of perturbation. This can be explained by the
 relative scale of each of the embeddings and their pairwise distances, which we
-catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh this out a bit further maybe.
+catalogue in Appendix \ref{sec:distance_dist}.
 
 \begin{figure}[!htbp]
   \centering
@@ -175,7 +174,6 @@ graphs are statisitcally significantly worse than those obtained from
 $\varepsilon$-graphs. }
   \label{fig:correlations_graph_construction}
 \end{figure}
-% TODO: discuss the idea of the M-W U test with Tim
 
 \subsection{Lower Values of $\varepsilon$ Are More Stable}
 \label{sec:sparser_better}
@@ -215,7 +213,6 @@ construct the graphs most likely increasingly overlap when some degree of twist
 is applied. In short, the conclusion of the last two paragraphs is that the
 sparser the graph representation by lowering $\varepsilon$, the more stable the
 resulting \gls{mmd}.
-% TODO: change \gls{mmd} with acrshort.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{./figures/results/res_2_1.pdf}
@@ -231,7 +228,7 @@ spectrum histogram descriptor under the tapering perturbation.}
   \scalebox{0.75}{
   \begin{tabular}{lllr}
     \toprule
-    Perturbation Type & Descriptor Function & $\varepsilon$ & $\sigma_\MMD$ \\
+    \textbf{Perturbation Type} & \textbf{Descriptor Function} & $\varepsilon$ & $\sigma_\MMD$ \\
     \midrule
     Gaussian Noise & Clustering Histogram & 8  &           0.011 \\
     &                              & 16 &           0.015 \\
@@ -332,57 +329,13 @@ threshold.)}
 \clearpage
 
 
-
-% TODO: the sparser, the better?
-
-% Among these outliers, we also see that the correlations are
-% substantially lower when perturbing proteins with the twisting perturbation for
-% the 32-\si{\angstrom}-graphs (the lowest are $\rho_P=0.73$ and $\rho_S=0.71$
-% when using the clustering histogram as a graph descriptor).
-% The overall quality
-% of the \gls{mmd} configurations with various $\varepsilon$ thresholds can be further
-% assessed using the standard deviation of the \gls{mmd} values across runs over the
-% range of perturbations applied, which we summarize in Table
-% \ref{tab:std_dev_epsilon_influence}. From
-
-% we see that twisting
-% perturbations show particularly high average standard deviations $>0.05$, and
-% higher $\varepsilon$ values also show higher standard deviation values
-% (culminating above $0.1$ for the twisting perturbation) for the twisting perturbations. In almost all cases, we have
-% $\sigma_{\MMD, 32-\AA}>\sigma_{\MMD, 16-\AA}>\sigma_{\MMD, 8-\AA}$. The degree
-% histogram descriptor under shearing and tapering perturbations seems to be the
-% exceptions.
-
-
-% TODO: erase/rewrite
-
-% In the last section, we discussed the notion of sensitivity of a particular
-% \gls{mmd} configuration to perturbations. We explore this idea further
-% here. Specifically, we investigate the impact of the $\varepsilon$ threshold on
-% the resulting sensitivity of the \gls{mmd} configuration to various
-% perturbations affecting the underlying point cloud. Figure
-% \ref{fig:mmd_sensitivity_eps} shows that, in general, the lower the
-% $\varepsilon$, the more sensitive the \gls{mmd} to perturbations. Low
-% sensitivity to perturbation might be useful in the early stages of modeling when
-% generated samples only need to \emph{coarsely} match the reference samples.
-% Conversely, a higher sensitivity to perturbations might be useful when trying to
-% \emph{finely} distinguish a set of anomalous samples from the reference samples.
-% Additionally, we can see that under the Gaussian noise, twisting and tapering
-% perturbation, larger values of $\varepsilon$ introduce larger variations in
-% \gls{mmd} values.
-
-
-
 \section{Graph Kernels}\label{sec:results_graph_kernels}
-% TODO compare WL with ESM (no modelling bias for WL on paper, might be a
-% weakness since some mutations might not have a functional effect.)
 
 The results of the perturbation experiments using the Weisfeiler-Lehman kernel
 (see Sections \ref{sec:kernels} and \ref{sec:methods_kernels}) in \gls{mmd} can be
 seen in Figure \ref{fig:wlk}. Two important takeaways can be be derived from
 this figure.
 
-% TODO: WL glossary entry
 \subsection{Quality of \gls{mmd} Using Weisfeiler-Lehman}\label{sec:quality_wl}
 The first conclusion is
 derived from the observation of the meta metrics. We can see that, correlations
@@ -554,7 +507,6 @@ consider the profile of individual perturbation experiments as well as reason
 through the expressive power of a particular descriptor or kernel to accurately
 assess the practicality of a particular \gls{mmd} configurations.
 
-% TODO:
 
 \subsection{\textalpha{}-Carbon Distance Histogram}\label{sec:results_dist_hist}
 
@@ -671,7 +623,6 @@ see if correlation coefficients stay consistent across kernel configurations.
 Results conducted by \cite{kucera2022conditional} suggest that this is not the
 case, highlighting the need for further work.
 
-% TODO: discuss kucera and more in-depth work on evaluating generative sequence models.
 
 \begin{figure}
   \centering
@@ -703,8 +654,8 @@ complemented by complementary sequence-specific perturbations -- see Section
     \bottomrule
   \end{tabular}
   }
-  \caption[$\sigma_\MMD$ values for the \gls{mmd} using the ESM learned
-embedding.]{$\sigma_\MMD$ values for the \gls{mmd} using the ESM learned embedding.
+  \caption[$\sigma_\MMD$ values for the \gls{mmd} using the \gls{esm} learned
+embedding.]{$\sigma_\MMD$ values for the \gls{mmd} using the \gls{esm} learned embedding.
 $\sigma_\MMD>0.1$ are in bold. These findings corroborate the correlation
 coefficients shown in Figure \ref{fig:esm_descriptor}: using a linear kernel or
 an RBF kernel with$\sigma<0.1$, we get $\sigma_\MMD<0.1$, we obtain higher
@@ -716,7 +667,6 @@ quality (here, more robust) metrics, since $\sigma_\MMD$ is relatively low.}
 
 \section{Topological Descriptors and Kernels}\label{sec:results_topo_kernels}
 
-% TODO kernel acronyms, \gls{tda} acronyms
 Figure \ref{fig:tda_kernels} shows the behavior of both the \gls{msk}
 and \gls{pfk}. Overall, we can see that they are among the best
 performing metrics in this thesis, with high correlations and low inter-run
@@ -808,7 +758,6 @@ inter-run variance, which is also supported by the $\sigma_\MMD$ values in Table
 \clearpage
 \section{Runtime}\label{sec:results_runtime}
 
-% TODO add numbers. Maybe big-O.
 One of the desiderata of \gls{mmd} is efficiency, i.e. a low computational
 complexity (see Section \ref{sec:evalproblem}). As such, we report the various
 computation times for each of the important elements of the pipelines outlined
@@ -936,5 +885,3 @@ elements of the computational pipleine to obtain \gls{mmd} values (Section
 \ref{sec:results_runtime}), and note that (i) the Vietoris-Rips filtration is
 excessively slow to compute, (ii) that the protein descriptors are particularly
 fast to compute, and (iii) comment on the various kernel runtimes.
-
-% TODO: introduce next chapter?
