@@ -101,16 +101,18 @@ Twist & Clustering Histogram &        0.052784 \\
 % TODO: shave significant digits
 \clearpage
 
-\subsection{Influence of the choice of kernel} We next investigate the overall
-influence of the kernel on the correlations between perturbations and
-\acrshort{mmd} shown in Figure \ref{fig:mmd_effect_kernel}. We can see that for
-$\sigma\lessapprox 0.1$ ($\sigma$ being the hyperparameter of the Gaussian
-kernel, see Section \ref{sec:kernels}) and for the linear kernel, \acrshort{mmd}
-values behave as desired, i.e. $\rho_P, \rho_S\geq 0.8$ and, if one excludes the
-Laplacian spectrum histogram at $\sigma=0.1$, we have $\rho_P,\rho_S>0.95$.
-However, correlation coefficients drop sharply when increasing $\sigma>0.1$,
-most likely due to oversmoothing, which is a phenomenon arising when the
-bandwidth of the kernel is large enough to obscure any structure in the data
+\subsection{Influence of the choice of kernel}
+
+We next investigate the overall influence of the kernel on the correlations
+between perturbations and \acrshort{mmd} shown in Figure
+\ref{fig:mmd_effect_kernel}. We can see that for $\sigma\lessapprox 0.1$
+($\sigma$ being the hyperparameter of the Gaussian kernel, see Section
+\ref{sec:kernels}) and for the linear kernel, \acrshort{mmd} values behave as
+desired, i.e. $\rho_P, \rho_S\geq 0.8$ and, if one excludes the Laplacian
+spectrum histogram at $\sigma=0.1$, we have $\rho_P,\rho_S>0.95$. However,
+correlation coefficients drop sharply when increasing $\sigma>0.1$, most likely
+due to oversmoothing, which is a phenomenon arising when the bandwidth of the
+kernel is large enough to obscure any structure in the data
 \citep{hwang1994nonparametric}. This can have unpredictable consequences on
 resulting MMD values: in the case of the degree histogram or the clustering
 histogram, this results in an overly sensitive kernel sharply increasing in
@@ -133,27 +135,27 @@ catalogue in Appendix \ref{sec:distance_dist}. % TODO: flesh this out a bit furt
   \label{fig:mmd_effect_kernel}
 \end{figure}
 
-\section{Influence of the Graph Representation on the Sensitivity to
-  Perturbations}\label{sec:results_sensitivity}
+\section{Influence of the Graph Representation on MMD}\label{sec:results_sensitivity}
 
-\subsection{Comparing graph construction techniques from proteins}\label{sec:techniques} To compare which graph
-construction technique was overall most adviseable, we computed the correlation
-coefficients of the various available combinations of graph type, graph
-extraction parameter, and description function with an RBF kernel with
-$\sigma=0.01$, which was shown to behave reasonably stably across descriptors
-(Figure \ref{fig:mmd_effect_kernel}). We then compared the distributions of the
-two correlation coefficients and computed a Mann-Whitney $\mathcal{U}$ test
-\citep{fay2010wilcoxon}. Figure \ref{fig:correlations_graph_construction} shows
-the distributions of both $\rho_S$ and $\rho_P$ for the $k$-NN and
-$\varepsilon$-graphs. Both the test for the Pearson correlation coefficient and
-the Spearman correlation coefficient were significant ($p=8.35\cdot 10^{-4}$ and
-$p=1.765\cdot 10^{-2}$, respectively) indicating that one distribution is
-stochastically greater than the other. In both cases, the distribution of the
-correlation coefficients from the $\varepsilon$-graphs is higher, as we can see
-in the legend of Figure \ref{fig:correlations_graph_construction}. This result
-is intuitive, because $\epsilon$-graphs are likely more sensitive to the
-underlying topology of the protein. We therefore proceed with $\epsilon$-graphs
-in the subsequent results discussed below.
+\subsection{Comparing Graph Construction Technique}\label{sec:techniques}
+To compare which graph construction technique was overall most adviseable, we
+computed the correlation coefficients of the various available combinations of
+graph type, graph extraction parameter, and description function with an RBF
+kernel with $\sigma=0.01$, which was shown to behave reasonably stably across
+descriptors (Figure \ref{fig:mmd_effect_kernel}). We then compared the
+distributions of the two correlation coefficients and computed a Mann-Whitney
+$\mathcal{U}$ test \citep{fay2010wilcoxon}. Figure
+\ref{fig:correlations_graph_construction} shows the distributions of both
+$\rho_S$ and $\rho_P$ for the $k$-NN and $\varepsilon$-graphs. Both the test for
+the Pearson correlation coefficient and the Spearman correlation coefficient
+were significant ($p=8.35\cdot 10^{-4}$ and $p=1.765\cdot 10^{-2}$,
+respectively) indicating that one distribution is stochastically greater than
+the other. In both cases, the distribution of the correlation coefficients from
+the $\varepsilon$-graphs is higher, as we can see in the legend of Figure
+\ref{fig:correlations_graph_construction}. This result is intuitive, because
+$\epsilon$-graphs are likely more sensitive to the underlying topology of the
+protein. We therefore proceed with $\epsilon$-graphs in the subsequent results
+discussed below.
 
 \begin{figure}[!htbp]
   \centering
@@ -175,8 +177,8 @@ $\varepsilon$-graphs. }
 \end{figure}
 % TODO: discuss the idea of the M-W U test with Tim
 
-\subsection{Lower values of $\varepsilon$ are more
-  stable}\label{sec:sparser_better}
+\subsection{Lower Values of $\varepsilon$ Are More Stable}
+\label{sec:sparser_better}
 In the previous paragraph, we established that $\varepsilon$-graphs were more
 appropriate to compute the \acrshort{mmd}. Now, we investigate which specific
 threshold(s) $\varepsilon$ are most appropriate using the same meta-metrics as
@@ -285,8 +287,8 @@ perturbations seems to be the exceptions.}
 \end{table}
 
 
-\subsection{Lower $\varepsilon$ values for graph contruction are more
-sensitive to smaller perturbations than higher $\varepsilon$ values}\label{sec:sensitivity}
+\subsection{Lower $\varepsilon$ Values for Graph Contruction Are More
+Sensitive to Lower Perturbation Regimes}\label{sec:sensitivity}
 While we noted that choosing a lower $\varepsilon$ value
 to extract the graph would likely improve the stability of resulting MMDs, there
 is also another consideration when choosing a graph representation. As shown in
@@ -381,7 +383,7 @@ seen in Figure \ref{fig:wlk}. Two important takeaways can be be derived from
 this figure.
 
 % TODO: WL glossary entry
-\subsection{Quality of MMD using Weisfeiler-Lehman}\label{sec:quality_wl}
+\subsection{Quality of MMD Using Weisfeiler-Lehman}\label{sec:quality_wl}
 The first conclusion is
 derived from the observation of the meta metrics. We can see that, correlations
 are relatively low for graph perturbations (Figure \ref{fig:wlk}, top row). If
@@ -406,8 +408,7 @@ are in line with the coefficients we have seen before ($\rho_P>0.94$ and we
 consistently have $\rho_S=1$), there seems to be a crucial caveat in the curves
 that we see in Figure \ref{fig:wlk} which we discuss next.
 
-\subsection{No increase in normalized MMD in low regimes of
-perturbation} \label{sec:insensitivity_wl_kernel}
+\subsection{Insensitivty in Low Perturbation Regimes} \label{sec:insensitivity_wl_kernel}
 Figure \ref{fig:wlk} indeed reveals a systematic pathology when using the
 Weisfeiler-Lehman kernel in MMD. When applying a low amount of perturbation,
 there does not seem to be a proportional rise in the (normalized) MMD value. As

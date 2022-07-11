@@ -410,12 +410,10 @@ the samples compared to an \acrshort{mmd} configuration with a high standard
 deviation. We abbreviate this standard deviation measure as $\sigma_\MMD$ to
 avoid confusion with the $\sigma$ parameter of the RBF kernel presented in
 Section \ref{sec:methods_kernels}. In Chapter \ref{chap:results}, wherever we
-conduct statistical tests, our highest significance threshold is $5\cdot 10^{-2}$.
-significance threshold is
+conduct statistical tests, and our highest significance threshold is $5\cdot 10^{-2}$.
 
 
 \subsection{Software Library Design}
-
 
 Due to the complexity and modularity of the methodology explored above, it is
 required to have a scalable library to execute all the evaluation experiments at
@@ -425,7 +423,7 @@ We were inspired by the standards of \texttt{scikit-learn} and implemented
 multiple modules following the same design patterns to ensure that we could
 build \texttt{Pipeline} objects with the necessary steps required to compute an
 \acrshort{mmd}. All the code used for this thesis can be found here:
-\url{https://github.com/pjhartout/msc_thesis}
+\url{https://github.com/pjhartout/msc_thesis}. Access can be granted upon request.
 
 % TODO: Plot of the library structure.
 
@@ -437,5 +435,5 @@ applied to them. We then discussed the representations of the proteins used in
 this study, as well as described the descriptor functions used for those
 representations. Crucially, we motivated our choice for the collection of
 kernels used for estimating the \acrshort{mmd}. Finally, we outlined the
-methodology leveraged to rank the quality of various \acrshort{mmd}
+methodology leveraged to assess the quality of various \acrshort{mmd}
 configurations objectively.

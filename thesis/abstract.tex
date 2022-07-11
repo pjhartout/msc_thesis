@@ -1,27 +1,25 @@
 \begin{abstract}
 Generative models applied to proteins are poised to revolutionize the \emph{in
-silico} design of novel proteins satisfying various functional and shape
+silico} design of novel proteins satisfying various functional and topological
 constraints. However, such models are notoriously hard to evaluate. The
 \acrfull{mmd}, a statistic used in a kernel two-sample test, has emerged as a
 highly versatile evaluation metric used to evaluate generative graph models.
 This versatility is due to the fact that any kernel, and, therefore, any
 appropriate underlying data representation, can be used. This makes it relevant
-for proteins, because they can be represented as graphs (obtained with various
-parameters), as point clouds, and as sequences of amino acids. In this thesis,
-we aim to evaluate the applicability of different representations, descriptor
-functions and kernel combinations for use in \acrshort{mmd} to design relevant
-metrics to evaluate generative models operating in the protein domain. Through a
-set of graph-based and point cloud-based perturbation experiments, we first
-evaluate various configurations of graph descriptors traditionally used to
-evaluate generative graph models. Second, we expand the use of \acrshort{mmd} to
-encompass previously unused configurations, such as (i) graph kernels, (ii)
-novel protein descriptor functions tailored to evaluate structural properties of
-proteins such has the dihedral angles histogram formed by each pair of amino
-acid, and the histogram of pairwise distances between amino acids, and (iii)
-kernels operating on topological descriptors of proteins. We find that there are
-multiple metrics that have a high correlation to various perturbations, and
-recommend which to use based on the various \emph{desiderata} of suitable metrics:
-expressivity, robustness and efficiency.
-
-% TODO:  Complement with findings from conclusion
+for proteins, because they can be represented as graphs, point clouds, and
+sequences of amino acids. In this thesis, we aim to evaluate the applicability
+of different representations, descriptor functions and kernel combinations for
+use in \acrshort{mmd} to design relevant metrics to evaluate generative models
+operating in the protein domain. Through a set of graph-based and point
+cloud-based perturbation experiments, we first evaluate various configurations
+of graph descriptors traditionally used to evaluate generative graph models.
+Second, we expand the use of \acrshort{mmd} to encompass previously unused
+configurations, such as (i) graph kernels, (ii) novel protein descriptor
+functions tailored to evaluate structural properties of proteins such has the
+dihedral angles histogram formed by each pair of amino acid, and the histogram
+of pairwise distances between amino acids, and (iii) kernels operating on
+topological descriptors of proteins. Using meta-metrics that accurately capture
+the \emph{desiderata} of suitable metrics (expressivity, robustness and
+efficiency), we find that there are multiple configurations of MMD that
+accurately gauge the quality of proteins.
 \end{abstract}

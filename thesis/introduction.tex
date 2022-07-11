@@ -41,7 +41,17 @@ standard measure used is a highly versatile statistic for a kernel two-sample
 test called \acrfull{mmd} introduced by \cite{gretton2012kernel}. \acrshort{mmd}
 computes the distance between two sets of data by computing a distance measure
 in a \acrfull{rkhs}, so its versatily stems from the fact that any valid kernel
-and appropriate underlying data representation can be used.
+and appropriate underlying data representation can be used. However, this
+framework has yet to be applied to proteins, with practitioners mostly relying
+on either sequence model evaluation metrics such as perplexity scores
+\citep{belinkov2019analysis,ingraham2019generative,hesslow2022rita},
+physics-based tools to validate 3D structures such as RosettaRemodel
+\citep{huang2011rosettaremodel, anand2018generative,ingraham2019generative},
+which has sometimes limited applicability \citep{leman2020macromolecular}, or
+experimental validation \citep{strokach2020fast}. While experimental validation
+is the ultimate metric, better metrics for the fast \emph{in-silico} assessment
+of generative proteins is required, and the flexibility of MMD could be
+leveraged to fill this gap.
 
 \cite{obray2022evaluation} recently performed an in-depth evaluation of
 \acrshort{mmd}, and their results unveiled a number of pitfalls related to

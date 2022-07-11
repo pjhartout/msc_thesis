@@ -114,7 +114,7 @@ provided the kernel is powerful enough and can be computed with reasonable
 computational resources, one can estimate a $p$-value from the statistic between
 the model's generated distribution and the empirical distribution.
 
-\subsection{Taking MMD sensitivity into consideration}\label{sec:discussion_right_mmd}
+\subsection{Taking MMD Sensitivity into Consideration}\label{sec:discussion_right_mmd}
 % Comment also on std dev - could potentially help with the p-value if high.
 Depending on the stage of modeling and the coarseness of the desired samples,
 one might choose different \acrshort{mmd} configurations. As we have shown in Figure
@@ -139,18 +139,19 @@ much a particular MMD configuration varies from one subset to another.
 \subsection{Assessing Realistic Proteins}\label{sec:discussion_realistic_proteins}
 
 % TODO: Sequence, see RITA.
-Some key findings of this study can be useful is in the
-context of assessing \emph{realistic} proteins. Defining realistic proteins take on a
-myriad of aspects: i.e. are the generated protein \emph{sequences} realistic? In this
+Some key findings of this study can be useful is in the context of assessing
+\emph{realistic} proteins. Defining realistic proteins take on a myriad of
+aspects: i.e. are the generated protein \emph{sequences} realistic? In this
 case, one might use a Weisfeiler-Lehman kernel or an ESM embedding to answer
 this. The literature, however, suggests that using embeddings does not yield the
-same optimal kernel parameters depending on the perturbation applied to the sequence. As
-such, it is recommended to use a spectrum kernel \citep{leslie2002spectrum} for
-sequences (see \cite{kucera2022conditional}, Section 4.1). There are, however,
-other aspects of proteins to consider, the most important of which is their 3D
-shape. For this purpose, the protein-specific descriptors devised in this thesis
-and introduced in Section \ref{sec:descriptors} whose results are shown in
-Section \ref{sec:results_protein_descriptors}, Figure
+same optimal kernel parameters depending on the perturbation applied to the
+sequence. As such, it is recommended to use a spectrum kernel
+\citep{leslie2002spectrum} for sequences (see \cite{kucera2022conditional},
+Section 4.1). There are, however, other aspects of proteins to consider, the
+most important of which is their 3D shape. For this purpose, the
+protein-specific descriptors devised in this thesis and introduced in Section
+\ref{sec:descriptors} whose results are shown in Section
+\ref{sec:results_protein_descriptors}, Figure
 \ref{fig:protein_specific_descriptors} can be used. This way, an unusual angle
 or abnormal interatomic distance distribution observed in the data will be
 reflected in the \acrshort{mmd} value.
@@ -162,7 +163,7 @@ reflected in the \acrshort{mmd} value.
 % (GDT)33 or lDDT-Cα34 but does remove distracting stereochemical violations
 % without the loss of accuracy.
 
-\subsection{Choosing the Right Kernel \& Kernel Parameters}
+\subsection{Choosing the Right Kernel and Kernel Parameters}
 % Kernel recommendations
 In this thesis, we consistently observed that the linear kernel and RBF kernels
 with $\sigma<0.01$ were often effective to detect perturbations and have shown
@@ -185,7 +186,7 @@ important limitations of this thesis.
 
 % TODO: investigate mean reciprocal rank
 
-\subsection{Establishing pseudo-negative controls}
+\subsection{Establishing Pseudo-Negative Controls}
 
 In Section \ref{sec:discussion_baselines}, we highlighted the necessity of a
 \emph{positive control}. While this is possible for certain kernels (e.g. for
@@ -205,7 +206,7 @@ worst-case \acrshort{mmd} value might take, i.e. establish a pseudo-negative con
 % ESM might work unpredictably on unseen sequences
 % Mention unbiased kernels such as the spectrum kernel
 
-\subsection{Limitations \& Future Directions of TDA in MMD}\label{sec:tda_limitations}
+\subsection{Limitations and Future Directions of TDA in MMD}\label{sec:tda_limitations}
 
 One of the novel applications of \acrshort{tda} discussed in this thesis is its
 adoption in \acrshort{mmd} by computing the kernel on two collections of point
@@ -228,7 +229,7 @@ parallel.
 % \acrshort{tda} on different point clouds
 % computational complexity
 
-\subsection{MMD \&  Mode Collapse}\label{sec:mode_collapse_mode_drop}
+\subsection{MMD and  Mode Collapse}\label{sec:mode_collapse_mode_drop}
 
 Mode collapse and mode dropping are the two distinctive and common failure modes
 of generative models \citep{salimans2016improved}. We define mode collapse as
