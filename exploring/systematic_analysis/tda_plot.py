@@ -116,7 +116,7 @@ def main():
     )
     df["kernel"] = df["kernel"].str.replace(
         "mutli_scale_kernel_bandwidth=1;bandwidth_fisher=1",
-        "Multi scale kernel",
+        "Multi-scale kernel",
     )
 
     df.reset_index(drop=True, inplace=True)
@@ -142,6 +142,14 @@ def main():
         ax.set_title(titles[i])
 
     plt.savefig(here() / "exploring/systematic_analysis/res_6.pdf")
+
+    df.groupby(["Perturbation (%)", "perturb_type", "Kernel"]).std()[
+        "Normalized MMD"
+    ].reset_index().groupby(["perturb_type", "Kernel"]).mean().round(3)[
+        "Normalized MMD"
+    ].to_latex(
+        here() / "exploring/systematic_analysis/res_6_std.tex"
+    )
 
 
 if __name__ == "__main__":

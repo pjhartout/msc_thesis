@@ -5,8 +5,8 @@
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{./figures/results/res_1_5.pdf}
-  \caption[MMD vs. Gaussian Noise Perturbation (in \%) for various graph
-descriptors of the 2-NN-graphs.]{MMD vs. Gaussian Noise Perturbation (in \%) for
+  \caption[\gls{mmd} vs. Gaussian Noise Perturbation (in \%) for various graph
+descriptors of the 2-NN-graphs.]{\gls{mmd} vs. Gaussian Noise Perturbation (in \%) for
 various graph descriptors and kernel parameters of the 2-NN-graphs. The kernel
 here is shown on top of each subplots.}
   \label{fig:mmd_effect_kernel_knn}
@@ -62,43 +62,42 @@ this thesis. The top row shows the mean distance between each of the protein
 descriptors introduced in this thesis while the bottom row shows the distance
 between each graph descriptor for two $\varepsilon$-graph extraction settings.}
   \label{fig:mean_distance_embedding}
-\end{figure} % TODO: ESM
+\end{figure}
 
 \clearpage
-\section{MMD Baselines for Various Configurations}\label{sec:mmd_baselines}
-% TODO: discuss with Tim MMD baselines.
-\acrshort{mmd} distributions between two sets of 100 unperturbed proteins with
-various \acrshort{mmd} configurations are shown here. This motivates why the
-practicioner should always make a positive control, as various \acrshort{mmd}
+\section{\gls{mmd} Baselines for Various Configurations}\label{sec:mmd_baselines}
+Baseline \gls{mmd} distributions between two sets of 100 unperturbed proteins with
+various \gls{mmd} configurations are shown here. This motivates why the
+practicioner should always make a positive control, as various \gls{mmd}
 configurations can have vastly different ranges depending on the configurations.
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/clustering_baselines.pdf}
-  \caption[Clustering coefficient histogram \acrshort{mmd} baselines for two
-different $\varepsilon$ values.]{Clustering coefficient \acrshort{mmd} baselines
+  \caption[Clustering coefficient histogram \gls{mmd} baselines for two
+different $\varepsilon$ values.]{Clustering coefficient \gls{mmd} baselines
 for two different $\varepsilon$ values. The left side of each violin plot is
 obtained with $\varepsilon=8$ and the right side with $\varepsilon=32$.
-Everywhere a plot contains ``sigma'' in the title, the RBF kernel with the
+ Everywhere a plot contains ``sigma'' in the title, the RBF kernel with the
 indicated parameter was used.}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/degree_baselines.pdf}
-  \caption[Degree distribution histogram \acrshort{mmd} baselines for two
-different $\varepsilon$ values.]{Degree distribution histogram \acrshort{mmd}
+  \caption[Degree distribution histogram \gls{mmd} baselines for two
+different $\varepsilon$ values.]{Degree distribution histogram \gls{mmd}
 baselines for two different $\varepsilon$ values. The left side of each violin
 plot is obtained with $\varepsilon=8$ and the right side with $\varepsilon=32$.
-Everywhere a plot contains ``sigma'' in the title, the RBF kernel with the
+ Everywhere a plot contains ``sigma'' in the title, the RBF kernel with the
 indicated parameter was used.}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/laplacian_spectrum_baselines.pdf}
-  \caption[Laplacian spectrum histogram \acrshort{mmd} baselines for two
-different $\varepsilon$ values.]{Laplacian spectrum histogram \acrshort{mmd}
+  \caption[Laplacian spectrum histogram \gls{mmd} baselines for two
+different $\varepsilon$ values.]{Laplacian spectrum histogram \gls{mmd}
 baselines for two different $\varepsilon$ values. The left side of each violin
 plot is obtained with $\varepsilon=8$ and the right side with
 $\varepsilon=32$.Everywhere a plot contains ``sigma'' in the title, the RBF
@@ -108,8 +107,8 @@ kernel with the indicated parameter was used.}
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{./figures/results/esm_baselines.pdf}
-  \caption[\acrshort{esm}-based \acrshort{mmd} baselines for two different
-$\varepsilon$ values.]{\acrshort{esm}-based \acrshort{mmd} baselines for two
+  \caption[\acrshort{esm}-based \gls{mmd} baselines for two different
+$\varepsilon$ values.]{\acrshort{esm}-based \gls{mmd} baselines for two
 different $\varepsilon$ values. The left side of each violin plot is obtained
 with $\varepsilon=8$ and the right side with $\varepsilon=32$. Everywhere a plot
 contains ``sigma'' in the title, the RBF kernel with the indicated parameter was
@@ -119,8 +118,8 @@ used.}
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{./figures/results/tda_baselines.pdf}
-  \caption[\acrshort{tda}-based \acrshort{mmd} baselines for two different
-$\varepsilon$ values.]{\acrshort{tda}-based \acrshort{mmd} baselines for two
+  \caption[\gls{tda}-based \gls{mmd} baselines for two different
+$\varepsilon$ values.]{\gls{tda}-based \gls{mmd} baselines for two
 different $\varepsilon$ values. The left side of each violin plot is obtained
 with $\varepsilon=8$ and the right side with $\varepsilon=32$. PFK: persistence
 Fisher kernel. MSK: multi-scale kernel.}
@@ -129,8 +128,8 @@ Fisher kernel. MSK: multi-scale kernel.}
 \begin{figure}
   \centering
   \includegraphics[width=0.75\textwidth]{./figures/results/wl_baselines.pdf}
-  \caption[Weisfeiler-Lehman-based \acrshort{mmd} baselines for two different
-$\varepsilon$ values.]{\acrshort{tda}-based \acrshort{mmd} baselines for two
+  \caption[Weisfeiler-Lehman-based \gls{mmd} baselines for two different
+$\varepsilon$ values.]{\gls{tda}-based \gls{mmd} baselines for two
 different $\varepsilon$ values. The left side of each violin plot is obtained
 with $\varepsilon=8$ and the right side with $\varepsilon=32$. PFK: persistence
 Fisher kernel. MSK: multi-scale kernel. The different iterations correspond to

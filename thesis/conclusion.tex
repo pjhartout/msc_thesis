@@ -1,49 +1,53 @@
 \chapter{Conclusion}\label{chap:conclusion}
 
-In this thesis, we performed a meta-evaluation of metrics based on \acrshort{mmd}. We first
-examined known configurations of \acrshort{mmd}, specifically by extracting graphs and
-using common descriptor functions such as the degree distribution, laplacian
-spectrum and clustering coefficient histogram to obtain a fixed-length vector,
-which we can then feed to appropriate kernels such as the linear kernel and the
-Gaussian kernel.
+In this thesis, we performed a meta-evaluation of metrics based on
+\gls{mmd} for protein generative models. We first examined known
+configurations of \gls{mmd}, specifically by extracting graphs and using
+common descriptor functions such as the degree distribution, laplacian spectrum
+and clustering coefficient histogram to obtain a fixed-length vector, which we
+can then feed to appropriate kernels such as the linear kernel and the Gaussian
+kernel.
 
-We then expanded the configurations of \acrshort{mmd} to include a kernel that operates
+We then expanded the configurations of \gls{mmd} to include a kernel that operates
 directly on graphs: the Weisfeiler-Lehman kernel, which we optimize to decrease
 runtime complexity on sparse graphs such as those used here. Furthermore, we
-used topological kernels such as the multi-scale kernel and the persistence
+used topological kernels such as the \gls{msk} and the persistence
 Fisher kernel to capture topological features of the protein. Finally, we
 designed two new protein-specific descriptors: the interatomic distance
 histogram and the dihedral angle histogram, which were inspired by the
 validation pipeline of Protein Data Bank.
 
-Overall, we find that the majority of \acrshort{mmd} configurations behaved reasonably
-well. We hypothesize that the highly structured nature of the graphs used here
-explain why our \acrshort{mmd} configurations behaved more predictably than those
-in \cite{obray2022evaluation}'s perturbation experiments, where synthetic, more
+Overall, we find that the majority of \gls{mmd} configurations performed
+well with respect to the meta-metrics of expressivity and robustness, i.e.
+correlation coefficients and standard deviations. We hypothesize that the highly
+structured nature of the graphs used here explain why our \gls{mmd}
+configurations behaved more predictably than those in
+\cite{obray2022evaluation}'s perturbation experiments, where synthetic, more
 unstructured graphs were investigated.
 
+
 Furthermore, we found that the procedure by which graphs were extracted from
-proteins had a sizeable influence on the resulting sensitivity of \acrshort{mmd} to lower
+proteins had a sizeable influence on the resulting sensitivity of \gls{mmd} to lower
 regimes of perturbations. For instance, a lower value of $\varepsilon$ results
-in \acrshort{mmd} values that were more sensitive to perturbations.
+in \gls{mmd} values that were more sensitive to perturbations.
 
 While the Weisfeiler-Lehman kernel performed relatively poorly on the specific
-graphs extracted in this thesis, we found that \acrshort{mmd} configurations leveraging
+graphs extracted in this thesis, we found that \gls{mmd} configurations leveraging
 topological representations and the protein-specific descriptor functions
 behaved well under all appropriate perturbation regimes. However, the runtime of
-TDA-related workflows were substantially higher than the others, while the
+\gls{tda}-related workflows were substantially higher than the others, while the
 protein-specific descriptors we introduced here were among the fastest to
 compute.
 
 The approach devised in this thesis has several limitations. First, a negative
-control cannot always be established, i.e. a worst-case \acrshort{mmd} - practitioners then
+control cannot always be established, i.e. a worst-case \gls{mmd} - practitioners then
 have to be satisfied with a highly perturbed set of proteins as a proxy for poor
-performance. One of the major drawbacks of \acrshort{mmd} is that it is in general not
+performance. One of the major drawbacks of \gls{mmd} is that it is in general not
 sensitive to model pathologies that do not affect the average kernel similarity
-between samples, i.e. when mode collapse occurs.
+between samples, e.g. when mode collapse occurs.
 
-To conclude, \acrshort{mmd} forms the basis of a powerful computational platform to
+To conclude, \gls{mmd} forms the basis of a powerful computational platform to
 evaluate generative models. Configured with a powerful combination of
-representations, descriptor functions, and kernels, \acrshort{mmd} could hopefully
+representations, descriptor functions, and kernels, \gls{mmd} could hopefully
 accelerate the design of even better generative models for protein design
 applications and beyond.
