@@ -178,7 +178,9 @@ of topological features across scales as one transitions from $K^{(i)}$ to
 $K^{(i+1)}$. The birth and death of topological features for different values of
 $f$ are usually summarized in a \emph{persistence diagram}, which is a multiset
 of tuples, each of which contains the values at which each feature is born or
-dies.
+dies\footnote{The name persistence diagram is derived from the observation that
+  points far from the diagonal line in the diagram are deemed persistent,
+  because they span a high range of values of the filtration function.}.
 
 A common construction for obtaining such features is the Vietoris-Rips complex
 \citep{vietoris1927hoheren}. It requires a distance threshold $\varepsilon$ and
@@ -597,7 +599,6 @@ second class of kernels leveraged here operate directly on the persistence
 diagrams obtained using the filtration procedures described in section
 \ref{sec:tda}. Specifically, we will use the persistence Fisher kernel introduced by
 \cite{le2018persistence}. We define both in the next paragraphs.
-% Introduce multi-scale kernel.
 
 \paragraph{The Weisfeiler-Lehman algorithm} Originally designed as a graph
 isomorphism test by \cite{weisfeiler1968reduction}, the eponymous
@@ -652,7 +653,7 @@ $k_{WL}(G,G')=\phi_2(G)\cdot\phi_2(G')$. Imagery adapted from
   \label{fig:wl_algo}
 \end{figure}
 
-\paragraph{Persistence diagram kernels} Kernels between persistence diagrams
+\paragraph{Persistence Fisher kernel} Kernels between persistence diagrams
 also offer powerful similarity measures between the global shape of proteins
 using the persistence diagrams produced by the Vietoris-Rips filtration, thereby
 going beyond just looking at the neighborhoods of each node in the case of the
@@ -694,6 +695,20 @@ the Euclidean space, as will be the case in this thesis, each persistence
 diagram then turns to a probability distribution, which is what allows us to
 compute the Fisher information metric
 \citep{anirudh2016riemannian,adams2017persistence}.
+
+\paragraph{Multi-scale kernel}.
+
+In this thesis, we will also use the multi-scale kernel introduced by
+\cite{reininghaus2015stable}. Using the same notation as above, they define the
+multi-scale kernel $k_{\text{MS}}$ as:
+\begin{equation}
+  \label{eq:msk}
+  k_{\text{MS}}(\dgi,\dgj) = {1\over 8\pi\sigma} \sum_{\substack{p\in\dgi\\ q\in\dgj}} e^{-{\|p-q\|^2\over 8\sigma}}-e^{-{\|p-\bar{q}\|^2\over 8\sigma}}
+\end{equation}
+where $\sigma$ is specified by the user and $\bar{q}$ is a point on the
+persistence diagram mirrored at the diagonal, i.e. if $q=(b,d)$, then
+$\bar{q}=(d,b)$ where $b$ is the birth of the topological feature $d$ is its
+corresponding death.
 
 \section{Summary}
 

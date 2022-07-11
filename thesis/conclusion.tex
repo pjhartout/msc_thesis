@@ -1,11 +1,12 @@
 \chapter{Conclusion}\label{chap:conclusion}
 
-In this thesis, we performed a meta-evaluation of metrics based on \acrshort{mmd}. We first
-examined known configurations of \acrshort{mmd}, specifically by extracting graphs and
-using common descriptor functions such as the degree distribution, laplacian
-spectrum and clustering coefficient histogram to obtain a fixed-length vector,
-which we can then feed to appropriate kernels such as the linear kernel and the
-Gaussian kernel.
+In this thesis, we performed a meta-evaluation of metrics based on
+\acrshort{mmd} for protein generative models. We first examined known
+configurations of \acrshort{mmd}, specifically by extracting graphs and using
+common descriptor functions such as the degree distribution, laplacian spectrum
+and clustering coefficient histogram to obtain a fixed-length vector, which we
+can then feed to appropriate kernels such as the linear kernel and the Gaussian
+kernel.
 
 We then expanded the configurations of \acrshort{mmd} to include a kernel that operates
 directly on graphs: the Weisfeiler-Lehman kernel, which we optimize to decrease
@@ -16,11 +17,14 @@ designed two new protein-specific descriptors: the interatomic distance
 histogram and the dihedral angle histogram, which were inspired by the
 validation pipeline of Protein Data Bank.
 
-Overall, we find that the majority of \acrshort{mmd} configurations behaved reasonably
-well. We hypothesize that the highly structured nature of the graphs used here
-explain why our \acrshort{mmd} configurations behaved more predictably than those
-in \cite{obray2022evaluation}'s perturbation experiments, where synthetic, more
+Overall, we find that the majority of \acrshort{mmd} configurations performed
+well with respect to the meta-metrics of expressivity and robustness, i.e.
+correlation coefficients and standard deviations. We hypothesize that the highly
+structured nature of the graphs used here explain why our \acrshort{mmd}
+configurations behaved more predictably than those in
+\cite{obray2022evaluation}'s perturbation experiments, where synthetic, more
 unstructured graphs were investigated.
+
 
 Furthermore, we found that the procedure by which graphs were extracted from
 proteins had a sizeable influence on the resulting sensitivity of \acrshort{mmd} to lower
@@ -40,7 +44,7 @@ control cannot always be established, i.e. a worst-case \acrshort{mmd} - practit
 have to be satisfied with a highly perturbed set of proteins as a proxy for poor
 performance. One of the major drawbacks of \acrshort{mmd} is that it is in general not
 sensitive to model pathologies that do not affect the average kernel similarity
-between samples, i.e. when mode collapse occurs.
+between samples, e.g. when mode collapse occurs.
 
 To conclude, \acrshort{mmd} forms the basis of a powerful computational platform to
 evaluate generative models. Configured with a powerful combination of

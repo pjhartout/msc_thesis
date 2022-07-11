@@ -14,19 +14,21 @@ chapter.
 
 \section{Overall \acrshort{mmd} Behavior}\label{sec:overall_behaviour}
 
-\subsection{General observations on the correlation coefficients}\label{sec:general_coefficients} Surprisingly,
-we found that the behavior of \acrshort{mmd} was not as inconsistent for the
-types of graphs extracted from proteins as was found on synthetic graphs by
-\cite{obray2022evaluation}. Figure \ref{fig:mmd_consistent_eps} show
-trajectories and correlations of \acrshort{mmd} values with different
-perturbation types using $\varepsilon$-graphs with $\varepsilon$ set to $8$
-\si{\angstrom}. Both the Spearman and Pearson correlation coefficients averaged
-across runs are high. There is, however, an exception: the correlation between
-the \acrshort{mmd} obtained from the degree histogram and the addition of edges
-is comparatively low with $\rho_P=0.25$ and $\rho_S=-0.44$ versus that obtained
-from the Laplacian spectrum histogram (with $\rho_P=0.95$, $\rho_S=0.98$), and
-the clustering histogram (with $\rho_P=0.95$, $\rho_S=0.97$). Curiously, the
-next lowest (Pearson) correlation coefficient from Figure
+\subsection{General observations on the correlation
+  coefficients}\label{sec:general_coefficients}
+Surprisingly, we found that the behavior of \acrshort{mmd} was not as
+inconsistent for the types of graphs extracted from proteins as was found on
+synthetic graphs by \cite{obray2022evaluation}. Figure
+\ref{fig:mmd_consistent_eps} show trajectories and correlations of
+\acrshort{mmd} values with different perturbation types using
+$\varepsilon$-graphs with $\varepsilon$ set to $8$ \si{\angstrom}. Both the
+Spearman and Pearson correlation coefficients averaged across runs are high.
+There is, however, an exception: the correlation between the \acrshort{mmd}
+obtained from the degree histogram and the addition of edges is comparatively
+low with $\rho_P=0.25$ and $\rho_S=-0.44$ versus that obtained from the
+Laplacian spectrum histogram (with $\rho_P=0.95$, $\rho_S=0.98$), and the
+clustering histogram (with $\rho_P=0.95$, $\rho_S=0.97$). Curiously, the next
+lowest (Pearson) correlation coefficient from Figure
 \ref{fig:mmd_consistent_eps} is also associated to the degree distribution
 histogram under the rewiring perturbation regime ($\rho_p=0.82$ $\rho_S=0.98$).
 
@@ -172,35 +174,6 @@ $\varepsilon$-graphs. }
   \label{fig:correlations_graph_construction}
 \end{figure}
 % TODO: discuss the idea of the M-W U test with Tim
-
-
-
-
-% $k$-NN graphs seem to behave similarly to $\varepsilon$-graphs, in that they are
-% able to detect perturbations - see Figure \ref{fig:mmd_k_nn_graphs} for an
-% example with 2-NN graphs. However, they are extremely sensitive to Gaussian
-% noise and to the addition of edges (see the upper left and the upper mid pane of Figure
-% \ref{fig:mmd_k_nn_graphs}). Presumably, this is because very small amounts of
-% noise ($<4$\si{\angstrom}) affect the direct local neighborhood of each node
-% very significantly in such a way that the resulting $k$-NN graph is rapidly
-% disrupted, which is not necessarily the case with other perturbations. We note
-% that overall the $\varepsilon$-graphs behave more consistently than $k$-NN
-% graphs, with 13 out of 21 Pearson's correlation coefficients being higher in
-% $\varepsilon$-graphs compared to $k$-NN graphs and 11 out of 21 Spearman's
-% correlation coefficients being higher in 8\si{\angstrom}-graphs compared to 2-NN
-% graphs. Even when the $\varepsilon$-graphs did not compare favorably, it was by
-% a considerably lower margin than $k$-NN graphs in a similar setting. This effect
-% seems to be mitigated by increasing $k$, but this comes at the cost of a lower
-% Spearman correlation coefficient, which is even less desirable - see Figure
-% \ref{fig:k_vs_turbulence_gaussian_noise}. Changing kernel parameters did not
-% alleviate the pathologies (see Supplementary Figure
-% \ref{fig:mmd_effect_kernel_knn}) and had the same overall effect as observed in
-% Figure \ref{fig:mmd_effect_kernel}. We, therefore, proceed with further analysis
-% using $\varepsilon$-graphs.
-
-
-% \acrshort{mmd} is quite stable, somewhat contradicts what obray is saying. Maybe due to
-% the different nature of the graphs.
 
 \subsection{Lower values of $\varepsilon$ are more
   stable}\label{sec:sparser_better}

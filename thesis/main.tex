@@ -75,8 +75,8 @@
 % \usepackage[linkcolor=black,colorlinks=true,citecolor=black,filecolor=black]{hyperref}
 \usepackage{hyperref}
 
+\renewcommand*{\glstextformat}[1]{\textcolor{black}{#1}}
 \makeglossaries
-
 \newacronym{mmd}{MMD}{Maximum Mean Discrepancy}
 \newacronym{gans}{GANs}{Generative Adversarial Networks}
 \newacronym{tda}{TDA}{Topological Data Analysis}
@@ -89,10 +89,10 @@
 
 \hypersetup{
   colorlinks=true,
-  linkcolor=black,
-  filecolor=black,
+  linkcolor=blue,
+  filecolor=blue,
   urlcolor=blue,
-  citecolor=black,
+  citecolor=blue,
   pdftitle={Designing Performance Measures to Evaluate Protein Generative Models},
   pdfpagemode=FullScreen,
 }
@@ -127,12 +127,15 @@
 
 %% TOC with the proper setup, do not change.
 \cleartorecto
-\tableofcontents
-\clearpage
-\listoffigures
-\listoftables
-\clearpage
-\printglossary[type=\acronymtype]
+{
+  \hypersetup{linkcolor=black}
+  \tableofcontents
+  \clearpage
+  \listoffigures
+  \listoftables
+  \clearpage
+  \printglossary[type=\acronymtype]
+}
 \clearpage
 
 \mainmatter
