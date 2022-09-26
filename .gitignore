@@ -20,8 +20,6 @@ exploring/systematic_analysis/*.svg
 # Hide hydra output directories
 outputs
 
-# We don't want the compiled pdf bloating the repo yet
-thesis/main.pdf
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
