@@ -7,7 +7,6 @@ docs/midterm_presentation/figures/gaussian_noise/
 docs/midterm_presentation/figures/twist/
 docs/midterm_presentation/figures/mutation/
 docs/midterm_presentation/figures/viet_filtration/
-docs/midterm_presentation/midterm_presentation.pdf
 
 experiments/systematic/tda_pc/tda_pc_job_array.sh
 experiments/systematic/gd_pc/gd_pc_job_array.sh
